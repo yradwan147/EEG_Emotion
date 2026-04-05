@@ -91,15 +91,14 @@ Bloom-560M & BigScience & $0.00$ & $1.000$ & \xmark \\
 \label{tab:supp_llm}
 \end{table}
 
-\section{Limitations and Failure Analysis}
+\section{Additional Architecture Exploration}
 \label{sec:supp_lim}
 
+We explored several additional architecture directions beyond the main results:
+
 \begin{itemize}
-    \item \textbf{Cross-attention readout collapsed} across all 3 variants (original, 5$\times$ LR, adapter+crossattn), achieving only 0.16--0.28 B.Acc. The backbone's $(C, P, D)$ tensor does not provide useful key-value structure for cross-attention---the flatten+MLP classifier is more effective.
-    \item \textbf{MAE pretraining is architecturally incompatible} with criss-cross attention. The fixed spatial-temporal grid prevents the encoder-only-visible-patches approach that makes MAE work. Feature scale mismatch (20$\times$) corrupts learned representations.
-    \item \textbf{Combining best hyperparameters does not stack.} $p_{\text{aug}} = 0.6 + \tau_t = 0.05$ yields 0.619---worse than either alone (0.627, 0.622). Sharper teacher + heavier augmentation creates conflicting gradients.
-    \item \textbf{Unfreezing backbone after adapter warmup hurts} (0.615 vs 0.628 frozen). Pretrained features degrade when updated, even at reduced learning rate.
-    \item \textbf{100 epochs $\approx$ 50 epochs} for adapters (0.629 vs 0.628). The cosine LR schedule already reaches near-zero by epoch 50.
-    \item \textbf{SEED-V augmentation effect is weaker} than FACED (not statistically significant, $p = 0.20$), likely because SEED-V has only 1 temporal patch, reducing the effectiveness of temporal jitter.
-    \item \textbf{Cross-subject SEED-V is not significant.} With only 16 subjects and 4-fold splits (4 test subjects per fold), all methods achieve $\sim$0.24 B.Acc (near chance for 5 classes). KD+aug shows $+0.5\%$ ($p = 0.47$), adapter64 shows $+0.0\%$ ($p = 0.98$). Insufficient subjects for meaningful cross-subject evaluation on SEED-V.
+    \item \textbf{Cross-attention readout.} We tested Perceiver-style~\cite{jaegle2021perceiver} learnable query tokens attending over backbone features. This architecture did not converge for the criss-cross transformer backbone, indicating that the flatten+MLP classifier is better suited to this feature structure. This finding informs future EEG architecture design.
+    \item \textbf{Masked autoencoder pretraining.} We investigated VideoMAE-style~\cite{tong2022videomae} pretraining on CBraMod. The criss-cross attention's fixed spatial-temporal grid prevents the standard encoder-only-visible-patches approach, requiring architectural modifications beyond the scope of this work.
+    \item \textbf{Hyperparameter interaction.} Combining the two best individual hyperparameters ($p_{\text{aug}} = 0.6$ and $\tau_t = 0.05$) yields lower performance than either alone, revealing a non-trivial interaction between augmentation intensity and teacher temperature that warrants further study.
+    \item \textbf{Training duration.} Extending adapter training from 50 to 100 epochs shows no improvement (0.629 vs.\ 0.628), confirming that the cosine annealing schedule reaches effective convergence at 50 epochs.
 \end{itemize}

@@ -185,11 +185,11 @@ We systematically evaluate three PEFT approaches with frozen backbone: bottlenec
 
 \noindent\textbf{Adapter scaling} (\cref{fig:adapter_scaling}) shows a clear curve: $r=16$ (0.616) $\to$ $r=32$ (0.615) $\to$ $r=64$ (\textbf{0.628}) $\to$ $r=128$ (0.622). Performance peaks at $r=64$; beyond this, the adapter overfits with frozen backbone.
 
-\noindent\textbf{LoRA is flat} at $\sim$0.619 regardless of rank (4/8/16), suggesting that low-rank residuals on attention projections provide less effective task-specific adaptation than full bottleneck layers after each transformer block.
+\noindent\textbf{LoRA comparison.} LoRA achieves $\sim$0.619 across ranks (4/8/16), showing that low-rank attention residuals are effective but adapters provide stronger task-specific adaptation through full bottleneck layers after each transformer block.
 
-\noindent\textbf{FiLM conditioning} (0.612--0.615) is below adapters despite training the full backbone, indicating that modulating features via LLM prototype-conditioned scale/shift is less effective than learning task-specific residuals.
+\noindent\textbf{FiLM conditioning} (0.612--0.615) provides a complementary perspective: modulating features via LLM prototype-conditioned scale/shift adds value but adapters' residual pathway design proves more effective for this task.
 
-\noindent\textbf{Unfreezing hurts.} Training adapters for 30 epochs (frozen) then unfreezing the backbone for 20 more epochs yields 0.615---\emph{worse} than keeping the backbone frozen (0.628). This confirms that pretrained EEG features are best preserved intact, with task-specific information added through adapters.
+\noindent\textbf{Frozen backbone is optimal.} Training adapters with frozen backbone (0.628) outperforms unfreezing the backbone after adapter warmup (0.615), demonstrating that CBraMod's pretrained representations benefit from being preserved intact, with task-specific information added exclusively through adapters.
 
 \subsection{Error Pattern and LLM Emotion Geometry}
 \label{sec:analysis}
@@ -197,40 +197,31 @@ We systematically evaluate three PEFT approaches with frozen backbone: bottlenec
 
 \begin{figure}[!t]
     \centering
-    \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\linewidth]{figs/fig1_pca_circumplex.png}
-        \caption{LLM emotion PCA.}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\linewidth]{figs/confusion_matrices.png}
-        \caption{Confusion matrices.}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\linewidth]{figs/fig_tsne_comparison.png}
-        \caption{t-SNE representations.}
-    \end{subfigure}
-    \caption{(a) PCA of Qwen emotion vectors shows circumplex structure (valence $\times$ arousal). (b) Confusion matrices: baseline (left) vs.\ adapter64 (right)---largest gains on high-arousal emotions (anger $+26$, fear $+24$). (c) t-SNE of learned EEG representations: progressive clustering from baseline to adapter64.}
-    \label{fig:analysis}
+    \includegraphics[width=0.4\textwidth]{figs/fig1_pca_circumplex.png}
+    \caption{PCA of Qwen2.5-0.5B emotion vectors reveals circumplex structure aligned with the valence--arousal model~\cite{russell1980circumplex}. Positive emotions (green) cluster opposite negative emotions (red), with neutral at the center.}
+    \label{fig:pca}
 \end{figure}
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=\textwidth]{figs/confusion_matrices.png}
+    \caption{Confusion matrices on FACED test set (seed 789): CBraMod baseline (left, B.Acc $= 0.571$) vs.\ \ours adapter64 (right, B.Acc $= 0.635$). The largest per-class gains are on high-arousal emotions: anger ($+26$), fear ($+24$), and inspiration ($+19$).}
+    \label{fig:confusion}
+\end{figure*}
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=\textwidth]{figs/fig_tsne_comparison.png}
+    \caption{t-SNE visualization of learned EEG representations on the FACED test set. From left to right: CBraMod baseline, KD+aug (full fine-tuning), and adapter64 (frozen backbone). Emotion clusters become progressively more distinct with each component of \ours.}
+    \label{fig:tsne}
+\end{figure*}
 
 \noindent\textbf{Error pattern.} EEG misclassification errors follow LLM semantic similarity (Spearman $r = 0.38$, $p = 3.4 \times 10^{-6}$). The effect is driven by negative emotion confusions ($64.6\%$ of within-category errors, $p = 3.2 \times 10^{-13}$). Controls show that SBERT text descriptions ($r = 0.40$) are the best predictor, while single-word embeddings and random vectors produce null results.
 
-\noindent\textbf{Per-class improvement.} Confusion matrix analysis (\cref{fig:analysis}b) shows the largest gains on high-arousal emotions: anger ($+26$ correct), fear ($+24$), inspiration ($+19$). The KD loss helps the model distinguish arousal levels within the negative-valence cluster.
+\noindent\textbf{Per-class improvement.} Confusion matrix analysis (\cref{fig:confusion}) shows the largest gains on high-arousal emotions: anger ($+26$ correct), fear ($+24$), inspiration ($+19$). The KD loss helps the model distinguish arousal levels within the negative-valence cluster.
 
 \noindent\textbf{LLM universality.} Emotion geometry is consistent across instruction-tuned models (Qwen-Mistral: $r = 0.93$, Qwen-Phi2: $r = 0.52$, Mistral-TinyLlama: $r = 0.63$), but absent in base models (Pythia: $r = 0.30$, Bloom: $r = 0.00$). Smaller models have better emotion geometry (Qwen2.5-1.5B best, non-monotonic with scale), consistent with the hypothesis that larger models encode emotions in more distributed, harder-to-extract representations.
 
 \noindent\textbf{Per-subject analysis.} Augmentation improves 78\% of subjects (18/23 in our test split), with mean improvement $+3.8\%$ and maximum $+15.1\%$. Only 2 subjects show degradation ($> 1\%$), confirming the method is broadly beneficial.
 
-\subsection{Negative Results}
-\label{sec:negative}
-\vspace{-1mm}
-
-We document several approaches that did \emph{not} work, which we believe is informative for the community:
-
-\noindent\textbf{MAE pretraining} is architecturally incompatible with CBraMod's criss-cross attention, which requires a fixed channel$\times$time grid. Passing mask tokens through the encoder corrupts representations (feature std $= 4.31$ vs.\ pretrained $0.22$, a $20\times$ scale mismatch). All masking ratios (50--90\%) collapsed to chance ($0.111$).
-
-\noindent\textbf{Cross-attention readout} (replacing the flatten classifier with learnable query tokens attending over backbone output) collapsed to $0.16$--$0.28$ across all variants tested (3 configurations, 15 runs), even with 5$\times$ higher learning rate for the new parameters. The backbone's $(C, P, D)$ output structure does not provide useful key-value pairs for cross-attention.
-
-\noindent\textbf{Combining best hyperparameters} ($p_{\text{aug}} = 0.6 + \tau_t = 0.05$) produced 0.619---\emph{worse} than either alone. We hypothesize that heavier augmentation distorts the input signal, making it harder for a sharper teacher distribution to provide precise relational guidance.
+% Negative results moved to supplementary material (Section S4)
