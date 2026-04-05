@@ -101,5 +101,5 @@ Bloom-560M & BigScience & $0.00$ & $1.000$ & \xmark \\
     \item \textbf{Unfreezing backbone after adapter warmup hurts} (0.615 vs 0.628 frozen). Pretrained features degrade when updated, even at reduced learning rate.
     \item \textbf{100 epochs $\approx$ 50 epochs} for adapters (0.629 vs 0.628). The cosine LR schedule already reaches near-zero by epoch 50.
     \item \textbf{SEED-V augmentation effect is weaker} than FACED (not statistically significant, $p = 0.20$), likely because SEED-V has only 1 temporal patch, reducing the effectiveness of temporal jitter.
-    \item \textbf{Cross-subject SEED-V performance is low} ($\sim$0.20--0.28 B.Acc) due to high inter-subject variability with only 16 subjects and 4-fold splits.
+    \item \textbf{Cross-subject SEED-V is not significant.} With only 16 subjects and 4-fold splits (4 test subjects per fold), all methods achieve $\sim$0.24 B.Acc (near chance for 5 classes). KD+aug shows $+0.5\%$ ($p = 0.47$), adapter64 shows $+0.0\%$ ($p = 0.98$). Insufficient subjects for meaningful cross-subject evaluation on SEED-V.
 \end{itemize}
