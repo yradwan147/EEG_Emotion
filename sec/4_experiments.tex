@@ -198,7 +198,7 @@ We systematically evaluate three PEFT approaches with frozen backbone: bottlenec
 \begin{figure}[!t]
     \centering
     \includegraphics[width=\textwidth]{figs/fig1_pca_circumplex.png}
-    \caption{PCA of Qwen2.5-0.5B emotion vectors reveals circumplex structure aligned with the valence--arousal model~\cite{russell1980circumplex}. Positive emotions (green) cluster opposite negative emotions (red), with neutral at the center.}
+    \caption{PCA of Qwen2.5-0.5B emotion vectors recovers the full valence$\times$arousal circumplex~\cite{russell1980circumplex}. PC1 separates positive from negative valence; within the negative cluster, high-arousal emotions (anger, fear, disgust) separate from low-arousal sadness along PC2, mirroring the two-dimensional structure established in affective science.}
     \label{fig:pca}
 \end{figure}
 
@@ -218,7 +218,7 @@ We systematically evaluate three PEFT approaches with frozen backbone: bottlenec
 
 \noindent\textbf{Error pattern.} EEG misclassification errors follow LLM semantic similarity (Spearman $r = 0.38$, $p = 3.4 \times 10^{-6}$). The effect is driven by negative emotion confusions ($64.6\%$ of within-category errors, $p = 3.2 \times 10^{-13}$). Controls show that SBERT text descriptions ($r = 0.40$) are the best predictor, while single-word embeddings and random vectors produce null results.
 
-\noindent\textbf{Per-class improvement.} Confusion matrix analysis (\cref{fig:confusion}) shows the largest gains on high-arousal emotions: anger ($+26$ correct), fear ($+24$), inspiration ($+19$). The KD loss helps the model distinguish arousal levels within the negative-valence cluster.
+\noindent\textbf{Per-class improvement.} Confusion matrix analysis (\cref{fig:confusion}) shows the largest gains on high-arousal emotions: anger ($+26$ correct), fear ($+24$), inspiration ($+19$), while sadness---the only low-arousal negative emotion---shows a smaller gain ($+11$). This pattern is consistent with the LLM emotion geometry: the extracted vectors recover not just the valence axis but the full valence$\times$arousal circumplex, placing sadness apart from the high-arousal negative cluster (anger, fear, disgust). The KD loss exploits this two-dimensional structure, providing graded supervision that distinguishes both valence \emph{and} arousal.
 
 \noindent\textbf{LLM universality.} Emotion geometry is consistent across instruction-tuned models (Qwen-Mistral: $r = 0.93$, Qwen-Phi2: $r = 0.52$, Mistral-TinyLlama: $r = 0.63$), but absent in base models (Pythia: $r = 0.30$, Bloom: $r = 0.00$). Smaller models have better emotion geometry (Qwen2.5-1.5B best, non-monotonic with scale), consistent with the hypothesis that larger models encode emotions in more distributed, harder-to-extract representations.
 
