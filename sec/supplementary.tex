@@ -18,7 +18,7 @@
     \item \textbf{Section \ref{sec:supp_exp}:} Full experimental details and hyperparameters.
     \item \textbf{Section \ref{sec:supp_arch}:} Complete architecture experiment results.
     \item \textbf{Section \ref{sec:supp_llm}:} Multi-LLM emotion vector analysis.
-    \item \textbf{Section \ref{sec:supp_lim}:} Limitations and failure analysis.
+    \item \textbf{Section \ref{sec:supp_explore}:} Additional architecture exploration.
 \end{itemize}
 
 \section{Experimental Details}
@@ -70,6 +70,8 @@ Cross-Attn & K=9 queries & 0.260 & --- & 6.6M \\
 \section{Multi-LLM Emotion Vector Analysis}
 \label{sec:supp_llm}
 
+We extract emotion vectors from 8 models across 6 families to test whether LLM emotion geometry is universal or specific to a single model family. For each model, we compute the first principal component of the 9 emotion vectors and correlate it with the ground-truth valence ordering. \cref{tab:supp_llm} summarizes the results.
+
 \begin{table}[!h]
 \caption{PC1-valence correlation across LLM models. Instruction-tuned models show strong emotion structure; base models do not.}
 \small
@@ -91,8 +93,10 @@ Bloom-560M & BigScience & $0.00$ & $1.000$ & \xmark \\
 \label{tab:supp_llm}
 \end{table}
 
+Instruction-tuned models (Qwen, Mistral) exhibit significant valence structure ($p < 0.05$), while base models (Pythia, Bloom) show no structure. Cross-family RDM agreement between instruction-tuned models is high: Qwen--Mistral $r = 0.93$, Qwen--Phi-2 $r = 0.52$, Mistral--TinyLlama $r = 0.63$ (all $p < 0.01$). Notably, smaller instruction-tuned models (Qwen2.5-1.5B) show stronger emotion geometry than larger ones (Qwen2.5-7B), suggesting that emotion representations become more distributed and harder to extract as model capacity increases. In practice, we use the smallest available instruction-tuned model (Qwen2.5-0.5B), as it provides equivalent downstream performance (cross-model agreement $r > 0.89$ within the Qwen family).
+
 \section{Additional Architecture Exploration}
-\label{sec:supp_lim}
+\label{sec:supp_explore}
 
 We explored several additional architecture directions beyond the main results:
 
