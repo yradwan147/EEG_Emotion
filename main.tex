@@ -1,0 +1,87 @@
+\documentclass{article}
+\usepackage{booktabs}
+
+% --- Submission mode ---
+\usepackage{neurips_2026}
+% \usepackage[preprint]{neurips_2026}  % for arXiv
+% \usepackage[main, final]{neurips_2026}  % camera-ready
+
+% === Core packages ===
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{caption}
+
+% === Figure and table packages ===
+\usepackage{graphicx}
+\graphicspath{{figs/}}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{colortbl}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, calc, fit, backgrounds}
+
+% === Cross-referencing ===
+\usepackage[capitalize,noabbrev]{cleveref}
+
+% === Checkmarks for comparison tables ===
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
+% === Highlight color for "ours" row ===
+\definecolor{blond}{rgb}{0.98, 0.94, 0.75}
+
+% === Method name macro ===
+\newcommand{\ours}{\textsc{EmotionKD}\xspace}
+\usepackage{xspace}
+
+% === Stat macros ===
+\newcommand{\facedacc}{0.628\xspace}
+\newcommand{\seedvacc}{0.416\xspace}
+\newcommand{\seedvkappa}{0.275\xspace}
+\newcommand{\baselineacc}{0.572\xspace}
+\newcommand{\reveacc}{0.565\xspace}
+\newcommand{\numconfigs}{45\xspace}
+\newcommand{\numruns}{400+\xspace}
+
+% === Author block ===
+\title{Bridging LLM Emotion Representations and EEG:\\Soft-Label Knowledge Distillation with\\Parameter-Efficient Adaptation}
+
+\author{%
+\textbf{Anonymous Author(s)}
+}
+
+\begin{document}
+\maketitle
+
+\input{sec/0_abstract}
+\input{sec/1_intro}
+\input{sec/2_related}
+\input{sec/3_method}
+\input{sec/4_experiments}
+\input{sec/5_conclusion}
+
+\newpage
+{\small
+\bibliographystyle{unsrt}
+\bibliography{refs}
+}
+
+\newpage
+\input{sec/supplementary}
+
+\newpage
+\input{checklist}
+
+\end{document}

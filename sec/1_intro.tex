@@ -1,0 +1,38 @@
+\section{Introduction}
+\label{sec:intro}
+\vspace{-1mm}
+
+Emotion recognition from electroencephalography (EEG) signals holds significant promise for brain-computer interfaces, mental health monitoring, and affective computing~\cite{russell1980circumplex, kriegeskorte2008rsa}. Unlike behavioral indicators such as facial expressions or speech, EEG provides a direct, objective window into neural activity associated with emotional states, making it particularly valuable for applications where behavioral signals may be unreliable or absent. Recent advances in EEG foundation models---large-scale pretrained transformers such as CBraMod~\cite{wang2025cbramod}, LaBraM~\cite{jiang2024labram}, and REVE~\cite{elouahidi2025reve}---have established strong baselines across diverse EEG tasks, including emotion recognition on benchmark datasets like FACED~\cite{chen2023faced} and SEED-V.
+
+Despite these advances, a fundamental limitation persists in how emotion labels are used during training. Current methods treat emotion categories as \emph{integer class indices}, ignoring the rich relational structure among emotions. The cross-entropy loss penalizes all misclassifications equally---confusing \emph{joy} with \emph{amusement} is treated identically to confusing \emph{joy} with \emph{anger}. This contradicts decades of emotion psychology research showing that emotions are organized along continuous dimensions of valence and arousal~\cite{russell1980circumplex}, and that the brain's own representations of emotion reflect this structure~\cite{lee2024emotion_words}. Moreover, recent work on contrastive EEG-text matching (EmotionCLIP~\cite{emotionclip2025}) and valence-arousal guided contrastive learning (EMOD~\cite{emod2026}) has shown that incorporating semantic structure into emotion labels improves classification, but these approaches rely on hand-crafted text templates or predefined coordinate systems that may not capture the full richness of emotion relationships.
+
+A remarkable recent discovery provides a new opportunity. Sofroniew et al.~\cite{sofroniew2026anthropic} showed that large language models develop internal representations of emotion concepts that are structured, causally functional, and organized along the same valence-arousal dimensions observed in human psychology. These \emph{LLM emotion vectors} encode the relational geometry of emotions---the fact that \emph{anger} and \emph{fear} share negative valence but differ in arousal---in a way that emerges naturally from language modeling, without explicit emotional supervision. We hypothesize that this geometry can serve as a supervisory signal for EEG emotion classification, teaching the model the relational structure that integer labels cannot convey.
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+\vspace{-4mm}
+\vspace{-\intextsep}
+\includegraphics[width=\linewidth]{figs/waterfall.png}
+\captionsetup{
+  width=\linewidth,
+  justification=raggedright,
+  singlelinecheck=false
+}
+\caption{Contribution of each component to the final performance on FACED 9-class emotion recognition.}
+\label{fig:teaser}
+\end{wrapfigure}
+
+We introduce \ours, a method that bridges LLM emotion representations and EEG through soft-label knowledge distillation. Given any instruction-tuned LLM, we extract emotion vectors by prompting the model to generate emotion-laden stories and recording hidden state activations at intermediate layers. These vectors define a similarity matrix that serves as soft targets for a KL-divergence-based KD loss, replacing the standard integer-label cross-entropy with a distribution that encodes \emph{how similar} each pair of emotions is. We combine this with temporal jitter augmentation---which we show through ablation is the single critical augmentation for EEG emotion classification---and a 3-layer BatchNorm projection head inspired by SimCLR v2~\cite{chen2020simclrv2}.
+
+A key finding emerges from our architecture exploration: \textbf{freezing the pretrained CBraMod backbone and adding lightweight bottleneck adapters (310K trainable parameters) matches or exceeds full fine-tuning (4.9M parameters)} on both FACED and SEED-V. This suggests that pretrained EEG representations already contain the information needed for emotion classification; the critical factor is the \emph{quality of the supervision signal} (LLM-guided KD), not the number of parameters being updated. We validate this finding through a systematic sweep of adapter bottleneck dimensions, showing a clear scaling curve with an optimal capacity at rank 64.
+
+We evaluate \ours across two benchmark datasets in both within-subject and cross-subject settings:
+\textbf{(1) FACED} (9-class, 123 subjects, 32 channels): balanced accuracy \(\mathbf{0.628}\), improving over the previous SOTA (REVE, NeurIPS 2025) by \(\mathbf{+11.2\%}\) relative.
+\textbf{(2) SEED-V} (5-class, 16 subjects, 62 channels): Cohen's $\kappa = \mathbf{0.275}$, improving over CBraMod (ICLR 2025) by \(\mathbf{+7.0\%}\) relative.
+Cross-subject evaluation on FACED (5-fold leave-group-out) shows significant improvement over baseline ($p < 0.001$), confirming generalization to unseen subjects.
+
+In summary, the contributions of this paper include:
+(1) \textbf{A novel knowledge distillation framework} that uses LLM-internal emotion representations as soft supervision targets for EEG emotion classification, outperforming standard contrastive alternatives (SupCon, valence-arousal coordinates) by $+1.8\%$.
+(2) \textbf{The finding that frozen backbone + adapters matches full fine-tuning} for EEG emotion recognition, with a systematic analysis of adapter scaling, LoRA, and FiLM conditioning alternatives.
+(3) \textbf{Cross-dataset and cross-subject validation} demonstrating that the method generalizes across datasets (FACED, SEED-V) and evaluation settings (within-subject, leave-group-out).
+(4) \textbf{Analysis of LLM emotion geometry universality}, showing that emotion structure is consistent across instruction-tuned models from 6 families (Qwen, Mistral, Phi-2, TinyLlama) but absent in base models (Pythia, Bloom), with implications for the choice of teacher model.
+(5) \textbf{Comprehensive ablation and negative results} across \numconfigs configurations and \numruns training runs, including documented failures (MAE pretraining, cross-attention readout) that inform the community about what does \emph{not} work for EEG emotion recognition.

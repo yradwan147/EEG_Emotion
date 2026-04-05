@@ -1,0 +1,11 @@
+\begin{abstract}
+\label{sec:abstract-sec}
+EEG-based emotion recognition remains challenging due to high inter-subject variability and the limited discriminative power of integer class labels that ignore the rich relational structure among emotions.
+We introduce \textbf{\ours}, a method that leverages large language model (LLM) internal emotion representations as soft-label knowledge distillation targets for EEG classification.
+By extracting emotion vectors from instruction-tuned LLMs---representations that naturally organize along valence-arousal axes---we construct a similarity-preserving KD loss that teaches the EEG encoder that \emph{anger is closer to disgust than to joy}, rather than treating all misclassifications equally.
+We evaluate \ours on two benchmark datasets: FACED (9-class, 123 subjects) and SEED-V (5-class, 16 subjects), testing \numconfigs configurations across \numruns individual training runs with 5-seed evaluation.
+On FACED, \ours achieves \(\mathbf{0.628}\) balanced accuracy (\(\mathbf{+11.2\%}\) over REVE, NeurIPS 2025) and on SEED-V, Cohen's $\kappa = \mathbf{0.275}$ (\(\mathbf{+7.0\%}\) over CBraMod, ICLR 2025).
+A surprising finding emerges: freezing the pretrained backbone and training only lightweight bottleneck adapters (310K parameters) \emph{matches or exceeds} full fine-tuning (4.9M parameters), suggesting that pretrained EEG representations are already rich enough for emotion---the key is \emph{what} supervision signal guides adaptation, not how many parameters are updated.
+Cross-subject evaluation confirms generalization (FACED LOSO: $p < 0.001$), and we show that LLM emotion geometry is universal across instruction-tuned models from 6 different families.
+We release our code and emotion vectors to advance research in brain-language alignment.
+\end{abstract}

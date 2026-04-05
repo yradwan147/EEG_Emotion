@@ -1,0 +1,236 @@
+\section{Experiments}
+\label{sec:experiments}
+\vspace{-1mm}
+
+We evaluate \ours across two benchmark datasets in four experimental settings: (1) within-subject evaluation on FACED and SEED-V, (2) cross-subject leave-group-out evaluation, (3) comprehensive ablation studies, and (4) analysis of LLM emotion geometry and error patterns. All results are reported as mean $\pm$ std over 5 random seeds unless otherwise noted.
+
+\subsection{Datasets}
+\label{sec:datasets}
+\vspace{-1mm}
+
+\noindent\textbf{FACED}~\cite{chen2023faced} contains 32-channel EEG recordings from 123 subjects watching 28 emotion-eliciting video clips spanning 9 emotion categories (amusement, inspiration, joy, tenderness, anger, fear, disgust, sadness, neutral). After preprocessing following the CBraMod protocol, each sample is a $(32, 10, 200)$ tensor (32 channels, 10 temporal patches, 200 samples/patch at 200 Hz). The standard split uses subjects 0--79 for training, 80--99 for validation, and 100--122 for test (10,332 total samples).
+
+\noindent\textbf{SEED-V} contains 62-channel EEG recordings from 16 subjects across 3 sessions, with 5 emotion categories (happy, sad, fear, disgust, neutral). Each sample is a $(62, 1, 200)$ tensor---notably, only \emph{one} temporal patch, meaning only spatial attention is active in the criss-cross transformer. The dataset contains 115,001 samples ($\sim$12$\times$ more than FACED).
+
+\subsection{Implementation Details}
+\vspace{-1mm}
+
+We use CBraMod~\cite{wang2025cbramod} (4.92M parameters, pretrained on TUEG) as the backbone. Training uses AdamW optimizer with multi-learning-rate scheduling (backbone: $10^{-4}$, heads: $5 \times 10^{-4}$), cosine annealing to $10^{-6}$, batch size 64, and 50 epochs. The semantic projection head is a 3-layer MLP with BatchNorm: $200 \to 512 \to 512 \to D_{\text{LLM}}$, inspired by SimCLR v2~\cite{chen2020simclrv2}. LLM emotion vectors are extracted from Qwen2.5-0.5B-Instruct ($D = 896$). KD hyperparameters: $\lambda = 0.1$, $\tau_t = 0.1$, $p_{\text{aug}} = 0.6$.
+
+\subsection{Within-Subject Results}
+\label{sec:within_subject}
+\vspace{-1mm}
+
+\begin{table}[!t]
+\caption{Within-subject results on FACED (9-class) and SEED-V (5-class). All results are mean over 5 seeds. $^\dagger$Published results from respective papers. Best in \textbf{bold}.}
+\small
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\multirow{2}{*}{Method} & \multicolumn{2}{c}{FACED} & \multicolumn{2}{c}{SEED-V} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+ & B.Acc & Kappa & B.Acc & Kappa \\
+\midrule
+LaBraM$^\dagger$~\cite{jiang2024labram} & --- & 0.470 & --- & 0.239 \\
+CBraMod$^\dagger$~\cite{wang2025cbramod} & 0.551 & 0.504 & --- & 0.257 \\
+REVE$^\dagger$~\cite{elouahidi2025reve} & 0.565 & 0.509 & --- & --- \\
+\midrule
+CBraMod (our repro) & 0.572 & 0.516 & 0.400 & 0.256 \\
+\quad + Augmentation & 0.609 & 0.553 & 0.406 & 0.263 \\
+\quad + Aug + InfoNCE & 0.614 & 0.564 & --- & --- \\
+\quad + Aug + SupCon & 0.611 & 0.560 & --- & --- \\
+\quad + Aug + V-A & 0.611 & 0.559 & --- & --- \\
+\quad + Aug + KD (ours) & 0.627 & 0.578 & 0.412 & 0.270 \\
+\midrule
+\rowcolor{blond}
+\textbf{\ours (adapter64)} & \textbf{0.628} & \textbf{0.582} & \textbf{0.416} & \textbf{0.275} \\
+\bottomrule
+\end{tabular}
+\label{tab:main_results}
+\end{table}
+
+\cref{tab:main_results} presents the main results. On FACED, \ours achieves $\mathbf{0.628}$ balanced accuracy, improving over our CBraMod baseline by $+5.6\%$ absolute and over the published REVE result by $+11.2\%$ relative. On SEED-V, \ours achieves $\kappa = \mathbf{0.275}$, improving over the published CBraMod result by $+7.0\%$ relative.
+
+\noindent\textbf{Results.} The improvement decomposes as: augmentation ($+3.7\%$), KD loss ($+1.8\%$ over augmentation alone), and adapters ($+0.1\%$). Importantly, \textbf{generic contrastive alternatives (SupCon, V-A coordinates) provide $\leq 0.2\%$ improvement over augmentation alone}, confirming that it is specifically the LLM emotion \emph{relational structure}---not contrastive learning in general---that drives the gain (see~\cref{sec:baseline_ablation}).
+
+\subsection{Cross-Subject Evaluation}
+\label{sec:cross_subject}
+\vspace{-1mm}
+
+\begin{table}[!t]
+\caption{Cross-subject results using 5-fold leave-group-out on FACED ($\sim$25 held-out subjects per fold). Both \ours variants significantly outperform baseline ($p < 0.001$, paired $t$-test).}
+\small
+\centering
+\begin{tabular}{lccccccc}
+\toprule
+Method & Fold 0 & Fold 1 & Fold 2 & Fold 3 & Fold 4 & Mean & $p$-value \\
+\midrule
+Baseline & 0.712 & 0.620 & 0.702 & 0.663 & 0.650 & 0.669 & --- \\
+KD + aug & 0.739 & 0.642 & 0.729 & 0.681 & 0.675 & 0.693 & 0.0002 \\
+\rowcolor{blond}
+\textbf{Adapter64} & \textbf{0.730} & \textbf{0.647} & \textbf{0.722} & \textbf{0.692} & \textbf{0.678} & \textbf{0.694} & \textbf{0.0004} \\
+\bottomrule
+\end{tabular}
+\label{tab:loso}
+\end{table}
+
+Cross-subject evaluation (\cref{tab:loso}) confirms that the improvement generalizes to completely unseen subjects. Both \ours variants beat baseline on \textbf{all 5 folds}, with highly significant paired $t$-test $p$-values ($< 0.001$). The cross-subject baseline (0.669) is higher than within-subject (0.572) because more subjects are available for training ($\sim$98 vs.\ $\sim$80).
+
+\subsection{Augmentation Ablation}
+\label{sec:aug_ablation}
+\vspace{-1mm}
+
+\begin{wraptable}[12]{r}{0.48\textwidth}
+  \centering
+  \vspace{-5mm}
+  \caption{Augmentation drop-one-out ablation on FACED. Temporal jitter is the only critical component.}
+  \small
+  \begin{tabular}{lcc}
+  \toprule
+  Config & B.Acc & $\Delta$ \\
+  \midrule
+  Full aug (all 4) & 0.609 & --- \\
+  Drop noise & 0.609 & $+$0.0\% \\
+  Drop dropout & 0.613 & $+$0.4\% \\
+  Drop scaling & 0.611 & $+$0.2\% \\
+  \textbf{Drop jitter} & \textbf{0.569} & $\mathbf{-3.9\%}$ \\
+  \bottomrule
+  \end{tabular}
+  \label{tab:aug_ablation}
+\end{wraptable}
+
+\cref{tab:aug_ablation} shows that temporal jitter is the single indispensable augmentation. Removing it drops performance by $-3.9\%$ (from $0.609$ to $0.569$), back to baseline level. All other augmentations can be removed with negligible ($\leq 0.4\%$) or even slightly positive effect. This finding has a biological interpretation: slight temporal shifts ($\pm 20$ samples at 200 Hz $= \pm 100$ ms) force the model to learn timing-invariant representations, critical for EEG where neural response onset varies across trials and subjects.
+
+\subsection{KD Loss Ablation}
+\label{sec:kd_ablation}
+\vspace{-1mm}
+
+\begin{wraptable}[14]{r}{0.48\textwidth}
+  \centering
+  \vspace{-5mm}
+  \caption{KD hyperparameter sensitivity on FACED (5 seeds each). Augmentation probability has the largest effect.}
+  \small
+  \begin{tabular}{lcc}
+  \toprule
+  Parameter & Value & B.Acc \\
+  \midrule
+  $\lambda = 0.05$ & & 0.620 \\
+  $\lambda = 0.10$ (default) & & 0.621 \\
+  $\lambda = 0.20$ & & 0.616 \\
+  $\lambda = 0.50$ & & 0.610 \\
+  \midrule
+  $\tau_t = 0.05$ & & 0.622 \\
+  $\tau_t = 0.10$ (default) & & 0.621 \\
+  $\tau_t = 0.20$ & & 0.619 \\
+  \midrule
+  $p_{\text{aug}} = 0.4$ & & 0.614 \\
+  $p_{\text{aug}} = 0.5$ (default) & & 0.621 \\
+  $\mathbf{p_{\text{aug}} = 0.6}$ & & \textbf{0.627} \\
+  \bottomrule
+  \end{tabular}
+  \label{tab:kd_ablation}
+\end{wraptable}
+
+We sweep KD hyperparameters across 40 tasks (\cref{tab:kd_ablation}). Key findings: (1) $\lambda$ is robust in $[0.05, 0.10]$ but degrades sharply above $0.20$, indicating that the KD signal should complement rather than dominate the CE loss. (2) Sharper teacher temperature ($\tau_t = 0.05$) marginally helps. (3) Augmentation probability has the largest effect, with $p_{\text{aug}} = 0.6$ yielding the best result ($0.627$). Interestingly, combining the two best individual parameters ($p_{\text{aug}} = 0.6 + \tau_t = 0.05$) yields $0.619$---\emph{worse} than either alone---suggesting interference between sharper teacher distributions and heavier augmentation.
+
+\subsection{Baseline Comparison}
+\label{sec:baseline_ablation}
+\vspace{-1mm}
+
+\begin{table}[!t]
+\caption{Comparison with contrastive alternatives on FACED. Generic contrastive losses add $\leq 0.2\%$ over augmentation alone. Our LLM-based KD adds $+1.8\%$, confirming that LLM emotion structure provides unique information.}
+\small
+\centering
+\begin{tabular}{lccc}
+\toprule
+Method & B.Acc & Kappa & vs Aug only \\
+\midrule
+CBraMod baseline & 0.572 & 0.516 & $-3.7\%$ \\
+SupCon (no aug) & 0.567 & 0.511 & $-4.2\%$ \\
+VA (no aug) & 0.564 & 0.507 & $-4.5\%$ \\
+Aug only & 0.609 & 0.553 & --- \\
+SupCon + aug & 0.611 & 0.560 & $+0.2\%$ \\
+VA + aug & 0.611 & 0.559 & $+0.2\%$ \\
+\rowcolor{blond}
+\textbf{KD + aug (ours)} & \textbf{0.627} & \textbf{0.578} & $\mathbf{+1.8\%}$ \\
+\bottomrule
+\end{tabular}
+\label{tab:baselines}
+\end{table}
+
+\cref{tab:baselines} reveals that \textbf{contrastive losses without augmentation actually \emph{hurt} performance}, with both SupCon ($0.567$) and V-A ($0.564$) below the CBraMod baseline ($0.572$). With augmentation, SupCon and V-A match augmentation-only performance ($\leq +0.2\%$). Only our LLM-based KD provides meaningful improvement ($+1.8\%$). This demonstrates that it is specifically the \emph{LLM emotion similarity structure}---not contrastive learning in general---that drives the improvement.
+
+\subsection{Adapter and PEFT Analysis}
+\label{sec:adapter_ablation}
+\vspace{-1mm}
+
+\begin{figure}[!t]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\linewidth]{figs/adapter_scaling.png}
+        \caption{Adapter scaling: peak at $r=64$.}
+        \label{fig:adapter_scaling}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\linewidth]{figs/peft_comparison.png}
+        \caption{PEFT methods vs.\ full fine-tuning.}
+        \label{fig:peft}
+    \end{subfigure}
+    \caption{(a) Adapter bottleneck scaling on FACED. Performance peaks at $r = 64$ (0.628), then decreases for $r = 128$ (0.622) due to overfitting. (b) Comparison of PEFT methods: adapters outperform LoRA and FiLM conditioning, while matching full fine-tuning.}
+    \label{fig:adapter_analysis}
+\end{figure}
+
+We systematically evaluate three PEFT approaches with frozen backbone: bottleneck adapters (rank 16/32/64/128), LoRA (rank 4/8/16), and FiLM conditioning (3/6 modulation layers).
+
+\noindent\textbf{Adapter scaling} (\cref{fig:adapter_scaling}) shows a clear curve: $r=16$ (0.616) $\to$ $r=32$ (0.615) $\to$ $r=64$ (\textbf{0.628}) $\to$ $r=128$ (0.622). Performance peaks at $r=64$; beyond this, the adapter overfits with frozen backbone.
+
+\noindent\textbf{LoRA is flat} at $\sim$0.619 regardless of rank (4/8/16), suggesting that low-rank residuals on attention projections provide less effective task-specific adaptation than full bottleneck layers after each transformer block.
+
+\noindent\textbf{FiLM conditioning} (0.612--0.615) is below adapters despite training the full backbone, indicating that modulating features via LLM prototype-conditioned scale/shift is less effective than learning task-specific residuals.
+
+\noindent\textbf{Unfreezing hurts.} Training adapters for 30 epochs (frozen) then unfreezing the backbone for 20 more epochs yields 0.615---\emph{worse} than keeping the backbone frozen (0.628). This confirms that pretrained EEG features are best preserved intact, with task-specific information added through adapters.
+
+\subsection{Error Pattern and LLM Emotion Geometry}
+\label{sec:analysis}
+\vspace{-1mm}
+
+\begin{figure}[!t]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\linewidth]{figs/fig1_pca_circumplex.png}
+        \caption{LLM emotion PCA.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\linewidth]{figs/confusion_matrices.png}
+        \caption{Confusion matrices.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\linewidth]{figs/fig_tsne_comparison.png}
+        \caption{t-SNE representations.}
+    \end{subfigure}
+    \caption{(a) PCA of Qwen emotion vectors shows circumplex structure (valence $\times$ arousal). (b) Confusion matrices: baseline (left) vs.\ adapter64 (right)---largest gains on high-arousal emotions (anger $+26$, fear $+24$). (c) t-SNE of learned EEG representations: progressive clustering from baseline to adapter64.}
+    \label{fig:analysis}
+\end{figure}
+
+\noindent\textbf{Error pattern.} EEG misclassification errors follow LLM semantic similarity (Spearman $r = 0.38$, $p = 3.4 \times 10^{-6}$). The effect is driven by negative emotion confusions ($64.6\%$ of within-category errors, $p = 3.2 \times 10^{-13}$). Controls show that SBERT text descriptions ($r = 0.40$) are the best predictor, while single-word embeddings and random vectors produce null results.
+
+\noindent\textbf{Per-class improvement.} Confusion matrix analysis (\cref{fig:analysis}b) shows the largest gains on high-arousal emotions: anger ($+26$ correct), fear ($+24$), inspiration ($+19$). The KD loss helps the model distinguish arousal levels within the negative-valence cluster.
+
+\noindent\textbf{LLM universality.} Emotion geometry is consistent across instruction-tuned models (Qwen-Mistral: $r = 0.93$, Qwen-Phi2: $r = 0.52$, Mistral-TinyLlama: $r = 0.63$), but absent in base models (Pythia: $r = 0.30$, Bloom: $r = 0.00$). Smaller models have better emotion geometry (Qwen2.5-1.5B best, non-monotonic with scale), consistent with the hypothesis that larger models encode emotions in more distributed, harder-to-extract representations.
+
+\noindent\textbf{Per-subject analysis.} Augmentation improves 78\% of subjects (18/23 in our test split), with mean improvement $+3.8\%$ and maximum $+15.1\%$. Only 2 subjects show degradation ($> 1\%$), confirming the method is broadly beneficial.
+
+\subsection{Negative Results}
+\label{sec:negative}
+\vspace{-1mm}
+
+We document several approaches that did \emph{not} work, which we believe is informative for the community:
+
+\noindent\textbf{MAE pretraining} is architecturally incompatible with CBraMod's criss-cross attention, which requires a fixed channel$\times$time grid. Passing mask tokens through the encoder corrupts representations (feature std $= 4.31$ vs.\ pretrained $0.22$, a $20\times$ scale mismatch). All masking ratios (50--90\%) collapsed to chance ($0.111$).
+
+\noindent\textbf{Cross-attention readout} (replacing the flatten classifier with learnable query tokens attending over backbone output) collapsed to $0.16$--$0.28$ across all variants tested (3 configurations, 15 runs), even with 5$\times$ higher learning rate for the new parameters. The backbone's $(C, P, D)$ output structure does not provide useful key-value pairs for cross-attention.
+
+\noindent\textbf{Combining best hyperparameters} ($p_{\text{aug}} = 0.6 + \tau_t = 0.05$) produced 0.619---\emph{worse} than either alone. We hypothesize that heavier augmentation distorts the input signal, making it harder for a sharper teacher distribution to provide precise relational guidance.

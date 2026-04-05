@@ -1,0 +1,105 @@
+\setcounter{page}{1}
+
+\renewcommand{\thefigure}{S\arabic{figure}}
+\setcounter{figure}{0}
+\renewcommand{\thesection}{S\arabic{section}}
+\setcounter{section}{0}
+\renewcommand{\thetable}{S\arabic{table}}
+\setcounter{table}{0}
+
+\begin{center}
+\Large\textbf{Bridging LLM Emotion Representations and EEG}\par
+\vspace{0.5em}
+\Large Supplementary Material
+\end{center}
+
+\noindent In this supplementary document, we include:
+\begin{itemize}
+    \item \textbf{Section \ref{sec:supp_exp}:} Full experimental details and hyperparameters.
+    \item \textbf{Section \ref{sec:supp_arch}:} Complete architecture experiment results.
+    \item \textbf{Section \ref{sec:supp_llm}:} Multi-LLM emotion vector analysis.
+    \item \textbf{Section \ref{sec:supp_lim}:} Limitations and failure analysis.
+\end{itemize}
+
+\section{Experimental Details}
+\label{sec:supp_exp}
+
+\noindent\textbf{Hardware.} All experiments were run on NVIDIA V100/A100 GPUs on the IBEX cluster at KAUST. Training time per experiment: $\sim$50 minutes (50 epochs $\times$ 1 min/epoch).
+
+\noindent\textbf{Hyperparameters.} AdamW optimizer with multi-LR (backbone: $10^{-4}$, heads: $5 \times 10^{-4}$), cosine annealing to $10^{-6}$, weight decay $0.05$, gradient clipping $1.0$, batch size 64, dropout $0.1$, label smoothing $0.1$.
+
+\noindent\textbf{Emotion vector extraction.} For each emotion, 30 stories are generated using diverse topic prompts. Hidden states are extracted from the 67\textsuperscript{th}-percentile layer, averaged across tokens (excluding the first 50 prompt tokens) and stories, then the global mean is subtracted.
+
+\noindent\textbf{Total compute.} Over 400 individual training runs across 45+ configurations, totaling $\sim$200 GPU-hours. All results use 5-seed evaluation (seeds: 3407, 42, 123, 456, 789).
+
+\section{Complete Architecture Experiments}
+\label{sec:supp_arch}
+
+\begin{table}[!h]
+\caption{All architecture experiments on FACED (5-seed mean). All experiments use the best training recipe (aug $p = 0.6$, KD, 3L-BN projection).}
+\small
+\centering
+\begin{tabular}{llccc}
+\toprule
+Category & Method & B.Acc & Std & Trainable Params \\
+\midrule
+Full FT & KD+aug (p=0.6) & 0.627 & 0.004 & 134M \\
+\midrule
+\multirow{4}{*}{Adapters} & Adapter-16 & 0.616 & 0.004 & 129M + 79K \\
+ & Adapter-32 & 0.615 & 0.009 & 129M + 156K \\
+ & \textbf{Adapter-64} & \textbf{0.628} & 0.006 & 129M + 310K \\
+ & Adapter-128 & 0.622 & 0.008 & 129M + 618K \\
+\midrule
+\multirow{3}{*}{LoRA} & LoRA-4 & 0.620 & 0.008 & 129M + 19K \\
+ & LoRA-8 & 0.618 & 0.007 & 129M + 38K \\
+ & LoRA-16 & 0.619 & 0.004 & 129M + 77K \\
+\midrule
+\multirow{2}{*}{FiLM} & FiLM-3 & 0.612 & 0.008 & 135M \\
+ & FiLM-6 & 0.615 & 0.003 & 136M \\
+\midrule
+\multirow{2}{*}{Depth} & 8 layers & 0.603 & 0.004 & 132M \\
+ & 6 layers & 0.593 & 0.006 & 132M \\
+\midrule
+Cross-Attn & K=9 queries & 0.260 & --- & 6.6M \\
+ & K=16 queries & 0.276 & --- & 6.8M \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_arch}
+\end{table}
+
+\section{Multi-LLM Emotion Vector Analysis}
+\label{sec:supp_llm}
+
+\begin{table}[!h]
+\caption{PC1-valence correlation across LLM models. Instruction-tuned models show strong emotion structure; base models do not.}
+\small
+\centering
+\begin{tabular}{llccc}
+\toprule
+Model & Family & PC1-Valence $r$ & $p$-value & Structure? \\
+\midrule
+Qwen2.5-0.5B & Alibaba & $+0.77$ & $0.016$ & \cmark \\
+Qwen2.5-1.5B & Alibaba & $+0.83$ & $0.005$ & \cmark \\
+Qwen2.5-7B & Alibaba & $-0.88$ & $0.002$ & \cmark \\
+Mistral-7B & Mistral AI & $-0.78$ & $0.013$ & \cmark \\
+Phi-2 & Microsoft & $-0.53$ & $0.139$ & Marginal \\
+TinyLlama & Meta & $+0.27$ & $0.488$ & \xmark \\
+Pythia-1.4B & EleutherAI & $+0.30$ & $0.433$ & \xmark \\
+Bloom-560M & BigScience & $0.00$ & $1.000$ & \xmark \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_llm}
+\end{table}
+
+\section{Limitations and Failure Analysis}
+\label{sec:supp_lim}
+
+\begin{itemize}
+    \item \textbf{Cross-attention readout collapsed} across all 3 variants (original, 5$\times$ LR, adapter+crossattn), achieving only 0.16--0.28 B.Acc. The backbone's $(C, P, D)$ tensor does not provide useful key-value structure for cross-attention---the flatten+MLP classifier is more effective.
+    \item \textbf{MAE pretraining is architecturally incompatible} with criss-cross attention. The fixed spatial-temporal grid prevents the encoder-only-visible-patches approach that makes MAE work. Feature scale mismatch (20$\times$) corrupts learned representations.
+    \item \textbf{Combining best hyperparameters does not stack.} $p_{\text{aug}} = 0.6 + \tau_t = 0.05$ yields 0.619---worse than either alone (0.627, 0.622). Sharper teacher + heavier augmentation creates conflicting gradients.
+    \item \textbf{Unfreezing backbone after adapter warmup hurts} (0.615 vs 0.628 frozen). Pretrained features degrade when updated, even at reduced learning rate.
+    \item \textbf{100 epochs $\approx$ 50 epochs} for adapters (0.629 vs 0.628). The cosine LR schedule already reaches near-zero by epoch 50.
+    \item \textbf{SEED-V augmentation effect is weaker} than FACED (not statistically significant, $p = 0.20$), likely because SEED-V has only 1 temporal patch, reducing the effectiveness of temporal jitter.
+    \item \textbf{Cross-subject SEED-V performance is low} ($\sim$0.20--0.28 B.Acc) due to high inter-subject variability with only 16 subjects and 4-fold splits.
+\end{itemize}

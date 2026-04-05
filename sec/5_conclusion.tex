@@ -1,0 +1,12 @@
+\section{Conclusion}
+\label{sec:conclusion}
+\vspace{-1mm}
+
+We introduced \ours, a framework that bridges LLM emotion representations and EEG through soft-label knowledge distillation. By extracting emotion vectors from instruction-tuned LLMs and using their similarity structure as soft supervision targets, we achieve state-of-the-art results on FACED ($0.628$ balanced accuracy, $+11.2\%$ over REVE) and SEED-V ($\kappa = 0.275$, $+7.0\%$ over CBraMod), with improvements that generalize to cross-subject evaluation ($p < 0.001$).
+
+Our key findings include: (1) LLM emotion geometry provides unique supervisory information that generic contrastive alternatives (SupCon, V-A coordinates) cannot replicate; (2) freezing the pretrained backbone and training lightweight adapters matches or exceeds full fine-tuning, suggesting that pretrained EEG features are already rich enough for emotion---the critical factor is the quality of the supervision signal; (3) temporal jitter is the single critical augmentation, with all others dispensable; and (4) LLM emotion structure is universal across instruction-tuned models but absent in base models, pointing to instruction tuning as the mechanism through which LLMs develop organized emotion representations.
+
+\noindent\textbf{Limitations.} The method assumes access to pretrained LLM emotion vectors, which requires a one-time extraction step. Cross-subject performance, while significantly improved, remains below within-subject performance, reflecting the fundamental challenge of EEG inter-subject variability. Our evaluation is limited to two datasets with the CBraMod backbone; generalization to other EEG foundation models (LaBraM, REVE) and additional emotion datasets remains to be validated.
+
+\noindent{\textbf{Data Availability Statement.}}
+Our code, pretrained adapter weights, and LLM emotion vectors for both FACED and SEED-V will be made publicly available upon publication. The code will be released on GitHub.
