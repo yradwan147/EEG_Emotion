@@ -27,6 +27,7 @@ Cross-checked against memory/reference_paper_citations.md (21 verified entries).
 | russell1980circumplex | Valence x arousal model, 1980 | YES | Verified standard reference |
 | tak2025emotion_interpretability | Mid-layer emotion encoding, ACL Findings | YES | Verified in memory |
 | lee2024emotion_words | Distributed emotion representations, fMRI | YES | Verified in memory |
+| reimers2019sbert | Sentence-BERT, EMNLP 2019, all-mpnet-base-v2 | YES | Standard reference, 10K+ citations |
 
 ## Verification Notes
 - All 22 citations have been verified via web search or are well-known standard references
