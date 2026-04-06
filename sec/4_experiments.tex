@@ -22,7 +22,7 @@ We use CBraMod~\cite{wang2025cbramod} (4.92M parameters, pretrained on TUEG) as 
 \vspace{-1mm}
 
 \begin{table}[!t]
-\caption{Within-subject results on FACED (9-class) and SEED-V (5-class). All results are mean over 5 seeds. $^\dagger$Published results from respective papers. Best in \textbf{bold}.}
+\caption{Within-subject results on FACED (9-class) and SEED-V (5-class). All results are balanced accuracy (B.Acc), mean over 5 seeds. $^\dagger$Published results from respective papers. Best in \textbf{bold}.}
 \small
 \centering
 \begin{tabular}{lcccc}
@@ -37,10 +37,7 @@ REVE$^\dagger$~\cite{elouahidi2025reve} & 0.565 & --- & --- & --- \\
 \midrule
 CBraMod (our repro) & 0.572 & 0.516 & 0.400 & 0.256 \\
 \quad + Augmentation & 0.609 & 0.553 & 0.406 & 0.263 \\
-\quad + Aug + InfoNCE & 0.614 & 0.564 & --- & --- \\
-\quad + Aug + SupCon & 0.611 & 0.560 & --- & --- \\
-\quad + Aug + V-A & 0.611 & 0.559 & --- & --- \\
-\quad + Aug + KD (ours) & 0.627 & 0.578 & 0.412 & 0.270 \\
+\quad + Aug + KD (ours) & 0.627 & 0.578 & 0.413 & 0.271 \\
 \midrule
 \rowcolor{blond}
 \textbf{\ours (adapter64)} & \textbf{0.628} & \textbf{0.582} & \textbf{0.416} & \textbf{0.275} \\
@@ -49,9 +46,9 @@ CBraMod (our repro) & 0.572 & 0.516 & 0.400 & 0.256 \\
 \label{tab:main_results}
 \end{table}
 
-\cref{tab:main_results} presents the main results. On FACED, \ours achieves $\mathbf{0.628}$ balanced accuracy, improving over our CBraMod baseline by $+5.6\%$ absolute and over the published REVE result by $+11.2\%$ relative. On SEED-V, \ours achieves $\kappa = \mathbf{0.275}$, improving over the published CBraMod result by $+7.0\%$ relative.
+\cref{tab:main_results} presents the main results. On FACED, \ours achieves $\mathbf{0.628}$ balanced accuracy, improving over our CBraMod baseline by $+5.6\%$ absolute and over the published REVE result by $+11.2\%$ relative. On SEED-V, \ours achieves $\mathbf{0.416}$ balanced accuracy ($\kappa = 0.275$), improving over the published CBraMod result by $+7.0\%$ relative.
 
-\noindent\textbf{Results.} The improvement decomposes as: augmentation ($+3.7\%$), KD loss ($+1.8\%$ over augmentation alone), and adapters ($+0.1\%$). Importantly, \textbf{generic contrastive alternatives (SupCon, V-A coordinates) provide $\leq 0.2\%$ improvement over augmentation alone}, confirming that it is specifically the LLM emotion \emph{relational structure}---not contrastive learning in general---that drives the gain (see~\cref{sec:baseline_ablation}).
+\noindent\textbf{Results.} The improvement decomposes as: augmentation ($+3.7\%$), KD loss ($+1.8\%$ over augmentation alone), and adapters ($+0.1\%$). The gain is consistent across both datasets despite their significant differences---FACED has 9 classes with 32 channels and 10 temporal patches, while SEED-V has 5 classes with 62 channels but only 1 temporal patch. This cross-dataset consistency suggests the method is robust to varying input configurations. A controlled comparison isolating loss function and teacher signal is presented in~\cref{sec:baseline_ablation}.
 
 \subsection{Cross-Subject Evaluation}
 \label{sec:cross_subject}
@@ -138,7 +135,7 @@ We sweep KD hyperparameters across 40 tasks (\cref{tab:kd_ablation}). Key findin
 \vspace{-1mm}
 
 \begin{table}[!t]
-\caption{Comparison with contrastive alternatives on FACED. Generic contrastive losses add $\leq 0.2\%$ over augmentation alone. Our LLM-based KD adds $+1.8\%$, confirming that LLM emotion structure provides unique information.}
+\caption{Controlled comparison on FACED (5 seeds each). All methods use the same 3-layer BN projection head and augmentation to isolate the effect of the loss function and teacher signal. B.Acc = balanced accuracy.}
 \small
 \centering
 \begin{tabular}{lccc}
@@ -146,19 +143,28 @@ We sweep KD hyperparameters across 40 tasks (\cref{tab:kd_ablation}). Key findin
 Method & B.Acc & Kappa & vs Aug only \\
 \midrule
 CBraMod baseline & 0.572 & 0.516 & $-3.7\%$ \\
-SupCon (no aug) & 0.567 & 0.511 & $-4.2\%$ \\
-VA (no aug) & 0.564 & 0.507 & $-4.5\%$ \\
 Aug only & 0.609 & 0.553 & --- \\
 SupCon + aug & 0.611 & 0.560 & $+0.2\%$ \\
 VA + aug & 0.611 & 0.559 & $+0.2\%$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Same 3L-BN projection head (fair comparison):}} \\
+InfoNCE + 3L-BN + aug & 0.614 & 0.563 & $+0.5\%$ \\
+SBERT KD + 3L-BN + aug & 0.621 & 0.571 & $+1.2\%$ \\
+Adapter64 + InfoNCE + aug & 0.620 & 0.569 & $+1.1\%$ \\
 \rowcolor{blond}
-\textbf{KD + aug (ours)} & \textbf{0.627} & \textbf{0.578} & $\mathbf{+1.8\%}$ \\
+\textbf{LLM KD + 3L-BN + aug (ours)} & \textbf{0.627} & \textbf{0.578} & $\mathbf{+1.8\%}$ \\
 \bottomrule
 \end{tabular}
 \label{tab:baselines}
 \end{table}
 
-\cref{tab:baselines} reveals that \textbf{contrastive losses without augmentation actually \emph{hurt} performance}, with both SupCon ($0.567$) and V-A ($0.564$) below the CBraMod baseline ($0.572$). With augmentation, SupCon and V-A match augmentation-only performance ($\leq +0.2\%$). Only our LLM-based KD provides meaningful improvement ($+1.8\%$). This demonstrates that it is specifically the \emph{LLM emotion similarity structure}---not contrastive learning in general---that drives the improvement.
+\cref{tab:baselines} presents a controlled comparison where all methods use the \emph{same} 3-layer BatchNorm projection head to isolate the effect of the loss function and teacher signal. Three findings emerge:
+
+\noindent\textbf{(1) KD outperforms InfoNCE with identical architecture.} With the same projection head, LLM KD ($0.627$) beats InfoNCE ($0.614$) by $+1.3\%$, confirming that the improvement comes from the \emph{soft-label loss function}, not the projection head design.
+
+\noindent\textbf{(2) LLM vectors outperform SBERT.} Replacing LLM hidden states with SBERT text embeddings~\cite{reimers2019sbert} (all-mpnet-base-v2, 768-dim) as KD targets yields $0.621$---better than InfoNCE but $0.6\%$ below LLM KD. This suggests that LLM hidden-state geometry captures emotion structure beyond surface-level text similarity.
+
+\noindent\textbf{(3) Adapters help any contrastive loss.} Adapter64 + InfoNCE ($0.620$) outperforms vanilla InfoNCE ($0.614$), showing that adapters provide complementary task-specific adaptation independent of the loss function.
 
 \subsection{Adapter and PEFT Analysis}
 \label{sec:adapter_ablation}

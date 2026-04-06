@@ -49,6 +49,22 @@
 |--------|--------|
 | All lambda/tau/augp values | kd_sweep logs kd_sweep_46360279_*.out |
 
+## Table 5 (Controlled Comparison — Supervisor Comment 2 & 4)
+| Number | Source |
+|--------|--------|
+| InfoNCE+3L-BN 0.614 | supervisor_exp_46409330 tasks 0-4, 5-seed mean: 0.610,0.619,0.622,0.622,0.599 |
+| SBERT KD 0.621 | supervisor_exp_46409330 tasks 5-9, 5-seed mean: 0.626,0.624,0.621,0.609,0.628 |
+| Adapter64+InfoNCE 0.620 | extra_exp_46409703 tasks 0-4, 5-seed mean: 0.609,0.621,0.620,0.628,0.621 |
+| LLM KD 0.627 | kd_sweep aug06_seed*, 5-seed mean (unchanged) |
+
+## SEED-V Results (Updated)
+| Number | Source |
+|--------|--------|
+| SEED-V LLM KD B.Acc 0.413 | seedv_all_46411551 tasks 10-14: 0.412,0.414,0.419,0.412,0.409 |
+| SEED-V LLM KD kappa 0.271 | Same tasks: 0.269,0.273,0.281,0.272,0.269 |
+| SEED-V InfoNCE B.Acc | seedv_all_46411551 tasks 0-4: 0.382,0.412,0.417,+2 pending |
+| SEED-V SBERT KD | seedv_all_46411551 tasks 5-9: pending |
+
 ## Error Pattern
 | Number | Source |
 |--------|--------|
