@@ -6,7 +6,9 @@ We introduced \ours, a framework that bridges LLM emotion representations and EE
 
 Our key findings include: (1) LLM emotion geometry provides unique supervisory information that generic contrastive alternatives (SupCon, V-A coordinates) cannot replicate; (2) freezing the pretrained backbone and training lightweight adapters matches or exceeds full fine-tuning, suggesting that pretrained EEG features are already rich enough for emotion---the critical factor is the quality of the supervision signal; (3) temporal jitter is the single critical augmentation, with all others dispensable; and (4) LLM emotion structure is universal across instruction-tuned models but absent in base models, pointing to instruction tuning as the mechanism through which LLMs develop organized emotion representations.
 
-\noindent\textbf{Future Work.} Extending \ours to additional EEG foundation models (LaBraM, REVE) and emotion datasets would further validate its generality. Investigating online adaptation of emotion vectors during training, rather than using fixed pre-extracted vectors, is a promising direction for personalized emotion recognition.
+Cross-backbone validation on LaBraM~\cite{jiang2024labram} confirms that the KD benefit is architecture-agnostic. We additionally find an inverted-U relationship between LLM scale and emotion vector quality (1.5B optimal, 32B worst), and that emotion-specific SFT of the teacher LLM degrades vector quality---suggesting that the useful emotion geometry emerges from broad language modeling rather than explicit emotional supervision.
+
+\noindent\textbf{Future Work.} Extending \ours to additional EEG foundation models (REVE, EEG-DINO) and emotion datasets would further validate its generality. Investigating online adaptation of emotion vectors during training, rather than using fixed pre-extracted vectors, is a promising direction for personalized emotion recognition.
 
 \noindent{\textbf{Data Availability Statement.}}
 Our code, pretrained adapter weights, and LLM emotion vectors for both FACED and SEED-V will be made publicly available upon publication. The code will be released on GitHub.

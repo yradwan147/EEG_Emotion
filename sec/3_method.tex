@@ -56,7 +56,7 @@ We present \ours, a framework for EEG emotion recognition that distills relation
         \draw[arrow, dashed] (kd) -- (total);
     \end{tikzpicture}
     }
-    \caption{\textbf{Overview of \ours.} The EEG signal is processed by a frozen pretrained CBraMod backbone with trainable adapter layers. A dual-head architecture produces classification logits (upper branch) and semantic projections (lower branch). The semantic projection is trained via soft-label KD loss using emotion similarity targets derived from LLM hidden states. The LLM branch (bottom) runs offline to extract emotion vectors.}
+    \caption{\textbf{Overview of \ours.} The EEG signal is processed by a frozen pretrained backbone (CBraMod or LaBraM) with trainable adapter layers. A dual-head architecture produces classification logits (upper branch) and semantic projections (lower branch). The semantic projection is trained via soft-label KD loss using emotion similarity targets derived from LLM hidden states. The LLM branch (bottom) runs offline to extract emotion vectors.}
     \label{fig:pipeline}
 \end{figure*}
 
