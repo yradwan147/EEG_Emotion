@@ -187,15 +187,16 @@ VA + aug & 0.611 & 0.559 & $+0.2\%$ \\
 \multicolumn{4}{l}{\textit{Same 3L-BN projection head:}} \\
 InfoNCE + 3L-BN & 0.614 & 0.563 & $+0.5\%$ \\
 SBERT KD + 3L-BN & 0.623 & 0.572 & $+1.4\%$ \\
+LLM \emph{logit} KD + 3L-BN & 0.606 & 0.553 & $-0.3\%$ \\
 Adapter64 + InfoNCE & 0.620 & 0.569 & $+1.1\%$ \\
 \rowcolor{blond}
-\textbf{LLM KD + 3L-BN (ours)} & \textbf{0.627} & \textbf{0.577} & $\mathbf{+1.8\%}$ \\
+\textbf{LLM \emph{hidden-state} KD + 3L-BN (ours)} & \textbf{0.627} & \textbf{0.577} & $\mathbf{+1.8\%}$ \\
 \bottomrule
 \end{tabular}
 \label{tab:baselines}
 \end{table}
 
-\cref{tab:baselines} isolates the contribution of the LLM teacher signal. With the same 3L-BN projection head, LLM KD ($0.627$) beats InfoNCE ($0.614$) by $+1.3\%$ and SBERT-text KD ($0.623$) by $+0.4\%$. Both gaps confirm that the improvement is driven by the soft-label loss \emph{and} the choice of teacher signal: LLM hidden-state geometry captures emotion structure beyond surface-level text similarity. SupCon ($0.611$) and direct valence--arousal regression ($0.611$) match aug-only at $\sim$$0.609$, indicating that generic contrastive losses do not add value beyond the augmentation pipeline.
+\cref{tab:baselines} isolates the contribution of the LLM teacher signal. With the same 3L-BN projection head, LLM hidden-state KD ($0.627$) beats InfoNCE ($0.614$) by $+1.3\%$ and SBERT-text KD ($0.623$) by $+0.4\%$. Critically, we also include an \emph{LLM logit KD} baseline where the teacher distribution comes from the LLM's classification probabilities (the LLM is prompted with the emotion-laden stories and we read off its 9-way emotion predictions) rather than from the internal hidden-state geometry. Logit KD yields $0.606$---\emph{worse} than aug-only---while hidden-state KD yields $0.627$ ($\Delta = +2.1\%$, paired $t = 4.08$, $p = 0.015$, bootstrap 95\% CI $[+1.05\%, +2.77\%]$). This is strong evidence that the value of LLM-guided supervision comes from the \emph{relational geometry} encoded in hidden states, not from the LLM's black-box classification ability. SupCon ($0.611$) and direct valence--arousal regression ($0.611$) match aug-only at $\sim$$0.609$, indicating that generic contrastive losses do not add value beyond the augmentation pipeline.
 
 \subsection{PEFT Analysis: Adapter64 on FACED}
 \label{sec:adapter_ablation}
@@ -242,7 +243,7 @@ We systematically evaluate three PEFT approaches with frozen backbone: bottlenec
 
 \noindent\textbf{Per-class improvement.} Confusion-matrix analysis (\cref{fig:confusion}) shows the largest gains on high-arousal positive emotions: joy ($+12.1\%$), amusement ($+7.2\%$), and on the high-arousal negative cluster: anger ($+5.4\%$), fear ($+4.8\%$), disgust ($+4.8\%$). Sadness, the only low-arousal negative emotion, shows a smaller gain ($+3.9\%$). This pattern is consistent with the LLM emotion geometry: the extracted vectors recover not just the valence axis but the full valence$\times$arousal circumplex, placing sadness apart from the high-arousal negative cluster. The KD loss exploits this two-dimensional structure, providing graded supervision that distinguishes both valence \emph{and} arousal.
 
-\noindent\textbf{Per-subject analysis.} Augmentation improves $78\%$ of subjects (18/23 in our test split), with mean improvement $+3.8\%$ and maximum $+15.1\%$.
+\noindent\textbf{Per-subject analysis.} KD improves $87\%$ of subjects ($20/23$ in our test split), with mean balanced-accuracy gain of $+5.2\%$ and maximum $+11.7\%$ (subject 117). Per-subject gains are \emph{not} correlated with baseline accuracy (Pearson $r = -0.14$, $p = 0.51$), indicating the benefit is broadly distributed rather than concentrated on initially weak subjects. The sorted per-subject gain distribution is shown in \cref{fig:subject_benefit} (Supp.~\cref{sec:supp_per_subject}).
 
 \subsection{LLM Scale and Cross-Family Universality}
 \label{sec:llm_scale}
@@ -290,6 +291,21 @@ We extend the LLM analysis to 11 instruction-tuned models from two families: 7 Q
 To directly test whether KD makes the EEG model's representations more brain-LLM aligned, we compute Linear Centered Kernel Alignment (CKA)~\cite{kornblith2019cka}, the standard metric for measuring representational similarity in NeurIPS-era brain-LLM alignment work~\cite{rethinking_cka_kd2024,brain_llm_compression2023}. For each test sample, we use the LLM emotion vector for that sample's class as a per-sample feature, and we compare these against CBraMod's penultimate features (200-dim) before and after KD on $1{,}932$ FACED test samples.
 
 \cref{fig:cka_increase} shows a uniform pattern: \emph{every} LLM in our suite---including those from a different family from the training teacher---becomes \emph{more} CKA-aligned with CBraMod's features after KD, with $\Delta$CKA $\approx +0.03$ across the board. Notably, the highest post-KD alignment is achieved with Gemma-4 31B (CKA $= 0.263$), even though training used Qwen-14B as the teacher. This argues that KD does not simply pull EEG features toward the specific teacher; it absorbs a universal emotion structure that aligns with all sufficiently capable instruction-tuned LLMs. We find a similar pattern for kernel CKA (RBF) and for class-mean RSA, with Linear CKA showing the cleanest signal.
+
+\subsection{Layerwise Valence/Arousal Probing}
+\label{sec:layerwise_probe}
+\vspace{-1mm}
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=0.92\linewidth]{figs/fig_layerwise_probe.png}
+    \caption{Linear probing of all 12 CBraMod encoder layers for valence (left; positive vs.\ negative, excluding neutral) and arousal (right; high vs.\ low). Lines show 5-fold balanced accuracy with $\pm 1$ std shaded. KD improves probe accuracy at \emph{every} layer, with the strongest effect at deeper layers (up to $+5.7\%$ for valence at layer 10 and $+8.0\%$ for arousal at layer 10). The effect is consistent with prior LLM interpretability findings~\cite{tak2025emotion_interpretability,decoding_emotion_deep2024}, showing that KD pushes emotion-dimension information into the late encoder layers where it supports downstream classification.}
+    \label{fig:layerwise_probe}
+\end{figure}
+
+To mechanistically test whether KD shapes the internal EEG representations along the valence--arousal axes, we train linear probes on each of CBraMod's 12 encoder layers for (i) binary valence (positive vs.\ negative, excluding neutral), and (ii) binary arousal (high vs.\ low, following the standard circumplex mapping~\cite{russell1980circumplex}: amusement/joy/anger/fear/disgust are high-arousal; inspiration/tenderness/sadness/neutral are low). Probes are $L_2$-regularized logistic regression with 5-fold stratified cross-validation.
+
+\cref{fig:layerwise_probe} shows the result. KD strictly dominates baseline at every layer for both tasks, and the gap widens toward deeper layers. At layer 10, KD-trained features reach $0.573$ valence B.Acc and $0.579$ arousal B.Acc, compared to $0.516$ and $0.498$ for baseline---an increase of $+5.7\%$ and $+8.0\%$, respectively. This provides direct mechanistic evidence that LLM-guided supervision \emph{rearranges} the EEG encoder's internal geometry to concentrate valence and arousal information in the late layers that feed the classifier, mirroring the depth-dependent emotion-encoding pattern reported in LLMs~\cite{tak2025emotion_interpretability,decoding_emotion_deep2024}.
 
 \subsection{Representational Visualization (t-SNE)}
 \label{sec:tsne}

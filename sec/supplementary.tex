@@ -22,6 +22,7 @@
     \item \textbf{Section \ref{sec:supp_seedv5s}:} SEED-V 5\,s preprocessing details and full per-seed results.
     \item \textbf{Section \ref{sec:supp_efficiency}:} Computational efficiency breakdown.
     \item \textbf{Section \ref{sec:supp_labram_recipes}:} LaBraM KD recipe robustness across three variants.
+    \item \textbf{Section \ref{sec:supp_per_subject}:} Per-subject KD benefit distribution.
     \item \textbf{Section \ref{sec:supp_explore}:} Additional architecture exploration.
 \end{itemize}
 
@@ -219,6 +220,18 @@ V3 (proj only) & 0.5 & 3L+BN & 0.3 & $0.4037 \pm 0.0092$ & $+2.93\%$ \\
 \end{table}
 
 \noindent\textbf{Statistical test.} For V1 (5 seeds, paired with audit baseline): $t = 2.94$, $p = 0.042$, bootstrap 95\% CI $[+0.0087, +0.0380]$. V2 and V3 use 3 seeds each. The consistency of all three recipes argues that LaBraM KD is robust to projection-head architecture (2-layer vs 3-layer with BatchNorm) and to KD weight ($\lambda \in \{0.1, 0.3\}$) and teacher temperature ($\tau_t \in \{0.1, 0.5\}$), in line with prior observations on ViT KD robustness~\cite{vitkd2022}.
+
+\section{Per-Subject KD Benefit}
+\label{sec:supp_per_subject}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.85\linewidth]{figs/fig_subject_benefit.png}
+\caption{Per-subject balanced accuracy gain from KD on the FACED test set (23 subjects, sorted by $\Delta$). Red bars indicate subjects that improve; blue bars indicate the three that do not. The dashed line is the mean gain ($+5.2\%$). $20/23$ subjects ($87\%$) benefit, with the largest gain at subject 117 ($+11.7\%$) and the largest regression at subject 100 ($-6.8\%$).}
+\label{fig:subject_benefit}
+\end{figure}
+
+\noindent\textbf{Distribution analysis.} Per-subject gains are uncorrelated with baseline accuracy (Pearson $r = -0.14$, $p = 0.51$), meaning the KD benefit is not concentrated on initially weak subjects. Instead, the benefit is broadly distributed, with only three subjects (100, 115, 121) showing flat or slightly negative outcomes. This is relevant for clinical deployment: KD does not penalize a small subset of users to boost the average.
 
 \section{Additional Architecture Exploration}
 \label{sec:supp_explore}
