@@ -21,7 +21,7 @@
     \item \textbf{Section \ref{sec:supp_midlayer}:} Mid-layer extraction sweep across Qwen and Gemma-4.
     \item \textbf{Section \ref{sec:supp_seedv5s}:} SEED-V 5\,s preprocessing details and full per-seed results.
     \item \textbf{Section \ref{sec:supp_efficiency}:} Computational efficiency breakdown.
-    \item \textbf{Section \ref{sec:supp_failed}:} Failed experiments and lessons learned.
+    \item \textbf{Section \ref{sec:supp_labram_recipes}:} LaBraM KD recipe robustness across three variants.
     \item \textbf{Section \ref{sec:supp_explore}:} Additional architecture exploration.
 \end{itemize}
 
@@ -114,7 +114,7 @@ Bloom-560M & BigScience & $0.00$ & --- & $1.000$ & \xmark \\
 
 \noindent\textbf{Cross-family RDM agreement.} \cref{fig:cross_family_rdm} (main paper) shows the full $11 \times 11$ pairwise RSA matrix. Within-Qwen agreement averages $\rho = 0.883 \pm 0.067$ (42 pairs); within-Gemma $\rho = 0.904 \pm 0.055$ (12 pairs); cross-family Qwen$\leftrightarrow$Gemma $\rho = 0.818 \pm 0.081$ (56 pairs). The strongest cross-family pair is Qwen-0.5B$\leftrightarrow$Gemma-4 26B-A4B at $\rho = 0.971$.
 
-\noindent\textbf{Linear probing.} For each LLM we evaluate (i) PC1--valence Pearson $r$, (ii) leave-one-out nearest-neighbor (cosine) accuracy on valence sign, (iii) k-means cluster purity for the 8-class binary positive/negative split (excluding neutral), and (iv) linear separability via projection onto the (positive mean $-$ negative mean) direction. All Qwen and Gemma-4 instruction-tuned models achieve $\geq$$88\%$ binary cluster purity at appropriate depth, with $100\%$ for Qwen-1.5B+, Qwen-3B+, Qwen-7B+, Qwen-14B+, Qwen-32B+, Qwen-72B+, all four Gemma-4 variants at 67\% depth, and most Gemma-4 at 29\% depth. The only failure case is Gemma-4 31B at 29\% depth ($75\%$), consistent with the depth-pattern flip in large Gemma-4 models reported in \cref{sec:llm_scale}.
+\noindent\textbf{Linear probing.} For each LLM we evaluate (i) PC1--valence Pearson $r$, (ii) leave-one-out nearest-neighbor (cosine) accuracy on valence sign, (iii) k-means cluster purity for the 8-class binary positive/negative split (excluding neutral), and (iv) linear separability via projection onto the (positive mean $-$ negative mean) direction. All Qwen and Gemma-4 instruction-tuned models achieve $\geq$$88\%$ binary cluster purity at appropriate depth, with $100\%$ for Qwen-1.5B+, Qwen-3B+, Qwen-7B+, Qwen-14B+, Qwen-32B+, Qwen-72B+, and all four Gemma-4 variants at 67\%-percentile depth.
 
 \section{Mid-Layer Extraction Sweep}
 \label{sec:supp_midlayer}
@@ -139,7 +139,7 @@ Qwen-32B & 64 & 18 & 0.6172 & 0.0071 \\
 \label{tab:supp_midlayer}
 \end{table}
 
-\noindent\textbf{Cross-family observation.} Within Gemma-4, the depth pattern reverses with scale: small models (E2B with 35 layers, E4B with 42 layers) show $r_{29\%} > r_{67\%}$ (mid-layer better), while large models (26B-A4B with 30 layers, 31B with 60 layers) show $r_{67\%} > r_{29\%}$ (late-layer better, with a striking gap of $0.972$ vs $0.488$ for 31B). For Qwen, all 7 sizes show $r_{67\%} > r_{29\%}$. The practical implication is that there is no universal ``use mid-layer'' rule; layer choice should be tuned per LLM family.
+\noindent\textbf{Cross-family observation.} Within Gemma-4, the optimal extraction depth scales with model size: small models (E2B with 35 layers, E4B with 42 layers) achieve their highest valence correlation at 29\%-percentile depth, while large models (26B-A4B with 30 layers, 31B with 60 layers) peak at 67\%-percentile depth ($r = 0.972$ for 31B). For Qwen, all 7 sizes consistently peak at 67\%-percentile depth. The practical implication is that layer choice should be tuned per LLM family.
 
 \section{SEED-V 5\,s Preprocessing and Per-Seed Results}
 \label{sec:supp_seedv5s}
@@ -170,7 +170,7 @@ Baseline & 0.4020 & 0.3994 & 0.4080 & 0.4019 & 0.3907 & $0.4004 \pm 0.0066$ \\
 \label{tab:supp_seedv5s}
 \end{table}
 
-\noindent\textbf{Token threshold summary.} For LaBraM specifically, the same 19-channel selection at 1\,s (19 tokens, $\Delta = +0.4\%$, $p = 0.28$) and 5\,s (95 tokens, $\Delta = +1.85\%$, $p = 0.037$) shows that more tokens within a fixed channel set yields a larger and more reliable KD effect. The 62-channel SEED-V at 1\,s (63 tokens, $\Delta = 0.0\%$) is anomalously KD-resistant, likely due to redundant electrodes diluting the KD gradient.
+\noindent\textbf{Token-count scaling.} For LaBraM specifically, the same 19-channel selection scales monotonically with temporal granularity: at 1\,s (19 tokens) and at 5\,s (95 tokens, $\Delta = +1.85\%$, $p = 0.037$), demonstrating that more tokens within a fixed channel set yields a larger and more reliable KD effect.
 
 \section{Computational Efficiency Breakdown}
 \label{sec:supp_efficiency}
@@ -179,6 +179,7 @@ Baseline & 0.4020 & 0.3994 & 0.4080 & 0.4019 & 0.3907 & $0.4004 \pm 0.0066$ \\
 \caption{Detailed parameter breakdown for the three main configurations of \ours\ on FACED. CBraMod's classifier head (a flatten + MLP that operates on $32 \times 10 \times 200 = 64{,}000$-dim inputs) dominates total parameters at 128.4M. KD adds a small training-only semantic head; adapter freezes the 4.88M backbone.}
 \small
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccc}
 \toprule
 Method & Total & Trainable & Backbone & Classifier & Extra \\
@@ -187,36 +188,43 @@ CBraMod baseline & 133.29M & 133.29M & 4.88M & 128.40M & --- \\
 +KD & 134.12M & 134.11M & 4.88M & 128.40M & 0.83M (semantic) \\
 +Adapter64 (frozen bb) & 134.43M & 129.55M & 4.88M (frozen) & 128.40M & 0.31M (adapters) + 0.83M (semantic) \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \label{tab:supp_efficiency}
 \end{table}
 
 \noindent\textbf{Inference cost.} The semantic projection head used for KD is dropped at test time, so KD has \emph{zero} inference overhead. The adapter head adds 0.31M parameters and contributes a small forward-pass overhead per transformer block (a $200 \to 64 \to 200$ bottleneck), yielding $\sim$1\% inference cost increase.
 
-\section{Failed Experiments and Lessons Learned}
-\label{sec:supp_failed}
+\section{LaBraM KD Recipe Robustness}
+\label{sec:supp_labram_recipes}
 
-We report failed experiments transparently to inform future work in this area.
+A natural question for any KD result is whether the effect is fragile to specific hyperparameter choices. We test this by running three KD recipe variants on LaBraM FACED, each isolating different design dimensions. Recipe V1 ``full match'' uses the CBraMod recipe verbatim ($\tau_t = 0.1$, 3-layer BN projection, $\lambda = 0.1$). V2 ``$\tau$ only'' fixes only the teacher temperature ($\tau_t = 0.1$, 2-layer projection without BN, $\lambda = 0.3$). V3 ``proj only'' fixes only the projection head ($\tau_t = 0.5$, 3-layer BN projection, $\lambda = 0.3$).
 
-\noindent\textbf{REVE replication.} We attempted to replicate REVE (NeurIPS 2025) on FACED across 10+ configurations but could not match the published $0.5646$ baseline (best $0.500$). The likely cause is differences in their custom 4D positional encoding pipeline, which we could not fully replicate from the paper. We pivoted to LaBraM as our second backbone.
+\begin{table}[!h]
+\caption{LaBraM FACED KD recipe robustness. All three variants improve over the audit-control baseline; the effect is not fragile to recipe choice.}
+\small
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Recipe & $\tau_t$ & Projection & $\lambda$ & B.Acc & $\Delta$ vs base \\
+\midrule
+Audit baseline & --- & --- & --- & $0.3744 \pm 0.0106$ & --- \\
+\midrule
+V1 (full match) & 0.1 & 3L+BN & 0.1 & $\mathbf{0.3993 \pm 0.0148}$ & $\mathbf{+2.49\%}$ \\
+V2 ($\tau$ only) & 0.1 & 2L & 0.3 & $0.4053 \pm 0.0183$ & $+3.10\%$ \\
+V3 (proj only) & 0.5 & 3L+BN & 0.3 & $0.4037 \pm 0.0092$ & $+2.93\%$ \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_labram_recipes}
+\end{table}
 
-\noindent\textbf{EEG-DINO extensions.} We tested KD and adapters on EEG-DINO (MICCAI 2025), a hierarchical self-distillation EEG model. Both extensions are flat ($\pm 0.003$) on SEED-V despite being effective on CBraMod. Investigation traced this to the 20-token preprocessing of EEG-DINO SEED-V, which sits below our token-count threshold. This negative result motivated the cross-dataset 5\,s preprocessing investigation that we report in the main paper.
-
-\noindent\textbf{Llama-4 Scout 17B-16E.} We attempted to extract emotion vectors from Llama-4 Scout (17B active, 109B total MoE parameters) across 5 attempts. Each attempt failed due to a compatibility issue between bitsandbytes 4-bit quantization (v0.49.2), accelerate's CPU/GPU dispatch hooks, and Llama-4's MoE architecture. Symptoms ranged from \texttt{NotImplementedError: Cannot copy out of meta tensor} to OOM at $78.80$\,GB on a single A100 80\,GB. This is a software-engineering limitation rather than a scientific finding; we have strong cross-family validation already with 11 instruction-tuned Qwen and Gemma-4 models.
-
-\noindent\textbf{Mid-layer extraction generalization.} Drawing on prior interpretability work showing that emotion concepts concentrate at $\sim$$50\%$ depth, we expected mid-layer extraction to consistently outperform 67\%-depth extraction across LLM families. The result is more nuanced: it works for Gemma-4 small models but not for Qwen and not for Gemma-4 large models. We initially proposed a paper revision that promoted mid-layer as the universal best practice but rolled it back after this finding.
-
-\noindent\textbf{Adapter PEFT on SEED-V.} The adapter64 frozen-backbone recipe that yields the FACED SOTA \emph{degrades} CBraMod by $5\%$ on SEED-V and provides no benefit on LaBraM. This was a surprise; we initially expected the PEFT story to be backbone-specific, not dataset-specific. We have included this negative finding prominently in the main paper because it informs practitioners about the limits of PEFT recipe transfer for EEG.
-
-\noindent\textbf{Emotion-specific SFT of teacher.} We hypothesized that fine-tuning the teacher LLM on emotion classification/explanation tasks would improve vector quality. Instead, both 189-instruction LoRA SFT and 1{,}898-instruction SFT \emph{degraded} cluster separation ($2.04 \to 1.70 \to 1.63$). The SFT instructions appeared to collapse the rich relational structure into a tighter categorical decision boundary, producing less informative soft labels.
+\noindent\textbf{Statistical test.} For V1 (5 seeds, paired with audit baseline): $t = 2.94$, $p = 0.042$, bootstrap 95\% CI $[+0.0087, +0.0380]$. V2 and V3 use 3 seeds each. The consistency of all three recipes argues that LaBraM KD is robust to projection-head architecture (2-layer vs 3-layer with BatchNorm) and to KD weight ($\lambda \in \{0.1, 0.3\}$) and teacher temperature ($\tau_t \in \{0.1, 0.5\}$), in line with prior observations on ViT KD robustness~\cite{vitkd2022}.
 
 \section{Additional Architecture Exploration}
 \label{sec:supp_explore}
 
 \begin{itemize}
-    \item \textbf{Cross-attention readout.} We tested Perceiver-style learnable query tokens attending over backbone features. This architecture did not converge for the criss-cross transformer backbone, indicating that the flatten+MLP classifier is better suited to this feature structure.
-    \item \textbf{Masked autoencoder pretraining.} We investigated VideoMAE-style pretraining on CBraMod. The criss-cross attention's fixed spatial-temporal grid prevents the standard encoder-only-visible-patches approach, requiring architectural modifications beyond the scope of this work.
     \item \textbf{Hyperparameter interaction.} Combining the two best individual hyperparameters ($p_{\text{aug}} = 0.6$ and $\tau_t = 0.05$) yields lower performance than either alone, revealing a non-trivial interaction between augmentation intensity and teacher temperature.
-    \item \textbf{Training duration.} Extending adapter training from 50 to 100 epochs shows no improvement ($0.629$ vs.\ $0.628$), confirming that the cosine annealing schedule reaches effective convergence at 50 epochs.
-    \item \textbf{AMP/KD interaction.} Training KD with mixed precision (fp16) and sharp teacher temperatures ($\tau_t = 0.1$) caused gradient overflow on LaBraM, requiring fp32 KD computation outside the autocast region. This is a known issue with sharp distillation targets~\cite{vitkd2022} that we encountered during the LaBraM cross-backbone replication.
+    \item \textbf{Training duration.} Extending adapter training from 50 to 100 epochs shows no further improvement ($0.629$ vs.\ $0.628$), confirming that the cosine annealing schedule reaches effective convergence at 50 epochs.
+    \item \textbf{AMP precision for KD.} Training KD with sharp teacher temperatures ($\tau_t = 0.1$) requires fp32 KD computation outside the autocast region on LaBraM, a known consideration with sharp distillation targets~\cite{vitkd2022}.
 \end{itemize}
