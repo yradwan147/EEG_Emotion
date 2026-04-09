@@ -50,6 +50,8 @@
 \section{Complete Architecture Experiments}
 \label{sec:supp_arch}
 
+This section provides the full breakdown of every architecture variant we evaluated on FACED. All rows in \cref{tab:supp_arch} use the same training recipe as our best run (aug $p=0.6$, LLM hidden-state KD, 3-layer BN projection, 50 epochs), so the differences isolate the effect of architecture alone. The table consolidates four ablation families: \textbf{(i) PEFT adapters} with bottleneck rank $r \in \{16, 32, 64, 128\}$ that peaks at $r=64$ ($0.628$); \textbf{(ii) LoRA} at rank $\{4, 8, 16\}$ which is flat around $0.619$; \textbf{(iii) FiLM conditioning} with $3$ or $6$ modulation layers, both underperforming adapters; and \textbf{(iv) Depth reduction} of the pretrained backbone from $12$ to $8$ or $6$ layers, which drops performance to $0.603$ and $0.593$ respectively. We also include two cross-attention read-outs (Perceiver-style~\cite{jaegle2021perceiver} with $K=9$ or $K=16$ learnable queries) that collapse to near-chance, indicating the criss-cross backbone's feature grid is not compatible with a learnable query aggregator in this setting. Three findings stand out. First, adapters with a frozen backbone match or beat full fine-tuning ($0.628$ vs.\ $0.627$) despite training only $0.31$\,M extra parameters. Second, LoRA is strictly worse than adapters across the entire rank range tested. Third, depth matters: removing a third of the encoder layers costs $\sim$$3\%$ balanced accuracy, so the full pretrained depth is load-bearing for the criss-cross attention.
+
 \begin{table}[!h]
 \caption{All architecture experiments on FACED (5-seed mean). All experiments use the best training recipe (aug $p = 0.6$, KD, 3L-BN projection).}
 \small
