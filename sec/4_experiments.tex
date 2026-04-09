@@ -264,13 +264,13 @@ We systematically evaluate three PEFT approaches with frozen backbone: bottlenec
 
 We extend the LLM analysis to 11 instruction-tuned models from two families: 7 Qwen2.5 sizes (0.5B--72B) and 4 Gemma-4 variants (E2B, E4B, 26B-A4B, 31B). For each, we extract emotion vectors at the 67th-percentile layer and analyze (i) PC1--valence Pearson correlation, (ii) cluster separation, and (iii) representational dissimilarity matrices.
 
-\begin{wrapfigure}[20]{r}{0.42\textwidth}
+\begin{figure*}
 \vspace{-4mm}
 \centering
-\includegraphics[width=\linewidth]{figs/fig_inverted_u.png}
+\includegraphics[width=0.5\linewidth]{figs/fig_inverted_u.png}
 \caption{Two inverted-U curves with peak at Qwen-1.5B. \textbf{Top:} cluster separation ratio (geometric quality of emotion vectors). \textbf{Bottom:} downstream FACED balanced accuracy when used as KD teacher (mid-layer extraction). Both metrics agree that Qwen-1.5B is the optimal teacher size.}
 \label{fig:inverted_u}
-\end{wrapfigure}
+\end{figure*}
 
 \noindent\textbf{Scale dependence.} \cref{fig:llm_scale_dual} shows the relationship between model size and emotion vector quality. For Qwen, valence correlation is high across all sizes ($r$ from $0.93$ at 0.5B to $0.98$ at 3B), while cluster separation peaks at 1.5B ($2.04$). The two metrics diverge because larger hidden dimensions ($896 \to 8192$) preserve the valence direction (high $r$) while shrinking inter-class distances relative to the ambient space. \cref{fig:inverted_u} (top) plots this inverted-U directly. Gemma-4 follows a similar pattern, with its 31B variant achieving $r = 0.972$. Critically, the inverted-U is mirrored in downstream EEG performance: when each Qwen size is used as a mid-layer KD teacher (\cref{fig:inverted_u}, bottom; full data in \cref{tab:supp_midlayer}), FACED balanced accuracy peaks at $\mathbf{0.628}$ for Qwen-1.5B and declines for both smaller and larger models. For KD, cluster separation is the operationally relevant metric, motivating our choice of small instruction-tuned LLMs as teachers.
 
