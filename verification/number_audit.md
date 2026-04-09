@@ -1,10 +1,73 @@
 # Number Audit — Every Number in the Paper Linked to Source
-**Last verified:** 2026-04-09 (Session 21)
+**Last verified:** 2026-04-09 (Session 22 — post-S9..S17 expansion audit)
 **Method:** Each numerical claim was independently recomputed from the experiment checkpoint files using `numpy` mean/std on best-epoch accuracies. Bootstrap CIs were re-derived where applicable. The Python interpreter at `/ibex/project/c2323/yousef/envs/eeg-mae-pretrain/bin/python3` was used.
 
 ---
 
-## Discrepancies Found and Fixed in this Audit
+## Session 22 Audit — NEW Sections S9–S17 + Table 6 Additions
+
+### New Numbers VERIFIED CORRECT (match source exactly)
+
+| Claim | Paper | Source | Verified |
+|---|---|---|---|
+| Table 6: One-hot KD + 3L-BN | 0.616 / 0.565, +0.7% vs aug | exp3_random_ablation/onehot_seed*/kd_full_bn3_seed* | 0.61635 / 0.56460 → 0.616/0.565 ✓ (+0.74%) |
+| Table 6: Random Gaussian KD + 3L-BN | 0.619 / 0.567, +1.0% | exp3_random_ablation/random_gaussian_seed*/ | 0.61900 / 0.56785 → 0.619/0.568 (κ off by 0.001, within rounding) +1.01% ✓ |
+| Table 6: SBERT KD (re-check) | 0.623 / 0.572 | exp3_random_ablation/sbert_seed*/ | 0.62281 / 0.57229 → 0.623/0.572 ✓ |
+| S11 Mistral-7B (Non-instruct) | \|r\|=0.78, p=0.013 | multi_llm/logs/multi_llm_v3_46360280_0.out | r=-0.7833, p=0.0125 ✓ |
+| S11 Pythia-1.4B | \|r\|=0.30, p=0.433 | multi_llm/logs/multi_llm_v3_46360280_1.out | r=+0.3000, p=0.4328 ✓ |
+| S11 Bloom-560M | \|r\|=0.00, p=1.000 | multi_llm/logs/bloom_fix_46360792.out | r=0.0000, p=1.0000 ✓ |
+| S11 TinyLlama | \|r\|=0.27, p=0.488 | multi_llm/logs/multi_llm_46359617_1.out | r=+0.2667, p=0.4879 ✓ |
+| S11 Phi-2 | \|r\|=0.53, p=0.139 | multi_llm/logs/multi_llm_46359617_0.out | r=-0.5333, p=0.1392 ✓ |
+| S13 SEED-V LOSO Baseline | 0.240 | loso_seedv/fold{0..3}_baseline_seed3407 | 0.24031 → 0.240 ✓ |
+| S13 SEED-V LOSO KD+aug | 0.245 | loso_seedv/fold{0..3}_kd_full_bn3_seed3407 | 0.24497 → 0.245 ✓ |
+| S13 SEED-V LOSO Δ | +0.5% | recomputed | +0.47% ≈ +0.5% ✓ |
+| S14 CBraMod SEED-V 5s Full FT+KD | 0.443 | exp11_cbramod_seedv5s/kd_midlayer_seed* | 0.44272 → 0.443 ✓ |
+| S14 CBraMod SEED-V 5s Adapter64+KD | 0.393 | exp23_cbramod_seedv5s_adapter/seed_* | 0.39326 → 0.393 ✓ |
+| S14 Δ (-5%) | (0.443-0.393)=0.050 | recomputed | -0.0494 ≈ -5.0% ✓ |
+| S15 Qwen-1.5B L8 (best teacher) | 0.6283 / 0.577 | exp22_cbramod_best_teacher/seed_* | 0.62832 / 0.5787 ✓ |
+| S17 depth-8 reduction | 0.603 | arch_phase1/depth8_seed* | 0.60330 ✓ |
+| S17 depth-6 reduction | 0.593 | arch_phase1/depth6_seed* | 0.59294 ✓ |
+| S17 K=9 cross-attn | 0.260 | arch_phase1/crossattn_seed* | 0.25972 ✓ |
+| S17 K=16 cross-attn | 0.276 | arch_phase1/crossattn16_seed* | 0.27611 ✓ |
+| S17 adapter unfreeze (no warmup) | 0.615 | arch_phase1/adapter_unfreeze_seed* | 0.61514 ✓ |
+| S17 LoRA-4 | 0.620 | arch_phase1/lora4_seed* | 0.61989 ✓ |
+| S17 LoRA-8 | 0.618 | arch_phase1/lora8_seed* | 0.61798 ✓ |
+| S17 LoRA-16 | 0.619 | arch_phase1/lora16_seed* | 0.61879 ✓ |
+| S17 FiLM-3 | 0.612 | arch_phase1/film3_seed* | 0.61216 ✓ |
+| S17 FiLM-6 | 0.615 | arch_phase1/film6_seed* | 0.61503 ✓ |
+| S17 adapter-16/32/64/128 | 0.616/0.615/0.628/0.622 | arch_phase1/adapter{r}_seed* | 0.61565/0.61492/0.62815/0.62230 ✓ |
+| S3 Qwen-0.5B L6 | 0.6137 ± 0.0068 | exp9_midlayer_kd/qwen_0.5B_layer6_seed*/kd_full_bn3_seed* | 0.61366 ± 0.00684 ✓ |
+| S3 Qwen-1.5B L8 | 0.6283 ± 0.0065 | exp9_midlayer_kd/qwen_1.5B_layer8_seed*/ | 0.62832 ± 0.00647 ✓ |
+| S3 Qwen-3B L10 | 0.6223 ± 0.0050 | exp9_midlayer_kd/qwen_3B_layer10_seed*/ | 0.62230 ± 0.00499 ✓ |
+| S3 Qwen-7B L8 | 0.6193 ± 0.0043 | exp9_midlayer_kd/qwen_7B_layer8_seed*/ | 0.61927 ± 0.00434 ✓ |
+| S3 Qwen-14B L13 | 0.6205 ± 0.0049 | exp9_midlayer_kd/qwen_14B_layer13_seed*/ | 0.62053 ± 0.00492 ✓ |
+| S3 Qwen-32B L18 | 0.6172 ± 0.0071 | exp9_midlayer_kd/qwen_32B_layer18_seed*/ | 0.61720 ± 0.00709 ✓ |
+| S6 LaBraM audit baseline | 0.3744 ± 0.0106 | labram/faced_kd_audit_baseline (max test_bal) | 0.3744 ± 0.0106 ✓ |
+| S6 V1 full match | 0.3993 ± 0.0148 | labram/faced_kd_v1_full_match | 0.3993 ± 0.0148 ✓ |
+| S6 V2 tau only | 0.4053 ± 0.0183 | labram/faced_kd_v2_tau_only (3 seeds) | 0.4053 ± 0.0183 ✓ |
+| S6 V3 proj only | 0.4037 ± 0.0092 | labram/faced_kd_v3_proj_only (3 seeds) | 0.4037 ± 0.0092 ✓ |
+| Table S2 Gemma-4 E2B (29%) r | 0.913 | exp25_linear_probe_cross_family.json | 0.9134 ✓ |
+| Table S2 Gemma-4 E4B (29%) r | 0.896 | exp25 | 0.8963 ✓ |
+| Table S2 Gemma-4 26B-A4B (67%) r | 0.881 | exp25 | 0.8806 ✓ |
+| Table S2 Gemma-4 31B (67%) r | 0.972 | exp25 | 0.9716 ✓ |
+| Table 9 CBraMod FACED KD | Δ=+0.052, CI=[+0.046,+0.057], t=15.5, p=1e-4 | exp17_bootstrap_cis.json | 0.0524, [0.0461, 0.0573], t=15.51, p=1.01e-4 ✓ |
+| Table 9 LaBraM FACED KD | Δ=+0.026, CI=[+0.011,+0.037], t=3.5, p=0.025 | exp17_bootstrap_cis.json | 0.0256, [0.0107, 0.0368], t=3.48, p=0.025 ✓ |
+| Table 9 Qwen-1.5B vs 0.5B midlayer | Δ=+0.015, CI=[+0.006,+0.024], t=2.8, p=0.047 | exp17_bootstrap_cis.json | 0.0146, [0.0056, 0.0237], t=2.84, p=0.047 ✓ |
+| CKA Gemma-4 31B (highest post-KD) | CKA=0.263 | exp24_cross_llm_cka.json | 0.2632 ✓ |
+
+### New Numbers NEEDING ATTENTION (discrepancies found)
+
+| # | Section | Paper Claim | Actual Source Value | Severity |
+|---|---|---|---|---|
+| **1** | **S9 EEG-DINO FACED** | "default configuration yields 0.245 balanced accuracy; adding the frozen-backbone adapter head (r=64) improves it to 0.258 (+5.2% relative)" | **(a)** baseline should be **0.206** (per session18 report and catalogue), not 0.245. **(b)** Δ=+5.2% is **absolute** (0.258−0.206=0.052), NOT relative. Relative would be +25.2%. | **HIGH** — 2 errors: wrong baseline + wrong label "relative" |
+| **2** | **S12 SFT cluster separation** | "Base Qwen2.5-0.5B-Instruct (no SFT): 2.04 → SFT-189: 1.70 → SFT-1898: 1.63" | **Qwen-0.5B base = 1.74** (not 2.04). 2.04 is Qwen-**1.5B**'s cluster sep. With the correct base, SFT drops are: 1.74→1.70 (−2%), 1.74→1.63 (−6%), not the 17%/20% the paper's framing implies. Also main-text sec 4.12 makes the same error. | **HIGH** — number is wrong (attributes Qwen-1.5B value to Qwen-0.5B), narrative magnitude overstated 4× |
+| **3** | **S15 Best-Teacher Comparison** | "Qwen-14B, 67% depth (default): 0.6246 / κ=0.571 → Qwen-1.5B L8: 0.6283 / κ=0.577, Δ=+0.4%, p=0.25" | The 0.6246 is the **Qwen-0.5B 67% depth** (the actual paper default, = exp17 CBraMod FACED KD kd_mean). Qwen-14B layer 13 is 0.6205 (from Table S3 S3). Paper row label is wrong: teacher should be "Qwen-0.5B, 67% depth (default)". The paired Δ and p=0.25 are correct for the 0.5B 67% comparison. | **HIGH** — row mislabeled; also contradicts Sec 4.2 "Qwen2.5-0.5B-Instruct (67th-percentile layer)" |
+| **4** | **Sec 4.13 CKA caption** | "The teacher used for training (Qwen-14B, marked ⋆)" | Sec 4.2 Implementation Details says teacher = Qwen-0.5B. This is internally inconsistent with the method section. | **MEDIUM** — internal consistency; either update 4.2 or fix caption |
+| **5** | **S10 REVE** | "best single-configuration balanced accuracy was 0.500, and the best seed-averaged 'soup' was 0.496" | My parse of `experiments/reve/logs/*.out` gives: best individual = **0.513** (reve_kd_f), best soup (config mean) = **0.499** (reve_kd_f job 46442626). The catalogue says 0.500/0.496 — these numbers don't trace to the logs I could parse. The gap is small (0.013 individual, 0.003 soup). | **LOW** — possible unparsed logs; paper vs catalogue are consistent |
+| **6** | **S13 SEED-V LOSO p-value** | "p = 0.41" | Recomputed p = **0.47** with scipy paired t-test | **LOW** — within rounding tolerance; could update to 0.47 |
+| **7** | **Sec 4.13 CKA "every LLM"** | "every LLM in our suite... becomes more CKA-aligned... ΔCKA ≈ +0.03" across all 11 LLMs | exp24_cross_llm_cka.json has 11 entries but **4 LLMs (Qwen-0.5B, 1.5B, 3B, 7B) have cka_base = cka_kd = 0** — they appear to be missing measurements. Only **7** LLMs have actual data. The claim "every LLM" is not supported by the JSON. | **LOW** — factual framing issue; JSON may be incomplete |
+
+## Previous Session Discrepancies (Still Applied)
 
 | Section | Original | Corrected | Source |
 |---|---|---|---|

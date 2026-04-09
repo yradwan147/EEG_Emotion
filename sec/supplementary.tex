@@ -250,7 +250,7 @@ Beyond CBraMod and LaBraM, we explored EEG-DINO~\cite{wang2025eegdino} (MICCAI 2
 
 \noindent\textbf{SEED-V default (1\,s $\to$ $\sim$20 tokens).} We ran 14 independent configuration rounds on EEG-DINO SEED-V: default hyperparameters, tuned HPs (lr$=1\times10^{-4}$, smooth$=0.1$, lr decay$=0.9$), the Medium (33M) variant, KD at $\alpha \in \{0.1, 0.2, 0.3\}$, feature-level contrastive KD, adapters at rank $\{16, 32, 64, 128\}$, PEFT with frozen backbone, augmentation (noise $+$ channel dropout $+$ time shift), and segment lengths $\{1\text{\,s}, 2\text{\,s}, 5\text{\,s}\}$. The best baseline ($0.387$) was reached in round~3 and \emph{no} extension moved the needle by more than $|\Delta| \leq 0.003$, with augmentation actively \emph{hurting} ($0.350$) and $5$\,s segments underperforming due to too-few samples ($0.335$). This cumulative null result---from an entirely different backbone family---is consistent with the token-count requirement identified in the main text: EEG-DINO's default SEED-V preprocessing yields only $\sim$20 spatial-temporal tokens per sample, well below the regime where KD contributes meaningful gradient signal.
 
-\noindent\textbf{FACED (32\,ch $\to$ $\sim$320 tokens).} On FACED, EEG-DINO's default configuration yields $0.245$ balanced accuracy; adding the frozen-backbone adapter head ($r=64$) improves it to $0.258$ ($+5.2\%$ relative), reproducing the same PEFT-wins-over-full-FT pattern observed for CBraMod. Linear probing on frozen features gives $0.140$ and KD-frozen gives $0.137$, both much worse than the adapter recipe, suggesting that adapters provide a task-specific residual path that a linear probe cannot.
+\noindent\textbf{FACED (32\,ch $\to$ $\sim$320 tokens).} On FACED, EEG-DINO's default full fine-tuning yields $0.206$ balanced accuracy; adding a frozen-backbone adapter head improves it to $0.258$ ($+5.2\%$ absolute, $+25.0\%$ relative, 5-seed mean), reproducing the same PEFT-wins-over-full-FT pattern observed for CBraMod. Linear probing on frozen features gives $0.140$ and KD on a frozen backbone gives $0.137$, both much worse than the adapter recipe, suggesting that adapters provide a task-specific residual path that a linear probe cannot.
 
 \noindent\textbf{Combined cross-backbone story.} Across three backbones with very different pretraining objectives (CBraMod: criss-cross masked prediction; LaBraM: vector-quantized neural spectrum; EEG-DINO: hierarchical self-distillation), the same two trends hold: (i) adapters with a frozen backbone either match or beat full fine-tuning on FACED, and (ii) KD is statistically significant when the input preprocessing yields $\geq 100$ spatial-temporal tokens and statistically flat otherwise.
 
@@ -293,7 +293,7 @@ TinyLlama-1.1B & \emph{base} & $0.27$ & $0.488$ & no \\
 \label{fig:teacher_requirements}
 \end{figure}
 
-We tested whether explicitly fine-tuning the teacher LLM on emotion classification/explanation tasks would sharpen the extracted vectors. We fine-tuned Qwen2.5-0.5B-Instruct via LoRA on two instruction sets: (i) 189 hand-written instructions covering the 9 FACED emotions with brief rationales, and (ii) a $10\times$ expanded 1898-instruction set generated via template paraphrasing. Both SFT variants \emph{degrade} cluster separation (see \cref{fig:teacher_requirements} left):
+We tested whether explicitly fine-tuning the teacher LLM on emotion classification/explanation tasks would sharpen the extracted vectors. We fine-tuned Qwen2.5-0.5B-Instruct via LoRA on two instruction sets: (i) 189 hand-written instructions covering the 9 FACED emotions with brief rationales, and (ii) a $10\times$ expanded 1898-instruction set generated via template paraphrasing. Both SFT variants monotonically \emph{reduce} cluster separation (see \cref{fig:teacher_requirements} left):
 
 \begin{table}[!h]
 \centering
@@ -302,20 +302,20 @@ We tested whether explicitly fine-tuning the teacher LLM on emotion classificati
 \toprule
 Variant & Cluster separation & $\Delta$ vs.\ base \\
 \midrule
-Base Qwen2.5-0.5B-Instruct (no SFT) & $2.04$ & --- \\
-$+$ SFT-189 & $1.70$ & $-16.7\%$ \\
-$+$ SFT-1898 & $1.63$ & $-20.1\%$ \\
+Base Qwen2.5-0.5B-Instruct (no SFT) & $1.743$ & --- \\
+$+$ SFT-189 & $1.700$ & $-2.5\%$ \\
+$+$ SFT-1898 & $1.628$ & $-6.6\%$ \\
 \bottomrule
 \end{tabular}
 \label{tab:supp_sft}
 \end{table}
 
-The RDM geometries of SFT and non-SFT vectors remain nearly identical (Spearman $\rho > 0.99$), indicating that SFT does not change \emph{which} emotions are similar to which, but rather \emph{compresses} the inter-class distances. We interpret this as SFT collapsing the rich relational structure into a tighter categorical decision boundary useful for classification but less informative as a KD teacher. We therefore use the base instruction-tuned vectors throughout the paper.
+The RDM geometries of SFT and non-SFT vectors remain nearly identical (Spearman $\rho > 0.99$), indicating that SFT does not change \emph{which} emotions are similar to which, but rather \emph{compresses} the inter-class distances monotonically with more instructions. We interpret this as SFT collapsing the rich relational structure into a tighter categorical decision boundary useful for classification but less informative as a KD teacher. We therefore use the base instruction-tuned vectors throughout the paper.
 
 \section{SEED-V Cross-Subject Leave-Group-Out}
 \label{sec:supp_seedv_loso}
 
-In addition to the FACED LOSO results reported in the main text, we also ran 4-fold leave-group-out on SEED-V (16 subjects, $\sim$4 held-out per fold). Results are not statistically significant: KD$+$aug reaches balanced accuracy $0.245$ vs.\ baseline $0.240$ ($\Delta = +0.5\%$, $p = 0.41$, paired $t$-test), and Adapter64 is flat. The small subject count, the $\sim$$5\times$ smaller per-fold training set compared to FACED, and the token-count regime (62\,ch\,$\times$\,1\,s preprocessing) together explain the null result. We include this as a limitation: the SEED-V 1\,s preprocessing used in prior work~\cite{wang2025cbramod} is not in the operating range where KD provides detectable cross-subject gains, and a larger subject pool is needed to run a meaningful LOSO on the 5\,s variant.
+In addition to the FACED LOSO results reported in the main text, we also ran 4-fold leave-group-out on SEED-V (16 subjects, $\sim$4 held-out per fold). Results are not statistically significant: KD$+$aug reaches balanced accuracy $0.245$ vs.\ baseline $0.240$ ($\Delta = +0.5\%$, $p = 0.47$, paired $t$-test), and Adapter64 is flat ($0.241$). The small subject count, the $\sim$$5\times$ smaller per-fold training set compared to FACED, and the token-count regime (62\,ch\,$\times$\,1\,s preprocessing) together explain the null result. We include this as a limitation: the SEED-V 1\,s preprocessing used in prior work~\cite{wang2025cbramod} is not in the operating range where KD provides detectable cross-subject gains, and a larger subject pool is needed to run a meaningful LOSO on the 5\,s variant.
 
 \section{Dataset-Dependent PEFT}
 \label{sec:supp_peft_dataset}
@@ -344,21 +344,21 @@ We hypothesize that the dense $62$-channel SEED-V montage couples adjacent elect
 \section{Best-Teacher Comparison}
 \label{sec:supp_best_teacher}
 
-In \cref{sec:llm_scale} we report the downstream-KD inverted-U: mid-layer extraction from Qwen-1.5B (layer 8) gives the best EEG accuracy ($0.6283$). To check whether this should replace Qwen-14B ($67$\%) as our default teacher, we ran a direct paired comparison using the same training pipeline:
+In \cref{sec:llm_scale} we report the downstream-KD inverted-U: mid-layer extraction from Qwen-1.5B (layer 8) gives the best EEG accuracy ($0.6283$). To check whether this should replace Qwen-0.5B ($67$\%) as our default teacher, we ran a direct paired comparison using the same training pipeline:
 
 \begin{center}
 \small
 \begin{tabular}{lcccc}
 \toprule
-Teacher & B.Acc & $\kappa$ & $\Delta$ vs.\ Qwen-14B & $p$-value \\
+Teacher & B.Acc & $\kappa$ & $\Delta$ vs.\ Qwen-0.5B & $p$-value \\
 \midrule
-Qwen-14B, $67$\% depth (default) & $0.6246$ & $0.571$ & --- & --- \\
+Qwen-0.5B, $67$\% depth (default) & $0.6246$ & $0.571$ & --- & --- \\
 Qwen-1.5B, layer 8 ($29$\% depth) & $\mathbf{0.6283}$ & $\mathbf{0.577}$ & $+0.4\%$ & $0.25$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-The $+0.4\%$ gap is within noise ($p = 0.25$, 5-seed paired $t$-test, bootstrap 95\% CI crosses zero). Both teachers yield SOTA-level performance, and Qwen-1.5B is $\sim$$10\times$ cheaper to run at extraction time. We retain Qwen-14B as the paper's default teacher because its downstream representations produce the most consistent per-sample CKA scores (\cref{sec:cka}), but note that either choice is valid; the inverted-U findings are the main message of this section.
+The $+0.4\%$ gap is within noise ($p = 0.25$, 5-seed paired $t$-test, bootstrap 95\% CI crosses zero). Both teachers yield SOTA-level performance, and Qwen-0.5B is $\sim$$3\times$ cheaper to run at extraction time. We retain Qwen-0.5B as the paper's default teacher for simplicity and consistency with our LLM scale analysis; the inverted-U findings are the main message of this section.
 
 \section{Llama-4 Scout Loading Issue}
 \label{sec:supp_llama4}

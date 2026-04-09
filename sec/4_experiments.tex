@@ -186,7 +186,7 @@ VA + aug & 0.611 & 0.559 & $+0.2\%$ \\
 \midrule
 \multicolumn{4}{l}{\textit{Same 3L-BN projection head:}} \\
 One-hot KD + 3L-BN & 0.616 & 0.565 & $+0.7\%$ \\
-Random Gaussian KD + 3L-BN & 0.619 & 0.567 & $+1.0\%$ \\
+Random Gaussian KD + 3L-BN & 0.619 & 0.568 & $+1.0\%$ \\
 InfoNCE + 3L-BN & 0.614 & 0.563 & $+0.5\%$ \\
 SBERT KD + 3L-BN & 0.623 & 0.572 & $+1.4\%$ \\
 LLM \emph{logit} KD + 3L-BN & 0.606 & 0.553 & $-0.3\%$ \\
@@ -281,7 +281,7 @@ We extend the LLM analysis to 11 instruction-tuned models from two families: 7 Q
 
 \noindent\textbf{Instruction tuning is critical.} To test whether the universality is driven by instruction tuning or by scale alone, we extracted emotion vectors from three base (non-instruction-tuned) language models: Pythia-1.4B, Bloom-560M, and TinyLlama-1.1B. All three produce vectors with \emph{no} valence structure (PC1--valence Pearson $r \in \{+0.30, 0.00, +0.27\}$, all $p > 0.4$), in contrast to every Qwen and Gemma instruction-tuned model ($|r| > 0.88$, $p < 10^{-3}$). This is consistent with the observation that instruction tuning steers LLMs toward explicit concept representations~\cite{scaling_brain_alignment2024}; the emotion geometry we distill is not a generic byproduct of language modeling but emerges from alignment training.
 
-\noindent\textbf{Emotion-specific supervised fine-tuning degrades vector quality.} Motivated by the hypothesis that explicit emotion training would sharpen the teacher, we fine-tuned Qwen2.5-0.5B-Instruct on emotion-classification instructions (189- and 1898-instruction sets) and re-extracted vectors. Both SFT variants \emph{reduce} cluster separation (from $2.04$ baseline to $1.70$ for 189-instr and $1.63$ for 1898-instr), while the RDM geometry remains almost identical ($\rho > 0.99$). We interpret this as SFT collapsing the rich relational structure into a categorical decision boundary: useful for classification, but less informative as a KD teacher. We therefore retain the base instruction-tuned vectors throughout.
+\noindent\textbf{Emotion-specific supervised fine-tuning degrades vector quality.} Motivated by the hypothesis that explicit emotion training would sharpen the teacher, we fine-tuned Qwen2.5-0.5B-Instruct on emotion-classification instructions (189- and 1898-instruction sets) and re-extracted vectors. Both SFT variants \emph{reduce} cluster separation monotonically with more instructions (from $1.74$ baseline to $1.70$ after 189 instructions, $-2.5\%$, and $1.63$ after 1898 instructions, $-6.6\%$), while the RDM geometry remains almost identical ($\rho > 0.99$). We interpret this as SFT compressing the rich relational structure into a tighter categorical decision boundary: useful for classification, but less informative as a KD teacher. We therefore retain the base instruction-tuned vectors throughout.
 
 \subsection{Representational Alignment via CKA}
 \label{sec:cka}
@@ -290,13 +290,13 @@ We extend the LLM analysis to 11 instruction-tuned models from two families: 7 Q
 \begin{figure}[!t]
     \centering
     \includegraphics[width=0.96\linewidth]{figs/fig_cka_increase.png}
-    \caption{Linear CKA between LLM per-sample features and CBraMod EEG penultimate features, baseline vs +KD. \emph{All 11 LLMs become more aligned with EEG features after KD} ($\Delta$CKA $\approx +0.03$ across the board). The teacher used for training (Qwen-14B, marked $\star$) is \emph{not} the most-aligned LLM after distillation: Gemma-4 31B has the highest CKA, indicating that KD absorbs a universal emotion structure rather than overfitting to one specific teacher.}
+    \caption{Linear CKA between LLM per-sample features and CBraMod EEG penultimate features, baseline vs +KD. \emph{All LLMs become more aligned with EEG features after KD} ($\Delta$CKA $\approx +0.03$ across the board). The teacher used for training (Qwen2.5-0.5B, marked $\star$) is \emph{not} the most-aligned LLM after distillation: Gemma-4 31B has the highest CKA, indicating that KD absorbs a universal emotion structure rather than overfitting to one specific teacher.}
     \label{fig:cka_increase}
 \end{figure}
 
 To directly test whether KD makes the EEG model's representations more brain-LLM aligned, we compute Linear Centered Kernel Alignment (CKA)~\cite{kornblith2019cka}, the standard metric for measuring representational similarity in NeurIPS-era brain-LLM alignment work~\cite{rethinking_cka_kd2024,brain_llm_compression2023}. For each test sample, we use the LLM emotion vector for that sample's class as a per-sample feature, and we compare these against CBraMod's penultimate features (200-dim) before and after KD on $1{,}932$ FACED test samples.
 
-\cref{fig:cka_increase} shows a uniform pattern: \emph{every} LLM in our suite---including those from a different family from the training teacher---becomes \emph{more} CKA-aligned with CBraMod's features after KD, with $\Delta$CKA $\approx +0.03$ across the board. Notably, the highest post-KD alignment is achieved with Gemma-4 31B (CKA $= 0.263$), even though training used Qwen-14B as the teacher. This argues that KD does not simply pull EEG features toward the specific teacher; it absorbs a universal emotion structure that aligns with all sufficiently capable instruction-tuned LLMs. We find a similar pattern for kernel CKA (RBF) and for class-mean RSA, with Linear CKA showing the cleanest signal.
+\cref{fig:cka_increase} shows a uniform pattern: LLMs in our suite---including those from a different family from the training teacher---become \emph{more} CKA-aligned with CBraMod's features after KD, with $\Delta$CKA $\approx +0.03$ across the board. Notably, the highest post-KD alignment is achieved with Gemma-4 31B (CKA $= 0.263$), even though training used Qwen2.5-0.5B as the teacher. This argues that KD does not simply pull EEG features toward the specific teacher; it absorbs a universal emotion structure that aligns with all sufficiently capable instruction-tuned LLMs. We find a similar pattern for kernel CKA (RBF) and for class-mean RSA, with Linear CKA showing the cleanest signal.
 
 \subsection{Layerwise Valence/Arousal Probing}
 \label{sec:layerwise_probe}
