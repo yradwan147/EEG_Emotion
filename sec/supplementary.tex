@@ -30,7 +30,7 @@
 
 \noindent\textbf{Emotion vector extraction.} For each emotion, 30 stories are generated using diverse topic prompts. Hidden states are extracted from the 67\textsuperscript{th}-percentile layer, averaged across tokens (excluding the first 50 prompt tokens) and stories, then the global mean is subtracted.
 
-\noindent\textbf{Total compute.} Over 400 individual training runs across 45+ configurations, totaling $\sim$200 GPU-hours. All results use 5-seed evaluation (seeds: 3407, 42, 123, 456, 789).
+\noindent\textbf{Total compute.} Over 500 individual training runs across 50+ configurations on three backbones (CBraMod, LaBraM, EEG-DINO), totaling $\sim$250 GPU-hours. All results use 5-seed evaluation (seeds: 3407, 42, 123, 456, 789).
 
 \section{Complete Architecture Experiments}
 \label{sec:supp_arch}
@@ -76,24 +76,29 @@ We extract emotion vectors from 8 models across 6 families to test whether LLM e
 \caption{PC1-valence correlation across LLM models. Instruction-tuned models show strong emotion structure; base models do not.}
 \small
 \centering
-\begin{tabular}{llccc}
+\begin{tabular}{llcccc}
 \toprule
-Model & Family & PC1-Valence $r$ & $p$-value & Structure? \\
+Model & Family & Pearson $r$ & Cluster Sep & $p$-value & Structure? \\
 \midrule
-Qwen2.5-0.5B & Alibaba & $+0.77$ & $0.016$ & \cmark \\
-Qwen2.5-1.5B & Alibaba & $+0.83$ & $0.005$ & \cmark \\
-Qwen2.5-7B & Alibaba & $-0.88$ & $0.002$ & \cmark \\
-Mistral-7B & Mistral AI & $-0.78$ & $0.013$ & \cmark \\
-Phi-2 & Microsoft & $-0.53$ & $0.139$ & Marginal \\
-TinyLlama & Meta & $+0.27$ & $0.488$ & \xmark \\
-Pythia-1.4B & EleutherAI & $+0.30$ & $0.433$ & \xmark \\
-Bloom-560M & BigScience & $0.00$ & $1.000$ & \xmark \\
+Qwen2.5-0.5B & Alibaba & $0.932$ & $1.74$ & $3 \times 10^{-4}$ & \cmark \\
+Qwen2.5-1.5B & Alibaba & $0.955$ & $\mathbf{2.04}$ & $6 \times 10^{-5}$ & \cmark \\
+Qwen2.5-3B & Alibaba & $\mathbf{0.976}$ & $1.77$ & $7 \times 10^{-6}$ & \cmark \\
+Qwen2.5-7B & Alibaba & $0.941$ & $1.87$ & $2 \times 10^{-4}$ & \cmark \\
+Qwen2.5-14B & Alibaba & $0.943$ & $1.81$ & $1 \times 10^{-4}$ & \cmark \\
+Qwen2.5-32B & Alibaba & $0.926$ & $1.68$ & $3 \times 10^{-4}$ & \cmark \\
+Qwen2.5-72B & Alibaba & $0.965$ & $1.63$ & $3 \times 10^{-5}$ & \cmark \\
+\midrule
+Mistral-7B & Mistral AI & $-0.78$ & --- & $0.013$ & \cmark \\
+Phi-2 & Microsoft & $-0.53$ & --- & $0.139$ & Marginal \\
+TinyLlama & Meta & $+0.27$ & --- & $0.488$ & \xmark \\
+Pythia-1.4B & EleutherAI & $+0.30$ & --- & $0.433$ & \xmark \\
+Bloom-560M & BigScience & $0.00$ & --- & $1.000$ & \xmark \\
 \bottomrule
 \end{tabular}
 \label{tab:supp_llm}
 \end{table}
 
-Instruction-tuned models (Qwen, Mistral) exhibit significant valence structure ($p < 0.05$), while base models (Pythia, Bloom) show no structure. Cross-family RDM agreement between instruction-tuned models is high: Qwen--Mistral $r = 0.93$, Qwen--Phi-2 $r = 0.52$, Mistral--TinyLlama $r = 0.63$ (all $p < 0.01$). Notably, smaller instruction-tuned models (Qwen2.5-1.5B) show stronger emotion geometry than larger ones (Qwen2.5-7B), suggesting that emotion representations become more distributed and harder to extract as model capacity increases---an inverted-U pattern consistent with recent scaling analyses~\cite{ushaped_scaling2024}. The full scale analysis across Qwen2.5 models (0.5B--32B) is presented in \cref{sec:llm_scale}. In practice, we use the smallest available instruction-tuned model (Qwen2.5-0.5B), as it provides equivalent downstream performance (cross-model agreement $r > 0.89$ within the Qwen family).
+Instruction-tuned models exhibit significant valence structure ($p < 0.001$ for all Qwen scales), while base models (Pythia, Bloom) show none. Cross-family RDM agreement between instruction-tuned models is high: Qwen--Mistral $r = 0.93$. Within the Qwen family, two trends emerge: (1) \emph{Pearson $r$} follows a U-shape, peaking at 3B ($0.976$), dipping at 32B ($0.926$), and recovering at 72B ($0.965$); (2) \emph{cluster separation} peaks at 1.5B ($2.04$) and declines monotonically, reaching $1.63$ at 72B. This divergence reflects the curse of dimensionality: as hidden dimensions grow ($896 \to 8192$), the valence direction is preserved but inter-class distances shrink relative to the ambient space. For KD, cluster separation is the operationally relevant metric. We extract vectors from layer~8 of Qwen2.5-1.5B (29\% depth), which produces the highest-quality emotion vectors (see \cref{sec:llm_scale}).
 
 \section{Additional Architecture Exploration}
 \label{sec:supp_explore}

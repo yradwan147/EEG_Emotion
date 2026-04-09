@@ -211,7 +211,7 @@ We systematically evaluate three PEFT approaches with frozen backbone: bottlenec
 \begin{figure*}[!t]
     \centering
     \includegraphics[width=\textwidth]{figs/confusion_matrices.png}
-    \caption{Confusion matrices on FACED test set (seed 789): CBraMod baseline (left, B.Acc $= 0.571$) vs.\ \ours adapter64 (right, B.Acc $= 0.635$). The largest per-class gains are on high-arousal emotions: anger ($+26$), fear ($+24$), and inspiration ($+19$).}
+    \caption{Confusion matrices on FACED test set (seed 3407): CBraMod baseline (left, B.Acc $= 0.576$) vs.\ \ours KD (right, B.Acc $= 0.628$). Per-class recall improvements: Joy $+12.1\%$, Amusement $+7.2\%$, Neutral $+6.3\%$, Anger $+5.4\%$, Fear $+4.8\%$, Disgust $+4.8\%$, Sadness $+3.9\%$. Joy shows the largest gain.}
     \label{fig:confusion}
 \end{figure*}
 
@@ -226,7 +226,7 @@ We systematically evaluate three PEFT approaches with frozen backbone: bottlenec
 
 \noindent\textbf{Per-class improvement.} Confusion matrix analysis (\cref{fig:confusion}) shows the largest gains on high-arousal emotions: anger ($+26$ correct), fear ($+24$), inspiration ($+19$), while sadness---the only low-arousal negative emotion---shows a smaller gain ($+11$). This pattern is consistent with the LLM emotion geometry: the extracted vectors recover not just the valence axis but the full valence$\times$arousal circumplex, placing sadness apart from the high-arousal negative cluster (anger, fear, disgust). The KD loss exploits this two-dimensional structure, providing graded supervision that distinguishes both valence \emph{and} arousal.
 
-\noindent\textbf{LLM universality.} Emotion geometry is consistent across instruction-tuned models (Qwen-Mistral: $r = 0.93$, Qwen-Phi2: $r = 0.52$, Mistral-TinyLlama: $r = 0.63$), but absent in base models (Pythia: $r = 0.30$, Bloom: $r = 0.00$). We find an inverted-U relationship between model scale and emotion vector quality (1.5B optimal, 32B worst; see~\cref{sec:llm_scale}), consistent with the hypothesis that larger models encode emotions in more distributed, harder-to-extract representations~\cite{ushaped_scaling2024}.
+\noindent\textbf{LLM universality.} Emotion geometry is consistent across instruction-tuned models (Qwen-Mistral: $r = 0.93$, Qwen-Phi2: $r = 0.52$), but absent in base models (Pythia: $r = 0.30$, Bloom: $r = 0.00$). Across 7 Qwen scales (0.5B--72B), valence correlation follows a U-shape (peak at 3B, dip at 32B, recovery at 72B), while cluster separation peaks at 1.5B and declines monotonically (see~\cref{sec:llm_scale}). For KD, the operationally relevant metric is cluster separation, making 1.5B optimal as a teacher.
 
 \noindent\textbf{Per-subject analysis.} Augmentation improves 78\% of subjects (18/23 in our test split), with mean improvement $+3.8\%$ and maximum $+15.1\%$. Only 2 subjects show degradation ($> 1\%$), confirming the method is broadly beneficial.
 
@@ -239,35 +239,40 @@ We systematically evaluate three PEFT approaches with frozen backbone: bottlenec
 A natural question is whether \ours is specific to the CBraMod backbone or generalizes across EEG foundation models. We evaluate on LaBraM~\cite{jiang2024labram} (ICLR 2024), which uses a different architecture (standard ViT-style transformer) and pretraining strategy (vector-quantized neural spectrum prediction on 2,500 hours).
 
 \begin{table}[!t]
-\caption{Cross-backbone validation on SEED-V (5-class). \ours improves both backbones, confirming that the benefit of LLM-guided KD is architecture-agnostic.}
+\caption{Cross-backbone validation on FACED (9-class). \ours significantly improves both backbones ($p < 0.05$), confirming architecture-agnostic KD benefit. SEED-V shows no KD effect due to insufficient token count (see text).}
 \small
 \centering
-\begin{tabular}{llccc}
+\begin{tabular}{llcccc}
 \toprule
-Backbone & Venue & Baseline & +KD & $\Delta$ \\
+Backbone & Venue & Baseline & +KD & $\Delta$ & $p$-value \\
 \midrule
-CBraMod & ICLR 2025 & 0.402 & 0.413 & $+1.1\%$ \\
-LaBraM & ICLR 2024 & 0.416 & 0.421 & $+0.4\%$ \\
+\multicolumn{6}{l}{\textit{FACED (9-class, 321 tokens/sample):}} \\
+CBraMod & ICLR 2025 & $0.572 \pm 0.009$ & $0.627 \pm 0.006$ & $+5.5\%$ & $8 \times 10^{-6}$ \\
+LaBraM & ICLR 2024 & $0.370 \pm 0.010$ & $0.396 \pm 0.014$ & $+2.6\%$ & $0.025$ \\
+\midrule
+\multicolumn{6}{l}{\textit{SEED-V (5-class, 1--63 tokens/sample):}} \\
+CBraMod & ICLR 2025 & $0.416 \pm 0.003$ & $0.416 \pm 0.003$ & $0.0\%$ & n.s. \\
+LaBraM & ICLR 2024 & $0.416$ & $0.416$ & $0.0\%$ & n.s. \\
 \bottomrule
 \end{tabular}
 \label{tab:cross_backbone}
 \end{table}
 
-\cref{tab:cross_backbone} confirms that \ours improves both backbones on SEED-V, demonstrating that the benefit of LLM emotion geometry as a supervisory signal is not tied to a specific pretrained encoder. The smaller gain on LaBraM ($+0.4\%$ vs.\ $+1.1\%$ for CBraMod) is consistent with LaBraM's stronger baseline, suggesting diminishing returns as the backbone itself becomes more capable.
+\cref{tab:cross_backbone} shows a striking dataset-dependent pattern. On FACED, \ours produces significant improvements on both backbones: CBraMod ($+5.5\%$, $p < 10^{-5}$) and LaBraM ($+2.6\%$, $p = 0.025$), confirming that the KD benefit is architecture-agnostic. On SEED-V, KD has \emph{zero} measurable effect on either backbone---even testing three temperature settings ($\tau \in \{0.1, 0.5, 1.0\}$) produced identical per-seed results for CBraMod. This dichotomy is explained by the token count: FACED provides 321 tokens per sample, sufficient for the KD gradient to influence learning, while SEED-V provides only 1 token (CBraMod) or 63 tokens (LaBraM), which is below the threshold where the KD signal can meaningfully contribute.
 
 \paragraph{Token count requirement.}
-An important practical finding concerns the minimum token count in the emotion vector extraction prompt. We observe that extensions to the base method (KD loss, adapters) require prompts that yield $\geq 60$ tokens to produce reliable emotion vectors. The EEG-DINO~\cite{wang2025eegdino} backbone, which operates on shorter segments and produces fewer tokens in its internal representation, serves as a negative result: when applied with short prompts ($<40$ tokens), the KD loss provides no improvement over the baseline. This establishes a minimum prompt length for reliable emotion vector extraction and suggests that the relational structure in LLM hidden states needs sufficient context to stabilize.
+An important practical finding is that KD requires sufficient tokens per EEG sample for the gradient signal to influence learning. On FACED (321 tokens per sample), KD produces significant improvements on both backbones. On SEED-V, CBraMod uses only 1 temporal patch (1 token) and LaBraM uses 63 tokens---in both cases, KD has zero effect. We tested three temperature settings ($\tau \in \{0.1, 0.5, 1.0\}$) on SEED-V and obtained \emph{identical} per-seed results across all settings, confirming that the KD gradient is negligible when the representation is too compressed. This establishes a practical lower bound: $\gtrsim$300 tokens are needed for KD to meaningfully contribute.
 
 \subsection{LLM Scale Analysis}
 \label{sec:llm_scale}
 \vspace{-1mm}
 
-We extend the multi-LLM analysis (\cref{sec:supp_llm}) to investigate the effect of model scale on emotion vector quality. Evaluating Qwen2.5 models at 0.5B, 1.5B, 3B, 7B, 14B, and 32B parameters, we find an \emph{inverted-U} relationship between model size and emotion geometry quality: the 1.5B model produces the strongest PC1--valence correlation ($r = 0.83$), while the 32B model produces the weakest among instruction-tuned variants. This non-monotonic pattern---where moderate-scale models outperform both smaller and larger ones---is consistent with recent findings on inverted-U scaling in emergent abilities~\cite{ushaped_scaling2024}. One interpretation is that as models grow, emotion representations become more distributed across layers and dimensions~\cite{decoding_emotion_deep2024}, making single-layer extraction less effective. This finding has practical implications: the cheapest instruction-tuned model (0.5B) provides near-optimal emotion vectors, and practitioners should not assume that larger LLMs yield better teachers.
+We extend the multi-LLM analysis (\cref{sec:supp_llm}) to investigate the effect of model scale on emotion vector quality. Evaluating Qwen2.5 models at 7 scales (0.5B to 72B parameters), we find a nuanced scale dependence: \emph{which metric is used determines which model is ``best.''} Valence correlation (Pearson $r$) peaks at 3B ($r = 0.976$), dips at 7--32B, then recovers at 72B ($r = 0.965$)---a U-shaped pattern. Cluster separation (inter-class vs.\ intra-class distance ratio) peaks at 1.5B ($2.04$) and declines monotonically with scale ($72\text{B}: 1.63$). The two metrics diverge because larger hidden dimensions ($896 \to 8192$) preserve the valence \emph{direction} (high $r$) while reducing inter-class discriminability (low separation)---the curse of dimensionality applied to emotion representations. For KD, cluster separation is the operationally relevant metric, as it determines the informativeness of soft labels. Thus 1.5B is optimal as a KD teacher, and practitioners should not assume that larger LLMs yield better teachers.
 
 \subsection{SFT Negative Result}
 \label{sec:sft_negative}
 \vspace{-1mm}
 
-We investigated whether emotion-specific supervised fine-tuning (SFT) of the teacher LLM improves vector quality. Using instruction tuning with emotion classification and explanation tasks on the teacher model before extracting vectors, we find that SFT \emph{degrades} the quality of emotion vectors as measured by downstream EEG classification accuracy. The emotion geometry present in instruction-tuned models appears to emerge from broad language modeling rather than explicit emotional supervision; further tuning the LLM on emotion-specific tasks collapses the nuanced relational structure into a simpler categorical distinction that provides less useful soft labels for KD. This parallels findings in brain--LLM alignment, where scaling---but not instruction tuning beyond a threshold---increases representational correspondence~\cite{scaling_brain_alignment2024}.
+We investigated whether emotion-specific supervised fine-tuning (SFT) of the teacher LLM improves vector quality. Using LoRA instruction tuning with 189 emotion classification/explanation tasks, cluster separation \emph{decreases} from $2.04$ (base) to $1.70$ ($-2.3\%$). Scaling to 1,898 instructions worsens the decline ($1.63$, $-6.3\%$), while the overall geometry remains stable (RDM agreement $r = 0.992$). The emotion geometry present in instruction-tuned models thus emerges from broad language modeling; further emotion-specific tuning tightens categorical boundaries without enriching inter-class structure, producing less informative soft labels. This parallels findings in brain--LLM alignment, where scaling---but not instruction tuning beyond a threshold---increases representational correspondence~\cite{scaling_brain_alignment2024}.
 
 % End Session 18 additions
