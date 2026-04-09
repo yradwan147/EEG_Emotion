@@ -113,7 +113,7 @@ Two regularities emerge. First, \emph{within} a fixed channel selection, more te
 \label{sec:aug_ablation}
 \vspace{-1mm}
 
-\begin{wraptable}[12]{r}{0.48\textwidth}
+\begin{table}% [12]{r}{0.48\textwidth}
   \centering
   \vspace{-5mm}
   \caption{Augmentation drop-one-out on FACED. Temporal jitter is the only critical component.}
@@ -130,7 +130,7 @@ Two regularities emerge. First, \emph{within} a fixed channel selection, more te
   \bottomrule
   \end{tabular}
   \label{tab:aug_ablation}
-\end{wraptable}
+\end{table}
 
 \cref{tab:aug_ablation} shows that temporal jitter is the single indispensable augmentation. Removing it drops performance by $-3.9\%$ (back to baseline level), while removing any other augmentation has negligible or even slightly positive effect. This finding has a biological interpretation: small temporal shifts ($\pm$20 samples at 200\,Hz $= \pm$100\,ms) force the model to learn timing-invariant representations, which is essential for EEG where neural response onset varies across trials and subjects.
 
