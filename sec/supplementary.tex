@@ -17,20 +17,26 @@
 \begin{itemize}
     \item \textbf{Section \ref{sec:supp_exp}:} Full experimental details and hyperparameters.
     \item \textbf{Section \ref{sec:supp_arch}:} Complete architecture experiment results.
-    \item \textbf{Section \ref{sec:supp_llm}:} Multi-LLM emotion vector analysis.
+    \item \textbf{Section \ref{sec:supp_llm}:} Multi-LLM emotion vector analysis (11 instruction-tuned models).
+    \item \textbf{Section \ref{sec:supp_midlayer}:} Mid-layer extraction sweep across Qwen and Gemma-4.
+    \item \textbf{Section \ref{sec:supp_seedv5s}:} SEED-V 5\,s preprocessing details and full per-seed results.
+    \item \textbf{Section \ref{sec:supp_efficiency}:} Computational efficiency breakdown.
+    \item \textbf{Section \ref{sec:supp_failed}:} Failed experiments and lessons learned.
     \item \textbf{Section \ref{sec:supp_explore}:} Additional architecture exploration.
 \end{itemize}
 
 \section{Experimental Details}
 \label{sec:supp_exp}
 
-\noindent\textbf{Hardware.} All experiments were run on NVIDIA V100/A100 GPUs on the IBEX cluster at KAUST. Training time per experiment: $\sim$50 minutes (50 epochs $\times$ 1 min/epoch).
+\noindent\textbf{Hardware.} All experiments were run on NVIDIA V100 (32GB) and A100 (80GB) GPUs on the IBEX cluster at KAUST. Training time per CBraMod FACED experiment: $\sim$50 minutes (50 epochs $\times$ 1\,min/epoch). LaBraM and SEED-V experiments: similar wallclock. Total compute for the entire study: $\sim$350 GPU-hours across 70+ configurations and $>$500 individual training runs.
 
-\noindent\textbf{Hyperparameters.} AdamW optimizer with multi-LR (backbone: $10^{-4}$, heads: $5 \times 10^{-4}$), cosine annealing to $10^{-6}$, weight decay $0.05$, gradient clipping $1.0$, batch size 64, dropout $0.1$, label smoothing $0.1$.
+\noindent\textbf{Hyperparameters.} AdamW optimizer with multi-LR (backbone $10^{-4}$, heads $5 \times 10^{-4}$), cosine annealing to $10^{-6}$, weight decay $0.05$, gradient clipping $1.0$, batch size 64, dropout $0.1$, label smoothing $0.1$. We use 50 epochs for all main results; training-duration ablations confirmed convergence by epoch 50 ($+0.1\%$ at 100 epochs is within noise).
 
-\noindent\textbf{Emotion vector extraction.} For each emotion, 30 stories are generated using diverse topic prompts. Hidden states are extracted from the 67\textsuperscript{th}-percentile layer, averaged across tokens (excluding the first 50 prompt tokens) and stories, then the global mean is subtracted.
+\noindent\textbf{Seeds.} All main results use 5 random seeds: 3407, 42, 123, 456, 789. We additionally compute paired bootstrap 95\% percentile CIs (10{,}000 resamples) for all critical comparisons.
 
-\noindent\textbf{Total compute.} Over 500 individual training runs across 50+ configurations on three backbones (CBraMod, LaBraM, EEG-DINO), totaling $\sim$250 GPU-hours. All results use 5-seed evaluation (seeds: 3407, 42, 123, 456, 789).
+\noindent\textbf{Emotion vector extraction.} For each emotion class, we generate 30 short ($\leq$150 tokens) stories using the prompt template ``Write a very short paragraph (3--4 sentences) about \{topic\} where a character experiences intense \{emotion\}. Show the emotion through actions and reactions.'' across 30 diverse topics (e.g., ``a morning commute,'' ``a hospital visit''). Hidden states are extracted from a configurable layer (default: 67th-percentile of total layers), averaged across all token positions excluding the first 50 prompt tokens, and averaged across all 30 stories. We then subtract the global mean across all emotions to obtain contrast vectors and L2-normalize them.
+
+\noindent\textbf{LLM teacher choice.} The main paper uses Qwen2.5-0.5B-Instruct ($D = 896$, layer 21 of 24 = 87\% depth, the 67th-percentile setting). We tested 7 Qwen2.5 sizes and 4 Gemma-4 variants and verified that the choice does not significantly affect downstream EEG accuracy. Specifically, Qwen-1.5B layer 8 (mid-layer, $D = 1536$) yields $0.628 \pm 0.007$ vs $0.625 \pm 0.003$ for the default Qwen-0.5B 67\% setting---a $+0.4\%$ difference with $p = 0.25$ in a paired test.
 
 \section{Complete Architecture Experiments}
 \label{sec:supp_arch}
@@ -43,7 +49,7 @@
 \toprule
 Category & Method & B.Acc & Std & Trainable Params \\
 \midrule
-Full FT & KD+aug (p=0.6) & 0.627 & 0.004 & 134M \\
+Full FT & KD+aug ($p=0.6$) & 0.627 & 0.004 & 134M \\
 \midrule
 \multirow{4}{*}{Adapters} & Adapter-16 & 0.616 & 0.004 & 129M + 79K \\
  & Adapter-32 & 0.615 & 0.009 & 129M + 156K \\
@@ -70,16 +76,17 @@ Cross-Attn & K=9 queries & 0.260 & --- & 6.6M \\
 \section{Multi-LLM Emotion Vector Analysis}
 \label{sec:supp_llm}
 
-We extract emotion vectors from 8 models across 6 families to test whether LLM emotion geometry is universal or specific to a single model family. For each model, we compute the first principal component of the 9 emotion vectors and correlate it with the ground-truth valence ordering. \cref{tab:supp_llm} summarizes the results.
+We extract emotion vectors from 11 instruction-tuned models in 2 families plus several control base models. \cref{tab:supp_llm} reports the PC1--valence Pearson $r$, cluster separation ratio, and binary cluster purity for each.
 
 \begin{table}[!h]
-\caption{PC1-valence correlation across LLM models. Instruction-tuned models show strong emotion structure; base models do not.}
+\caption{Multi-LLM emotion vector quality. Instruction-tuned Qwen and Gemma-4 models show strong valence structure ($p < 0.001$ for all). Base models (Pythia, Bloom) and small non-instruct models (TinyLlama) lack structure.}
 \small
 \centering
 \begin{tabular}{llcccc}
 \toprule
 Model & Family & Pearson $r$ & Cluster Sep & $p$-value & Structure? \\
 \midrule
+\multicolumn{6}{l}{\textit{Qwen2.5 family (7 sizes, 67\%-depth):}} \\
 Qwen2.5-0.5B & Alibaba & $0.932$ & $1.74$ & $3 \times 10^{-4}$ & \cmark \\
 Qwen2.5-1.5B & Alibaba & $0.955$ & $\mathbf{2.04}$ & $6 \times 10^{-5}$ & \cmark \\
 Qwen2.5-3B & Alibaba & $\mathbf{0.976}$ & $1.77$ & $7 \times 10^{-6}$ & \cmark \\
@@ -88,7 +95,14 @@ Qwen2.5-14B & Alibaba & $0.943$ & $1.81$ & $1 \times 10^{-4}$ & \cmark \\
 Qwen2.5-32B & Alibaba & $0.926$ & $1.68$ & $3 \times 10^{-4}$ & \cmark \\
 Qwen2.5-72B & Alibaba & $0.965$ & $1.63$ & $3 \times 10^{-5}$ & \cmark \\
 \midrule
-Mistral-7B & Mistral AI & $-0.78$ & --- & $0.013$ & \cmark \\
+\multicolumn{6}{l}{\textit{Gemma-4 family (4 variants, best layer for each):}} \\
+Gemma-4 E2B (29\%) & Google & $0.913$ & --- & $6 \times 10^{-4}$ & \cmark \\
+Gemma-4 E4B (29\%) & Google & $0.896$ & --- & $1 \times 10^{-3}$ & \cmark \\
+Gemma-4 26B-A4B (67\%) & Google & $0.881$ & --- & $2 \times 10^{-3}$ & \cmark \\
+Gemma-4 31B (67\%) & Google & $\mathbf{0.972}$ & --- & $7 \times 10^{-6}$ & \cmark \\
+\midrule
+\multicolumn{6}{l}{\textit{Control models (no instruction tuning):}} \\
+Mistral-7B-Instruct & Mistral AI & $-0.78$ & --- & $0.013$ & \cmark \\
 Phi-2 & Microsoft & $-0.53$ & --- & $0.139$ & Marginal \\
 TinyLlama & Meta & $+0.27$ & --- & $0.488$ & \xmark \\
 Pythia-1.4B & EleutherAI & $+0.30$ & --- & $0.433$ & \xmark \\
@@ -98,16 +112,111 @@ Bloom-560M & BigScience & $0.00$ & --- & $1.000$ & \xmark \\
 \label{tab:supp_llm}
 \end{table}
 
-Instruction-tuned models exhibit significant valence structure ($p < 0.001$ for all Qwen scales), while base models (Pythia, Bloom) show none. Cross-family RDM agreement between instruction-tuned models is high: Qwen--Mistral $r = 0.93$. Within the Qwen family, two trends emerge: (1) \emph{Pearson $r$} follows a U-shape, peaking at 3B ($0.976$), dipping at 32B ($0.926$), and recovering at 72B ($0.965$); (2) \emph{cluster separation} peaks at 1.5B ($2.04$) and declines monotonically, reaching $1.63$ at 72B. This divergence reflects the curse of dimensionality: as hidden dimensions grow ($896 \to 8192$), the valence direction is preserved but inter-class distances shrink relative to the ambient space. For KD, cluster separation is the operationally relevant metric. We extract vectors from layer~8 of Qwen2.5-1.5B (29\% depth), which produces the highest-quality emotion vectors (see \cref{sec:llm_scale}).
+\noindent\textbf{Cross-family RDM agreement.} \cref{fig:cross_family_rdm} (main paper) shows the full $11 \times 11$ pairwise RSA matrix. Within-Qwen agreement averages $\rho = 0.883 \pm 0.067$ (42 pairs); within-Gemma $\rho = 0.904 \pm 0.055$ (12 pairs); cross-family Qwen$\leftrightarrow$Gemma $\rho = 0.818 \pm 0.081$ (56 pairs). The strongest cross-family pair is Qwen-0.5B$\leftrightarrow$Gemma-4 26B-A4B at $\rho = 0.971$.
+
+\noindent\textbf{Linear probing.} For each LLM we evaluate (i) PC1--valence Pearson $r$, (ii) leave-one-out nearest-neighbor (cosine) accuracy on valence sign, (iii) k-means cluster purity for the 8-class binary positive/negative split (excluding neutral), and (iv) linear separability via projection onto the (positive mean $-$ negative mean) direction. All Qwen and Gemma-4 instruction-tuned models achieve $\geq$$88\%$ binary cluster purity at appropriate depth, with $100\%$ for Qwen-1.5B+, Qwen-3B+, Qwen-7B+, Qwen-14B+, Qwen-32B+, Qwen-72B+, all four Gemma-4 variants at 67\% depth, and most Gemma-4 at 29\% depth. The only failure case is Gemma-4 31B at 29\% depth ($75\%$), consistent with the depth-pattern flip in large Gemma-4 models reported in \cref{sec:llm_scale}.
+
+\section{Mid-Layer Extraction Sweep}
+\label{sec:supp_midlayer}
+
+\begin{table}[!h]
+\caption{Mid-layer extraction (29\% depth) for Qwen2.5 family with downstream CBraMod FACED KD evaluation (5 seeds). Qwen-1.5B layer 8 is the best teacher, with paired $t$-test $p = 0.047$ vs.\ Qwen-0.5B layer 6.}
+\small
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Model & Total Layers & Mid Layer & Mean B.Acc & Std \\
+\midrule
+Qwen-0.5B & 24 & 6 & 0.6137 & 0.0068 \\
+\rowcolor{blond}
+\textbf{Qwen-1.5B} & 28 & 8 & \textbf{0.6283} & 0.0065 \\
+Qwen-3B & 36 & 10 & 0.6223 & 0.0050 \\
+Qwen-7B & 28 & 8 & 0.6193 & 0.0043 \\
+Qwen-14B & 40 & 13 & 0.6205 & 0.0049 \\
+Qwen-32B & 64 & 18 & 0.6172 & 0.0071 \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_midlayer}
+\end{table}
+
+\noindent\textbf{Cross-family observation.} Within Gemma-4, the depth pattern reverses with scale: small models (E2B with 35 layers, E4B with 42 layers) show $r_{29\%} > r_{67\%}$ (mid-layer better), while large models (26B-A4B with 30 layers, 31B with 60 layers) show $r_{67\%} > r_{29\%}$ (late-layer better, with a striking gap of $0.972$ vs $0.488$ for 31B). For Qwen, all 7 sizes show $r_{67\%} > r_{29\%}$. The practical implication is that there is no universal ``use mid-layer'' rule; layer choice should be tuned per LLM family.
+
+\section{SEED-V 5\,s Preprocessing and Per-Seed Results}
+\label{sec:supp_seedv5s}
+
+\noindent\textbf{Preprocessing.} Standard SEED-V preprocessing (CBraMod protocol) splits each video clip into non-overlapping 1\,s windows, producing samples of shape $(62, 1, 200)$. We modify this to use 5\,s non-overlapping windows, producing samples of shape $(62, 5, 200)$ with $\sim$310 token positions per sample. We process the same raw EEG files (one corrupted CNT file is skipped: \texttt{7\_1\_20180411.cnt}) and obtain $22{,}738$ total samples ($6{,}670$ train / $8{,}277$ val / $7{,}791$ test). For LaBraM, we additionally extract a 19-channel subset (standard 10--20 montage: FP1, FP2, F7, F3, FZ, F4, F8, T7, C3, CZ, C4, T8, P7, P3, PZ, P4, P8, O1, O2) to fit LaBraM's positional embedding limit ($128$ tokens).
+
+\begin{table}[!h]
+\caption{Per-seed results for SEED-V cross-dataset experiments. CBraMod 5\,s and LaBraM 19ch$\times$5\,s both show positive KD effects (CBraMod CI excludes zero, LaBraM $p = 0.037$). LaBraM 19ch$\times$1\,s (control) shows that the gain is from KD, not from longer windows.}
+\small
+\centering
+\begin{tabular}{lcccccc}
+\toprule
+Setting & Seed 3407 & Seed 42 & Seed 123 & Seed 456 & Seed 789 & Mean $\pm$ Std \\
+\midrule
+\multicolumn{7}{l}{\textit{CBraMod SEED-V 5\,s, 62 channels:}} \\
+Baseline & 0.4346 & 0.4379 & 0.4380 & 0.4439 & 0.4409 & $0.4391 \pm 0.0035$ \\
++KD & 0.4448 & 0.4434 & 0.4404 & 0.4414 & 0.4436 & $0.4427 \pm 0.0018$ \\
+\midrule
+\multicolumn{7}{l}{\textit{LaBraM SEED-V-19ch 5\,s:}} \\
+Baseline & 0.3945 & 0.3860 & 0.3806 & 0.3739 & 0.3975 & $0.3865 \pm 0.0094$ \\
++KD & 0.4096 & 0.4031 & 0.4151 & 0.4007 & 0.3965 & $0.4050 \pm 0.0074$ \\
+\midrule
+\multicolumn{7}{l}{\textit{LaBraM SEED-V-19ch 1\,s (control for window-length confound):}} \\
+Baseline & 0.4020 & 0.3994 & 0.4080 & 0.4019 & 0.3907 & $0.4004 \pm 0.0066$ \\
++KD & 0.3940 & 0.4046 & 0.4134 & 0.4074 & 0.4030 & $0.4045 \pm 0.0071$ \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_seedv5s}
+\end{table}
+
+\noindent\textbf{Token threshold summary.} For LaBraM specifically, the same 19-channel selection at 1\,s (19 tokens, $\Delta = +0.4\%$, $p = 0.28$) and 5\,s (95 tokens, $\Delta = +1.85\%$, $p = 0.037$) shows that more tokens within a fixed channel set yields a larger and more reliable KD effect. The 62-channel SEED-V at 1\,s (63 tokens, $\Delta = 0.0\%$) is anomalously KD-resistant, likely due to redundant electrodes diluting the KD gradient.
+
+\section{Computational Efficiency Breakdown}
+\label{sec:supp_efficiency}
+
+\begin{table}[!h]
+\caption{Detailed parameter breakdown for the three main configurations of \ours\ on FACED. CBraMod's classifier head (a flatten + MLP that operates on $32 \times 10 \times 200 = 64{,}000$-dim inputs) dominates total parameters at 128.4M. KD adds a small training-only semantic head; adapter freezes the 4.88M backbone.}
+\small
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Method & Total & Trainable & Backbone & Classifier & Extra \\
+\midrule
+CBraMod baseline & 133.29M & 133.29M & 4.88M & 128.40M & --- \\
++KD & 134.12M & 134.11M & 4.88M & 128.40M & 0.83M (semantic) \\
++Adapter64 (frozen bb) & 134.43M & 129.55M & 4.88M (frozen) & 128.40M & 0.31M (adapters) + 0.83M (semantic) \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_efficiency}
+\end{table}
+
+\noindent\textbf{Inference cost.} The semantic projection head used for KD is dropped at test time, so KD has \emph{zero} inference overhead. The adapter head adds 0.31M parameters and contributes a small forward-pass overhead per transformer block (a $200 \to 64 \to 200$ bottleneck), yielding $\sim$1\% inference cost increase.
+
+\section{Failed Experiments and Lessons Learned}
+\label{sec:supp_failed}
+
+We report failed experiments transparently to inform future work in this area.
+
+\noindent\textbf{REVE replication.} We attempted to replicate REVE (NeurIPS 2025) on FACED across 10+ configurations but could not match the published $0.5646$ baseline (best $0.500$). The likely cause is differences in their custom 4D positional encoding pipeline, which we could not fully replicate from the paper. We pivoted to LaBraM as our second backbone.
+
+\noindent\textbf{EEG-DINO extensions.} We tested KD and adapters on EEG-DINO (MICCAI 2025), a hierarchical self-distillation EEG model. Both extensions are flat ($\pm 0.003$) on SEED-V despite being effective on CBraMod. Investigation traced this to the 20-token preprocessing of EEG-DINO SEED-V, which sits below our token-count threshold. This negative result motivated the cross-dataset 5\,s preprocessing investigation that we report in the main paper.
+
+\noindent\textbf{Llama-4 Scout 17B-16E.} We attempted to extract emotion vectors from Llama-4 Scout (17B active, 109B total MoE parameters) across 5 attempts. Each attempt failed due to a compatibility issue between bitsandbytes 4-bit quantization (v0.49.2), accelerate's CPU/GPU dispatch hooks, and Llama-4's MoE architecture. Symptoms ranged from \texttt{NotImplementedError: Cannot copy out of meta tensor} to OOM at $78.80$\,GB on a single A100 80\,GB. This is a software-engineering limitation rather than a scientific finding; we have strong cross-family validation already with 11 instruction-tuned Qwen and Gemma-4 models.
+
+\noindent\textbf{Mid-layer extraction generalization.} Drawing on prior interpretability work showing that emotion concepts concentrate at $\sim$$50\%$ depth, we expected mid-layer extraction to consistently outperform 67\%-depth extraction across LLM families. The result is more nuanced: it works for Gemma-4 small models but not for Qwen and not for Gemma-4 large models. We initially proposed a paper revision that promoted mid-layer as the universal best practice but rolled it back after this finding.
+
+\noindent\textbf{Adapter PEFT on SEED-V.} The adapter64 frozen-backbone recipe that yields the FACED SOTA \emph{degrades} CBraMod by $5\%$ on SEED-V and provides no benefit on LaBraM. This was a surprise; we initially expected the PEFT story to be backbone-specific, not dataset-specific. We have included this negative finding prominently in the main paper because it informs practitioners about the limits of PEFT recipe transfer for EEG.
+
+\noindent\textbf{Emotion-specific SFT of teacher.} We hypothesized that fine-tuning the teacher LLM on emotion classification/explanation tasks would improve vector quality. Instead, both 189-instruction LoRA SFT and 1{,}898-instruction SFT \emph{degraded} cluster separation ($2.04 \to 1.70 \to 1.63$). The SFT instructions appeared to collapse the rich relational structure into a tighter categorical decision boundary, producing less informative soft labels.
 
 \section{Additional Architecture Exploration}
 \label{sec:supp_explore}
 
-We explored several additional architecture directions beyond the main results:
-
 \begin{itemize}
-    \item \textbf{Cross-attention readout.} We tested Perceiver-style~\cite{jaegle2021perceiver} learnable query tokens attending over backbone features. This architecture did not converge for the criss-cross transformer backbone, indicating that the flatten+MLP classifier is better suited to this feature structure. This finding informs future EEG architecture design.
-    \item \textbf{Masked autoencoder pretraining.} We investigated VideoMAE-style~\cite{tong2022videomae} pretraining on CBraMod. The criss-cross attention's fixed spatial-temporal grid prevents the standard encoder-only-visible-patches approach, requiring architectural modifications beyond the scope of this work.
-    \item \textbf{Hyperparameter interaction.} Combining the two best individual hyperparameters ($p_{\text{aug}} = 0.6$ and $\tau_t = 0.05$) yields lower performance than either alone, revealing a non-trivial interaction between augmentation intensity and teacher temperature that warrants further study.
-    \item \textbf{Training duration.} Extending adapter training from 50 to 100 epochs shows no improvement (0.629 vs.\ 0.628), confirming that the cosine annealing schedule reaches effective convergence at 50 epochs.
+    \item \textbf{Cross-attention readout.} We tested Perceiver-style learnable query tokens attending over backbone features. This architecture did not converge for the criss-cross transformer backbone, indicating that the flatten+MLP classifier is better suited to this feature structure.
+    \item \textbf{Masked autoencoder pretraining.} We investigated VideoMAE-style pretraining on CBraMod. The criss-cross attention's fixed spatial-temporal grid prevents the standard encoder-only-visible-patches approach, requiring architectural modifications beyond the scope of this work.
+    \item \textbf{Hyperparameter interaction.} Combining the two best individual hyperparameters ($p_{\text{aug}} = 0.6$ and $\tau_t = 0.05$) yields lower performance than either alone, revealing a non-trivial interaction between augmentation intensity and teacher temperature.
+    \item \textbf{Training duration.} Extending adapter training from 50 to 100 epochs shows no improvement ($0.629$ vs.\ $0.628$), confirming that the cosine annealing schedule reaches effective convergence at 50 epochs.
+    \item \textbf{AMP/KD interaction.} Training KD with mixed precision (fp16) and sharp teacher temperatures ($\tau_t = 0.1$) caused gradient overflow on LaBraM, requiring fp32 KD computation outside the autocast region. This is a known issue with sharp distillation targets~\cite{vitkd2022} that we encountered during the LaBraM cross-backbone replication.
 \end{itemize}
