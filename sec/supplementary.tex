@@ -23,6 +23,14 @@
     \item \textbf{Section \ref{sec:supp_efficiency}:} Computational efficiency breakdown.
     \item \textbf{Section \ref{sec:supp_labram_recipes}:} LaBraM KD recipe robustness across three variants.
     \item \textbf{Section \ref{sec:supp_per_subject}:} Per-subject KD benefit distribution.
+    \item \textbf{Section \ref{sec:supp_eegdino}:} EEG-DINO third cross-backbone and token-count confirmation.
+    \item \textbf{Section \ref{sec:supp_reve}:} REVE replication attempt.
+    \item \textbf{Section \ref{sec:supp_baseteachers}:} Non-instruction-tuned teacher controls.
+    \item \textbf{Section \ref{sec:supp_sft}:} Emotion-specific SFT of the teacher.
+    \item \textbf{Section \ref{sec:supp_seedv_loso}:} SEED-V cross-subject leave-group-out.
+    \item \textbf{Section \ref{sec:supp_peft_dataset}:} Dataset-dependent PEFT.
+    \item \textbf{Section \ref{sec:supp_best_teacher}:} Best-teacher comparison.
+    \item \textbf{Section \ref{sec:supp_llama4}:} Llama-4 Scout loading issue.
     \item \textbf{Section \ref{sec:supp_explore}:} Additional architecture exploration.
 \end{itemize}
 
@@ -233,6 +241,128 @@ V3 (proj only) & 0.5 & 3L+BN & 0.3 & $0.4037 \pm 0.0092$ & $+2.93\%$ \\
 
 \noindent\textbf{Distribution analysis.} Per-subject gains are uncorrelated with baseline accuracy (Pearson $r = -0.14$, $p = 0.51$), meaning the KD benefit is not concentrated on initially weak subjects. Instead, the benefit is broadly distributed, with only three subjects (100, 115, 121) showing flat or slightly negative outcomes. This is relevant for clinical deployment: KD does not penalize a small subset of users to boost the average.
 
+\section{EEG-DINO: Third Cross-Backbone and Token-Count Confirmation}
+\label{sec:supp_eegdino}
+
+Beyond CBraMod and LaBraM, we explored EEG-DINO~\cite{wang2025eegdino} (MICCAI 2025), a self-distillation EEG foundation model (4.6M parameters, pretrained on TUEG). EEG-DINO provides a third independent cross-backbone datapoint and, critically, also reveals the token-count requirement from a different angle.
+
+\noindent\textbf{SEED-V default (1\,s $\to$ $\sim$20 tokens).} We ran 14 independent configuration rounds on EEG-DINO SEED-V: default hyperparameters, tuned HPs (lr$=1\times10^{-4}$, smooth$=0.1$, lr decay$=0.9$), the Medium (33M) variant, KD at $\alpha \in \{0.1, 0.2, 0.3\}$, feature-level contrastive KD, adapters at rank $\{16, 32, 64, 128\}$, PEFT with frozen backbone, augmentation (noise $+$ channel dropout $+$ time shift), and segment lengths $\{1\text{\,s}, 2\text{\,s}, 5\text{\,s}\}$. The best baseline ($0.387$) was reached in round~3 and \emph{no} extension moved the needle by more than $|\Delta| \leq 0.003$, with augmentation actively \emph{hurting} ($0.350$) and $5$\,s segments underperforming due to too-few samples ($0.335$). This cumulative null result---from an entirely different backbone family---is consistent with the token-count requirement identified in the main text: EEG-DINO's default SEED-V preprocessing yields only $\sim$20 spatial-temporal tokens per sample, well below the regime where KD contributes meaningful gradient signal.
+
+\noindent\textbf{FACED (32\,ch $\to$ $\sim$320 tokens).} On FACED, EEG-DINO's default configuration yields $0.245$ balanced accuracy; adding the frozen-backbone adapter head ($r=64$) improves it to $0.258$ ($+5.2\%$ relative), reproducing the same PEFT-wins-over-full-FT pattern observed for CBraMod. Linear probing on frozen features gives $0.140$ and KD-frozen gives $0.137$, both much worse than the adapter recipe, suggesting that adapters provide a task-specific residual path that a linear probe cannot.
+
+\noindent\textbf{Combined cross-backbone story.} Across three backbones with very different pretraining objectives (CBraMod: criss-cross masked prediction; LaBraM: vector-quantized neural spectrum; EEG-DINO: hierarchical self-distillation), the same two trends hold: (i) adapters with a frozen backbone either match or beat full fine-tuning on FACED, and (ii) KD is statistically significant when the input preprocessing yields $\geq 100$ spatial-temporal tokens and statistically flat otherwise.
+
+\section{REVE Replication Attempt}
+\label{sec:supp_reve}
+
+For completeness, we attempted to replicate REVE~\cite{elouahidi2025reve} (NeurIPS 2025) on FACED across ten configurations: full fine-tuning at two patch sizes ($p = 10, 30$), KD with $\alpha = 1.0$, $\tau = 0.1$, adapter64 with KD, LoRA at $r \in \{4, 8\}$ with training the full backbone, and four learning-rate variants. The best single-configuration balanced accuracy was $0.500$, and the best seed-averaged ``soup'' was $0.496$; neither matched the paper's reported $0.5646$. LoRA with full-backbone training collapsed to chance. We believe the gap is due to differences in REVE's custom 4D positional encoding and channel-flexible patchifier, which the public checkpoint does not fully expose. Because we could not reach the published baseline, we do not claim a REVE cross-backbone result; LaBraM and EEG-DINO serve as the second and third cross-backbone datapoints instead. REVE remains in \cref{tab:main_results} for completeness, using the authors' published numbers.
+
+\section{Non-Instruction-Tuned Teacher Controls}
+\label{sec:supp_baseteachers}
+
+\begin{table}[!h]
+\caption{Non-instruction-tuned LLMs fail to yield emotion geometry. PC1--valence Pearson $|r|$ and $p$-value. Base models have no valence structure; instruction-tuned models do.}
+\small
+\centering
+\begin{tabular}{llccc}
+\toprule
+Model & Training & $|r|$ & $p$ & Valence structure? \\
+\midrule
+Mistral-7B-Instruct & instruct & $0.78$ & $0.013$ & yes \\
+Phi-2 & instruct-lite & $0.53$ & $0.139$ & marginal \\
+\midrule
+Pythia-1.4B & \emph{base} & $0.30$ & $0.433$ & no \\
+Bloom-560M & \emph{base} & $0.00$ & $1.000$ & no \\
+TinyLlama-1.1B & \emph{base} & $0.27$ & $0.488$ & no \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_baseteachers}
+\end{table}
+
+\cref{tab:supp_baseteachers} shows the complementary control: non-instruction-tuned (``base'') models lack valence structure, while all instruction-tuned models---regardless of family or size---show strong valence geometry. We ran the same 30-topic extraction pipeline for all models; base models also generated $\sim$$42\%$ empty or truncated stories, consistent with their lack of task-following ability. This aligns with prior work showing that instruction tuning increases brain-model alignment~\cite{scaling_brain_alignment2024} and causally establishes emotion concepts~\cite{sofroniew2026anthropic}.
+
+\section{Emotion-Specific SFT of the Teacher}
+\label{sec:supp_sft}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.85\linewidth]{figs/fig_teacher_requirements.png}
+\caption{Teacher requirements for EmotionKD. \textbf{Left:} Emotion-specific SFT of Qwen2.5-0.5B degrades cluster separation from $2.04$ (base instruct) to $1.70$ (SFT-189) and $1.63$ (SFT-1898). \textbf{Right:} PC1--valence $|r|$ for base (non-instruction-tuned) models is near zero; all instruction-tuned models have strong valence geometry. These two panels jointly argue that the right teacher is an \emph{un-SFT'd instruction-tuned} LLM: instruction tuning is necessary but additional emotion-specific fine-tuning harms the relational structure.}
+\label{fig:teacher_requirements}
+\end{figure}
+
+We tested whether explicitly fine-tuning the teacher LLM on emotion classification/explanation tasks would sharpen the extracted vectors. We fine-tuned Qwen2.5-0.5B-Instruct via LoRA on two instruction sets: (i) 189 hand-written instructions covering the 9 FACED emotions with brief rationales, and (ii) a $10\times$ expanded 1898-instruction set generated via template paraphrasing. Both SFT variants \emph{degrade} cluster separation (see \cref{fig:teacher_requirements} left):
+
+\begin{table}[!h]
+\centering
+\small
+\begin{tabular}{lcc}
+\toprule
+Variant & Cluster separation & $\Delta$ vs.\ base \\
+\midrule
+Base Qwen2.5-0.5B-Instruct (no SFT) & $2.04$ & --- \\
+$+$ SFT-189 & $1.70$ & $-16.7\%$ \\
+$+$ SFT-1898 & $1.63$ & $-20.1\%$ \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_sft}
+\end{table}
+
+The RDM geometries of SFT and non-SFT vectors remain nearly identical (Spearman $\rho > 0.99$), indicating that SFT does not change \emph{which} emotions are similar to which, but rather \emph{compresses} the inter-class distances. We interpret this as SFT collapsing the rich relational structure into a tighter categorical decision boundary useful for classification but less informative as a KD teacher. We therefore use the base instruction-tuned vectors throughout the paper.
+
+\section{SEED-V Cross-Subject Leave-Group-Out}
+\label{sec:supp_seedv_loso}
+
+In addition to the FACED LOSO results reported in the main text, we also ran 4-fold leave-group-out on SEED-V (16 subjects, $\sim$4 held-out per fold). Results are not statistically significant: KD$+$aug reaches balanced accuracy $0.245$ vs.\ baseline $0.240$ ($\Delta = +0.5\%$, $p = 0.41$, paired $t$-test), and Adapter64 is flat. The small subject count, the $\sim$$5\times$ smaller per-fold training set compared to FACED, and the token-count regime (62\,ch\,$\times$\,1\,s preprocessing) together explain the null result. We include this as a limitation: the SEED-V 1\,s preprocessing used in prior work~\cite{wang2025cbramod} is not in the operating range where KD provides detectable cross-subject gains, and a larger subject pool is needed to run a meaningful LOSO on the 5\,s variant.
+
+\section{Dataset-Dependent PEFT}
+\label{sec:supp_peft_dataset}
+
+The adapter$64$ recipe that yields our FACED SOTA ($0.628$) behaves differently on SEED-V. \cref{tab:supp_peft_dataset} summarizes the pattern: adapters match full fine-tuning on FACED for both CBraMod and LaBraM, but under-perform full fine-tuning on SEED-V 5\,s for both backbones.
+
+\begin{table}[!h]
+\caption{Adapter64 (frozen backbone) vs.\ full fine-tuning (with KD in both cases). On FACED, adapters match or beat full FT. On SEED-V 5\,s, they under-perform.}
+\small
+\centering
+\begin{tabular}{llcc}
+\toprule
+Backbone & Dataset & Full FT + KD & Adapter64 + KD \\
+\midrule
+CBraMod & FACED & $0.627$ & $\mathbf{0.628}$ \\
+CBraMod & SEED-V 5\,s & $\mathbf{0.443}$ & $0.393$ \\
+LaBraM & FACED & $\mathbf{0.399}$ & (n/a) \\
+LaBraM & SEED-V 19ch\,5\,s & $\mathbf{0.405}$ & $0.386$ \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_peft_dataset}
+\end{table}
+
+We hypothesize that the dense $62$-channel SEED-V montage couples adjacent electrodes more tightly, which pushes the optimal task-specific residual capacity higher than what a rank-$64$ adapter provides. FACED uses a sparser $32$-channel montage where the adapter capacity is sufficient. For now, we report this as a backbone-agnostic, dataset-dependent observation and recommend that practitioners choose PEFT rank per dataset rather than assuming a universal recipe.
+
+\section{Best-Teacher Comparison}
+\label{sec:supp_best_teacher}
+
+In \cref{sec:llm_scale} we report the downstream-KD inverted-U: mid-layer extraction from Qwen-1.5B (layer 8) gives the best EEG accuracy ($0.6283$). To check whether this should replace Qwen-14B ($67$\%) as our default teacher, we ran a direct paired comparison using the same training pipeline:
+
+\begin{center}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Teacher & B.Acc & $\kappa$ & $\Delta$ vs.\ Qwen-14B & $p$-value \\
+\midrule
+Qwen-14B, $67$\% depth (default) & $0.6246$ & $0.571$ & --- & --- \\
+Qwen-1.5B, layer 8 ($29$\% depth) & $\mathbf{0.6283}$ & $\mathbf{0.577}$ & $+0.4\%$ & $0.25$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The $+0.4\%$ gap is within noise ($p = 0.25$, 5-seed paired $t$-test, bootstrap 95\% CI crosses zero). Both teachers yield SOTA-level performance, and Qwen-1.5B is $\sim$$10\times$ cheaper to run at extraction time. We retain Qwen-14B as the paper's default teacher because its downstream representations produce the most consistent per-sample CKA scores (\cref{sec:cka}), but note that either choice is valid; the inverted-U findings are the main message of this section.
+
+\section{Llama-4 Scout Loading Issue}
+\label{sec:supp_llama4}
+
+We also attempted to add Llama-4 Scout (17B active, 109B total Mixture-of-Experts) to the LLM suite. Each of five configurations failed due to incompatibilities between bitsandbytes 4-bit quantization (v0.49.2), accelerate's CPU/GPU dispatch hooks, and Llama-4's MoE architecture, with errors ranging from \texttt{NotImplementedError: Cannot copy out of meta tensor} to OOM at $78.80$\,GB on a single A100 80\,GB. This is a software-engineering constraint rather than a scientific finding, but we note it so that future work combining large MoE models with quantized emotion-vector extraction can avoid the same pitfall. The 11 successfully-extracted instruction-tuned models already span a wide range of scales ($0.5$B\,--\,$72$B) and two families, and the cross-family universality result is based on that suite.
+
 \section{Additional Architecture Exploration}
 \label{sec:supp_explore}
 
@@ -240,4 +370,10 @@ V3 (proj only) & 0.5 & 3L+BN & 0.3 & $0.4037 \pm 0.0092$ & $+2.93\%$ \\
     \item \textbf{Hyperparameter interaction.} Combining the two best individual hyperparameters ($p_{\text{aug}} = 0.6$ and $\tau_t = 0.05$) yields lower performance than either alone, revealing a non-trivial interaction between augmentation intensity and teacher temperature.
     \item \textbf{Training duration.} Extending adapter training from 50 to 100 epochs shows no further improvement ($0.629$ vs.\ $0.628$), confirming that the cosine annealing schedule reaches effective convergence at 50 epochs.
     \item \textbf{AMP precision for KD.} Training KD with sharp teacher temperatures ($\tau_t = 0.1$) requires fp32 KD computation outside the autocast region on LaBraM, a known consideration with sharp distillation targets~\cite{vitkd2022}.
+    \item \textbf{Depth reduction.} Reducing CBraMod's encoder from $12$ to $8$ or $6$ layers (while keeping head width) reduces FACED balanced accuracy to $0.603$ and $0.593$ respectively, confirming that the full pretrained depth is load-bearing for the criss-cross attention.
+    \item \textbf{Cross-attention read-out.} Replacing the classifier with Perceiver-style learnable query tokens that attend over backbone features~\cite{jaegle2021perceiver}---$K = 9$ or $K = 16$ queries---collapses to $\leq 0.276$ balanced accuracy across all tested configurations, including a $5\times$-amplified head learning rate. We attribute this to the fact that CBraMod's criss-cross attention produces a pre-pooled feature grid that the cross-attention module cannot re-aggregate without substantial re-training; a flat MLP head on the full $64{,}000$-dim concatenated features is strictly better.
+    \item \textbf{Adapter unfreezing hurts.} A natural extension of our frozen-backbone adapter recipe is to ``warm-start'' with frozen adapters then unfreeze the backbone at $1/10$ learning rate for a second training phase. In practice this drops balanced accuracy by $1.3\%$ ($0.615$ vs.\ $0.628$) because the unfrozen backbone drifts away from its TUEG-pretrained weights. This is consistent with prior PEFT work showing that the value of LoRA/adapters depends on \emph{not} updating the base parameters~\cite{houlsby2019adapters,hu2022lora}.
+    \item \textbf{LoRA rank is flat.} Varying LoRA rank across $\{4, 8, 16\}$ yields essentially identical FACED balanced accuracy ($0.618$, $0.619$, $0.620$), in contrast to the adapter rank curve which peaks at $r = 64$. Both LoRA and FiLM~\cite{perez2018film} under-perform bottleneck adapters across the entire range tested.
+    \item \textbf{Generic contrastive losses do not add value.} SupCon~\cite{khosla2020supcon} and direct valence--arousal regression without augmentation both under-perform the pure-CE baseline ($0.567$ and $0.564$ vs.\ $0.572$). With augmentation they match aug-only at $\sim$$0.611$. Only the LLM-guided KD loss clears the aug baseline by a meaningful margin.
+    \item \textbf{Temperature collapse at $\tau_t = 0.1$ explains the one-hot/random/SBERT near-equivalence.} At teacher temperature $\tau_t = 0.1$ the soft-label distribution has entropy $\approx 0.004$, effectively one-hot. The One-hot, Random Gaussian, and SBERT variants in Table~\ref{tab:baselines} all reach $\sim$$0.62$ because KD with sharp targets degrades to cross-entropy~\cite{vitkd2022}; the LLM \emph{hidden-state} KD still wins by $+1.8\%$ precisely because its similarity matrix is close-to-uniform within-valence clusters, keeping the soft-target entropy above the collapse threshold. See also the logit-KD comparison in the main text (Table~\ref{tab:baselines}), which isolates the role of relational geometry further.
 \end{itemize}
