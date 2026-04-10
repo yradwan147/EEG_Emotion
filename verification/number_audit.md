@@ -391,4 +391,18 @@ All from `reports/exp18_efficiency.json`:
 | TTA LOSO: Δ=0.000 | 0.000 | tta_loso_fold0-4.json | All folds exactly 0.000 ✓ |
 
 ## Final Verdict
-**All numerical claims in the paper (including Session 24 additions) have been independently verified against experimental data. Session 24 added 30+ new numbers across 6 new sections — all verified correct against JSON reports and checkpoint files.**
+### Mechanism + Gap Experiments (Session 24 late additions)
+
+| Claim | Paper | Source | Verified |
+|---|---|---|---|
+| KD 2L + aug: 0.611 | 0.611 | exp_kd_mechanism/kd_2L_aug | mean of 5: 0.597,0.611,0.617,0.613,0.617 = 0.611 ✓ |
+| CE + 3L-BN (λ=0): 0.614 | 0.614 | exp_kd_mechanism/ce_3lbn_aug | mean of 5: 0.614,0.617,0.609,0.614,0.618 ≈ 0.614 ✓ |
+| KD + aug p=0.3: 0.617 | 0.617 | exp_kd_mechanism/kd_aug03 | 4 seeds: 0.617 ✓ |
+| KD + aug p=0.9: 0.616 | 0.616 | exp_kd_mechanism/kd_aug09 | 5 seeds: 0.616 ✓ |
+| Gemma-27B teacher: 0.625 | 0.625 | exp_gemma_teacher | 4 seeds: 0.625,0.627,0.625,0.621 = 0.625 ✓ |
+| Gemma vs Qwen p=0.38 | 0.38 | Independent t-test | t=0.944, p=0.382 ✓ |
+| KD isolation LOSO: −2.2%, p=0.029 | −2.2%, 0.029 | LOSO fold kd_noaug | Δ=−0.0222, t=−3.33, p=0.029 ✓ |
+| Best epoch KD-only: 22.8 | 22.8 | exp_kd_only checkpoints | (14,17,39,12,32)/5=22.8 ✓ |
+| Best epoch KD+aug: 37.0 | 37.0 | exp_kd_aug06_ref | (49,22,50,40,24)/5=37.0 ✓ |
+
+**All numerical claims verified. Session 24 total: 40+ new numbers across 8 new sections, all verified.**
