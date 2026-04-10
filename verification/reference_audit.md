@@ -131,9 +131,46 @@
 2. Every `\cite` occurrence in `sec/*.tex` had its surrounding sentence checked against the cited paper's stated findings.
 3. Priority was given to (a) recently added entries (EEG-DINO, REVE, E²-LLM, EMOD, EmotionCLIP, CoMET, CMCRD, mdJPT, U-shape scaling, controllable emotion), (b) anonymous/incomplete authorship (Anthropic paper, LaBraM), and (c) high-stakes claim bindings (Tak et al. depth claim, Sofroniew et al. functional claim, scaling paper's instruction-tuning finding).
 
+---
+
+## Session 24 Reference Additions
+
+### New entries added to refs.bib (11 new):
+
+| Bib Key | Title | Venue/Year | Status |
+|---|---|---|---|
+| `zhang2018mixup` | mixup: Beyond Empirical Risk Minimization | ICLR 2018 | VERIFIED — 12k+ citations |
+| `verma2019manifold` | Manifold Mixup | ICML 2019 | VERIFIED — 2.5k+ citations |
+| `yao2022cmixup` | C-Mixup: Improving Generalization in Regression | NeurIPS 2022 | VERIFIED — arXiv:2210.05775 |
+| `turner2023activation` | Activation Addition: Steering Without Optimization | arXiv 2023 | VERIFIED — arXiv:2308.10248 |
+| `rimsky2024steering` | Steering Llama 2 via CAA | ACL 2024 | VERIFIED — arXiv:2312.06681 |
+| `koh2020concept` | Concept Bottleneck Models | ICML 2020 | VERIFIED — 1k+ citations |
+| `harkonnen2020ganspace` | GANSpace: Discovering Interpretable GAN Controls | NeurIPS 2020 | VERIFIED — 1k+ citations |
+| `park2019rkd` | Relational Knowledge Distillation | CVPR 2019 | VERIFIED — 1.5k+ citations |
+| `neurottt2025` | NeuroTTT: Test-Time Training for EEG FMs | arXiv 2025 | VERIFIED — arXiv:2509.26301 |
+| `pgnapl2025` | PGNA-PL: Prototype-Guided EEG Emotion PLL | ICLR 2025 | VERIFIED — OpenReview nnPkQb0Z0H |
+| `riemannian_eeg2025` | Riemannian Geometry for EEG Affective States | Applied Sciences 2025 | VERIFIED — MDPI 10.3390/app151910370 |
+
+### In-tex citation verification (new sections):
+
+| Citation | Context | Claim | Verified? |
+|---|---|---|---|
+| `zhang2018mixup` | Sec 4.12 | Mixup augmentation reference | ✓ Standard mixup paper |
+| `yao2022cmixup` | Sec 4.12 | C-Mixup similar-label preferential | ✓ Correct method description |
+| `verma2019manifold` | Sec 4.12 | Manifold mixup at hidden layers | ✓ Correct |
+| `turner2023activation` | Sec 4.14 | Activation addition for LLMs | ✓ Correct method |
+| `rimsky2024steering` | Sec 4.14 | CAA for steering | ✓ Correct |
+| `harkonnen2020ganspace` | Sec 4.14 | GANSpace PCA for GAN controls | ✓ Correct method |
+| `riemannian_eeg2025` | Sec 4.13 | Riemannian SPD for EEG | ✓ Correct |
+| `koh2020concept` | Supp S18 | Concept Bottleneck Models | ✓ Correct |
+| `neurottt2025` | Supp S18 | TTA for EEG FMs | ✓ Correct |
+| `eeg_graphadapter2024` | Supp S18 | Graph adapter PEFT | ✓ Already in bib |
+| `pgnapl2025` | Supp S20 | Related competitor | ✓ Correct description |
+
 ## Final Verdict
-- **Fabricated references:** 0
+- **Fabricated references:** 0 (0/54 total)
 - **Hard claim mismatches:** 0
-- **Minor wording concerns:** 1 (Sofroniew "persist across contexts" → recommend softening)
-- **Recommended metadata fixes:** 2 (`jiang2024labram` full authors; `emod2026` AAAI vs arXiv status)
-- **Overall status:** CLEAN. All 43 references verified as real papers with correct titles, authors, and venues. All in-tex claims supported by cited sources. Paper is safe for NeurIPS 2026 submission from a reference-integrity standpoint.
+- **Minor wording concerns:** 1 (Sofroniew, unchanged)
+- **Recommended metadata fixes:** 2 (unchanged)
+- **Session 24 additions:** 11 new references, all verified
+- **Overall status:** CLEAN. All 54 references verified. Paper is safe from a reference-integrity standpoint.
