@@ -327,6 +327,38 @@ To mechanistically test whether KD shapes the internal EEG representations along
 
 \cref{fig:tsne} shows t-SNE projections of CBraMod features on FACED before and after \ours. Emotion clusters become more discrete after KD. Extended three-panel visualizations including the adapter64 variant are presented in \cref{fig:cluster_tsne_3panel,fig:cluster_umap_3panel}, with convex hull overlays in \cref{fig:cluster_convex_hull} further quantifying the reduced inter-class overlap.
 
+\subsection{KD Isolation: Augmentation is Required}
+\label{sec:kd_isolation}
+\vspace{-1mm}
+
+\begin{table}[!t]
+\caption{KD isolation on FACED. Without augmentation, KD and adapters \emph{hurt} performance ($-0.5\%$ to $-1.3\%$). KD only helps \emph{on top of} augmentation, acting as a complementary regularizer.}
+\small
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Config & Aug? & B.Acc & $\Delta$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Without augmentation:}} \\
+Baseline & \xmark & 0.572 & --- \\
++ KD (3L-BN proj) & \xmark & 0.559 & $-1.3\%$ \\
++ Adapter64 + KD & \xmark & 0.567 & $-0.5\%$ \\
+\midrule
+\multicolumn{4}{l}{\textit{With augmentation ($p_{\text{aug}} = 0.6$):}} \\
+Aug only & \cmark & 0.616 & $+4.4\%$ \\
++ KD (3L-BN proj) & \cmark & 0.622 & $+5.0\%$ \\
++ Adapter64 + InfoNCE & \cmark & 0.620 & $+4.8\%$ \\
+\rowcolor{blond}
+\textbf{+ Adapter64 + KD} & \cmark & \textbf{0.628} & $\mathbf{+5.6\%}$ \\
+\bottomrule
+\end{tabular}
+\label{tab:kd_isolation}
+\end{table}
+
+A natural question is whether KD provides value independently of augmentation, or only in combination. \cref{tab:kd_isolation} presents the full factorial: we train both KD and adapter64 configurations with and without augmentation ($p_{\text{aug}} = 0$ vs.\ $0.6$). The result is striking: \textbf{without augmentation, KD actively hurts} ($-1.3\%$ for full fine-tuning, $-0.5\%$ for adapter64). The 3-layer BN projection head adds model capacity that, without the regularization provided by temporal jitter and other augmentations, leads to mild overfitting. With augmentation, the same KD signal adds $+0.6\%$ on top of aug-only ($0.622$ vs.\ $0.616$), and adapter64 further improves to $0.628$.
+
+This pattern---where KD helps only in combination with augmentation---reveals that the two mechanisms are \emph{complementary regularizers}: augmentation regularizes the \emph{input} space (forcing timing-invariant features), while KD regularizes the \emph{output} space (providing graded soft targets that encode inter-class relationships). Neither alone matches their combination.
+
 \subsection{Mixup Augmentation}
 \label{sec:mixup}
 \vspace{-1mm}
