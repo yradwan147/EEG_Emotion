@@ -70,7 +70,9 @@ KD + mixup & 0.749 & 0.664 & 0.732 & \textbf{0.712} & 0.684 & \textbf{0.708} & 0
 \label{tab:loso}
 \end{table}
 
-\cref{tab:loso} shows that improvements generalize to completely unseen subjects. Both \ours variants beat baseline on \emph{all 5 folds}, with paired $t$-test $p < 0.001$. Adding mixup augmentation further improves the cross-subject mean from $0.693$ to $\mathbf{0.708}$ ($+1.5\%$, $p = 0.042$, all 5 folds positive), confirming that augmentation-based regularization is particularly valuable in the cross-subject regime where class boundaries are harder to learn. The cross-subject baseline ($0.669$) is higher than within-subject ($0.572$) because more subjects are available for training ($\sim$98 vs.\ $\sim$80).
+\cref{tab:loso} shows that improvements generalize to completely unseen subjects. Both \ours variants beat baseline on \emph{all 5 folds}, with paired $t$-test $p < 0.001$. Adding mixup augmentation further improves the cross-subject mean from $0.693$ to $\mathbf{0.708}$ ($+1.5\%$, $p = 0.042$, all 5 folds positive), confirming that augmentation-based regularization is particularly valuable in the cross-subject regime where class boundaries are harder to learn.
+
+\noindent\textbf{Why is LOSO accuracy higher than within-subject?} The cross-subject baseline ($0.669$) exceeds the within-subject baseline ($0.572$), which may appear counterintuitive. This is explained by the dataset split design: within-subject uses subjects 0--79 for training ($\sim$6{,}700 samples), while LOSO uses $\sim$98 subjects per fold ($\sim$8{,}300 samples)---a $24\%$ larger training set. The LOSO test set ($\sim$1{,}000$ samples from $\sim$12 subjects) is also more homogeneous than the within-subject test set ($\sim$1{,}900$ samples from 23 subjects spanning a wider demographic range). Both factors favor higher LOSO accuracy despite the cross-subject challenge.
 
 \subsection{Cross-Backbone Generalization}
 \label{sec:cross_backbone}
