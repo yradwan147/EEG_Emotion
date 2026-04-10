@@ -464,7 +464,21 @@ A structured emotion manifold should enable faster calibration for new subjects.
     \label{fig:cluster_centroids_heatmap}
 \end{figure}
 
-\cref{fig:cluster_tsne_3panel} provides extended visualizations comparing baseline, KD, and adapter64 feature spaces. The progressive improvement in cluster separation is visually striking: baseline features show substantial class overlap (particularly among negative emotions), while KD and adapter64 create more discrete, well-separated clusters. Convex hull analysis (\cref{fig:cluster_convex_hull}) quantifies the reduced overlap, and the centroid distance heatmap (\cref{fig:cluster_centroids_heatmap}) confirms that KD increases inter-class separation uniformly across emotion pairs.
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\linewidth]{figs/fig_cluster_umap_3panel.png}
+    \caption{Three-panel UMAP of FACED test features. UMAP preserves global structure better than t-SNE, revealing how the positive-emotion cluster separates from the negative cluster under KD training.}
+    \label{fig:cluster_umap_3panel}
+\end{figure}
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=\linewidth]{figs/fig_cluster_density.png}
+    \caption{Kernel density estimation for the two most-confused class pairs (Sadness--Neutral, top; Anger--Neutral, bottom). Under KD (right), the density peaks separate more cleanly, consistent with the per-class silhouette improvement.}
+    \label{fig:cluster_density}
+\end{figure}
+
+\cref{fig:cluster_tsne_3panel,fig:cluster_umap_3panel} provide extended visualizations comparing baseline, KD, and adapter64 feature spaces. The centroid distance heatmap (\cref{fig:cluster_centroids_heatmap}) confirms that KD increases mean inter-class separation from $0.06$ to $0.10$ ($+67\%$) in standardized feature space. The kernel density analysis (\cref{fig:cluster_density}) shows how KD pulls apart the most-confused class pairs (Sadness--Neutral, Anger--Neutral), consistent with the per-class silhouette improvement in \cref{fig:perclass_silhouette}.
 
 \begin{figure}[!t]
     \centering
