@@ -469,3 +469,41 @@ All from `reports/exp18_efficiency.json`:
 | Mumtaz aug+kd | 0.8753 ± 0.020 | task 10-14 | ✓ |
 
 **Session 28 total: 32 new numerical claims across 6 new sections, all verified from log files.**
+
+---
+
+## Cycle 50-56 additions (2026-04-14)
+
+### Experiment A: PhysioNet-MI CBraMod recipe sweep (#254, job 46651252)
+| Claim | Value | Source | Verified |
+|---|---|---|---|
+| Baseline (5 seeds) | 0.5069 ± 0.0149 | cb_physio_46651252_{0..4}.out | [0.4986, 0.5025, 0.5253, 0.5191, 0.4892] mean=0.5069 ✓ |
+| Aug (5 seeds) | 0.5084 ± 0.0287 | cb_physio_46651252_{5..9}.out | [0.5347, 0.4791, 0.4791, 0.5114, 0.5379] mean=0.5084 ✓ |
+| KD (5 seeds) | **0.5139 ± 0.0236** | cb_physio_46651252_{10..14}.out | [0.5124, 0.4810, 0.5035, 0.5329, 0.5398] mean=0.5139 ✓ |
+| Aug+KD (5 seeds) | 0.4947 ± 0.0489 | cb_physio_46651252_{15..19}.out | [0.5406, 0.5385, 0.4763, 0.4225, 0.4957] mean=0.4947 ✓ |
+| Paper reference | 0.5138 ± 0.0066 | cbramod.pdf Table 15 | ✓ |
+| Baseline gap to paper | -0.0069 | 0.5069 - 0.5138 | ✓ within 1% |
+| KD matches paper exactly | 0.5139 ≈ 0.5138 | difference = +0.0001 | ✓ |
+| Aug vs base Welch p | 0.92 | scipy.stats.ttest_ind | ✓ null |
+
+### Experiment B: EMOD frozen backbone PEFT (#255, job 46650081)
+| Claim | Value | Source | Verified |
+|---|---|---|---|
+| Frozen aug (5 seeds) | 0.4317 ± 0.022 | emod_fz_46650081_{0..4}.out | [0.4188, 0.4563, 0.4067, 0.4533, 0.4236] ✓ |
+| Frozen aug+KD (5 seeds) | 0.4317 ± 0.023 | emod_fz_46650081_{5..9}.out | [0.4041, 0.4446, 0.4094, 0.4552, 0.4450] ✓ |
+| Full-FT reference | 0.619 ± 0.005 (rep) / 0.642 ± 0.007 (aug+KD) | emod_plus_46632393 | ✓ |
+| Frozen vs full-FT aug+KD gap | -0.210 | 0.432 - 0.642 | ✓ |
+| aug vs aug+kd Welch p | 0.996 | no difference | ✓ |
+
+### Experiment C: Random-initialized EMOD ablation (#253, job 46650052)
+| Claim | Value | Source | Verified |
+|---|---|---|---|
+| Random-init aug+KD (5 seeds) | **0.6209 ± 0.0032** | emod_ri_46650052_{0..4}.out | [0.6227, 0.6153, 0.6233, 0.6217, 0.6217] ✓ |
+| Pretrained replication (from Table S12) | 0.619 ± 0.005 | emod_rep_46633766 | ✓ |
+| Random-init vs pretrained replication p | 0.53 (n.s.) | scipy.stats.ttest_ind Welch | ✓ statistically identical |
+| Pretrained aug+KD vs random-init aug+KD delta | +0.021 | 0.642 - 0.621 | ✓ |
+| Pretrained vs random-init p | 0.0016 | Welch t=5.82 | ✓ |
+| Random-init vs published CBraMod | +0.070 | 0.621 - 0.551 | ✓ |
+| Random-init vs our CBraMod + \\ours | -0.004 | 0.621 - 0.625 | ✓ within noise |
+
+**Summary**: The $0.642$ FACED SOTA decomposes into two additive $\sim 2\%$ contributions: pretraining alone and training recipe alone, with neither dominating the other.

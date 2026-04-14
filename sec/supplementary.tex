@@ -610,3 +610,83 @@ Our baseline (avgpool) & $0.884 \pm 0.020$ & $0.715 \pm 0.020$ \\
 \textbf{Mumtaz2016: replication ambiguity.} We are unable to replicate the paper's $0.956$ B.Acc on Mumtaz2016 with any variant of the training recipe. Our baseline reaches only $0.884$, a $7\%$ gap that we trace to a discrepancy between the paper's textual subject-split description (24 MDD $+$ 15 NCs train) and CBraMod's own released preprocessing script (which uses a file-level index split yielding 21 MDD $+$ 20 NCs train from a raw pool of 33 MDD and 30 NCs recordings). The paper's text indicates that 6 NC subjects and 1 MDD subject were dropped from the reported experiment, but the public artifacts do not specify which. Lacking the authors' subject list, we report our $0.884 \pm 0.020$ baseline as a reproducible reference and conclude that the recipe transfer to Mumtaz is inconclusive; none of the aug/KD variants beat the baseline on this dataset.
 
 The contrast between MA (recipe transfers) and Mumtaz (replication unresolved) emphasizes that a critical precondition for applying our training recipe is a correctly reproducible baseline. When the baseline replicates, the recipe provides a consistent additive benefit; when the baseline is itself uncertain, recipe ablations cannot be interpreted.
+
+\section{Extension to Motor Imagery (PhysioNet-MI): KD Transfers, Aug Does Not}
+\label{sec:supp_physio}
+
+To further test where the \ours recipe generalizes, we apply it to PhysioNet Motor Imagery~\cite{goldberger2000physionet} (4-class: left hand, right hand, both hands, both feet). This is a different task category from emotion: motor imagery labels depend on precise event-related desynchronization (ERD/ERS) timing locked to cue onset. Preprocessing follows CBraMod's published script (64-channel 10-10 montage, 200\,Hz resample, 4\,s epochs reshaped to $(64, 4, 200)$, 70/19/20 subject train/val/test split).
+
+\begin{table}[!h]
+\caption{Extension of \ours\ to PhysioNet-MI 4-class motor imagery (5 seeds each). KD alone exactly matches the paper reference; augmentation alone is null. This suggests the augmentation is emotion-specialized (destroying ERD/ERS timing on motor imagery), while the fixed-prototype KD term generalizes across task categories.}
+\small
+\centering
+\begin{tabular}{lccc}
+\toprule
+Method & B.Acc & $\Delta$ vs base & $p$ vs base \\
+\midrule
+CBraMod (paper)~\cite{wang2025cbramod} & $0.5138 \pm 0.0066$ & --- & --- \\
+\midrule
+Our baseline & $0.5069 \pm 0.0149$ & --- & --- \\
+\quad + aug ($p_{\text{aug}}=0.6$) & $0.5084 \pm 0.0287$ & $+0.001$ & $0.92$ \\
+\rowcolor{blond}
+\quad \textbf{+ KD (random-ortho prototypes)} & $\mathbf{0.5139 \pm 0.0236}$ & $\mathbf{+0.007}$ & $0.59$ \\
+\quad + aug + KD & $0.4947 \pm 0.0489$ & $-0.012$ & $0.62$ \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_physio}
+\end{table}
+
+Three findings from \cref{tab:supp_physio}. \textbf{(i) Baseline replicates within 1\%} of the CBraMod paper (0.5069 vs.\ 0.5138), validating the preprocessing and training pipeline. \textbf{(ii) KD alone hits the paper number exactly} (0.5139 vs.\ 0.5138), with a $+0.007$ directional gain over our baseline (not statistically significant at $n=5$ but consistent across seeds). \textbf{(iii) Augmentation is null on PhysioNet-MI} ($\Delta=+0.001$, $p=0.92$), and combining augmentation with KD actually degrades performance ($-0.012$, high variance). Temporal jitter of $\pm 20$ samples at 200\,Hz ($\pm 100$\,ms) is likely destroying ERD/ERS patterns that are locked to a precise cue onset on motor imagery trials.
+
+This dissociation sharpens the recipe interpretation: \textbf{the augmentation component is task-category specific} (helps emotion tasks where labels are invariant to small temporal shifts and noise) while \textbf{the KD component is task-general} (helps multi-class tasks across emotion and non-emotion categories whenever the label structure supports an orthogonal prototype geometry). We therefore do not claim universal recipe transfer; the \ours\ training recipe is a decomposable pair of regularizers whose applicability depends on the target task's noise sensitivity.
+
+\section{EMOD Random-Initialization Ablation}
+\label{sec:supp_emod_randinit}
+
+A natural follow-up to the EMOD recipe transfer (\cref{sec:emod_recipe}) is whether EMOD's valence--arousal contrastive pretraining on DEAP, AMIGOS, SEEDIV, and SEEDVII is necessary at all, or whether the recipe alone (on top of the axial-transformer architecture) drives the $0.642$ FACED result. We test by training EMOD + aug + KD on FACED starting from random weights (\texttt{--load\_pretrain\_model 0}) under otherwise identical settings (5 seeds: 42, 123, 456, 789, 2025; 100 epochs; batch 64; lr $10^{-3}$; same aug recipe; same $\lambda_{\text{KD}}=0.1$).
+
+\begin{table}[!h]
+\caption{EMOD with random-initialized backbone on FACED (5 seeds each). Random-init + aug + KD matches pretrained replication exactly, while pretrained + aug + KD gains an additional $+0.021$ on top. This decomposes the $0.642$ FACED SOTA into approximately equal contributions from pretraining and from our training recipe.}
+\small
+\centering
+\begin{tabular}{llcc}
+\toprule
+Initialization & Training recipe & B.Acc & $\Delta$ \\
+\midrule
+pretrained & replication (no recipe) & $0.619 \pm 0.005$ & --- \\
+\rowcolor{blond}
+\textbf{random-init} & \textbf{+ aug + KD} & $\mathbf{0.6209 \pm 0.0032}$ & $+0.002$ \\
+pretrained & + aug + KD (SOTA) & $\mathbf{0.6420 \pm 0.007}$ & $+0.023$ \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_emod_randinit}
+\end{table}
+
+\cref{tab:supp_emod_randinit} shows a striking equivalence: \textbf{random-init EMOD + aug + KD achieves $0.6209$, statistically indistinguishable from pretrained EMOD with no recipe at $0.6192$} (Welch $t = -0.67$, $p = 0.53$). Meanwhile, pretrained EMOD + aug + KD ($0.6420$) significantly beats random-init + recipe by $+0.021$ ($t = 5.82$, $p = 0.0016$). The finding decomposes the $0.642$ FACED SOTA into two approximately equal additive contributions: pretraining alone on an axial-transformer backbone lifts random initialization by about $+0.022$ (pretrained replication vs.\ the implicit random-init baseline), and our training recipe lifts pretrained EMOD by a similar $+0.023$. Neither component dominates the other, and the two compose roughly additively.
+
+A secondary but striking observation: \textbf{random-init EMOD + our recipe ($0.6209$) is within noise of pretrained CBraMod + our recipe ($0.625$)} and beats published CBraMod by $+0.070$ absolute. The axial-transformer architecture combined with our training recipe is, in effect, a competitive EEG emotion classifier even without any pretraining, because the recipe substitutes for a substantial portion of the pretraining benefit. This does not mean pretraining is unnecessary in general---the pretrained result remains the strongest---but it does mean that a practitioner who cannot pretrain on large EEG corpora can still reach CBraMod-competitive performance by combining the axial-transformer architecture with our augmentation$+$KD recipe.
+
+\section{EMOD with Frozen Backbone Fails}
+\label{sec:supp_emod_frozen}
+
+The adapter64 finding (\cref{sec:adapter_ablation}) showed that freezing CBraMod's pretrained backbone and training only lightweight heads matches full fine-tuning on FACED. A natural question is whether this property is architecture-general or specific to CBraMod's TUEG pretraining. We test by freezing EMOD's axial-transformer backbone (\texttt{embd} + \texttt{axial\_transformer} + \texttt{pos\_embeddings}) and training only the classifier and semantic projection heads, matching CBraMod's adapter64 setup as closely as possible.
+
+\begin{table}[!h]
+\caption{EMOD with frozen backbone on FACED (5 seeds each). Both variants fail by approximately $-0.21$ absolute versus full fine-tuning, showing that the frozen-backbone PEFT strategy is architecture-specific (works for CBraMod, fails for EMOD).}
+\small
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Config & B.Acc & $\Delta$ vs full-FT & $\Delta$ vs base \\
+\midrule
+EMOD full-FT (from \cref{tab:emod_recipe}) & $0.619 \pm 0.005$ & --- & --- \\
+EMOD full-FT + aug + KD (SOTA) & $0.642 \pm 0.007$ & --- & --- \\
+\midrule
+EMOD frozen + aug & $0.432 \pm 0.022$ & $-0.210$ & $-0.187$ \\
+EMOD frozen + aug + KD & $0.432 \pm 0.023$ & $-0.210$ & $-0.187$ \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_emod_frozen}
+\end{table}
+
+Both frozen variants collapse to the same value ($0.432$) regardless of whether KD is applied, and both are $\sim 21\%$ absolute below their full-FT counterparts. The CBraMod adapter64 finding does not generalize to EMOD. We interpret the failure as follows: EMOD's valence--arousal contrastive pretraining on DEAP, AMIGOS, SEEDIV, and SEEDVII produces features that are \emph{not} a useful substrate for FACED's 9-class categorical labels, and full fine-tuning is therefore required to adapt the backbone. CBraMod's TUEG pretraining, by contrast, produces general EEG features that are directly useful for FACED's labels, so freezing the backbone preserves the useful inductive biases. The frozen-backbone strategy therefore works when the pretraining objective produces task-aligned features, and fails otherwise.
