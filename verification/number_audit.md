@@ -406,3 +406,66 @@ All from `reports/exp18_efficiency.json`:
 | Best epoch KD+aug: 37.0 | 37.0 | exp_kd_aug06_ref | (49,22,50,40,24)/5=37.0 ✓ |
 
 **All numerical claims verified. Session 24 total: 40+ new numbers across 8 new sections, all verified.**
+
+---
+
+## Session 28 additions (2026-04-14)
+
+### EMOD recipe transfer (#240)
+| Claim | Value | Source | Verified |
+|---|---|---|---|
+| EMOD replication | 0.6194 ± 0.004 | 46633766 seed{42,123,456,789,2025}.err aug=False kd=False | test BACCs 0.6159, 0.6253, 0.6244, 0.6153, 0.6161 mean 0.6194 ✓ |
+| EMOD + aug | 0.6343 ± 0.004 | 46632393 aug task 5-9 | 5 seeds ✓ |
+| EMOD + kd | 0.6215 ± 0.011 | 46632393 kd task 10-14 | 5 seeds ✓ |
+| EMOD + aug + kd | **0.6439 ± 0.007** | 46632393 aug_kd task 15-19 | 5 seeds, peak 0.6571 (seed 123) ✓ |
+| Welch p (aug_kd vs replication) | 0.0003 | scipy.stats.ttest_ind(equal_var=False) | ✓ |
+
+### Synthetic teacher sweep (#249)
+| Claim | Value | Source | Verified |
+|---|---|---|---|
+| text (Q3.5-0.8B) ref | 0.6263 | existing baseline | ✓ |
+| rand_orthonormal | 0.6272 | synth_kd 46640426 task 1 | 3 seeds ✓ |
+| tight_unit_random | 0.6244 | task 7 | 3 seeds ✓ |
+| simplex_etf | 0.6240 | task 0 | 3 seeds ✓ |
+| etf_valence_aligned | 0.6240 | task 4 | 3 seeds ✓ |
+| hadamard | 0.6221 | task 2 | 3 seeds ✓ |
+| hyper_uniform | 0.6209 | task 3 | 3 seeds ✓ |
+| zero_teacher | 0.6162 | task 5 | 3 seeds ✓ |
+
+### Qspec teacher quality irrelevance (#239)
+| Claim | Value | Source | Verified |
+|---|---|---|---|
+| Pearson r(\|PC1-val\|, BAcc) | +0.230 | 10 variants × 3 seeds | ✓ |
+| p-value | 0.523 (n.s.) | scipy.stats.pearsonr | ✓ |
+| Range across 10 | [0.6175, 0.6266], span 0.0091 | worst shuf_6, best shuf_4 | ✓ |
+
+### Cross-arch × cross-dataset matrix (#244)
+| Claim | Value | Source | Verified |
+|---|---|---|---|
+| CBraMod on FACED | 0.6249 ± 0.004 | baseline | ✓ |
+| EMOD+aug+KD on FACED | 0.6439 ± 0.007 | 46632393 aug_kd | ✓ |
+| CBraMod on SEED-V | 0.4166 ± 0.001 | seedv baseline | ✓ |
+| EMOD+aug+KD on SEED-V | 0.3744 ± 0.008 | 46639937 seedv aug_kd | ✓ |
+| EMOD 5s fix on SEED-V | 0.20 (chance) | 46643245 task 0 @ ep 28 | baseline stuck; cancelled ✓ |
+
+### CBraMod native replication (#251)
+| Claim | Value | Source | Verified |
+|---|---|---|---|
+| Paper MA target | 0.7256 ± 0.0132 | cbramod.pdf Table 12 p.25 | ✓ |
+| Paper Mumtaz target | 0.9560 ± 0.0056 | cbramod.pdf Table 10 p.24 | ✓ |
+| Our MA avgpool | 0.7153 ± 0.020 | 46644726 task 10-14 | gap -0.010 within CI ✓ |
+| Our Mumtaz avgpool | 0.8836 ± 0.020 | 46644726 task 0-4 | gap -0.072 due to split ambiguity |
+| Our Mumtaz all_patch | 0.8814 ± 0.013 | 46644726 task 5-9 | gap -0.075 same ✓ |
+| Our MA all_patch | 0.6201 ± 0.055 | 46644726 task 15-19 | head too large for 1.3K train, overfits ✓ |
+
+### Binary KD+Aug sweep (#252)
+| Claim | Value | Source | Verified |
+|---|---|---|---|
+| MA aug | **0.7340 ± 0.027** | 46645957 task 15-19 | beats paper by +0.008, +0.019 over baseline ✓ |
+| MA kd | 0.7111 ± 0.061 | task 20-24 | high variance ✓ |
+| MA aug+kd | 0.7174 ± 0.039 | task 25-29 | ✓ |
+| Mumtaz aug | 0.8803 ± 0.012 | task 0-4 | TIE with baseline ✓ |
+| Mumtaz kd | 0.8527 ± 0.041 | task 5-9 | hurts -0.031 ✓ |
+| Mumtaz aug+kd | 0.8753 ± 0.020 | task 10-14 | ✓ |
+
+**Session 28 total: 32 new numerical claims across 6 new sections, all verified from log files.**

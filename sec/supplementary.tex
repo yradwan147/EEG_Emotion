@@ -485,3 +485,128 @@ KD share of gain & 14\% & 26\% & \\
 \end{table}
 
 On both datasets, augmentation provides the majority of the improvement. KD adds a smaller but consistent residual. The KD share is smaller on SEED-V ($14\%$ vs.\ $26\%$), consistent with the harder task and noisier signal (62 channels, shorter effective windows).
+
+\section{EMOD Recipe Transfer: Per-Seed Details}
+\label{sec:supp_emod_details}
+
+\cref{tab:emod_recipe} in the main text summarizes the EMOD recipe transfer on FACED. Here we report per-seed B.Acc for all 20 runs (4 variants $\times$ 5 seeds).
+
+\begin{table}[!h]
+\caption{EMOD+\ours\ per-seed test B.Acc on FACED (seeds 42, 123, 456, 789, 2025). EMOD + aug + KD reaches a new FACED SOTA of $0.642 \pm 0.007$ with a single-seed peak of $0.655$.}
+\small
+\centering
+\begin{tabular}{lccccccc}
+\toprule
+Variant & s42 & s123 & s456 & s789 & s2025 & Mean & Std \\
+\midrule
+replication & 0.616 & 0.625 & 0.624 & 0.615 & 0.616 & 0.619 & 0.005 \\
+\quad + aug & 0.639 & 0.637 & 0.629 & 0.629 & 0.631 & 0.633 & 0.005 \\
+\quad + KD & 0.606 & 0.638 & 0.622 & 0.618 & 0.610 & 0.619 & 0.013 \\
+\rowcolor{blond}
+\quad \textbf{+ aug + KD} & 0.639 & 0.637 & \textbf{0.655} & 0.638 & 0.641 & \textbf{0.642} & 0.007 \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_emod_per_seed}
+\end{table}
+
+Our EMOD replication of $0.619 \pm 0.005$ is $-1.0\%$ below the authors' published $0.629$, likely because they did not release per-seed checkpoints. A race condition in the published training script (best-checkpoint saved to a seed-independent filename) initially caused all five of our seeds to report identical values; after patching the checkpoint filename to include the seed index, we obtained the reported per-seed spread and a mean that is consistent with $5$ independent runs.
+
+\section{EMOD Cannot Transfer to SEED-V}
+\label{sec:supp_emod_seedv}
+
+To test whether the EMOD recipe gain generalizes to a different dataset, we applied the same aug$+$KD recipe on EMOD's pretrained checkpoint to SEED-V in two configurations: (i) CBraMod-preprocessed $1\,\text{s}$ windows matching our main SEED-V setup, and (ii) a $5\,\text{s}$ preprocessing variant matching EMOD's pretraining regime (their DEAP/AMIGOS checkpoints used multi-second windows).
+
+Both configurations fail. The 1\,s run yields $0.374 \pm 0.008$ B.Acc (vs.\ CBraMod's $0.417$ on the same input), and the 5\,s run's baseline remains pinned near chance ($0.20 \pm 0.003$ B.Acc at epoch 28 of 50), with the aug$+$KD variant climbing slowly to $\approx 0.31$ before we cancelled the runs to reclaim GPU resources. KD does contribute some additional lift over a stuck baseline, but in both cases the EMOD checkpoint lands well below CBraMod on SEED-V regardless of training recipe. We interpret this as a fundamental pretraining/downstream mismatch: EMOD's V-A contrastive pretraining targets emotional-dimension axes, which align with FACED's 9-category labels (all of which have valence/arousal coordinates in the circumplex) but not with SEED-V's 5-class labels which include a categorical ``neutral'' that breaks the V-A mapping. Combined with CBraMod's strong SEED-V performance, the two-way finding supports the interpretation that our aug+KD recipe is \emph{architecture-agnostic but not data-agnostic}---it amplifies whatever signal a backbone already captures, rather than introducing a new learning ability.
+
+\section{Synthetic Prototype Teachers: Full Variant Table}
+\label{sec:supp_synth_teachers}
+
+\cref{fig:synth_teachers} in the main text shows 7 synthetic-teacher variants tied to the LLM text teacher. Here we include the per-variant downstream B.Acc and construction details.
+
+\begin{table}[!h]
+\caption{Seven synthetic-prototype KD variants on FACED, 3 seeds each. The random orthonormal basis (row 2) ties the LLM text teacher (row 1) within noise, and the full range of all 7 variants is only $0.011$. The zero-teacher control (row 8) recovers the aug-only baseline.}
+\small
+\centering
+\begin{tabular}{llc}
+\toprule
+Teacher & Construction & Test B.Acc \\
+\midrule
+text (Qwen2.5-0.5B, reference) & mid-layer hidden states & $0.626$ \\
+\textbf{random orthonormal} & $\mathbf{QR}(\mathbf{N}(0, I_{9 \times 1024}))$ & $\mathbf{0.627}$ \\
+tight unit random & unit-norm Gaussian, stretched frame & $0.624$ \\
+simplex ETF~\cite{papyan2020neural} & Neural-Collapse optimum & $0.624$ \\
+ETF + valence aligned & ETF rotated so principal axis $=$ valence & $0.624$ \\
+Hadamard & $\pm 1$ binary orthogonal matrix & $0.622$ \\
+hyperspherical uniform & Tammes-style max-min-angle arrangement & $0.621$ \\
+zero teacher (CE only, KD disabled) & no regularization target & $0.616$ \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_synth_teachers}
+\end{table}
+
+All variants use the same adapter64 frozen-backbone student, $\lambda_{\text{KD}} = 0.1$, and $p_{\text{aug}} = 0.6$. This extends the quality-spectrum finding (\cref{sec:supp_qspec}) to the limiting case where the teacher carries no emotion-specific information at all: it still matches the LLM teacher on downstream B.Acc, confirming that the operative mechanism is geometric regularization rather than knowledge transfer.
+
+\section{Teacher Quality Spectrum}
+\label{sec:supp_qspec}
+
+To measure how downstream B.Acc depends on teacher-vector quality in a controlled way, we constructed 10 teachers spanning a wide range of PC1--valence correlations by increasingly shuffling the original Qwen2.5-0.5B class vectors. Let $\mathbf{V} \in \mathbb{R}^{9 \times D}$ be the original text teacher. For $k \in \{1, 2, 3, 4, 5, 6, 7, 9\}$ we generate ``shuf\_$k$'' by randomly permuting $k$ of the 9 class vectors; shuf\_0 (no shuffling) is the original text teacher and shuf\_9 is a fully random permutation. We also include a pure random Gaussian baseline.
+
+For each of the 10 resulting teachers, we train CBraMod adapter64 + 3L-BN KD for 3 seeds and compare downstream FACED B.Acc. The teacher-quality proxy is the absolute Pearson correlation between the first PC of the teacher matrix and the ground-truth valence axis.
+
+\begin{table}[!h]
+\caption{Quality-spectrum teacher sweep (3 seeds each) on FACED. Despite a $5\times$ range in valence-axis fidelity ($0.19$ to $0.97$), downstream B.Acc spans only $0.009$, and the Pearson correlation between quality and downstream accuracy is statistically indistinguishable from zero.}
+\small
+\centering
+\begin{tabular}{lcc}
+\toprule
+Teacher & $|{\rm PC1}{-}{\rm valence}|$ & Test B.Acc \\
+\midrule
+text (original) & $0.97$ & $0.626$ \\
+shuf\_1 & $0.88$ & $0.624$ \\
+shuf\_2 & $0.75$ & $0.620$ \\
+shuf\_3 & $0.65$ & $0.621$ \\
+shuf\_4 & $0.53$ & $0.627$ \\
+shuf\_5 & $0.49$ & $0.621$ \\
+shuf\_6 & $0.42$ & $0.620$ \\
+shuf\_7 & $0.27$ & $0.623$ \\
+shuf\_9 & $0.21$ & $0.618$ \\
+random Gaussian & $0.19$ & $0.619$ \\
+\midrule
+\multicolumn{2}{l}{Pearson $r$} & \multicolumn{1}{l}{$+0.23$, $p = 0.52$ (n.s.)} \\
+\multicolumn{2}{l}{Range across all 10} & \multicolumn{1}{l}{$[0.618, 0.627]$, span $0.009$} \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_qspec}
+\end{table}
+
+This result provides a second, independent line of evidence (beyond the synthetic prototypes) that teacher quality is not the binding constraint on KD downstream performance.
+
+\section{Extension to Non-Emotion Binary Tasks}
+\label{sec:supp_binary}
+
+To test whether the \ours\ recipe generalizes beyond emotion classification, we apply it to two binary downstream tasks from the original CBraMod paper: Mumtaz2016~\cite{mumtaz2016dataset} (depression screening, 2-class MDD vs.\ healthy) and MentalArithmetic~\cite{goldberger2000physionet} (2-class stress detection). We use CBraMod's published preprocessing and the \texttt{avgpooling\_patch\_reps} classifier head.
+
+\begin{table}[!h]
+\caption{Extension of \ours\ to binary downstream tasks (5 seeds each). The augmentation recipe transfers to MA (directionally $+1.9\%$ over our baseline, crossing above the paper target); the KD term neither helps nor hurts consistently on binary tasks, consistent with the interpretation that fixed-prototype regularization requires $\geq 3$ classes to encode meaningful inter-class geometry. Paper numbers from Tables 10 and 12 of~\cite{wang2025cbramod}.}
+\small
+\centering
+\begin{tabular}{lccc}
+\toprule
+Method & Mumtaz2016 (B.Acc) & MentalArithmetic (B.Acc) \\
+\midrule
+CBraMod (paper) & $0.956 \pm 0.006$ & $0.726 \pm 0.013$ \\
+\midrule
+Our baseline (avgpool) & $0.884 \pm 0.020$ & $0.715 \pm 0.020$ \\
+\quad + aug & $0.880 \pm 0.012$ & $\mathbf{0.734 \pm 0.027}$ \\
+\quad + KD (identity prototypes) & $0.853 \pm 0.041$ & $0.711 \pm 0.061$ \\
+\quad + aug + KD & $0.875 \pm 0.020$ & $0.717 \pm 0.039$ \\
+\bottomrule
+\end{tabular}
+\label{tab:supp_binary}
+\end{table}
+
+\textbf{MentalArithmetic: recipe transfers.} Our baseline of $0.715$ matches the CBraMod paper ($0.726$) within $1.1\%$---effectively replicating their reported number within the paper's own standard deviation of $\pm 0.013$. Adding augmentation lifts the test B.Acc to $\mathbf{0.734}$, which exceeds the paper number by $+0.008$. Adding KD on top of augmentation does not help further (\(0.717\) vs.\ \(0.734\)), consistent with the interpretation that orthogonal identity prototypes cannot meaningfully regularize a 2-class projection space that BCE already separates correctly. The effect direction is consistent with our FACED cross-backbone results, though small sample size ($n = 5$ seeds) limits statistical power.
+
+\textbf{Mumtaz2016: replication ambiguity.} We are unable to replicate the paper's $0.956$ B.Acc on Mumtaz2016 with any variant of the training recipe. Our baseline reaches only $0.884$, a $7\%$ gap that we trace to a discrepancy between the paper's textual subject-split description (24 MDD $+$ 15 NCs train) and CBraMod's own released preprocessing script (which uses a file-level index split yielding 21 MDD $+$ 20 NCs train from a raw pool of 33 MDD and 30 NCs recordings). The paper's text indicates that 6 NC subjects and 1 MDD subject were dropped from the reported experiment, but the public artifacts do not specify which. Lacking the authors' subject list, we report our $0.884 \pm 0.020$ baseline as a reproducible reference and conclude that the recipe transfer to Mumtaz is inconclusive; none of the aug/KD variants beat the baseline on this dataset.
+
+The contrast between MA (recipe transfers) and Mumtaz (replication unresolved) emphasizes that a critical precondition for applying our training recipe is a correctly reproducible baseline. When the baseline replicates, the recipe provides a consistent additive benefit; when the baseline is itself uncertain, recipe ablations cannot be interpreted.

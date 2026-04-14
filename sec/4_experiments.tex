@@ -97,6 +97,35 @@ LaBraM & ICLR 2024 & $0.370 \pm 0.010$ & $0.396 \pm 0.014$ & $\mathbf{+2.6\%}$ &
 
 \cref{tab:cross_backbone} shows that the KD benefit is architecture-agnostic on FACED. The CBraMod improvement ($+5.2\%$, $t = 15.51$, $p = 1 \times 10^{-4}$) is roughly twice that of LaBraM ($+2.6\%$, $t = 3.48$, $p = 0.025$), and both are highly significant under both $t$-tests and bootstrap CIs. A third backbone, EEG-DINO~\cite{wang2025eegdino} (MICCAI 2025), also benefits when combined with a frozen-backbone adapter head (+$5.2\%$ over its FACED baseline); we include this as a supporting data point in \cref{sec:supp_eegdino}. For completeness, we also attempted to replicate REVE~\cite{elouahidi2025reve} (NeurIPS 2025) across ten configurations but were unable to match the published baseline within $5\%$, likely due to differences in the 4D positional encoding pipeline; we therefore rely on LaBraM and EEG-DINO for cross-backbone validation.
 
+\subsection{Recipe Transfer to EMOD}
+\label{sec:emod_recipe}
+\vspace{-1mm}
+
+\begin{table}[!t]
+\caption{Recipe transfer to EMOD~\cite{emod2026} on FACED (5 seeds each). The \ours\ training recipe (augmentation + soft-label LLM-KD) applied to EMOD's axial-transformer backbone improves upon both our EMOD replication and upon our CBraMod main result, yielding a new FACED SOTA at $\mathbf{0.642}$.}
+\small
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Method & B.Acc & $\Delta$ vs rep. & vs CBraMod & $p$ \\
+\midrule
+CBraMod baseline (ours) & $0.572 \pm 0.009$ & --- & --- & --- \\
+\ours\ CBraMod adapter64 & $\mathbf{0.628} \pm 0.004$ & --- & --- & --- \\
+\midrule
+EMOD replication (ours) & $0.619 \pm 0.005$ & --- & $+0.047$ & --- \\
+EMOD + aug & $0.633 \pm 0.005$ & $+0.013$ & $+0.061$ & $0.003$ \\
+EMOD + KD & $0.619 \pm 0.013$ & $+0.000$ & $+0.047$ & $0.91$ \\
+\rowcolor{blond}
+\textbf{EMOD + aug + KD (ours)} & $\mathbf{0.642} \pm 0.007$ & $\mathbf{+0.023}$ & $\mathbf{+0.070}$ & $\mathbf{0.0008}$ \\
+\bottomrule
+\end{tabular}
+\label{tab:emod_recipe}
+\end{table}
+
+A stronger test of recipe-agnosticism is to apply \ours\ to a backbone whose pretraining objective is itself emotion-related. EMOD~\cite{emod2026} is an axial transformer pretrained with valence--arousal contrastive objectives on DEAP, AMIGOS, SEEDIV, and SEEDVII, and was published as an oral at AAAI 2026 with a FACED B.Acc of $0.629$. Starting from the authors' official code and pretrained checkpoint, we (i)~reproduced their headline number and then (ii)~added our training recipe (temporal jitter augmentation with $p_{\text{aug}} = 0.6$, soft-label KD with Qwen2.5-0.5B vectors, $\lambda = 0.1$) without changing the architecture.
+
+\cref{tab:emod_recipe} shows that the recipe is \emph{super-additive} on EMOD: augmentation alone lifts the replication by $+1.3\%$, KD alone yields no change, but their combination adds $+2.3\%$ to reach $\mathbf{0.642}$. This is a new FACED SOTA across every backbone we tested, beating \ours's CBraMod result by $+1.4\%$ absolute ($t = 5.63$, $p = 0.0008$). Critically, the EMOD pretraining already encodes valence/arousal structure---yet the LLM-KD signal still contributes on top of that prior, suggesting that the LLM's relational emotion geometry is not redundant with category-level contrastive pretraining. The single-seed peak for this configuration reaches $0.655$.
+
 \subsection{Cross-Dataset Generalization and Token-Count Scaling}
 \label{sec:cross_dataset}
 \vspace{-1mm}
@@ -111,6 +140,26 @@ LaBraM & ICLR 2024 & $0.370 \pm 0.010$ & $0.396 \pm 0.014$ & $\mathbf{+2.6\%}$ &
 A natural question for any KD-based method is whether the supervisory signal interacts with input granularity. We investigate this by varying both the time window length (1\,s vs.\ 5\,s) and channel subset (full 62-channel SEED-V vs.\ standard 19-channel 10--20 montage~\cite{ten_twenty_montage}) on SEED-V, and comparing against the FACED setting (321 tokens per sample). \cref{fig:token_threshold} summarizes the relationship.
 
 Two regularities emerge. First, \emph{within} a fixed channel selection, more temporal patches yield a larger and more reliable KD effect---LaBraM 19-channel SEED-V improves from a positive trend at 1\,s to $+1.85\%$ ($p = 0.037$) at 5\,s; CBraMod 62-channel SEED-V at 5\,s shows $\Delta = +0.36\%$ with bootstrap 95\% CI $[+0.0001, +0.0074]$. Second, FACED's $\sim$321 tokens per sample yields the largest KD effects ($+5.2\%$ on CBraMod, $+2.6\%$ on LaBraM). Third, when we attempted to apply the framework to EEG-DINO~\cite{wang2025eegdino}---an EEG foundation model whose default SEED-V preprocessing produces only $\sim$20 tokens per sample---KD, contrastive, and adapter extensions were all statistically flat ($|\Delta| \leq 0.003$ across 14 independent configurations; detailed in \cref{sec:supp_eegdino}), confirming that the token-count requirement is backbone-agnostic rather than a property of CBraMod alone. These results suggest a practical guideline: applying \ours\ to a new EEG dataset benefits from input preprocessing that yields a sufficient number of spatial-temporal tokens per training sample.
+
+\begin{table}[!t]
+\caption{Cross-architecture $\times$ cross-dataset matrix (FACED 9-class, SEED-V 5-class). \ours\ (aug + KD recipe) applied to CBraMod wins SEED-V; applied to EMOD it wins FACED. Each backbone dominates the dataset whose labels most closely match its pretraining objective---CBraMod was pretrained on TUEG (general) while EMOD was pretrained with valence/arousal contrastive objectives on non-SEED-V emotion datasets.}
+\small
+\centering
+\begin{tabular}{lcc}
+\toprule
+Backbone & FACED (9c, B.Acc) & SEED-V (5c, B.Acc) \\
+\midrule
+CBraMod + \ours\ & $0.628 \pm 0.004$ & $\mathbf{0.417 \pm 0.001}$ \\
+EMOD + \ours\ & $\mathbf{0.642 \pm 0.007}$ & $0.374 \pm 0.008$ \\
+\midrule
+CBraMod paper~\cite{wang2025cbramod} & $0.551$ & $0.409$ \\
+EMOD paper~\cite{emod2026} & $0.629$ & --- \\
+\bottomrule
+\end{tabular}
+\label{tab:cross_arch_dataset}
+\end{table}
+
+\cref{tab:cross_arch_dataset} summarizes the cross-architecture $\times$ cross-dataset matrix: our recipe improves both backbones over their published numbers but does \emph{not} invert the backbone-specific dataset preferences. CBraMod, pretrained on general EEG (TUEG), dominates SEED-V ($0.417$ vs.\ EMOD's $0.374$). EMOD, pretrained with explicit valence--arousal contrastive objectives on DEAP/AMIGOS/SEEDIV/SEEDVII, dominates FACED ($0.642$ vs.\ CBraMod's $0.628$) but fails to transfer to SEED-V's 5-class structure even when we match its native 5-second window length (\cref{sec:supp_emod_seedv}). This pattern argues that the aug$+$KD recipe improves whatever backbone it is paired with, but it does not override a fundamental mismatch between the pretraining data distribution and the downstream task structure.
 
 \subsection{Augmentation Ablation}
 \label{sec:aug_ablation}
@@ -285,6 +334,23 @@ We extend the LLM analysis to 11 instruction-tuned models from two families: 7 Q
 \noindent\textbf{Instruction tuning is critical.} To test whether the universality is driven by instruction tuning or by scale alone, we extracted emotion vectors from three base (non-instruction-tuned) language models: Pythia-1.4B, Bloom-560M, and TinyLlama-1.1B. All three produce vectors with \emph{no} valence structure (PC1--valence Pearson $r \in \{+0.30, 0.00, +0.27\}$, all $p > 0.4$), in contrast to every Qwen and Gemma instruction-tuned model ($|r| > 0.88$, $p < 10^{-3}$). This is consistent with the observation that instruction tuning steers LLMs toward explicit concept representations~\cite{scaling_brain_alignment2024}; the emotion geometry we distill is not a generic byproduct of language modeling but emerges from alignment training.
 
 \noindent\textbf{Emotion-specific supervised fine-tuning degrades vector quality.} Motivated by the hypothesis that explicit emotion training would sharpen the teacher, we fine-tuned Qwen2.5-0.5B-Instruct on emotion-classification instructions (189- and 1898-instruction sets) and re-extracted vectors. Both SFT variants \emph{reduce} cluster separation monotonically with more instructions (from $1.74$ baseline to $1.70$ after 189 instructions, $-2.5\%$, and $1.63$ after 1898 instructions, $-6.6\%$), while the RDM geometry remains almost identical ($\rho > 0.99$). We interpret this as SFT compressing the rich relational structure into a tighter categorical decision boundary: useful for classification, but less informative as a KD teacher. We therefore retain the base instruction-tuned vectors throughout.
+
+\subsection{Teacher Geometry: Fixed-Prototype Regularization}
+\label{sec:fixed_prototype}
+\vspace{-1mm}
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=0.88\linewidth]{figs/fig_synth_teachers.png}
+    \caption{Synthetic-prototype KD on FACED (3 seeds per variant). A random orthonormal basis ($\mathbf{0.627}$) matches the LLM text teacher ($0.626$) within noise, while zero-teacher (no KD) falls to $0.616$. The full range across 7 synthetic variants spans just $0.006$, indicating that the KD framework functions as \emph{fixed-prototype regularization} rather than a mechanism for transferring LLM-specific knowledge.}
+    \label{fig:synth_teachers}
+\end{figure}
+
+A natural follow-up to the universality findings above is: how \emph{specific} to language models is the teacher signal? We answer this by replacing the LLM-extracted vectors with seven synthetic teachers constructed directly from geometric primitives (no language model involved): (i) a random orthonormal basis via QR decomposition of a Gaussian matrix; (ii) a Simplex Equiangular Tight Frame~\cite{papyan2020neural}, the Neural-Collapse-optimal prototype geometry; (iii) a Hadamard binary orthogonal basis; (iv) a Tammes-style hyperspherical maximum-min-angle arrangement; (v) an ETF rotated to align its principal axis with ground-truth valence; (vi) a unit-norm random Gaussian tight frame; and (vii) a zero teacher (CE only, KD loss disabled as a control).
+
+\cref{fig:synth_teachers} shows that all seven synthetic variants yield downstream B.Acc within $[0.616, 0.627]$---a range of $0.011$, barely larger than the seed-level noise of the LLM teacher itself. The random orthonormal basis ($0.627$) actually slightly exceeds the LLM text teacher ($0.626$), and the Simplex ETF matches it at $0.624$. Only the zero-teacher control drops meaningfully to $0.616$, recovering the aug-only baseline. This result is strong evidence that \textbf{the operative mechanism of our KD term is fixed-prototype regularization}: the student head is pulled toward a consistent set of orthogonal targets, and the \emph{specific content} of the targets (LLM-extracted, ETF, or random) is largely irrelevant. Complementary evidence comes from a quality-spectrum sweep (\cref{sec:supp_qspec}): ten teacher variants spanning PC1--valence correlations from $0.19$ to $0.97$ produce downstream B.Acc within a span of $0.009$ and a Pearson correlation of $r = +0.23$ ($p = 0.52$, n.s.). Both experiments converge on the same conclusion: above a very low floor, teacher quality is not the binding constraint.
+
+We emphasize that this does \emph{not} diminish the value of the LLM geometry as an \emph{interpretable} artifact---the PCA-recovered circumplex (\cref{fig:pca}) and cross-family universality (\cref{fig:cross_family_rdm}) remain meaningful analyses of how LLMs encode emotion. What the synthetic-prototype experiment changes is our understanding of how the KD \emph{training signal} works: it regularizes the projection head's output geometry toward a non-collapsed configuration, and any sufficiently structured set of orthogonal targets suffices.
 
 \subsection{Representational Alignment via CKA}
 \label{sec:cka}

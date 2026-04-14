@@ -174,3 +174,22 @@
 - **Recommended metadata fixes:** 2 (unchanged)
 - **Session 24 additions:** 11 new references, all verified
 - **Overall status:** CLEAN. All 54 references verified. Paper is safe from a reference-integrity standpoint.
+
+---
+
+## Session 28 additions (2026-04-14)
+
+New or reinforced citations to add/verify during writing-phase execution:
+
+| Citation key | Section | Claim | Verified |
+|---|---|---|---|
+| `papyan2020neural_collapse` | §synthetic_teachers | Simplex ETF optimality for class prototypes | Papyan, Han, Donoho PNAS 2020 ✓ |
+| `emod2026_wang` | §emod_transfer, §cross_arch | EMOD AAAI 2026 oral, V-A contrastive pretraining | arxiv 2511.05863 ✓ |
+| `hinton2015kd` | §synthetic_teachers | Reframe: our KD is fixed-prototype rather than dark-knowledge | already in bib ✓ |
+| `cbramod2025` | §replication, §cross_arch | Mumtaz/MA paper targets, Tables 10/12 | already in bib ✓ |
+| `mumtaz2016dataset` | §replication | Original depression dataset | figshare 2016 ✓ |
+| `goldberger2000mental_arithmetic` | §replication | Original MA dataset (PhysioNet) | ✓ |
+
+**To add during execution:** `@misc{emod2026_wang, author={Wang et al.}, title={EMOD: Emotional EEG...}, year=2026, url={https://arxiv.org/abs/2511.05863}}` and corresponding paper number entries in number_audit.md.
+
+**Session 28 net:** 6 new or reinforced references, none fabricated, all verified against source.
