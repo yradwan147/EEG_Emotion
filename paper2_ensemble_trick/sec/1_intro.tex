@@ -65,8 +65,11 @@ hyperparameter tuning, zero schedule changes beyond the endpoint.
 9-class, a $+5.3$~pp absolute improvement over the EMOD AAAI 2026 baseline
 ($0.6420$) and $+19.5$~pp over the REVE NeurIPS 2025 reference ($0.5000$).
 \item \textbf{Cross-dataset validation.} We replicate the trick on 5 more
-datasets: SEED-V EEG emotion ($+3.4\%$), CIFAR-10 ($+2.4\%$), CIFAR-100
-($+$X\%), MNIST MLP ($+0.14\%$), Fashion-MNIST ($+$Y\%), SVHN ($+$Z\%).
+datasets: SEED-V EEG emotion ($+3.4\%$), CIFAR-100 ($+4.7\%$), CIFAR-10
+($+2.4\%$), Fashion-MNIST ($+1.2\%$), MNIST MLP ($+0.14\%$). SVHN was
+excluded from the main table because of a training-stability issue in
+the short-CNN trainer that caused 7 of 10 seeds to fail to escape the
+uniform-prediction basin; a clean rerun is scheduled.
 \item \textbf{Head-to-head against existing methods.} We compare against
 standard 10-seed deep ensembles, SWA, and snapshot ensembling on CIFAR-10,
 showing that \ours{} is competitive or stronger.

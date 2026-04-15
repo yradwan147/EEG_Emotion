@@ -272,6 +272,17 @@ test, the valence direction is extractable and the arousal direction is not.
 The maximum arousal $|r|$ we observed at any layer in any model is 0.16
 (Warriner lexicon at L28), still well below the valence number.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{va_asymmetry}
+\caption{Valence vs.\ arousal layer-wise on Qwen2.5-1.5B. Valence (green)
+has early-layer signal at L1, a middle dilution zone, and a sharp
+re-crystallization at L27--L28 reaching $|r|=0.50$. Arousal (red) never
+exceeds $|r|=0.05$ at any layer --- the asymmetry is structural, not a
+small-effect question.}
+\label{fig:va_asym}
+\end{figure}
+
 \subsection{PCA Beats Supervised LDA for OOD Transfer}
 
 We compared two ways to extract the concept direction from the story

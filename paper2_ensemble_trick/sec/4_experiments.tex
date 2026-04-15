@@ -91,7 +91,9 @@ ensemble. Gain scales inversely with individual accuracy.}
 Dataset & Arch & Ind.\ mean & 5-seed ensemble & \textbf{10-model mixed} \\
 \midrule
 CIFAR-10 & Small CNN & 0.9015 & 0.9209 (+0.0194) & \textbf{\ciftenacc{} (+0.0238)} \\
+CIFAR-10 & ResNet-18 & TBD & TBD & TBD \\
 CIFAR-100 & Small CNN & 0.6886 & 0.7225 (+0.0339) & \textbf{0.7353 (+0.0467)} \\
+CIFAR-100 & ResNet-18 & TBD & TBD & TBD \\
 MNIST & MLP & 0.9849 & 0.9859 (+0.0010) & \textbf{0.9863 (+0.0014)} \\
 Fashion-MNIST & Small CNN & 0.9313 & 0.9418 (+0.0105) & \textbf{0.9434 (+0.0121)} \\
 SVHN$^{\dagger}$ & Small CNN & -- & -- & -- \\
@@ -177,6 +179,17 @@ Snapshot ensemble (1 run, 5 cyclic-LR snapshots) & 0.8946 ($-0.0046$) \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{cifar10_baselines_bar}
+\caption{CIFAR-10 head-to-head ensemble comparison at matched compute.
+\ours{} beats every baseline including the 10-seed standard deep
+ensemble. SWA and snapshot ensembling both \emph{hurt} relative to the
+single-model mean on this small-CNN trainer, likely because they
+average over a narrow region of weight space.}
+\label{fig:cifar10_bar}
+\end{figure}
 
 \subsection{Theoretical Decomposition}
 

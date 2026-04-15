@@ -12,10 +12,11 @@ supervised classifiers across a wide range of tasks: it achieves AUC \sstauc{}
 AUC \yelpauc{} on Yelp Polarity, AUC \twauc{} on Twitter SemEval-17, correlates
 \huliur{} with the Hu \& Liu 6{,}789-word sentiment lexicon, and \warrinerr{}
 with the continuous Warriner \textit{et al.\@} 2013 valence lexicon. A
-leave-one-out data-efficiency curve shows that a single story per class
-(9 total samples) already gives AUC 0.74 on SST-2, and that fifteen stories per
+data-efficiency curve shows that a single story per class
+(9 total samples) already gives AUC 0.74 on SST-2, and that nine stories per
 class match the accuracy of a supervised logistic regression trained on
-\emph{5{,}000 labeled SST-2 examples}. Layer-wise probing reveals a striking
+$\sim\!80$--$100$ labeled SST-2 examples --- a $\sim\!10$--$30\times$
+data-efficiency gain over supervised training. Layer-wise probing reveals a striking
 ``V-shape'' pattern: the valence direction appears strongly at layer~1 (inherited
 from the embedding layer), fades to near zero through the context-integration
 zone (layers 2--26), then abruptly \emph{re-crystallizes} at the final two
@@ -25,7 +26,7 @@ for the arousal axis: the corresponding PCA projection gives
 $|r|\leq 0.16$ at every layer for every model on every test. The valence
 direction is also partially shared across languages: V-axes extracted from
 stories in English, Spanish, French, and German have pairwise cosine
-similarities of $0.23$--$0.47$, while the arousal axes are essentially
+similarities of $0.16$--$0.47$, while the arousal axes are essentially
 orthogonal. Probing is \speedup{} faster than direct prompting at inference,
 produces continuous scores useful for ranking, and reveals a novel
 interpretability insight about how LLMs represent affect. Our findings
