@@ -1,0 +1,97 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{What does the V-shape tell us about LLM computation?}
+
+The striking observation that the V-axis at layer 14 is nearly orthogonal
+(cosine 0.067) to the V-axis at layer 28, while layer 27 is 95\% aligned
+with layer 28, suggests a specific computational story.
+
+Early layers (L1--L3) inherit a \emph{word-level} valence signal from the
+token embeddings. Word embeddings like ``happy'' and ``sad'' are already
+far apart in embedding space (this is well known from
+word2vec-era work). Probing at L1 recovers this signal at AUC 0.75 on SST-2.
+
+Middle layers (L4--L26) perform context integration. During this phase, the
+word-level valence signal is mixed with syntactic, discourse, and task-relevant
+features, and the \emph{linear} valence direction is destroyed. A PCA probe
+at any middle layer recovers essentially nothing (AUC $\approx 0.53$).
+
+Final layers (L27--L28) prepare the residual stream for the LM head's
+next-token prediction. For causal language modeling, the LM head must
+produce coherent next-word distributions, which requires the residual stream
+to expose ``decodable'' semantic directions. We hypothesize that the final
+layers perform a kind of \emph{re-linearization} of task-relevant features,
+and that valence is one such feature that the LM head reads off as a nearly
+linear direction.
+
+This interpretation makes a testable prediction: non-causal models
+(masked-language models or bidirectional models) should show a different
+V-shape. We leave this for future work.
+
+\subsection{Why does arousal fail?}
+
+The valence/arousal asymmetry is the most striking empirical finding of this
+paper. The same PCA-of-centroids method that gives $|r|=0.50$ for valence
+gives $|r| \leq 0.16$ for arousal, across 5 model families and every test
+we ran. Three hypotheses:
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Arousal is distributed.} Perhaps arousal is encoded in a
+non-linear or multi-dimensional manner in LLM residual streams, so a single
+linear direction cannot capture it. A probing study with non-linear probes
+(e.g., MLP) could test this.
+\item \textbf{Arousal is embedding-only.} Perhaps arousal information sits
+in the embedding layer (where ``calm'' and ``excited'' are far apart) but is
+not re-encoded in later layers because causal language modeling does not
+need it. An L1-only probe could test this.
+\item \textbf{Arousal definition mismatch.} Perhaps the PCA second component
+is simply capturing a different dimension (e.g., topic, subject, register)
+that happens to be more variance-heavy than arousal after valence is removed.
+\end{enumerate}
+
+We find hypothesis 1 most likely, but further work is needed.
+
+\subsection{When does \ours{} work and when does it not?}
+
+Based on our results, \ours works when:
+\begin{itemize}[leftmargin=*]
+\item the target concept has a \emph{clean linear manifestation} in the
+final layer of the LLM (valence yes, arousal no, toxicity no, formality
+yes on self-LOOCV but untested on external data);
+\item the downstream task rewards \emph{ranking} rather than
+absolute classification accuracy (lexicon correlation, binary sentiment
+with median threshold, ordinal regression);
+\item inference speed matters (\speedup{} faster than direct prompting);
+\item interpretability matters (a single linear direction is easier to
+inspect than a prompting workflow).
+\end{itemize}
+
+It does \emph{not} work for:
+\begin{itemize}[leftmargin=*]
+\item raw classification accuracy (direct prompting beats us by
+15\,pp on SST-2);
+\item concepts that are not linearly encoded (toxicity, arousal);
+\item fine-grained distinctions within a class (9-class GoEmotions nearest
+centroid gives 28\%, below the majority baseline of 39\%).
+\end{itemize}
+
+\subsection{Data-Efficiency Implications}
+
+The n-shot ablation shows that \emph{one} story per class already produces a
+signal above chance (AUC 0.74 on SST-2). Fifteen stories per class match
+the accuracy of a supervised classifier fit on 5{,}000 labeled samples.
+This is a $\sim$30$\times$ data-efficiency gain over supervised methods.
+For applications in low-resource languages, domain-specific sentiment
+(legal, medical, financial), or rapid prototyping, this efficiency is the
+main practical benefit of \ours.
+
+\subsection{Theoretical Connection to Few-Shot Learning}
+
+\ours is a degenerate case of few-shot prototype learning
+\cite{snell2017prototypical} where (i)~the prototypes are LLM-generated rather
+than human-labeled, (ii)~the query representation is the LLM's own final
+layer, (iii)~the classifier is a single projection (not a soft-max over
+distances). The key insight is that the LLM itself can serve as both the
+data source and the representation source; no human labels are needed for
+either role.

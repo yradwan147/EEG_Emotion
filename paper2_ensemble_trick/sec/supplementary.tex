@@ -1,0 +1,104 @@
+\section*{Supplementary Material}
+\addcontentsline{toc}{section}{Supplementary Material}
+\renewcommand{\thesection}{S\arabic{section}}
+\setcounter{section}{0}
+
+\section{Full EMOD d6 SOTA recipe}
+\label{sup:emod_recipe}
+
+Our FACED SOTA uses the following recipe (inherited from prior mechanism work):
+\begin{itemize}[leftmargin=*]
+\item \textbf{Backbone.} EMOD axial-transformer (\cite{chen2026emod}).
+\item \textbf{Depth extension.} Pretrained EMOD has 3 axial layers; we
+increase \texttt{transformer\_depth=6} and load the pretrained checkpoint
+with \texttt{strict=False}, keeping layers 0--2 pretrained and randomly
+initializing layers 3--5 (``progressive stacking'' of
+\cite{gong2024progressive}).
+\item \textbf{Augmentation.} CBraMod-style 4-op augmentation
+(jitter / noise / channel-dropout / amplitude-scale) with $p_\mathrm{aug}=0.6$.
+\item \textbf{Label smoothing.} $\mathrm{LS}=0.1$ on the cross-entropy loss.
+\item \textbf{Knowledge distillation.} Auxiliary KD term with $\lambda=0.1$,
+$\tau=0.1$ and a fixed random orthonormal 9$\times$1024 prototype tensor
+(we showed earlier that replacing this with LLM-derived vectors does not
+change the result within noise).
+\item \textbf{Optimizer.} Adam with $\mathrm{lr}=10^{-3}$, weight decay
+$10^{-4}$, backbone-LR multiplier $0.5$.
+\item \textbf{Schedule.} Cosine annealing with $T_\mathrm{max}=100$ (group A)
+or $T_\mathrm{max}=150$ (group B), $\mathrm{lr}_{\mathrm{min}}=10^{-6}$.
+\item \textbf{Batch size.} 64.
+\item \textbf{Seeds.} $\{2025, 42, 123, 456, 789\}$ for each group.
+\end{itemize}
+
+\section{Full per-seed results}
+\label{sup:per_seed}
+
+\begin{table}[h]
+\centering
+\caption{Per-seed test BAcc for FACED d6 100ep and 150ep trainings.}
+\label{tab:perseed_faced}
+\begin{tabular}{lcc}
+\toprule
+Seed & 100ep BAcc & 150ep BAcc \\
+\midrule
+2025 & 0.6638 & 0.6565 \\
+42   & 0.6549 & 0.6526 \\
+123  & 0.6479 & 0.6573 \\
+456  & 0.6625 & 0.6486 \\
+789  & 0.6612 & 0.6755 \\
+\midrule
+mean & 0.6581 & 0.6581 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Alternative endpoints}
+\label{sup:endpoints}
+
+We ran small ablations varying $T_B/T_A$. Results on CIFAR-10:
+
+\begin{table}[h]
+\centering
+\caption{Effect of $T_B$ on CIFAR-10 mixed-length ensemble gain (with
+$T_A=50$ fixed).}
+\label{tab:endpoint_ablation}
+\begin{tabular}{lccc}
+\toprule
+$T_B$ & 5-seed $T_A$ ens. & Mixed ensemble & Gain over $T_A$ ens. \\
+\midrule
+50 (same, control) & 0.9209 & 0.9209 & 0.000 \\
+65  & TBD & TBD & TBD \\
+75 (main)  & 0.9209 & 0.9253 & +0.0044 \\
+100 & TBD & TBD & TBD \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Training logs for 100ep vs 150ep FACED d6}
+\label{sup:training_logs}
+
+Full per-epoch val BACC curves are available in the supplementary data
+release (\texttt{training\_log\_analysis.json}). The key observation is
+that the 100ep and 150ep trajectories reach nearly identical val BACC by
+their respective final epochs ($0.6771$ vs.\ $0.6776$), but the 150ep
+trajectory is behind at epoch 99 ($0.6722$) because the cosine schedule
+still has $\sim\!25\%$ of the base LR remaining.
+
+\section{Error-correlation analysis}
+\label{sup:correlation}
+
+\begin{table}[h]
+\centering
+\caption{Error correlation (Cohen $\kappa$ on error indicators) within and
+between the 100ep and 150ep groups. Lower $\kappa$ means more independent
+errors, which drives ensemble gain.}
+\label{tab:error_kappa}
+\begin{tabular}{lc}
+\toprule
+Comparison & Cohen $\kappa$ \\
+\midrule
+Within 100ep group (10 pairs) & 0.6935 \\
+Within 150ep group (10 pairs) & 0.6786 \\
+Cross-group 100ep $\times$ 150ep (25 pairs) & 0.7024 \\
+\bottomrule
+\end{tabular}
+\end{table}

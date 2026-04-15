@@ -1,0 +1,69 @@
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Linear probing in language models.}
+Linear probing of intermediate representations is a well-established
+interpretability tool \cite{alain2016understanding, hewitt2019structural,
+belinkov2022probing}. Standard probes fit a linear classifier (usually
+logistic regression) on a labeled dataset to predict properties of interest
+(part-of-speech, syntactic structure, sentiment) from hidden activations. The
+probe's accuracy is then interpreted as a measure of how ``linearly
+decodable'' the property is from the model's representations. Our method
+differs in three ways: (i)~we use \emph{zero} labeled data---only LLM-generated
+stories with pseudo-labels inherited from the generation prompt;
+(ii)~we use \emph{unsupervised} PCA of nine centroids rather than supervised
+logistic regression; (iii)~we are specifically interested in the
+\emph{direction} of variation, not just the decodability.
+
+\paragraph{Concept direction discovery.}
+A parallel line of work extracts concept directions for activation steering
+\cite{turner2024activation, rimsky2024steering, zou2023representation}. These
+methods typically use contrastive pairs: pairs of prompts differing in the
+target concept. Our method uses nine \emph{class centroids} rather than
+contrastive pairs, which is simpler (no alignment needed) and more scalable
+to multi-class concepts. We also show that \emph{generation is sufficient}:
+the LLM itself produces the class-exemplars, so no human labels or curated
+datasets are required.
+
+\paragraph{Emotion-vector distillation from LLMs.}
+Several recent papers use LLM-derived emotion vectors as auxiliary signals
+for downstream tasks \cite{zhang2024emotionkd, li2025emod, aqa2024emotion}.
+These methods typically fine-tune a student model with the LLM vector as a
+soft-label teacher. Our work is complementary: instead of transferring the
+full vector, we extract a single direction and project new text onto it.
+We also show that for classification (our downstream tasks), the LLM's
+content is \emph{not the source of the signal}---a random 9-dimensional
+orthonormal prototype tensor matches the LLM-derived one within noise.
+
+\paragraph{Sentence embeddings and sentiment lexicons.}
+Sentence encoders such as SBERT \cite{reimers2019sentence} and SimCSE
+\cite{gao2021simcse} provide fixed-length text representations that can be
+used for similarity search. We compare directly to SBERT
+(\texttt{all-MiniLM-L6-v2}) with the same nine-story centroid pipeline and
+find that the generative LLM's residual stream is \emph{substantially} richer
+for this purpose (+15 to +24 percentage points across SST-2, IMDB, and Hu \&
+Liu). Classical sentiment lexicons such as NRC VAD
+\cite{mohammad2018obtaining}, Warriner \textit{et al.\@}
+\cite{warriner2013norms}, and Hu \& Liu \cite{huliu2004opinion} require
+thousands to tens of thousands of hand-labeled words. We reach competitive
+correlation with these lexicons (Pearson 0.62--0.76) using only
+the nine story centroids and no human labels.
+
+\paragraph{Sudden-emergence findings.}
+Phase-transition phenomena in transformer training have received recent
+attention \cite{olsson2022induction, wei2022emergent, michaud2024quantization}.
+Most of these papers study training dynamics (abilities emerging at particular
+scale or steps). We report an emergence \emph{in layer space} at inference: the
+valence direction appears abruptly at layer 27/28, not gradually through the
+network. To our knowledge this abrupt-in-depth pattern has not been reported;
+standard probing papers test one or two layers and miss the V-shape.
+
+\paragraph{Few-shot prompting baselines.}
+Direct-prompting sentiment classification with instruction-tuned LLMs is
+strong \cite{brown2020language, wei2022finetuned}. We benchmark against this
+baseline and find that prompting beats probing on accuracy (92.78\% vs.\
+77.75\% on SST-2). Our method's advantages are therefore \emph{not}
+classification accuracy but (i)~\speedup{} inference speedup via batched
+forward passes, (ii)~continuous scores useful for ranking, calibration, and
+distribution monitoring, (iii)~interpretability insights about where and how
+the LLM represents the concept, and (iv)~no prompt engineering.

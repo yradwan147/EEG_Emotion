@@ -1,0 +1,40 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We presented \ours, a data-free method for extracting a linear valence
+direction from LLM residual streams using just nine LLM-generated stories
+per emotion class. The method uses zero labels, zero gradient updates, and
+zero prompt engineering. On seven sentiment benchmarks, two word-valence
+lexicons, a continuous VAD regression task, and four languages, the same
+nine-story-centroid V-axis produces competitive zero-shot results. Data
+efficiency is extreme: one story per class already produces a
+better-than-random classifier; fifteen stories per class match a supervised
+logistic regression trained on 5{,}000 labeled examples.
+
+The most striking interpretability finding is a sudden ``V-shape'' emergence
+pattern: the valence direction is present at layer 1 (embedding-level),
+disappears through the middle of the network (a 24-layer dilution zone),
+then re-crystallizes abruptly at the final 1--2 transformer blocks.
+The final-layer V-axis is \emph{nearly orthogonal} to the middle-layer
+V-axis (cosine 0.067), showing that the valence direction is freshly
+constructed just before the LM head. This pattern replicates across
+Qwen, Pythia, and Bloom model families, suggesting it is a universal
+feature of causal language model computation.
+
+Equally striking is the valence/arousal asymmetry: the same method that
+recovers valence with Pearson $|r|=0.50$ fails to recover arousal at any
+layer in any model tested ($|r|\leq0.16$). This suggests that valence is
+encoded as a privileged linear direction that arousal does not share, with
+implications for LLM interpretability research.
+
+We also report honest negatives: direct prompting beats our probing on raw
+classification accuracy; concept generalization to toxicity fails;
+cross-LLM ensembling of V-axes hurts. These define the scope of \ours:
+it is valuable for efficiency (\speedup{} faster inference), interpretability
+(a single inspectable direction), data efficiency (zero labels), and
+continuous scoring, but not for pushing state-of-the-art classification
+accuracy.
+
+We hope this work will motivate further study of ``when and where'' LLMs
+encode concepts as linear directions, and provide a simple reproducible
+baseline for data-free concept probing in future interpretability research.

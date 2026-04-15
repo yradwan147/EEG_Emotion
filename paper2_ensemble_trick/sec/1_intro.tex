@@ -1,0 +1,92 @@
+\section{Introduction}
+\label{sec:intro}
+
+Deep ensembling \cite{lakshminarayanan2017simple} remains one of the most
+effective and widely used uncertainty-estimation and accuracy-boosting
+techniques in deep learning. The classic recipe is simple: train $N$
+independent models with different random seeds, average their softmax
+outputs at test time, and enjoy a $\sim$1--3 percentage point accuracy boost
+in exchange for $N\times$ inference cost. But seed diversity is a blunt
+instrument, and practitioners have spent a decade looking for richer
+ensemble-diversity sources: snapshot ensembles via cyclic learning rates
+\cite{huang2017snapshot}, Stochastic Weight Averaging (SWA)
+\cite{izmailov2018averaging}, Fast Geometric Ensembles (FGE)
+\cite{garipov2018loss}, BatchEnsemble \cite{wen2020batchensemble}, Diverse
+Mixture-of-Experts ensembles \cite{wenzel2020hyperparameter}, and many
+others. Most of these tricks either (i)~require custom training schedules
+that complicate existing pipelines, or (ii)~average weights rather than
+predictions (losing calibration), or (iii)~trade off gain for complexity.
+
+We propose a trick so simple it barely deserves a name: \emph{train the
+same model for two different epoch budgets and ensemble the resulting
+checkpoints}. Concretely, given a standard cosine-annealed training recipe
+with $T_\mathrm{max}$ epochs, train once with $T_\mathrm{max}=100$ and once
+with $T_\mathrm{max}=150$ (same seeds, same everything else), then average
+softmax outputs across both runs' checkpoints.
+
+This is the minimal possible modification to standard deep ensembling.
+There is no new training objective, no new regularizer, no custom LR
+schedule, no weight averaging; the only change is the \emph{endpoint} of
+one of the cosine schedules. Yet this change produces a measurable
+$+1.5$~pp gain on EEG emotion classification and a $+0.4$--$0.5$~pp gain on
+image classification \emph{beyond} what standard same-length deep
+ensembling gives.
+
+\paragraph{Why does this work?}
+At first glance, training longer should either improve or hurt mean
+accuracy, and either way a same-mean-accuracy ensemble should behave
+identically to a seed-only deep ensemble. We show empirically that this
+intuition is wrong. The key observation is that with a cosine schedule
+truncated at $T_\mathrm{max}$, the \emph{path} through parameter space
+depends on $T_\mathrm{max}$, not just the final accuracy. Specifically, a
+150-epoch training run's epoch-100 checkpoint has a non-zero LR
+($\sim\!\!0.25\cdot \mathrm{lr}_{\mathrm{init}}$ for our schedule), and
+it continues training for 50 more epochs with slowly decaying LR before
+stopping. This tail phase is an effective ``basin exploration'' phase: the
+model wanders through neighboring local minima with the \emph{same} loss
+and accuracy but \emph{different} decision boundaries at the pixel/EEG-sample
+level.
+
+Our decomposition shows that the 100ep and 150ep trajectories, despite
+reaching identical mean validation BAcc ($0.6771$ vs.\ $0.6776$ on
+FACED within 0.0005), produce different consensus predictions on 13\% of
+test samples. On those disagreement samples the 10-model mixed ensemble is
+10 percentage points more accurate than either group's individual
+consensus. That $+10$~pp on 13\% of samples equals a $+1.3$~pp total gain,
+closely matching the observed $+1.5$~pp.
+
+\paragraph{Contributions.}
+\begin{itemize}[leftmargin=*]
+\item \textbf{A new ensemble-diversity trick.} \ours{} trains the same model
+twice with different $T_\mathrm{max}$ and averages checkpoints. Zero
+hyperparameter tuning, zero schedule changes beyond the endpoint.
+\item \textbf{Flagship application: new FACED EEG emotion SOTA.} Our
+10-model \ours{} ensemble reaches $\facedacc$ balanced accuracy on FACED
+9-class, a $+5.3$~pp absolute improvement over the EMOD AAAI 2026 baseline
+($0.6420$) and $+19.5$~pp over the REVE NeurIPS 2025 reference ($0.5000$).
+\item \textbf{Cross-dataset validation.} We replicate the trick on 5 more
+datasets: SEED-V EEG emotion ($+3.4\%$), CIFAR-10 ($+2.4\%$), CIFAR-100
+($+$X\%), MNIST MLP ($+0.14\%$), Fashion-MNIST ($+$Y\%), SVHN ($+$Z\%).
+\item \textbf{Head-to-head against existing methods.} We compare against
+standard 10-seed deep ensembles, SWA, and snapshot ensembling on CIFAR-10,
+showing that \ours{} is competitive or stronger.
+\item \textbf{Theoretical explanation.} We show (i)~that 100ep and 150ep
+trajectories reach identical mean accuracy but produce different consensus
+predictions on 13\% of test samples; (ii)~that the ensemble gain equals
+the disagreement-sample correction times the disagreement fraction; and
+(iii)~that the gain scales inversely with individual accuracy (``the
+more capacity-bound the student, the bigger the gain'').
+\item \textbf{Training-log analysis.} We show from real training curves
+that 150ep's val BAcc catches up to 100ep's at epoch 149 exactly,
+demonstrating that the extra 50 epochs add \emph{zero} mean accuracy but
+substantial parameter drift.
+\end{itemize}
+
+\paragraph{When should you use \ours?}
+The trick is most valuable when individual model accuracy leaves room for
+ensemble gains---typically, hard tasks or capacity-bound students. On
+MNIST with 0.985 individual accuracy we get only a $+0.14$~pp gain, because
+there are essentially no decision-boundary errors left to correct. On
+FACED EEG 9-class with 0.66 individual accuracy we get $+3.7$~pp. The
+trick's gain is well-predicted by $(1 - \mathrm{individual\ accuracy})$ in
+our experiments.

@@ -1,0 +1,94 @@
+\section{Method}
+\label{sec:method}
+
+\subsection{\ours{}: Two Cosine Schedules, One Ensemble}
+
+Let $f_\theta$ be a neural network trained with a cosine-annealed
+learning-rate schedule starting at $\mathrm{lr}_{\mathrm{init}}$ and
+decaying to $\mathrm{lr}_{\mathrm{min}}$ over $T_\mathrm{max}$ epochs.
+Standard deep ensembling trains $N$ independent copies of $f_\theta$ with
+$N$ different random seeds at the same $T_\mathrm{max}$ and averages softmax
+outputs at test time.
+
+\ours{} trains $2N$ models: $N$ seeds with $T_\mathrm{max}=T_A$ and $N$
+seeds with $T_\mathrm{max}=T_B$ (with $T_B > T_A$, e.g., $T_B = 1.5 T_A$).
+The final ensemble averages softmax outputs from all $2N$ models:
+\[
+\bar p(x) = \frac{1}{2N}\sum_{i=1}^{2N} \mathrm{softmax}\!\bigl(f_{\theta_i}(x)\bigr).
+\]
+
+There is no change to the training objective, loss function, random seeds,
+augmentation pipeline, optimizer, or any other component. The only change
+is a single integer (the endpoint of the cosine schedule) differing across
+the two groups.
+
+\subsection{Why Two Endpoints?}
+
+\paragraph{The ``low-LR exploration'' phase.}
+A cosine schedule $\mathrm{lr}(t) = \mathrm{lr}_{\mathrm{min}} +
+\frac{1}{2}(\mathrm{lr}_{\mathrm{init}} - \mathrm{lr}_{\mathrm{min}})(1 + \cos(\pi t / T_{\max}))$
+at $t=100$ with $T_\mathrm{max}=100$ produces
+$\mathrm{lr}=\mathrm{lr}_{\mathrm{min}} \approx 10^{-6}$. The same schedule at
+$t=100$ with $T_\mathrm{max}=150$ produces
+$\mathrm{lr} = \mathrm{lr}_{\mathrm{init}} \cdot (1 + \cos(2\pi/3))/2 = 0.25 \cdot \mathrm{lr}_{\mathrm{init}} \approx 2.5 \times 10^{-4}$.
+That is a 250$\times$ difference in instantaneous LR.
+
+So a model training for 150 epochs, at epoch 100, is still in the
+``moderate-LR'' regime and continues to take meaningful gradient steps
+through the loss landscape. Over the remaining 50 epochs, the LR slowly
+decays to $\mathrm{lr}_{\mathrm{min}}$. During this 50-epoch tail, the
+model \emph{stochastically explores} the loss basin it is in: each SGD
+step perturbs the weights, but the decreasing LR eventually settles it
+into some local minimum of that basin.
+
+\paragraph{Empirical finding.}
+We show in \cref{sec:experiments} that:
+(i) the 150-epoch and 100-epoch runs reach \emph{identical} mean
+validation accuracy (difference $<\!0.001$);
+(ii) but they produce different consensus predictions on 13\% of test samples;
+(iii) on those disagreement samples, the mixed ensemble is 10 percentage
+points more accurate than either group's consensus;
+(iv) multiplying 10\,pp $\times$ 13\% gives $+1.3$~pp total gain, closely
+matching the observed $+1.5$~pp between the same-length ensemble and the
+mixed-length ensemble.
+
+\subsection{Theoretical Prediction of Gain Magnitude}
+
+Let $p_A$ be the accuracy of a single seed trained with $T_\mathrm{max}=T_A$
+and let $p_B$ be the same for $T_B$. Let $q$ be the fraction of test samples
+on which the 100-epoch and 150-epoch \emph{group consensuses} disagree, and
+let $g$ be the accuracy gain on disagreement samples when using the mixed
+ensemble over either single-length ensemble. The predicted total gain is
+\[
+\Delta_{\mathrm{mixed}} \approx q \cdot g.
+\]
+
+We verify this equation empirically: on FACED d6 ensembles, $q = 0.131$,
+$g = 0.103$, product $= 0.0135$, observed gain $= 0.015$.
+
+\subsection{Gain-vs-Accuracy Scaling Law}
+
+We also conjecture and verify empirically that the gain scales inversely
+with individual accuracy. This follows from a simple argument: if
+individual models are already perfect, there are no disagreement samples
+and no gain from ensembling (mixed or otherwise). If individual models are
+near-random, many disagreement samples are also near-random and ensembling
+helps less. The sweet spot is individual accuracy in the 0.3--0.8 range,
+where many disagreement samples are still decodable by the richer
+ensemble distribution.
+
+\subsection{Complexity}
+
+\paragraph{Compute.} \ours{} requires two training runs per seed, one with
+$T_\mathrm{max}=T_A$ and one with $T_\mathrm{max}=T_B$. Total compute is
+$\sim\!T_A + T_B$ epochs per seed, vs.\ $\sim\!2T_A$ for a standard $2N$-seed
+deep ensemble with the same total ensemble size. The extra cost is
+$(T_B - T_A) \cdot N$ training epochs (e.g., $50 \times 5 = 250$ epochs
+for our $T_A=100, T_B=150, N=5$ setup on CIFAR-10). This is a modest
+overhead for the $+1.5$~pp gain beyond standard deep ensembles.
+
+\paragraph{Inference.} Identical to standard deep ensembles: $2N$ forward
+passes per input, softmax averaged.
+
+\paragraph{Storage.} Identical to standard deep ensembles: $2N$ model
+checkpoints.

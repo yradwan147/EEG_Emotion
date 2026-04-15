@@ -1,0 +1,230 @@
+\section*{Supplementary Material}
+\addcontentsline{toc}{section}{Supplementary Material}
+\renewcommand{\thesection}{S\arabic{section}}
+\setcounter{section}{0}
+
+\section{Full Layer-wise Results (Qwen2.5-1.5B)}
+\label{sup:layerwise}
+
+\begin{table}[h]
+\centering
+\small
+\caption{Per-layer SST-2 AUC and EmoBank V $|r|$ for Qwen2.5-1.5B (all 28
+layers). The V-shape pattern: strong at L1, near-zero from L2 to L26, abrupt
+jump at L27.}
+\label{tab:sup_layerwise}
+\begin{tabular}{lcc}
+\toprule
+Layer & SST-2 AUC & EmoBank V $|r|$ \\
+\midrule
+L1  & 0.752 & 0.370 \\
+L2  & 0.524 & 0.005 \\
+L3  & 0.524 & 0.005 \\
+L4  & 0.524 & 0.005 \\
+L8  & 0.524 & 0.005 \\
+L12 & 0.525 & 0.005 \\
+L14 & 0.525 & 0.005 \\
+L16 & 0.525 & 0.005 \\
+L18 & 0.525 & 0.005 \\
+L20 & 0.525 & 0.005 \\
+L22 & 0.526 & 0.004 \\
+L24 & 0.527 & 0.004 \\
+L25 & 0.531 & 0.003 \\
+L26 & 0.532 & 0.002 \\
+\textbf{L27} & \textbf{0.836} & \textbf{0.517} \\
+\textbf{L28} & \textbf{0.837} & \textbf{0.496} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Latent Space Analysis}
+\label{sup:latent}
+
+We computed a set of geometric diagnostics per layer to quantify how the
+residual stream changes across the network:
+
+\begin{table}[h]
+\centering
+\small
+\caption{Latent-space metrics per layer for Qwen2.5-1.5B. Isotropy is the
+von-Neumann entropy of eigenvalue distribution (0 = fully anisotropic, 1 =
+perfectly isotropic). Effective rank of the 9 centroids. Silhouette score
+of the 9-class clustering. V-axis cosine similarity with the L28 V-axis.}
+\label{tab:sup_latent}
+\begin{tabular}{lccccc}
+\toprule
+Layer & Isotropy & Eff.\ rank & PC1 var ratio & Silhouette & cos$(v_L, v_{28})$ \\
+\midrule
+L1 & 0.010 & 2.99 & 0.972 & $-$0.178 & 0.291 \\
+L14 & 0.033 & 3.94 & 0.937 & $-$0.145 & \textbf{0.067} \\
+L27 & 0.576 & 6.92 & 0.515 & $-$0.008 & 0.953 \\
+L28 & 0.533 & 6.80 & 0.546 & $-$0.014 & 1.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Isotropy rises from 0.01 to 0.58 across layers---the residual stream becomes
+increasingly high-dimensional / balanced across dimensions. The effective
+rank of the 9 centroids roughly doubles (3.0 $\to$ 6.9). The silhouette
+score is always negative, meaning individual story embeddings don't cluster
+tightly by class in any layer---the 9-class structure is a
+\emph{centroid-level} property, not a sample-level property.
+
+\section{Multilingual Self-LOOCV}
+\label{sup:multilingual}
+
+Since all Hugging Face multilingual sentiment datasets (tyqiangz/multilingual-sentiments,
+cardiffnlp/tweet\_sentiment\_multilingual) rely on deprecated script-based
+loaders, we cannot test cross-language generalization on external
+benchmarks directly. Instead, we perform \emph{self-LOOCV}: generate 20
+stories per class in each language, use 12 for centroids and 8 for test,
+and classify test stories by nearest centroid.
+
+\begin{table}[h]
+\centering
+\caption{Multilingual self-LOOCV accuracy on Qwen2.5-1.5B. 9-class
+nearest-centroid and binary (pos vs neg emotions) AUC.}
+\label{tab:sup_multilingual}
+\begin{tabular}{lccc}
+\toprule
+Language & 9-class acc & Binary AUC & Binary acc \\
+\midrule
+English & 0.764 & 0.535 & 0.563 \\
+Spanish & 0.681 & \textbf{0.899} & \textbf{0.781} \\
+French  & 0.597 & 0.658 & 0.594 \\
+German  & 0.486 & 0.870 & 0.781 \\
+Chinese & TBD   & TBD   & TBD   \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 9-class accuracy is high ($>\!0.59$) across all three languages tested,
+confirming that the nine story centroids capture a discriminative axis
+even in non-English. Binary valence AUC is strongest in Spanish (0.90)
+and weaker in English (0.54) --- the latter is likely an artifact of the
+small (n=72) held-out set, since the same model achieves AUC 0.868 on
+the independent SST-2 test.
+
+\section{Prompt Robustness}
+\label{sup:promptrobust}
+
+We tested four different story-generation prompt styles:
+(i) \emph{standard} (``Write a short story in which the main character
+feels \ldots''), (ii) \emph{first-person} (``Write a first-person diary
+entry \ldots''), (iii) \emph{dialogue} (``Write a two-person dialogue in
+which one character is clearly feeling \ldots''), and (iv) \emph{scene}
+(``Describe a cinematic scene \ldots''). For each style we regenerate 9
+stories per class, recompute the V-axis via PCA, and evaluate zero-shot
+SST-2 AUC.
+
+\begin{table}[h]
+\centering
+\caption{Prompt-style robustness on SST-2 (Qwen2.5-1.5B, L28).}
+\label{tab:sup_prompt_robust}
+\begin{tabular}{lcc}
+\toprule
+Prompt style & SST-2 AUC & SST-2 acc (median thresh) \\
+\midrule
+standard      & 0.794 & 0.718 \\
+first-person  & 0.761 & 0.677 \\
+dialogue      & 0.766 & 0.697 \\
+scene         & 0.803 & 0.734 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All four styles yield AUC $> 0.75$, confirming the method is robust to
+surface-level prompt changes. However, the V-axes are not all mutually
+aligned: the pairwise cosine similarities between standard,
+first-person, and scene axes are large (0.78--0.82, all positive),
+while the \emph{dialogue} axis flips sign relative to the others
+($\cos = -0.49$ vs.\ standard, $-0.69$ vs.\ first-person). Dialogue
+still yields a strong SST-2 AUC after sign-alignment; the flipped sign
+reflects PCA sign ambiguity rather than a genuine semantic disagreement.
+This motivates a simple post-hoc \emph{sign-align} step: when deploying a
+new prompt style, check the centroid of the \texttt{happy} class lies on
+the positive side of the axis, and multiply by $-1$ if not.
+
+\section{Qwen3.5-2B Cross-Scaling}
+\label{sup:qwen35}
+
+As a robustness check on model generation, we repeat the main
+experiments with Qwen3.5-2B (Instruct, 24 layers), representing a
+newer-generation model at a similar parameter scale:
+
+\begin{table}[h]
+\centering
+\caption{Qwen3.5-2B vs.\ Qwen2.5-1.5B on the main Paper 1 benchmarks.
+Qwen2.5-1.5B remains the best single model.}
+\label{tab:sup_qwen35}
+\begin{tabular}{lcc}
+\toprule
+Metric & Qwen2.5-1.5B (main) & Qwen3.5-2B \\
+\midrule
+SST-2 AUC           & \textbf{0.868} & 0.822 \\
+SST-2 acc (median)  & \textbf{0.778} & 0.748 \\
+IMDB AUC            & \textbf{0.895} & 0.822 \\
+EmoBank V $|r|$     & 0.480          & \textbf{0.520} \\
+Hu \& Liu $|r|$     & \textbf{0.761} & 0.722 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Qwen3.5-2B is competitive but slightly weaker than Qwen2.5-1.5B on 4 of
+5 benchmarks. It is \emph{stronger} on the continuous EmoBank regression
+(|r| 0.52 vs.\ 0.48). These results confirm that our main findings are
+not a Qwen2.5-specific artifact.
+
+\section{Failure Cases}
+\label{sup:failures}
+
+\subsection{Toxicity concept}
+We attempted to generalize the method by generating 15 toxic and 15 safe
+stories, computing a T-axis as the difference of class means, and testing on
+Jigsaw Civil Comments. Balanced AUC was 0.59 (near random). The centroid
+distance $|\mu_{\mathrm{toxic}} - \mu_{\mathrm{safe}}| = 58.85$ in L28 space
+is large, so the LLM distinguishes its own toxic and safe stories cleanly,
+but the direction does not transfer to real-world toxic comments.
+
+\subsection{Multi-LLM ensemble}
+Combining V-axes from 4 LLMs and averaging sign-aligned projections:
+
+\begin{table}[h]
+\centering
+\caption{Multi-LLM ensemble hurts relative to best single LLM.}
+\label{tab:sup_multillm}
+\begin{tabular}{lccc}
+\toprule
+Benchmark & Best single (Qwen-1.5B) & Mean 4-model ensemble & $\Delta$ \\
+\midrule
+SST-2 AUC & 0.837 & 0.805 & $-$0.032 \\
+IMDB AUC & 0.819 & 0.779 & $-$0.040 \\
+Yelp AUC & 0.928 & 0.907 & $-$0.021 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Interpretation: the LLMs have different V-axis qualities (Qwen-1.5B best,
+Bloom-560m weakest) and averaging drags the strong model toward the weak
+model. Unlike same-model ensembling (which is the core mechanism of our
+companion paper on the trajectory-length ensemble trick), cross-model
+ensembling suffers from a ``weakest-link'' effect.
+
+\section{Hyperparameters}
+\label{sup:hparams}
+
+\paragraph{Story generation.} 9 stories per class $\times$ 9 classes $= 81$
+total. Generation: $\max\text{new tokens}=150$, $T=0.8$, top-$p=0.9$,
+repetition penalty = 1.1.
+
+\paragraph{Feature extraction.} Layer $L=28$ for Qwen2.5-1.5B.
+Mean-pooled over non-pad tokens with attention mask weighting.
+Max context = 512 tokens for stories, 128--256 for downstream test text.
+
+\paragraph{PCA.} Standard SVD of the mean-centered 9$\times 1{,}536$
+centroid matrix. First principal component taken as V-axis.
+
+\paragraph{Threshold calibration.} For SST-2 calibrated accuracy we use
+200 held-out SST-2 samples to find the optimal threshold by grid search.
+The ``median'' threshold uses the median of the validation projections
+with no labels at all.

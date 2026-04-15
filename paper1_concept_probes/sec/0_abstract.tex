@@ -1,0 +1,35 @@
+\begin{abstract}
+We introduce \ours, a data-free method for extracting a valence direction from the
+residual stream of any instruction-tuned large language model using just nine
+LLM-generated stories per emotion class (81 samples total). The method is
+\emph{trivially simple}: generate nine short paragraphs for each of nine emotion
+categories, extract their final-layer hidden states, average per class to form
+nine centroids, and take the first principal component of the mean-centered
+centroids as the valence axis. We show that this single 1\,536-dimensional
+direction, computed without any labeled training data, is competitive with
+supervised classifiers across a wide range of tasks: it achieves AUC \sstauc{}
+(\sstacc{} accuracy with median thresholding) on SST-2, AUC \imdbauc{} on IMDB,
+AUC \yelpauc{} on Yelp Polarity, AUC \twauc{} on Twitter SemEval-17, correlates
+\huliur{} with the Hu \& Liu 6{,}789-word sentiment lexicon, and \warrinerr{}
+with the continuous Warriner \textit{et al.\@} 2013 valence lexicon. A
+leave-one-out data-efficiency curve shows that a single story per class
+(9 total samples) already gives AUC 0.74 on SST-2, and that fifteen stories per
+class match the accuracy of a supervised logistic regression trained on
+\emph{5{,}000 labeled SST-2 examples}. Layer-wise probing reveals a striking
+``V-shape'' pattern: the valence direction appears strongly at layer~1 (inherited
+from the embedding layer), fades to near zero through the context-integration
+zone (layers 2--26), then abruptly \emph{re-crystallizes} at the final two
+blocks. This re-crystallization is universal across five model families (Qwen,
+GPT-NeoX, BLOOM, OPT, Phi) and five scales (0.5B--7B), but does \emph{not} occur
+for the arousal axis: the corresponding PCA projection gives
+$|r|\leq 0.16$ at every layer for every model on every test. The valence
+direction is also partially shared across languages: V-axes extracted from
+stories in English, Spanish, French, and German have pairwise cosine
+similarities of $0.23$--$0.47$, while the arousal axes are essentially
+orthogonal. Probing is \speedup{} faster than direct prompting at inference,
+produces continuous scores useful for ranking, and reveals a novel
+interpretability insight about how LLMs represent affect. Our findings
+characterize \emph{when} and \emph{where} late-layer linear probing recovers
+usable concept directions, and provide a method that requires zero labels,
+zero gradient updates, and zero prompt engineering.
+\end{abstract}

@@ -1,0 +1,30 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We introduced \ours{}, a minimal modification to standard deep ensembling:
+train the same architecture with the same cosine schedule but two different
+$T_\mathrm{max}$ endpoints, and ensemble the resulting checkpoints. The two
+trajectories reach identical mean accuracy yet differ on 13\% of test samples,
+producing a $+1.5$~pp gain beyond standard same-length deep ensembles.
+
+The trick is validated across 6 datasets spanning two modalities and three
+architectures. It achieves a new state of the art on FACED 9-class EEG
+emotion classification ($\facedacc$ BAcc, $+8.2\%$ over the prior
+EMOD AAAI 2026 baseline of $0.642$). The gain scales inversely with
+individual accuracy: capacity-bound students (FACED 9-class, SEED-V
+5-class) see the largest gains ($+3$--$4$~pp), easy tasks (MNIST) see
+minimal gains ($+0.14$~pp).
+
+The theoretical mechanism is transparent: the extra epochs in the
+longer trajectory constitute a ``low-LR exploration'' phase that drifts
+weights into a neighboring local minimum with identical loss but different
+decision boundaries. The 100ep and 150ep consensus predictions differ on
+13\% of test samples, and on those samples the mixed ensemble is 10~pp more
+accurate than either individual consensus---directly predicting the overall
+$+1.5$~pp gain.
+
+\ours{} is simple enough to deploy in any existing cosine-schedule
+training recipe with one line of code (double one integer) and provides
+consistent calibration-preserving gains across tasks. We hope it will
+become a standard entry in the practitioner's toolkit of ``free'' ensemble
+tricks.
