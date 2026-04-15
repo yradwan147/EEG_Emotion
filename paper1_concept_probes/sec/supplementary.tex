@@ -107,6 +107,47 @@ so the low EN-self-LOOCV AUC reflects sampling variance on only 72 held-out
 stories, not a genuine weakness. Chinese also has the highest 9-class
 nearest-centroid accuracy (0.875).
 
+\section{V-shape is causal-LM specific: BERT and RoBERTa baselines}
+\label{sup:bidirectional}
+
+The V-shape pattern we identify (dilution in middle layers, crystallization at
+the final 1--2 blocks) is specific to \emph{causal} (autoregressive) language
+models. We verify this by running the same nine-story-centroid PCA method on
+two bidirectional encoder-only models: BERT-base and RoBERTa-base.
+
+\begin{table}[h]
+\centering
+\caption{Per-layer zero-shot SST-2 AUC for bidirectional encoders. Unlike
+Qwen / Pythia / Bloom (\cref{fig:crossmodel}), the peak AUC occurs in
+\emph{middle} layers and the final layer is \emph{not} the best.}
+\label{tab:sup_bidirectional}
+\begin{tabular}{lcccccccc}
+\toprule
+Model & L1 & L3 & L5 & L7 & L9 & L11 & L12 & Peak layer \\
+\midrule
+BERT-base      & 0.730 & 0.749 & 0.755 & 0.789 & \textbf{0.845} & 0.805 & 0.814 & L9  \\
+RoBERTa-base   & 0.723 & 0.761 & 0.834 & \textbf{0.856} & 0.831 & 0.835 & 0.771 & L7  \\
+\midrule
+Qwen2.5-1.5B (causal, final-layer peak) & 0.752 & \ldots & 0.525 & \ldots & 0.525 & \ldots & 0.532 & \textbf{L28} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+BERT peaks at layer 9 of 12 (AUC 0.845) and RoBERTa at layer 7 of 12 (AUC
+0.856). In both cases, the final layer has lower AUC than several middle
+layers. Compare this to Qwen2.5-1.5B where layers 2--26 are all near chance
+and the final 1--2 layers jump by 0.3 AUC.
+
+\paragraph{Interpretation.}
+Bidirectional encoders do not have to produce a next-token distribution at
+the final layer, so there is no pressure to ``re-linearize'' semantic
+features at the end. The V-axis lives in middle layers where contextual
+mixing has surfaced valence-relevant features but late-layer compression
+has not yet begun. Causal LMs, by contrast, \emph{must} surface decodable
+next-token information in the final residual stream, which incidentally
+re-linearizes valence. This is a testable prediction in the main text
+(\cref{sec:discussion}) that we now verify empirically.
+
 \section{Mechanism: Where is the V-axis built?}
 \label{sup:mechanism}
 
