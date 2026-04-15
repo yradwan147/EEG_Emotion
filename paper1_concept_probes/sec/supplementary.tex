@@ -107,6 +107,61 @@ so the low EN-self-LOOCV AUC reflects sampling variance on only 72 held-out
 stories, not a genuine weakness. Chinese also has the highest 9-class
 nearest-centroid accuracy (0.875).
 
+\section{Mechanism: Where is the V-axis built?}
+\label{sup:mechanism}
+
+The granular layer sweep (\cref{tab:sup_layerwise}) shows the V-axis
+``crystallizes'' between paper layer L26 (SST-2 AUC 0.532) and L27
+(AUC 0.836). To localize this within the transformer block, we perform
+causal ablations on Qwen2.5-1.5B-Instruct using the 500-sample balanced
+SST-2 validation (baseline AUC 0.8488 at this sample size).
+
+\paragraph{Head ablation (12 heads at the final layer).}
+We zero each attention head individually at the final transformer layer
+by masking the corresponding $128$-dim slice of the o\_proj input.
+Across all 12 heads the SST-2 AUC drop is within $\pm 0.002$ of the
+baseline (max drop $+0.0019$ for head 3). \emph{No single head carries
+the V-axis.}
+
+\paragraph{Block ablation (attention vs MLP).}
+We then zero the entire attention block or the entire MLP block at
+both paper L27 (the crystallizing layer) and paper L28 (the final
+layer):
+
+\begin{table}[h]
+\centering
+\caption{Block ablation at the last two transformer layers.
+SST-2 AUC on 500 balanced samples; baseline is 0.8488. Drops are
+all $\leq 0.004$ --- the V-axis is distributed redundantly across
+the last two blocks.}
+\label{tab:sup_block_ablation}
+\begin{tabular}{lcc}
+\toprule
+Ablation & Paper L27 & Paper L28 \\
+\midrule
+Zero attention              & 0.8518 & 0.8498 \\
+Zero MLP                    & 0.8460 & 0.8457 \\
+Zero attention + MLP        & 0.8496 & 0.8480 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Even zeroing the entire forward pass of a whole layer (attention + MLP)
+changes the final SST-2 AUC by at most $0.004$. Ablating the attention
+alone actually \emph{improves} AUC slightly (by 0.003 at L27), possibly
+because late-layer attention mixes non-valence features into the residual
+stream. Ablating the MLP hurts slightly more, consistent with the MLP
+doing the linear re-projection.
+
+\paragraph{Interpretation.}
+The final two transformer blocks are \emph{redundant}: either alone
+can project the residual stream onto a linear valence direction. This
+makes the V-axis a robust convergent feature of late-layer computation
+rather than the output of a single ``valence circuit''. It also
+explains why the L28 V-axis is nearly orthogonal to the middle-layer
+(L14) V-axis --- the late-layer computation builds a direction
+$\emph{de novo}$ from distributed features.
+
 \section{Prompt Robustness}
 \label{sup:promptrobust}
 
