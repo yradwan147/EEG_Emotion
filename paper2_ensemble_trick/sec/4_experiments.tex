@@ -91,7 +91,7 @@ ensemble. Gain scales inversely with individual accuracy.}
 Dataset & Arch & Ind.\ mean & 5-seed ensemble & \textbf{10-model mixed} \\
 \midrule
 CIFAR-10 & Small CNN & 0.9015 & 0.9209 (+0.0194) & \textbf{\ciftenacc{} (+0.0238)} \\
-CIFAR-10 & ResNet-18 & TBD & TBD & TBD \\
+CIFAR-10 & ResNet-18 & 0.9452 & 0.9563 (+0.0111) & \textbf{0.9599 (+0.0147)} \\
 CIFAR-100 & Small CNN & 0.6886 & 0.7225 (+0.0339) & \textbf{0.7353 (+0.0467)} \\
 CIFAR-100 & ResNet-18 & TBD & TBD & TBD \\
 MNIST & MLP & 0.9849 & 0.9859 (+0.0010) & \textbf{0.9863 (+0.0014)} \\
@@ -136,12 +136,13 @@ the headroom from individual accuracy to 1.0.}
 \toprule
 Dataset & Ind.\ accuracy & Mixed gain & Ratio: gain/(1-ind.) \\
 \midrule
-FACED 9c EEG      & 0.6581 & +0.0367 & 0.107 \\
-SEED-V 5c EEG     & 0.3743 & +0.0340 & 0.054 \\
-CIFAR-100 CNN     & 0.6886 & +0.0467 & 0.150 \\
-CIFAR-10 CNN      & 0.9015 & +0.0238 & 0.242 \\
-Fashion-MNIST CNN & 0.9313 & +0.0121 & 0.176 \\
-MNIST MLP         & 0.9849 & +0.0014 & 0.093 \\
+FACED 9c EEG           & 0.6581 & +0.0367 & 0.107 \\
+SEED-V 5c EEG          & 0.3743 & +0.0340 & 0.054 \\
+CIFAR-100 CNN          & 0.6886 & +0.0467 & 0.150 \\
+CIFAR-10 CNN           & 0.9015 & +0.0238 & 0.242 \\
+CIFAR-10 ResNet-18     & 0.9452 & +0.0147 & 0.268 \\
+Fashion-MNIST CNN      & 0.9313 & +0.0121 & 0.176 \\
+MNIST MLP              & 0.9849 & +0.0014 & 0.093 \\
 \bottomrule
 \end{tabular}
 \end{table}
