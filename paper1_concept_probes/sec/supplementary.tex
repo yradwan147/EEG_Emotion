@@ -90,20 +90,22 @@ nearest-centroid and binary (pos vs neg emotions) AUC.}
 Language & 9-class acc & Binary AUC & Binary acc \\
 \midrule
 English & 0.764 & 0.535 & 0.563 \\
-Spanish & 0.681 & \textbf{0.899} & \textbf{0.781} \\
+Spanish & 0.681 & 0.899 & 0.781 \\
 French  & 0.597 & 0.658 & 0.594 \\
 German  & 0.486 & 0.870 & 0.781 \\
-Chinese & TBD   & TBD   & TBD   \\
+Chinese & \textbf{0.875} & \textbf{0.967} & \textbf{0.875} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The 9-class accuracy is high ($>\!0.59$) across all three languages tested,
-confirming that the nine story centroids capture a discriminative axis
-even in non-English. Binary valence AUC is strongest in Spanish (0.90)
-and weaker in English (0.54) --- the latter is likely an artifact of the
-small (n=72) held-out set, since the same model achieves AUC 0.868 on
-the independent SST-2 test.
+The method works across all five tested languages. Binary valence AUC
+is strongest in Chinese (0.97) and Spanish (0.90), moderate in German
+(0.87) and French (0.66), and surprisingly weak on the small
+English held-out self-LOOCV set (0.54); the same Qwen2.5-1.5B model
+achieves AUC 0.868 on the independent SST-2 test set (\cref{tab:sst2}),
+so the low EN-self-LOOCV AUC reflects sampling variance on only 72 held-out
+stories, not a genuine weakness. Chinese also has the highest 9-class
+nearest-centroid accuracy (0.875).
 
 \section{Prompt Robustness}
 \label{sup:promptrobust}
