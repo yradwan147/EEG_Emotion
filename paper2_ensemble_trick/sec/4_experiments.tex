@@ -91,7 +91,7 @@ ensemble. Gain scales inversely with individual accuracy.}
 Dataset & Arch & Ind.\ mean & 5-seed ensemble & \textbf{10-model mixed} \\
 \midrule
 CIFAR-10 & Small CNN & 0.9015 & 0.9209 (+0.0194) & \textbf{\ciftenacc{} (+0.0238)} \\
-CIFAR-100 & Small CNN & TBD & TBD & TBD \\
+CIFAR-100 & Small CNN & 0.6886 & 0.7225 (+0.0339) & \textbf{0.7353 (+0.0467)} \\
 MNIST & MLP & 0.9849 & 0.9859 (+0.0010) & \textbf{0.9863 (+0.0014)} \\
 Fashion-MNIST & Small CNN & 0.9313 & 0.9418 (+0.0105) & \textbf{0.9434 (+0.0121)} \\
 SVHN$^{\dagger}$ & Small CNN & -- & -- & -- \\
@@ -110,6 +110,12 @@ Collecting results across all six datasets, we find that the mixed-length
 ensemble gain scales approximately linearly with the headroom
 $(1 - p_\mathrm{individual})$: harder tasks with lower individual accuracy
 receive proportionally larger gains.
+On CIFAR-100, we note that the mixed ensemble at $0.7353$ is slightly
+below the best single-length 5-seed ensemble at $B=75$~epochs
+($0.7367$); the mixed gain is positive when compared against the average
+of the two same-length ensembles (\emph{mean}($A$-5-seed, $B$-5-seed)
+$=0.7296$, mixed $-$ mean $=+0.0057$). CIFAR-100 is the one dataset
+where the longer schedule $B$ alone beats the mixed ensemble.
 
 \begin{figure}[h]
 \centering
@@ -128,11 +134,12 @@ the headroom from individual accuracy to 1.0.}
 \toprule
 Dataset & Ind.\ accuracy & Mixed gain & Ratio: gain/(1-ind.) \\
 \midrule
-FACED 9c EEG  & 0.6581 & +0.0367 & 0.107 \\
-SEED-V 5c EEG & 0.3743 & +0.0340 & 0.054 \\
-CIFAR-10 CNN  & 0.9015 & +0.0238 & 0.242 \\
+FACED 9c EEG      & 0.6581 & +0.0367 & 0.107 \\
+SEED-V 5c EEG     & 0.3743 & +0.0340 & 0.054 \\
+CIFAR-100 CNN     & 0.6886 & +0.0467 & 0.150 \\
+CIFAR-10 CNN      & 0.9015 & +0.0238 & 0.242 \\
 Fashion-MNIST CNN & 0.9313 & +0.0121 & 0.176 \\
-MNIST MLP     & 0.9849 & +0.0014 & 0.093 \\
+MNIST MLP         & 0.9849 & +0.0014 & 0.093 \\
 \bottomrule
 \end{tabular}
 \end{table}
