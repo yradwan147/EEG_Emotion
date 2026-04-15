@@ -32,8 +32,9 @@ Method & AUC & Accuracy \\
 Random direction (mean of 5) & 0.509 & 0.509 \\
 SBERT MiniLM-L6 + same pipeline & 0.713 & 0.658 \\
 Supervised LR, $N=10$ labels & 0.680 $\pm$ 0.058 & 0.608 $\pm$ 0.059 \\
-Supervised LR, $N=100$ labels & 0.878 $\pm$ 0.012 & 0.794 $\pm$ 0.019 \\
-Supervised LR, $N=5000$ labels & 0.914 $\pm$ 0.000 & 0.849 $\pm$ 0.001 \\
+Supervised LR, $N=100$ labels (L28 features) & 0.877 & 0.778 \\
+Supervised LR, $N=5000$ labels (L28 features) & 0.923 & 0.848 \\
+Supervised LR, $N=67{,}349$ (full SST-2 train, L28) & 0.951 & 0.878 \\
 Direct LLM prompting (greedy) & -- & 0.928 \\
 \rowcolor{blond}
 \textbf{\ours (zero labels)} & \textbf{\sstauc{}} [0.844, 0.890] & \textbf{\sstacc{}} \\
