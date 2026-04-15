@@ -208,6 +208,50 @@ All five models produce a usable late-layer valence direction. The
 magnitude varies (Qwen strongest, BLOOM weakest) but every model shows the
 same V-shape pattern.
 
+\paragraph{Functional alignment across models.}
+Different models have different hidden-state dimensionalities, so we
+cannot directly compare their V-axis \emph{vectors}. Instead, we
+project the same 81 stories onto each model's V-axis, producing a
+per-story valence score for every model. After a simple sign alignment
+(positive emotions on the positive side), we compute pairwise cosine
+similarity and Spearman rank correlation of these 81-dimensional
+per-story valence vectors.
+
+\begin{table}[h]
+\centering
+\caption{Functional cross-model agreement on per-story valence
+projections. Despite different architectures and sizes, all four models
+rank the 81 stories nearly identically on valence.}
+\label{tab:crossmodel_func}
+\begin{tabular}{lcc}
+\toprule
+Model pair & Cosine sim & Spearman $\rho$ \\
+\midrule
+Qwen2.5-0.5B $\times$ Qwen2.5-1.5B & \textbf{0.980} & \textbf{0.977} \\
+Qwen2.5-0.5B $\times$ Pythia-1.4b & 0.974 & 0.972 \\
+Qwen2.5-0.5B $\times$ Bloom-560m & 0.944 & 0.935 \\
+Qwen2.5-1.5B $\times$ Pythia-1.4b & \textbf{0.984} & \textbf{0.982} \\
+Qwen2.5-1.5B $\times$ Bloom-560m & 0.944 & 0.932 \\
+Pythia-1.4b $\times$ Bloom-560m & 0.937 & 0.924 \\
+\midrule
+\textbf{Mean (all 6 pairs)} & \textbf{0.961} & \textbf{0.954} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Cross-model mean pairwise cosine is $0.961$ and Spearman $\rho$ is
+$0.954$, with a minimum of $0.937$ (Pythia-1.4b vs.\ Bloom-560m). The
+four models --- two Qwen sizes, a GPT-NeoX model, and a BLOOM model ---
+functionally agree on which of the 81 stories are more or less positive,
+even though they have different architectures, training data, and
+internal coordinate systems. This is stronger evidence for
+universality than the per-model $|V_L|$ numbers in
+\cref{tab:crossmodel}, which only show that each model individually has
+a usable V-axis. The high cosine across language-model families
+suggests that late-layer valence direction is a convergent solution of
+the next-token prediction objective rather than an artifact of any
+single training pipeline.
+
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.9\textwidth]{vshape_crossmodel}
