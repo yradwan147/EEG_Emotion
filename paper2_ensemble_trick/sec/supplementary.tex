@@ -51,6 +51,48 @@ mean & 0.6581 & 0.6581 \\
 \end{tabular}
 \end{table}
 
+\section{Ensemble size (N) ablation}
+\label{sup:nablation}
+
+We trained 10 seeds at each of $T_A=50$ and $T_B=75$ epochs on CIFAR-10
+(small CNN) and computed ensemble accuracy for $N \in \{1, \ldots, 10\}$
+for three configurations: A-only (N seeds at 50ep), B-only (N seeds at
+75ep), and mixed ($N$-from-A + $N$-from-B, $2N$ total).
+
+\begin{table}[h]
+\centering
+\caption{N-seed ablation on CIFAR-10 small CNN. All numbers are test
+accuracy on the CIFAR-10 test set.}
+\label{tab:sup_nablation}
+\begin{tabular}{lccc}
+\toprule
+$N$ & A-only ($N\times$50ep) & B-only ($N\times$75ep) & Mixed ($N\times$50ep + $N\times$75ep) \\
+\midrule
+1  & 0.8890 & 0.8982 & 0.9042 \\
+2  & 0.8993 & 0.9102 & 0.9094 \\
+3  & 0.9040 & 0.9122 & 0.9112 \\
+4  & 0.9040 & 0.9147 & 0.9129 \\
+5  & 0.9060 & 0.9150 & 0.9141 \\
+6  & 0.9075 & 0.9169 & 0.9153 \\
+7  & 0.9077 & 0.9187 & 0.9159 \\
+8  & 0.9085 & 0.9185 & 0.9167 \\
+9  & 0.9082 & 0.9190 & 0.9156 \\
+10 & 0.9086 & 0.9185 & 0.9166 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Findings.}
+All three configurations saturate around $N=8$. On this particular
+trainer, B-only (longer schedule) plateaus slightly higher than mixed
+($0.919$ vs.\ $0.917$), because 75-epoch training has $+1$~pp absolute
+advantage over 50-epoch and the marginal gain from trajectory-length
+diversity is smaller than on the FACED flagship. On harder
+capacity-bound tasks (e.g.\ FACED) the mixed ensemble consistently beats
+same-length, consistent with our gain-vs-headroom scaling law.
+$N=5$ (the paper's default) achieves 97--99\% of the $N=10$ saturation
+on all three settings.
+
 \section{Alternative endpoints}
 \label{sup:endpoints}
 
