@@ -8,20 +8,22 @@ $<\!0.001$ in our experiments), but they differ on 13\% of test samples
 because the longer trajectory spends 50 additional epochs in a low-LR
 ``basin-exploration'' phase that drifts weights into a neighboring local
 minimum. Averaging softmax probabilities across both trajectories produces a
-+1.5 percentage-point gain \emph{beyond} what standard seed-only deep
-ensembling achieves.
++1.1 to +1.5 percentage-point gain \emph{beyond} what standard same-length
+deep ensembling (5 or 10 seeds) achieves.
 
 We validate \ours across three modalities (EEG, images, text) and nine
 benchmarks spanning four architecture families. In EEG emotion
 classification, we achieve a new state of the art on FACED 9-class
 (\facedacc{} balanced accuracy, +5.3 pp / +8.2\% over the EMOD AAAI 2026
-baseline), matched by a cross-dataset confirmation on SEED-V (BAcc 0.4083,
+baseline, and +1.1 pp above a true 10-seed same-length deep ensemble),
+matched by a cross-dataset confirmation on SEED-V (BAcc 0.4083,
 \seedvgain{} ensemble gain). In image classification, we replicate the
-trick on CIFAR-10 (accuracy \ciftenacc{}, \ciftengain{} gain), CIFAR-100,
-MNIST, Fashion-MNIST, and SVHN. Head-to-head against SWA, snapshot
-ensembles, and standard 10-seed deep ensembles, \ours{} is competitive or
-stronger while adding \emph{zero} hyperparameter tuning and a single
-additional training run.
+trick on CIFAR-10, CIFAR-100, MNIST, and Fashion-MNIST with small CNN,
+ResNet-18, and MLP backbones. In text classification, we confirm the
+gain with DistilBERT on SST-2. Head-to-head against SWA, snapshot
+ensembles, and standard 10-seed deep ensembles, \ours{} wins on all
+four calibration metrics (accuracy, NLL, ECE, Brier) while adding
+\emph{zero} hyperparameter tuning and a single additional training run.
 
 A theoretical decomposition shows that \ours-induced diversity is
 proportional to the ``unused'' individual-accuracy headroom: gain scales from

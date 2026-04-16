@@ -20,10 +20,12 @@ data-efficiency gain over supervised training. Layer-wise probing reveals a stri
 ``V-shape'' pattern: the valence direction appears strongly at layer~1 (inherited
 from the embedding layer), fades to near zero through the context-integration
 zone (layers 2--26), then abruptly \emph{re-crystallizes} at the final two
-blocks. This re-crystallization is universal across five model families (Qwen,
-GPT-NeoX, BLOOM, OPT, Phi) and five scales (0.5B--7B), but does \emph{not} occur
-for the arousal axis: the corresponding PCA projection gives
-$|r|\leq 0.16$ at every layer for every model on every test. The valence
+blocks. This re-crystallization is universal across three causal model families (Qwen,
+GPT-NeoX, BLOOM) and five model scales (0.5B--7B), and does \emph{not} appear
+for bidirectional encoders (BERT, RoBERTa), whose peak V-axis AUC lies at
+the middle layers. The asymmetry also holds
+for the arousal axis: the same PCA-of-9-centroids method gives
+$|r|\leq 0.16$ for arousal at every layer, every model, and every test we ran. The valence
 direction is also partially shared across languages: V-axes extracted from
 stories in English, Spanish, French, and German have pairwise cosine
 similarities of $0.16$--$0.47$, while the arousal axes are essentially

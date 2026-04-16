@@ -56,9 +56,9 @@ The same method, applied to the second PCA component, does \emph{not}
 recover a usable arousal axis: on EmoBank
 \cite{buechel2017emobank} continuous arousal ratings the zero-shot Pearson
 correlation is $|r|\leq 0.16$, essentially at the random-projection floor. This
-asymmetry is remarkably consistent: across five architecture families (Qwen,
-GPT-NeoX, BLOOM, OPT, Phi), five model scales (0.5B to 7B parameters), four
-languages (English, Spanish, French, German), and seven downstream sentiment
+asymmetry is remarkably consistent: across three causal model families (Qwen,
+GPT-NeoX, BLOOM), five model scales (0.5B to 7B parameters), five languages
+(English, Spanish, French, German, Chinese), and seven downstream sentiment
 tasks, the valence direction is linear and extractable while the arousal
 direction is not. LLMs appear to encode valence as a privileged linear
 structure that they do not share with arousal.
@@ -88,9 +88,9 @@ affect regression task. On SST-2 we match the accuracy of a supervised
 logistic regression trained on 80--100 labeled examples while using
 \emph{zero} labels.
 \item We demonstrate data efficiency in the extreme: a single story per class
-(9 total samples) already produces an SST-2 AUC of 0.74, and just fifteen
-stories per class match the accuracy of a supervised classifier fitted on
-5{,}000 labeled samples.
+(9 total samples) already produces an SST-2 AUC of 0.74, and just nine stories
+per class match a supervised logistic regression trained on roughly 80--100
+labeled SST-2 examples --- a 10--30$\times$ reduction in labeled data.
 \item We reveal a novel interpretability pattern: a sudden re-crystallization
 of the valence direction at the final 1--2 transformer blocks, separated from
 an embedding-level signal at layer~1 by a long middle-layer ``dilution zone''.
