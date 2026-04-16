@@ -1,6 +1,25 @@
 \section{Introduction}
 \label{sec:intro}
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{signature_mechanism}
+\caption{\textbf{Why \ours{} works.}
+\textbf{(A)} Training 5 seeds of the same model at $T_\mathrm{max}=100$
+and 5 more at $T_\mathrm{max}=150$ reaches nearly identical final
+validation accuracy (0.6771 vs.\ 0.6776, $<\!0.001$ apart).
+\textbf{(B)} Yet the two endpoints \emph{do not} lie in the same loss
+basin: linearly interpolating their weights crosses a $+0.25$~nats
+train-loss barrier, and test accuracy dips by $6$~percentage points in
+the middle.
+\textbf{(C)} On the 13\% of test samples where the 100ep group-consensus
+and 150ep group-consensus \emph{disagree}, the mixed ensemble is
+\textbf{+10.3~pp} more accurate than either single-length consensus. The
+macroscopic $+1.5$~pp ensemble gain is the product of this correction
+($10.3\%$) and the disagreement fraction ($13.1\%$).}
+\label{fig:hero}
+\end{figure}
+
 Deep ensembling \cite{lakshminarayanan2017simple} remains one of the most
 effective and widely used uncertainty-estimation and accuracy-boosting
 techniques in deep learning. The classic recipe is simple: train $N$

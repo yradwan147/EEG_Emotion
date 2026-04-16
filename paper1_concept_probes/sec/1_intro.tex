@@ -1,6 +1,25 @@
 \section{Introduction}
 \label{sec:intro}
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{signature_method}
+\caption{\textbf{\ours{} at a glance.}
+\textbf{(A)} The pipeline: generate nine short stories per emotion class with
+the LLM itself, embed them at the LLM's final layer, average per class to
+form nine centroids, and take the first PCA component of the mean-centered
+centroids as the valence axis $v$.
+\textbf{(B)} Zero-shot SST-2 AUC of the V-axis extracted at each transformer
+layer of Qwen2.5-1.5B: strong at L1 (embedding-level signal), falls to chance
+through layers 2--26 (the ``dilution zone''), and \emph{re-crystallizes
+abruptly} at layers 27--28.
+\textbf{(C)} Data efficiency: a single story per class already beats a
+supervised logistic regression trained on ten labelled SST-2 examples,
+and nine stories match a supervised classifier trained on roughly a hundred
+labels --- a 10--30$\times$ reduction in labeled data.}
+\label{fig:hero}
+\end{figure}
+
 Large language models (LLMs) encode rich affective representations, yet the
 exact form of these representations is poorly understood. A natural question
 is whether sentiment, emotion, or affect is encoded as a \emph{linear direction}
