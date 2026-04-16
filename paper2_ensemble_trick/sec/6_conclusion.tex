@@ -7,10 +7,12 @@ $T_\mathrm{max}$ endpoints, and ensemble the resulting checkpoints. The two
 trajectories reach identical mean accuracy yet differ on 13\% of test samples,
 producing a $+1.5$~pp gain beyond standard same-length deep ensembles.
 
-The trick is validated across 6 datasets spanning two modalities and three
-architectures. It achieves a new state of the art on FACED 9-class EEG
-emotion classification ($\facedacc$ BAcc, $+8.2\%$ over the prior
-EMOD AAAI 2026 baseline of $0.642$). The gain scales inversely with
+The trick is validated across 9 benchmarks spanning three modalities
+(EEG, images, text) and three architectures (axial transformer, small
+CNN, ResNet-18, MLP, DistilBERT). It achieves a new state of the art on
+FACED 9-class EEG emotion classification ($\facedacc$ BAcc, $+8.2\%$
+over the prior EMOD AAAI 2026 baseline of $0.642$, and $+1.1$~pp above
+a true 10-seed same-length deep ensemble at $0.6838$). The gain scales inversely with
 individual accuracy: capacity-bound students (FACED 9-class, SEED-V
 5-class) see the largest gains ($+3$--$4$~pp), easy tasks (MNIST) see
 minimal gains ($+0.14$~pp).

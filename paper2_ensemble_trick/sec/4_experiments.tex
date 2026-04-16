@@ -3,8 +3,8 @@
 
 \subsection{Setup}
 
-We test \ours{} on 6 datasets spanning two modalities (EEG and vision) and
-multiple architectures:
+We test \ours{} on 9 benchmarks spanning three modalities (EEG, images,
+text) and multiple architectures:
 
 \begin{itemize}[leftmargin=*]
 \item \textbf{FACED} \cite{liu2024faced}: 9-class EEG emotion classification,
@@ -109,7 +109,7 @@ rerun is scheduled (see supplementary).}
 
 \subsection{Gain Scaling Law}
 
-Collecting results across all six datasets, we find that the mixed-length
+Collecting results across all nine benchmarks, we find that the mixed-length
 ensemble gain scales approximately linearly with the headroom
 $(1 - p_\mathrm{individual})$: harder tasks with lower individual accuracy
 receive proportionally larger gains.
@@ -124,7 +124,7 @@ where the longer schedule $B$ alone beats the mixed ensemble.
 \centering
 \includegraphics[width=0.75\textwidth]{gain_scaling_law}
 \caption{Ensemble gain (y-axis) vs.\ $(1 - \text{individual accuracy})$ (x-axis)
-across all 6 datasets. The mixed-length gain scales approximately linearly with
+across all benchmarks. The mixed-length gain scales approximately linearly with
 the headroom from individual accuracy to 1.0.}
 \label{fig:scaling}
 \end{figure}
