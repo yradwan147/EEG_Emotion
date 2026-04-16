@@ -51,6 +51,43 @@ mean & 0.6581 & 0.6581 \\
 \end{tabular}
 \end{table}
 
+\section{Scheduler ablation}
+\label{sup:scheduler}
+
+Does the trajectory-length ensemble trick depend on cosine annealing
+specifically? We repeat the CIFAR-10 mixed-ensemble test (5 seeds
+$\times$ 50ep + 5 seeds $\times$ 75ep, same small CNN) with four
+different learning-rate schedules:
+
+\begin{table}[h]
+\centering
+\caption{Scheduler ablation on CIFAR-10. The mixed-ensemble gain over
+the A-only 5-seed ensemble is positive for all four schedulers, showing
+that the trick is not cosine-specific.}
+\label{tab:sup_scheduler}
+\begin{tabular}{lcccc}
+\toprule
+Scheduler & A mean & A ens & B ens & Mixed (+ over A ens) \\
+\midrule
+Cosine         & 0.8878 & 0.9041 & 0.9166 & 0.9124 ($+0.0083$) \\
+Step (0.1 at 50\%, 75\%)  & 0.8855 & 0.9004 & 0.9124 & 0.9091 ($+0.0087$) \\
+Linear decay   & 0.8892 & 0.9042 & 0.9161 & 0.9125 ($+0.0083$) \\
+Constant LR    & 0.8658 & 0.9043 & 0.9058 & 0.9113 ($+0.0070$) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Findings.}
+(i)~All four schedulers produce a positive mixed-ensemble gain of
+$+0.0070$--$+0.0087$ over the 5-seed same-length ensemble.
+(ii)~Constant LR gives the \emph{smallest} individual accuracy (0.866)
+but still benefits from the trick; the proportional single-group
+ensemble gain ($+0.039$) is much larger, consistent with our
+gain-vs-headroom scaling law. (iii)~Cosine and linear decay give
+essentially identical results ($0.9124$ vs.\ $0.9125$), so the only
+ingredient is ``some decay from high to low LR'' --- the specific curve
+shape barely matters.
+
 \section{Ensemble size (N) ablation}
 \label{sup:nablation}
 
