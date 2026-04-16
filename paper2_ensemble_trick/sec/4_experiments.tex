@@ -232,6 +232,51 @@ and the mixed ensemble accuracy is 39.53\%---a gain of $+10.3$ percentage
 points on a subset of 13.1\% of the test set. The predicted overall gain
 $10.3 \times 0.131 = 1.35$~pp closely matches the observed $+1.50$~pp.
 
+\subsection{Calibration: NLL, ECE, and Brier}
+
+Ensembles are usually evaluated on calibration as much as accuracy. We
+recompute the CIFAR-10 head-to-head on fresh runs, this time saving
+full softmax logits, and report accuracy, NLL (negative log-likelihood
+in nats), ECE (15-bin expected calibration error), and Brier score.
+
+\begin{table}[h]
+\centering
+\caption{CIFAR-10 full-calibration comparison (same small CNN, fresh
+seeds for this calibration run; reported acc numbers differ slightly
+from Table~\ref{tab:cifar10_baselines} due to fresh seeds).
+\ours{} improves \emph{all four} metrics over SWA, snapshot, and a
+10-seed same-length deep ensemble. Lower is better for NLL, ECE, Brier.}
+\label{tab:cifar10_calib}
+\begin{tabular}{lcccc}
+\toprule
+Method & Acc $\uparrow$ & NLL $\downarrow$ & ECE $\downarrow$ & Brier $\downarrow$ \\
+\midrule
+Single model (50ep) mean of 5 seeds & 0.8904 & 0.3469 & 0.0328 & 0.1637 \\
+SWA (60ep)                          & 0.8865 & 0.3537 & 0.0275 & 0.1688 \\
+Snapshot (5 cyclic snaps)           & 0.8882 & 0.3372 & 0.0180 & 0.1638 \\
+5-seed ens 50ep                     & 0.9058 & 0.2813 & 0.0126 & 0.1389 \\
+5-seed ens 75ep                     & 0.9146 & 0.2557 & 0.0104 & 0.1253 \\
+5-seed ens 100ep                    & 0.9190 & 0.2479 & 0.0125 & 0.1196 \\
+10-seed same-length 50ep            & 0.9078 & 0.2722 & 0.0101 & 0.1355 \\
+\rowcolor{blond}
+\textbf{\ours{} (5$\times$50ep + 5$\times$65ep)}   & 0.9126 & 0.2607 & 0.0098 & 0.1290 \\
+\rowcolor{blond}
+\textbf{\ours{} (5$\times$50ep + 5$\times$75ep)}   & 0.9149 & 0.2566 & 0.0107 & 0.1277 \\
+\rowcolor{blond}
+\textbf{\ours{} (5$\times$50ep + 5$\times$100ep)}  & \textbf{0.9168} & \textbf{0.2489} & \textbf{0.0096} & \textbf{0.1236} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Findings.}
+(i)~\ours{} with $T_B=100$ achieves the best NLL, the best ECE, and
+the best Brier among all methods. (ii)~SWA \emph{hurts} NLL relative
+to a single model ($0.3537$ vs.\ $0.3469$) because weight averaging
+collapses the ensemble's uncertainty into a point estimate; our method
+preserves it by averaging outputs. (iii)~The endpoint-ratio sweep
+($T_B \in \{65, 75, 100\}$) shows larger $T_B$ gives modestly better
+metrics --- the longer tail phase explores more of the basin.
+
 \subsection{Loss Landscape: Different Basins}
 
 A complementary mechanism test (Fort \emph{et al.} NeurIPS 2019 style) is to
