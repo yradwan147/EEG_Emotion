@@ -115,7 +115,18 @@ usage.
 papers that are in-press for AAAI 2026 and NeurIPS 2025. This is normal
 for forward-looking submissions.
 
-## Overall Verdict: **PASS (with 3 soft recommendations)**
+## Addendum (cycle 73kk-73ll): no new citations added tonight
+
+Overnight additions (calibration table, loss landscape, ResNet-18,
+scheduler ablation, text ensemble, FACED 10-seed, N-ablation) introduced
+zero new `\cite{}` keys. Loss landscape section mentions "Fort et al.
+NeurIPS 2019 style" inline without `\cite` — non-critical, could be
+added in a final polish pass.
+
+Last compile at 05:22 (commit 5a0f808): **0 undefined-citation
+warnings**. Bibliography renders [1]–[18] correctly.
+
+## Overall Verdict: **PASS (with 4 soft recommendations)**
 
 1. Fix the 3 placeholder citations (same as Paper 1 — it's the same
    "LLM-KD for EEG" list in Section 2).
@@ -123,5 +134,8 @@ for forward-looking submissions.
 3. Consider adding a citation for "cosine learning rate schedule"
    (Loshchilov & Hutter 2017 SGDR) in Section 3 where the cosine
    decay is introduced — currently uncited, just described.
+4. Add `fort2019deepensembles` bib entry and cite at Section 4.8
+   (loss landscape) where the "Fort et al. NeurIPS 2019" methodology
+   is referenced.
 
 No hard blockers. Paper 2 compiles clean with all citations resolved.

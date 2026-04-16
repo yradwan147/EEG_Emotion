@@ -199,9 +199,75 @@ supplementary table caption.
    intermediate step in `ensemble_trick_analysis.py`. Recommend
    adding a save-and-verify step.
 
-## Overall Verdict: **PASS**
+## Addendum (cycle 73kk-73ll, 2026-04-16 05:35): numbers added after initial audit
 
-All 80+ individual numerical claims in the main text verified against
-source JSONs. Two minor action items for the final draft
-(placeholder intro contributions, supplementary caption reframe).
-ResNet-18 rows pending, will be filled before maintenance.
+### Table 1 FACED flagship — 10-seed same-length row (replaced d6+d8)
+
+| Method | Paper BAcc | Source | Status |
+|---|---|---|---|
+| EMOD d6 10-seed same-length ensemble | 0.6838 | faced_10seed_same_length.json ensemble_10_same_length | OK |
+| **Mixed d6+d6_e150 10-model** | **0.6948** | unchanged from earlier | OK |
+| Gain mixed over 10-seed same-length | +0.011 | 0.6948 - 0.6838 = 0.0110 | OK |
+
+### Table 3 (image) — ResNet-18 rows + DistilBERT row
+
+| Row | Paper values | Source | Status |
+|---|---|---|---|
+| CIFAR-10 ResNet-18 | 0.9452 / 0.9563 (+0.0111) / 0.9599 (+0.0147) | ensemble_resnet18_cifar10.json | OK |
+| CIFAR-100 ResNet-18 | 0.7707 / 0.8020 (+0.0313) / 0.8104 (+0.0397) | ensemble_resnet18_cifar100.json | OK |
+| SST-2 DistilBERT | 0.9062 / 0.9094 (+0.0032) / 0.9094 | text_ensemble_sst2.json | OK |
+
+### Table 4 scaling law — 3 new rows (CIFAR-100 R18, CIFAR-10 R18, SST-2)
+
+All 3 ratios verified arithmetically against individual means.
+
+### Section 4.7 Calibration table (new)
+
+| Method | Acc | NLL | ECE | Brier | Source | Status |
+|---|---|---|---|---|---|---|
+| Single 50ep | 0.8904 | 0.3469 | 0.0328 | 0.1637 | cifar10_calibration_endpoint.json A_50ep.individual_mean | OK |
+| SWA | 0.8865 | 0.3537 | 0.0275 | 0.1688 | swa | OK |
+| Snapshot | 0.8882 | 0.3372 | 0.0180 | 0.1638 | snapshot_ensemble | OK |
+| 5-seed 50ep | 0.9058 | 0.2813 | 0.0126 | 0.1389 | A_50ep.ensemble | OK |
+| 5-seed 75ep | 0.9146 | 0.2557 | 0.0104 | 0.1253 | B1_75ep.ensemble | OK |
+| 5-seed 100ep | 0.9190 | 0.2479 | 0.0125 | 0.1196 | B2_100ep.ensemble | OK |
+| 10-seed 50ep | 0.9078 | 0.2722 | 0.0101 | 0.1355 | ensemble_10seed_50ep | OK |
+| Ours A50+B65 | 0.9126 | 0.2607 | 0.0098 | 0.1290 | mixed_A50_B065 | OK |
+| Ours A50+B75 | 0.9149 | 0.2566 | 0.0107 | 0.1277 | mixed_A50_B175 | OK |
+| **Ours A50+B100** | **0.9168** | **0.2489** | **0.0096** | **0.1236** | mixed_A50_B2100 | OK |
+
+### Section 4.8 Loss landscape (new)
+
+| Metric | Paper value | Source | Status |
+|---|---|---|---|
+| Train barrier | +0.2497 | cifar10_loss_landscape.json barrier_train | OK |
+| Test barrier | +0.1266 | barrier_test | OK |
+| Endpoint A train loss | 0.121 | endpoint_A.train_loss 0.1207 | APPROX OK |
+| Endpoint B train loss | 0.051 | endpoint_B.train_loss 0.0512 | APPROX OK |
+| Midway acc dip | 0.843 | alpha=0.5 test_acc 0.8434 | APPROX OK |
+| Endpoint accs | 0.890 / 0.902 | endpoint A 0.8905, B 0.9018 | OK |
+
+### Supplementary S5 scheduler ablation (new)
+
+| Scheduler | A mean | A ens | B ens | Mixed (+ over A ens) | Source | Status |
+|---|---|---|---|---|---|---|
+| Cosine | 0.8878 | 0.9041 | 0.9166 | 0.9124 (+0.0083) | cifar10_scheduler_ablation.json.cosine | OK |
+| Step | 0.8855 | 0.9004 | 0.9124 | 0.9091 (+0.0087) | step | OK |
+| Linear | 0.8892 | 0.9042 | 0.9161 | 0.9125 (+0.0083) | linear | OK |
+| Constant | 0.8658 | 0.9043 | 0.9058 | 0.9113 (+0.0070) | constant | OK |
+
+### Supplementary S6 N-seed ablation (new, 10 rows)
+
+All N=1..10 values verified against cifar10_n_ablation.json.by_N.
+Plateau around N=7-8 confirmed.
+
+### Flags update
+- Previous flag about X/Y/Z% intro placeholders: **resolved** (commit 8a8ea74).
+- Previous flag about Cohen κ supplementary caption: **not yet reframed** — minor text-only issue.
+- All supplementary numbers verified.
+
+## Overall Verdict: **PASS** (updated)
+
+All 140+ individual numerical claims across main text + supplementary
+verified against source JSONs. Paper is numerically consistent with the
+full experimental record including all overnight additions.

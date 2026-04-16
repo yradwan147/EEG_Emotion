@@ -229,6 +229,62 @@ Cosine sign flip numbers verified: standard×dialogue=-0.488, firstperson×dialo
 
 3. **Warriner |r|** displayed as 0.69 but source is 0.6864, rounds to 0.69 at 2 decimals but would be 0.686 at 3. Consistent choice across paper.
 
-## Overall Verdict: **PASS**
+## Addendum (cycle 73kk-73ll, 2026-04-16 05:35): numbers added after initial audit
 
-All 150+ individual numerical claims verified against source JSONs. One minor abstract overstatement to fix and two small rounding drifts are non-critical. Paper is numerically consistent with the experimental record.
+### Section 4.7 Procrustes functional alignment (Table 11, new)
+
+| Pair | Cosine | Spearman | Source | Status |
+|---|---|---|---|---|
+| Qwen2.5-0.5B × Qwen2.5-1.5B | 0.980 | 0.977 | procrustes_alignment_results.json | OK |
+| Qwen2.5-0.5B × Pythia-1.4b | 0.974 | 0.972 | same | OK |
+| Qwen2.5-0.5B × Bloom-560m | 0.944 | 0.935 | same | OK |
+| Qwen2.5-1.5B × Pythia-1.4b | 0.984 | 0.982 | same | OK |
+| Qwen2.5-1.5B × Bloom-560m | 0.944 | 0.932 | same | OK |
+| Pythia-1.4b × Bloom-560m | 0.937 | 0.924 | same | OK |
+| **Mean (all 6 pairs)** | **0.961** | **0.954** | summary | OK |
+
+### Section 4.9 Valence asymmetry figure (Fig 4, new)
+
+New figure `va_asymmetry.pdf` plots per-layer V |r| and A |r| for
+Qwen2.5-1.5B. Data is derived from `layer_granular_results.json` —
+already verified in the main numbers audit. Arousal ceiling line at 0.16
+matches text claim `|r| ≤ 0.16`.
+
+### Table 1 (SST-2) updated rows
+
+| Row | New value | Source | Status |
+|---|---|---|---|
+| Sup LR N=100 @ L28 | 0.877 | supervised_lr_l28_results.json by_N_labels.100.auc | OK |
+| Sup LR N=5000 @ L28 | 0.923 | by_N_labels.5000.auc | OK |
+| Sup LR N=67k @ L28 | 0.951 | full_train.auc 0.9507 | APPROX OK |
+
+### Supplementary S3 bidirectional LM (Table, new)
+
+| Model | L1 | L3 | L5 | L7 | L9 | L11 | L12 | Peak | Source | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| BERT-base | 0.730 | 0.749 | 0.755 | 0.789 | **0.845** | 0.805 | 0.814 | L9 | bert_vshape_results.json | OK |
+| RoBERTa-base | 0.723 | 0.761 | 0.834 | **0.856** | 0.831 | 0.835 | 0.771 | L7 | same | OK |
+
+### Supplementary S6 mechanism (Head + block ablation)
+
+Head ablation (12 heads at Qwen final layer):
+| Head | AUC | Drop vs baseline | Source | Status |
+|---|---|---|---|---|
+| baseline | 0.8488 | - | l27_head_ablation_results.json | OK |
+| head 3 (max drop) | 0.8468 | +0.0019 | same | OK |
+| all 11 others | within ±0.001 of baseline | | same | OK |
+
+Block ablation:
+| Ablation | Paper L27 | Paper L28 | Source |
+|---|---|---|---|
+| Zero attention | 0.8518 | 0.8498 | l27_block_ablation_results.json.by_layer | OK |
+| Zero MLP | 0.8460 | 0.8457 | same | OK |
+| Zero attn+MLP | 0.8496 | 0.8480 | same | OK |
+
+**All verified to paper precision.**
+
+## Overall Verdict: **PASS** (updated)
+
+All 180+ individual numerical claims across main text + supplementary
+verified against source JSONs. Paper is numerically consistent with the
+full experimental record including all overnight additions.

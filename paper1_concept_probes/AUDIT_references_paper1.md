@@ -91,6 +91,16 @@ Bibliography renders as `[1]`–`[24]` in the compiled PDF (23 cited + 1
 from supplementary for `buechel2017emobank` reuse). Inline citations
 render correctly as numbered brackets via `\bibliographystyle{unsrt}`.
 
+## Addendum (cycle 73kk-73ll): no new citations added tonight
+
+Overnight additions (Procrustes, BERT V-shape, block ablation,
+supervised LR @ L28) introduced no new `\cite{}` keys. All content
+references existing bib entries or use inline numeric references
+without citations. Count unchanged at 23 unique citation keys.
+
+Last compile at 05:10 (commit 5a0f808): **0 undefined-citation
+warnings**. Bibliography renders [1]–[24] correctly.
+
 ## Overall Verdict: **PASS (with 3 soft recommendations)**
 
 1. Fix the 3 placeholder citations (`zhang2024emotionkd`, `li2025emod`,
