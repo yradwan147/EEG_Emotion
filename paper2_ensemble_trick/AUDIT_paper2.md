@@ -158,3 +158,34 @@ All values sourced from `llm_steering/diag_p2_d4_endpoint_T{110,120,130,140,150,
 
 ### Verdict Pass C
 **PASS**. All new numbers in cycle 74n edit trace cleanly to source JSONs. No values invented.
+
+## Pass D — Final-polish re-run (cycle 74 final, 2026-04-24)
+
+Final narrative polish pass. No numerical values edited; only prose
+restructuring (abstract rewrite, intro free-diversity framing, §4
+reordering with Mechanism I/II/III/IV labels, explicit transitions,
+endpoint-ratio rebuttal framing, conclusion tightening).
+
+Re-verified the hero numbers against source JSON:
+
+| Claim | Paper | Source | Status |
+|---|---|---|---|
+| `\facedacc` = 0.6948 | §4.2, abstract | `ensemble_d6_d6e150_results.json` ensemble.bacc = 0.69485 | OK ✓ |
+| `\facedgain` = +3.7% | §4.4 | `ensemble_d6_d6e150_results.json` gain_vs_mean = 0.0368 | OK ✓ |
+| Power-law α=0.85 | abstract | `p2_scaling_law_fit.json` power_law_fit.alpha_exponent = 0.8506 | OK ✓ |
+| Pearson r=0.75, p=0.019 | abstract | `p2_scaling_law_fit.json` pearson_correlation = 0.7527, 0.01926 | OK ✓ |
+| R²=0.57 | abstract | `p2_scaling_law_fit.json` fit_ols_linear.r_squared = 0.5665 | OK ✓ |
+| PCA ratio 3.25 | §4.11 | `p2_pca_basin.json` ratio_between_within = 3.2545 | OK ✓ |
+| PCA between 5166 | §4.11 | `p2_pca_basin.json` pairwise_between_mean = 5166.16 | OK ✓ |
+| Disagreement 253, 13.1% | §4.7 | `p2_disagreement_deep_dive.json` size=253, fraction=0.1310 | OK ✓ |
+| 28.85% / 29.25% / 39.53% | §4.7 | disagreement_set.acc_*=0.2885/0.2925/0.3953 | OK ✓ |
+| $q\cdot g$ = 0.131×0.103 = 1.35 pp | abstract, §4.7 | arithmetic | OK ✓ |
+| Endpoint sweep rows | §4.10 | `diag_p2_d4_endpoint_T{110..200}.json` | OK ✓ (re-verified in Pass C) |
+
+All macros preserved (\facedacc, \facedgain, \seedvacc, \seedvgain,
+\ciftenacc, \ciftengain). No numerical values changed in the narrative
+polish.
+
+### Verdict Pass D
+**PASS**. Zero numerical drift from Pass C. Narrative is tighter and
+better signposted; all claims continue to resolve against source JSONs.

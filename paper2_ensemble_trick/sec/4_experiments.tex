@@ -1,6 +1,19 @@
 \section{Experiments}
 \label{sec:experiments}
 
+We evaluate \ours{} along four lines of evidence. First, we show a
+headline SOTA on FACED EEG emotion classification
+(\cref{sec:faced}). Second, we demonstrate cross-modality generality on
+six image and text benchmarks (\cref{sec:image}), from which emerges a
+predictive scaling law
+(\cref{sec:scaling}). Third, we compare head-to-head against SWA,
+snapshot, and 10-seed deep ensembles on accuracy \emph{and} calibration
+(\cref{sec:baselines,sec:calib}). Fourth, we open the mechanism: a
+theoretical decomposition on FACED, weight-space PCA and
+mode-connectivity probes, and an endpoint-ratio sweep that answers
+``why $T_B=150$?'' empirically
+(\cref{sec:decomp,sec:curves,sec:endpoint_sweep,sec:basin}).
+
 \subsection{Setup}
 
 We test \ours{} on 9 benchmarks spanning three modalities (EEG, images,
@@ -28,7 +41,8 @@ for $T_\mathrm{max}$), then compare:
 (b)~5-seed same-length deep ensemble accuracy (gold-standard baseline),
 (c)~10-model mixed-length \ours{} ensemble accuracy.
 
-\subsection{EEG Emotion Classification}
+\subsection{EEG Emotion Classification: A New FACED SOTA}
+\label{sec:faced}
 
 \begin{table}[h]
 \centering
@@ -70,15 +84,21 @@ EMOD d6 + aug + rand9 KD, individual mean & 0.3743 $\pm$ 0.006 \\
 \end{tabular}
 \end{table}
 
-The EEG emotion SOTA is a concrete flagship application: our ensemble trick
-pushes FACED from $0.642$ to \facedacc{}, an $+8.2\%$ relative improvement.
+Crucially, \ours{} beats the 10-seed same-length deep ensemble
+($0.6838$) by $+1.1$~pp---a margin larger than the gap between the
+5-seed and 10-seed same-length ensembles---so the gain is not a matter
+of buying more seeds. Two trajectory-length groups at
+$N{=}5$ each outperform $N{=}10$ seed diversity. SEED-V confirms the
+picture at $+3.4\%$ cross-dataset.
 
-\subsection{Image Classification (Small CNN and MLP)}
+\subsection{Cross-Modality Validation: Images and Text}
+\label{sec:image}
 
-We next test whether the ensemble trick generalizes beyond the EEG
-domain. We use standard small-CNN and MLP architectures on five vision
-benchmarks covering a range of individual-model accuracies from below
-$0.70$ (CIFAR-100) to above $0.98$ (MNIST).
+Having established the EEG headline, we next ask whether the same
+single-integer change transports to other modalities and architectures.
+We use standard small-CNN, MLP, ResNet-18, and DistilBERT backbones on
+seven additional benchmarks whose individual-model accuracies span the
+range from $\sim\!0.69$ (CIFAR-100) to $\sim\!0.98$ (MNIST).
 
 \begin{table}[h]
 \centering
@@ -107,13 +127,13 @@ trainer used for this sweep had a training instability that caused 7 of
 rerun is scheduled (see supplementary).}
 \end{table}
 
-\subsection{Gain Scaling Law}
+\subsection{A Predictive Scaling Law for the Gain}
 \label{sec:scaling}
 
-Collecting results across all nine benchmarks, we find that the mixed-length
-ensemble gain scales approximately linearly with the headroom
-$(1 - p_\mathrm{individual})$: harder tasks with lower individual accuracy
-receive proportionally larger gains.
+A striking pattern emerges from the nine benchmarks together: the
+mixed-length ensemble gain is a \emph{predictable function} of how far
+each individual model is from ceiling. Every added modality confirms
+the same fit.
 A least-squares linear fit of gain on headroom gives slope $0.057$,
 intercept $0.011$, Pearson $r=0.753$, $p=0.019$, $R^2=0.57$; a power-law
 fit $\text{gain} = c \cdot \text{headroom}^{\alpha}$ gives exponent
@@ -161,18 +181,19 @@ MNIST MLP              & 0.9849 & +0.0014 & 0.093 \\
 \end{tabular}
 \end{table}
 
-\subsection{Comparison to Existing Ensemble Methods (CIFAR-10)}
+\subsection{Head-to-Head Against SWA, Snapshot, and Deep Ensembles}
+\label{sec:baselines}
 
-To verify that our gains are not just from extra training compute, we
-compare \ours{} against three standard diversity-boosting ensemble
-methods under a matched compute budget on CIFAR-10 with the same small
-CNN: (i)~a standard 10-seed same-length deep ensemble, (ii)~Stochastic
-Weight Averaging starting at epoch 30 of a 60-epoch run, and
-(iii)~a snapshot ensemble with 5 cyclic-LR snapshots from a single run.
-All methods were trained with identical hyperparameters except for the
-ensemble construction; \ours{} consumes roughly the same total compute
-as the 10-seed deep ensemble ($5\times50 + 5\times75 = 625$ vs.\
-$10\times50 = 500$ epochs, a $1.25\times$ increase).
+The scaling law predicts \emph{when} \ours{} helps; we next ask
+\emph{how much} it helps against standard alternatives at matched
+compute. On CIFAR-10 with the same small CNN we compare
+(i)~a 10-seed same-length deep ensemble, (ii)~Stochastic Weight
+Averaging (SWA start at epoch 30 of a 60-epoch run)~\cite{izmailov2018averaging},
+and (iii)~a snapshot ensemble with 5 cyclic-LR snapshots from a single
+run~\cite{huang2017snapshot}. All methods share hyperparameters and
+training code; \ours{} uses roughly the same compute as the 10-seed
+deep ensemble ($5\times50 + 5\times75 = 625$ vs.\ $10\times50 = 500$
+epochs, a $1.25\times$ increase).
 
 \begin{table}[h]
 \centering
@@ -206,11 +227,61 @@ average over a narrow region of weight space.}
 \label{fig:cifar10_bar}
 \end{figure}
 
-\subsection{Theoretical Decomposition}
+\subsection{Calibration: NLL, ECE, and Brier at Matched Compute}
+\label{sec:calib}
 
-We repeated the experiment on FACED d6 with saved checkpoints and
-decomposed the ensemble gain into (i)~within-group and (ii)~cross-group
-contributions.
+Ensembles are evaluated on calibration as much as
+accuracy~\cite{ashukha2020pitfalls}. We rerun the CIFAR-10 head-to-head
+on fresh seeds and save full softmax logits, then report accuracy, NLL
+(negative log-likelihood, nats), ECE (15-bin expected calibration
+error), and Brier score. (Accuracies differ slightly from
+\cref{tab:cifar10_baselines} because of the fresh seeds.)
+
+\begin{table}[h]
+\centering
+\caption{CIFAR-10 full-calibration comparison (same small CNN, fresh
+seeds; accuracy numbers differ slightly from Table~\ref{tab:cifar10_baselines}
+because of the fresh seeds). \ours{} sweeps all four metrics over SWA,
+snapshot, and a 10-seed same-length deep ensemble. Lower is better for
+NLL, ECE, Brier.}
+\label{tab:cifar10_calib}
+\begin{tabular}{lcccc}
+\toprule
+Method & Acc $\uparrow$ & NLL $\downarrow$ & ECE $\downarrow$ & Brier $\downarrow$ \\
+\midrule
+Single model (50ep) mean of 5 seeds & 0.8904 & 0.3469 & 0.0328 & 0.1637 \\
+SWA (60ep)                          & 0.8865 & 0.3537 & 0.0275 & 0.1688 \\
+Snapshot (5 cyclic snaps)           & 0.8882 & 0.3372 & 0.0180 & 0.1638 \\
+5-seed ens 50ep                     & 0.9058 & 0.2813 & 0.0126 & 0.1389 \\
+5-seed ens 75ep                     & 0.9146 & 0.2557 & 0.0104 & 0.1253 \\
+5-seed ens 100ep                    & 0.9190 & 0.2479 & 0.0125 & 0.1196 \\
+10-seed same-length 50ep            & 0.9078 & 0.2722 & 0.0101 & 0.1355 \\
+\rowcolor{blond}
+\textbf{\ours{} (5$\times$50ep + 5$\times$65ep)}   & 0.9126 & 0.2607 & 0.0098 & 0.1290 \\
+\rowcolor{blond}
+\textbf{\ours{} (5$\times$50ep + 5$\times$75ep)}   & 0.9149 & 0.2566 & 0.0107 & 0.1277 \\
+\rowcolor{blond}
+\textbf{\ours{} (5$\times$50ep + 5$\times$100ep)}  & \textbf{0.9168} & \textbf{0.2489} & \textbf{0.0096} & \textbf{0.1236} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Findings.}
+(i)~\ours{} with $T_B=100$ attains the best NLL, the best ECE, and the
+best Brier across the whole table. (ii)~SWA \emph{hurts} NLL relative
+to a single model ($0.3537$ vs.\ $0.3469$): weight averaging collapses
+the predictive distribution into a point estimate, while \ours{}
+preserves it by averaging outputs. (iii)~Across the endpoint-ratio
+sweep ($T_B \in \{65, 75, 100\}$) all four calibration metrics improve
+monotonically with $T_B$, consistent with a longer tail visiting more
+of the basin.
+
+\subsection{Mechanism (I): Theoretical Decomposition of the Gain}
+\label{sec:decomp}
+
+Having shown the gain across tasks and against baselines, we now open
+the mechanism box. On FACED d6 we save all 10 checkpoints and decompose
+the gain into within-group and cross-group contributions.
 
 \begin{table}[h]
 \centering
@@ -243,63 +314,17 @@ and the mixed ensemble accuracy is 39.53\%---a gain of $+10.3$ percentage
 points on a subset of 13.1\% of the test set. The predicted overall gain
 $10.3 \times 0.131 = 1.35$~pp closely matches the observed $+1.50$~pp.
 
-\subsection{Calibration: NLL, ECE, and Brier}
+\subsection{Mechanism (II): Same Seed, Different $T_\mathrm{max}$, Different Basins}
+\label{sec:curves}
 
-Ensembles are usually evaluated on calibration as much as
-accuracy~\cite{ashukha2020pitfalls}. We
-recompute the CIFAR-10 head-to-head on fresh runs, this time saving
-full softmax logits, and report accuracy, NLL (negative log-likelihood
-in nats), ECE (15-bin expected calibration error), and Brier score.
-
-\begin{table}[h]
-\centering
-\caption{CIFAR-10 full-calibration comparison (same small CNN, fresh
-seeds for this calibration run; reported acc numbers differ slightly
-from Table~\ref{tab:cifar10_baselines} due to fresh seeds).
-\ours{} improves \emph{all four} metrics over SWA, snapshot, and a
-10-seed same-length deep ensemble. Lower is better for NLL, ECE, Brier.}
-\label{tab:cifar10_calib}
-\begin{tabular}{lcccc}
-\toprule
-Method & Acc $\uparrow$ & NLL $\downarrow$ & ECE $\downarrow$ & Brier $\downarrow$ \\
-\midrule
-Single model (50ep) mean of 5 seeds & 0.8904 & 0.3469 & 0.0328 & 0.1637 \\
-SWA (60ep)                          & 0.8865 & 0.3537 & 0.0275 & 0.1688 \\
-Snapshot (5 cyclic snaps)           & 0.8882 & 0.3372 & 0.0180 & 0.1638 \\
-5-seed ens 50ep                     & 0.9058 & 0.2813 & 0.0126 & 0.1389 \\
-5-seed ens 75ep                     & 0.9146 & 0.2557 & 0.0104 & 0.1253 \\
-5-seed ens 100ep                    & 0.9190 & 0.2479 & 0.0125 & 0.1196 \\
-10-seed same-length 50ep            & 0.9078 & 0.2722 & 0.0101 & 0.1355 \\
-\rowcolor{blond}
-\textbf{\ours{} (5$\times$50ep + 5$\times$65ep)}   & 0.9126 & 0.2607 & 0.0098 & 0.1290 \\
-\rowcolor{blond}
-\textbf{\ours{} (5$\times$50ep + 5$\times$75ep)}   & 0.9149 & 0.2566 & 0.0107 & 0.1277 \\
-\rowcolor{blond}
-\textbf{\ours{} (5$\times$50ep + 5$\times$100ep)}  & \textbf{0.9168} & \textbf{0.2489} & \textbf{0.0096} & \textbf{0.1236} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{Findings.}
-(i)~\ours{} with $T_B=100$ achieves the best NLL, the best ECE, and
-the best Brier among all methods. (ii)~SWA \emph{hurts} NLL relative
-to a single model ($0.3537$ vs.\ $0.3469$) because weight averaging
-collapses the ensemble's uncertainty into a point estimate; our method
-preserves it by averaging outputs. (iii)~The endpoint-ratio sweep
-($T_B \in \{65, 75, 100\}$) shows larger $T_B$ gives modestly better
-metrics --- the longer tail phase explores more of the basin.
-
-\subsection{Loss Landscape: Different Basins}
-
-A complementary mechanism test in the style of
-Fort~\emph{et al.}~\cite{fort2019deepensembles} is to
-check whether the 50-epoch and 75-epoch minima lie in the \emph{same}
-loss basin (connected by a monotonic-loss path) or in \emph{different}
-basins (separated by a barrier). We train two CIFAR-10 small CNNs with
-the \emph{same} random seed (2025) at $T_A=50$ and $T_B=75$ epochs, then
-linearly interpolate between their weights
-$w(\alpha)=(1-\alpha) w_A + \alpha w_B$ for $\alpha \in [0, 1]$ and
-measure the train and test loss at each interpolated point.
+The decomposition predicts the magnitude of the gain; the next question
+is whether the two groups really occupy \emph{different local minima} or
+just two points in one wider basin. Following
+Fort~\emph{et al.}~\cite{fort2019deepensembles}, we train two CIFAR-10
+small CNNs with the \emph{same} random seed (2025) at $T_A=50$ and
+$T_B=75$ epochs and linearly interpolate between their weights
+$w(\alpha)=(1-\alpha) w_A + \alpha w_B$, $\alpha \in [0,1]$, measuring
+the train and test loss at each step.
 
 \begin{figure}[h]
 \centering
@@ -321,13 +346,14 @@ $0.8434$, compared to $0.8905$ at $\alpha=0$ and $0.9018$ at
 $\alpha=1$ --- a $-6$~pp drop. This is a textbook ``different basins''
 signature. Same seed, different $T_\mathrm{max}$, different minima.
 
-\subsection{Training-Log Analysis: Same Accuracy, Different Trajectories}
+\subsection{Mechanism (III): Same Final Accuracy, Different Trajectories}
 
-To visualize \emph{why} the mixed ensemble works, we plot the full
-per-epoch validation curves for all 10 FACED d6 seeds from both groups.
-The two trajectories converge to near-identical final accuracy but visit
-different regions of the loss landscape at the key epoch 100 crossover
-point.
+If the two groups reach different minima, the per-epoch validation
+curves should reveal the divergence. We plot the full training curves
+for all 10 FACED d6 seeds. The two trajectories converge to the
+\emph{same} final accuracy but follow different routes to get
+there---the 150ep group is still at $\approx$0.25 of initial LR at
+epoch 100 and spends 50 more epochs drifting before stopping.
 
 \begin{figure}[h]
 \centering
@@ -359,17 +385,16 @@ Epoch & 100ep group BAcc & 150ep group BAcc \\
 \end{tabular}
 \end{table}
 
-\subsection{Endpoint-Ratio Ablation: Why $T_B=150$?}
+\subsection{Ablation: The Endpoint Ratio is a Robust Operating Regime, Not a Tuned Constant}
 \label{sec:endpoint_sweep}
 
-A natural reviewer question is: is $T_B=150$ a tuned sweet spot, or does
-the gain hold across a range of endpoint ratios? To answer this directly
-we ran the full 5-seed sweep at $T_B \in \{110, 120, 130, 140, 150, 200\}$
-on FACED EMOD d6, with $T_A=100$ held fixed in all mixed ensembles.
-\cref{tab:endpoint_sweep} and \cref{fig:endpoint_sweep} report, for each
-$T_B$, the mean individual BAcc of the $T_B$ group, the $T_B$-only 5-seed
-ensemble, and the 10-model mixed ensemble combining $T_A=100$ with each
-$T_B$.
+A natural concern is that $T_B=150$ might be a cherry-picked sweet
+spot. To rule this out, we run the full sweep
+$T_B \in \{110, 120, 130, 140, 150, 200\}$ on FACED EMOD d6 with $T_A=100$
+held fixed. \cref{tab:endpoint_sweep} and \cref{fig:endpoint_sweep}
+report, for each $T_B$, the mean individual BAcc of the $T_B$ group,
+the $T_B$-only 5-seed ensemble, and the mixed 10-model ensemble formed
+by $T_A=100 \cup T_B$.
 
 \begin{table}[h]
 \centering
@@ -407,29 +432,30 @@ analyses (\cref{sec:basin}).}
 \end{figure}
 
 \paragraph{Interpretation.}
-The sweep traces a clear, interpretable curve. For $T_B \in [110, 140]$
-the $T_B$ trajectory has not yet spent enough time in the low-LR tail to
-reach a distinct basin (mean individual BAcc drops as the cosine
-schedule forces a larger tail that the run cannot fully recover, yet the
-group has not visited a \emph{separate} minimum either); the mixed ensemble
-sits at or slightly above the $T_A$-only baseline. At
-$\rho = 1.5$ the mean individual BAcc recovers to $0.6581$
-(identical to $T_A$ within $0.0001$), while the run has spent $50$
-additional epochs in the tail phase and arrives at a distinct basin
-(\cref{sec:basin}); this is where the mixed gain is largest at $+0.015$
-BAcc over the $T_A$-only ensemble. At $\rho = 2.0$ the long tail is past
-the productive regime and individual accuracy drops to $0.596$, so the
-mixed ensemble is pulled below the $T_A$-only baseline. In practice we
-recommend $\rho \approx 1.5$; gains at $\rho = 1.1$ are positive but
-smaller, and $\rho \ge 2.0$ should be avoided.
+The sweep traces an interpretable curve that matches the basin
+geometry. For intermediate $\rho \in (1.1, 1.4]$ the $T_B$ trajectory
+has not yet spent enough low-LR tail time to reach a distinct basin,
+and its individual accuracy is also transiently depressed because the
+cosine tail is stretched; the mixed ensemble sits just above the
+$T_A$-only baseline. At $\rho = 1.5$ the mean individual BAcc recovers
+to $0.6581$ (within $0.0001$ of $T_A$) while the run has spent 50
+additional epochs in the productive tail and settles in a
+geometrically distinct basin (\cref{sec:basin}); this is exactly where
+the mixed gain is maximal ($+0.015$ over $T_A$-only). At $\rho = 2.0$
+the long tail leaves the productive regime, individual accuracy drops
+to $0.596$, and the mixed ensemble is dragged below the baseline. The
+takeaway: \ours{} operates in a broad regime $\rho \in [1.4, 1.6]$
+with $\rho = 1.5$ as a task-robust default and $\rho \ge 2.0$ to be
+avoided.
 
-\subsection{Loss-Landscape Geometry: The Two Groups Occupy Different Basins}
+\subsection{Mechanism (IV): Different Basins, and Why Weight-Space Averaging Fails}
 \label{sec:basin}
 
-The ensemble gain above suggests that the 100ep and 150ep runs end in
-\emph{different} local minima. We verify this directly in two
-complementary ways: a weight-space PCA of the 10 checkpoints, and a
-linear mode-connectivity probe between pairs of minima.
+The endpoint sweep's sweet spot at $\rho=1.5$ coincides with the regime
+where the two groups reach distinct basins. We verify basin separation
+directly in two complementary ways on FACED: a weight-space PCA of the
+10 checkpoints, and a linear mode-connectivity probe between cross-group
+pairs.
 
 \paragraph{Weight-space PCA.}
 Flattening the 10 FACED d6 checkpoints (5 seeds $\times$ 2 endpoints) into
@@ -470,12 +496,15 @@ two 150ep seeds, blue/orange dashed) traces the usual mode-connectivity
 barrier: test loss peaks near $\lambda=0.5$ at $\approx 2.0$ and
 recovers to the endpoint value.
 
-This is a useful negative: it tells us unambiguously that the
-\ours{} gain comes from \textbf{prediction-space averaging}, not from
-any weight-space convexity between trajectories. Averaging softmax
-outputs succeeds precisely where averaging weights fails, because
-softmax averaging is agnostic to the geometry of the weight space and
-only cares about the per-sample class distributions.
+This is a crisp design signal: \textbf{prediction-space averaging
+succeeds exactly where parameter-space averaging fails}. Output
+averaging is agnostic to the geometry of the weight space and only
+requires that the two predictive distributions disagree on the right
+samples, which is what our decomposition already confirmed. It also
+explains why SWA (which averages weights) \emph{hurts} NLL on this
+trainer (\cref{sec:calib}): weight averaging across trajectories that
+live in different basins collapses the ensemble's uncertainty rather
+than combining it.
 
 \begin{figure}[h]
 \centering

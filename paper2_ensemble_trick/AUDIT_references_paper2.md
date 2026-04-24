@@ -162,3 +162,41 @@ ensemble papers") are cited in the bibliography and grounded in the
 main text.
 
 No hard blockers. Paper 2 compiles clean with all citations resolved.
+
+## Round 3 — final polish pass (2026-04-24)
+
+Final narrative polish. Zero new `\cite{}` keys added or removed. All
+21 unique citation keys extracted from `sec/*.tex` and `main.tex`
+cross-checked against `refs.bib`:
+
+| Key | In refs.bib | Section |
+|---|---|---|
+| `aqa2024emotion` | ✓ | 2 |
+| `ashukha2020pitfalls` | ✓ | 4.6 |
+| `chen2026emod` | ✓ | 2, 4.2, S1 |
+| `fort2019deepensembles` | ✓ | 4.8 |
+| `garipov2018loss` | ✓ | 1, 2 |
+| `gong2024progressive` | ✓ | S1 |
+| `huang2017snapshot` | ✓ | 1, 2, 4.5 |
+| `izmailov2018averaging` | ✓ | 1, 2, 4.5 |
+| `jiang2024labram` | ✓ | 2 |
+| `kostas2025reve` | ✓ | 2, 4.2 |
+| `krizhevsky2009learning` | ✓ | 4.1 |
+| `lakshminarayanan2017simple` | ✓ | 1, 2 |
+| `li2025emod` | ✓ | 2 |
+| `liu2024faced` | ✓ | 2, 4.1 |
+| `loshchilov2017sgdr` | ✓ | 3.1 |
+| `wang2025cbramod` | ✓ | 2 |
+| `wen2020batchensemble` | ✓ | 1, 2 |
+| `wenzel2020hyperparameter` | ✓ | 1, 2 |
+| `yang2023biot` | ✓ | 2 |
+| `zhang2024emotionkd` | ✓ | 2 |
+| `zheng2019investigating` | ✓ | 2, 4.1 |
+
+Final compile: `Output written on main.pdf (19 pages, 622964 bytes)`.
+Zero undefined-citation warnings, zero missing references, bibliography
+renders [1]--[21]. No citation drift from the narrative polish.
+
+### Verdict Round 3
+**PASS.** All 21 cite keys present in refs.bib; zero compile warnings on
+citations; no drift from prior verification passes.

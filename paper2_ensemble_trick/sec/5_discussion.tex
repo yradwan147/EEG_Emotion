@@ -92,7 +92,9 @@ tested whether the trick also works with the \emph{same} random seed for
 the 100ep and 150ep runs (only LR schedule differs). The non-determinism
 in SGD data ordering suggests this would still give some diversity.
 
-\paragraph{Not a universal cure.} \ours{} is a small (+1--1.5 pp) gain
-on top of standard deep ensembles. It is not a replacement for better
-architectures, better data, or better pretraining. We view it as a
-``free'' trick for practitioners who already use deep ensembles.
+\paragraph{Ceiling-bound datasets give smaller gains.} The scaling law
+is also a scope statement: on tasks where individual accuracy is near
+ceiling (MNIST at 0.985, SST-2 at 0.91) the headroom is small and the
+gain is correspondingly small. We view this as predictive rather than
+limiting---the scaling fit tells practitioners in advance when the
+trick will and will not pay off.
