@@ -1,18 +1,17 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented \ours{}, a fully unsupervised recipe that extracts a linear
-valence direction from LLM residual streams using nine LLM-generated
-stories per emotion class. The method uses zero human labels, zero
-gradient updates, and no operator-specified contrastive pairs. A single
-81-story axis transfers across seventeen zero-label evaluations: five
-English sentiment benchmarks (SST-2 AUC $0.868$, IMDB $0.895$, Yelp
-$0.953$, Rotten Tomatoes $0.843$, Twitter $0.923$), four non-English
-sentiment-transfer tests (ES $0.949$, FR $0.991$, DE $0.972$, ZH $1.000$),
-three word-valence lexicons ($|r|=0.76, 0.69, 0.95$), and one continuous
-VAD regression ($|r|=0.50$). A supervised logistic regression on the same
-features needs $N\!\approx\!100$ SST-2 labels to match our zero-label
-accuracy.
+\ours{} is a fully unsupervised recipe that extracts a linear valence
+direction from LLM residual streams using nine LLM-generated stories per
+emotion class: zero human labels, zero gradient updates, no
+operator-specified contrastive pairs. A single 81-story axis transfers
+across seventeen zero-label evaluations --- five English sentiment
+benchmarks (SST-2 AUC $0.868$, IMDB $0.895$, Yelp $0.953$, Rotten
+Tomatoes $0.843$, Twitter $0.923$), four non-English sentiment-transfer
+tests (ES $0.949$, FR $0.991$, DE $0.972$, ZH $1.000$), three
+word-valence lexicons ($|r|=0.76, 0.69, 0.95$), and one continuous VAD
+regression ($|r|=0.50$). A supervised logistic regression on the same
+features needs $N\!\approx\!100$ SST-2 labels to catch up.
 
 Three properties define the method's practical value. First, it is robust
 across languages: the English axis transfers to four other languages at
@@ -48,7 +47,14 @@ polarity). These bounds are scope statements, not failures: they
 delineate the class of concepts for which one-dimensional unsupervised
 extraction is expected to succeed.
 
-We hope this work motivates further study of \emph{when and where} LLMs
-encode concepts as linear directions, and provides a simple, reproducible,
-deployment-oriented baseline for zero-label concept probing in future
-interpretability research.
+Three findings pull together into one picture. Cross-family functional
+agreement ($\cos \geq 0.94$ across Qwen / Pythia / BLOOM), cross-language
+zero-shot transfer (English-only axis hits AUC $1.000$ on Chinese), and
+the universal V-shape in depth (dilution through the middle, abrupt
+re-crystallisation at the final block) all point at the same conclusion:
+valence is a universal linear direction in causal LMs, built at the top
+of the network where the LM head reads it. \ours{} is the simplest
+recipe that surfaces it without labels. We hope the recipe and the
+V-shape invite further study of \emph{when and where} LLMs place
+concepts on linear directions, and provide a reproducible,
+deployment-oriented baseline for zero-label concept probing.

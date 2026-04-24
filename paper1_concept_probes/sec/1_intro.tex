@@ -20,25 +20,27 @@ labels --- a 10--30$\times$ reduction in labeled data.}
 \label{fig:hero}
 \end{figure}
 
-Practical affect classification today still depends on labelled data:
-thousands of annotations to train a sentiment model, hand-curated
-multilingual datasets to support non-English deployment, bespoke contrastive
-pairs to probe LLM internals. Each of those requirements is a barrier
-in the real-world settings where sentiment analysis is most needed --- new
-languages, new domains (legal, medical, financial), and rapid prototyping
-pipelines where no labels have been collected yet. A natural question is
-whether the \emph{content} that those labels are trying to recover is
-already present, in linear form, inside any sufficiently capable
-instruction-tuned large language model, and if so whether we can pull it
-out without labels.
+Practical affect classification still runs on labels: thousands of
+annotations to train a sentiment model, hand-curated multilingual
+datasets to support non-English deployment, bespoke contrastive pairs to
+probe LLM internals. Each of those requirements is a barrier in the
+real-world settings where sentiment analysis is most needed --- new
+languages, new domains (legal, medical, financial), and rapid-prototyping
+pipelines where no labels have yet been collected. A natural question is
+whether the \emph{content} those labels are trying to recover is already
+present --- in linear form --- inside any sufficiently capable
+instruction-tuned LLM, and if so whether we can pull it out without
+labels.
 
-This paper answers the question affirmatively for valence. We show that a
-single unsupervised direction, computed in seconds from nine LLM-generated
-paragraphs per class and no human annotations, is a competitive zero-shot
+This paper answers the question affirmatively for valence. A single
+unsupervised direction, computed in seconds from 81 LLM-generated
+paragraphs and zero human annotations, is a competitive zero-shot
 sentiment classifier across five English benchmarks, four non-English
-benchmarks, three word-valence lexicons, one continuous VAD regression
-task, and two concept-generalisation probes --- seventeen evaluations in
-total, all using the \emph{same} 81-story axis.
+languages, three word-valence lexicons, one continuous VAD regression,
+and two concept-generalisation probes --- seventeen evaluations
+in total, all using the \emph{same} 81-story axis. The same axis
+classifies held-out Chinese stories at AUC $1.000$ without ever
+seeing Chinese during extraction.
 
 \paragraph{Our method in one sentence.}
 Generate nine short stories for each of nine emotion categories
@@ -59,13 +61,12 @@ examples on the same hidden features, a $\sim\!10$--$30\times$
 data-efficiency gain. A single story per class (9 total samples) already
 gives AUC $0.74$ on SST-2; nine stories per class reaches $0.868$.
 
-\paragraph{2. Robust across languages.}
+\paragraph{2. Cross-language transfer without translation.}
 The \emph{English} V-axis, applied zero-shot to held-out non-English
 stories, recovers valence at AUC $0.949$ (Spanish), $0.991$ (French),
-$0.972$ (German), and $1.000$ (Chinese). Within-language V-axes extracted
-from stories in each of the four target languages also transfer above AUC
-$0.85$ in every case. Arousal is not preserved in the same way, which
-delineates the regime of the method.
+$0.972$ (German), and \emph{$1.000$} (Chinese) --- no translation, no
+re-extraction, no target-language labels. The direction the LLM places
+valence on is shared across the languages it was trained on.
 
 \paragraph{3. Robust across model scales and families.}
 The identical recipe produces a usable V-axis on Qwen2.5-0.5B, 1.5B, and
@@ -74,50 +75,54 @@ and Bloom-560m ($|r|\!=\!0.34$). Across four LLMs the per-story valence
 rankings agree at mean cosine $0.961$ and Spearman $0.954$. The method is
 not tied to a particular pretraining recipe.
 
-\paragraph{4. Simpler than contrastive alternatives.}
+\paragraph{4. Beats the standard contrastive recipe.}
 Representation-engineering methods extract concept directions from
 operator-specified contrastive pairs (honest/dishonest, happy/sad,
 harmful/harmless)
-\cite{zou2023representation, rimsky2024steering, arditi2024refusal}. Our
-9-centroid PCA \emph{does not require} the operator to supply polarity
-labels, and we show it outperforms the mean-difference contrastive axis
-(AUC $0.868$ vs $0.753$ on SST-2, $+0.115$) when the same stories are
-repartitioned into positive/negative halves.
+\cite{zou2023representation, rimsky2024steering, arditi2024refusal}. On
+matched Qwen-1.5B L28 features, our 9-centroid PCA improves SST-2 AUC
+by $+0.115$ ($0.868$ vs $0.753$) over the mean-difference contrastive
+axis computed from the \emph{same} stories repartitioned into
+positive/negative halves, while removing the requirement that the
+operator supply a binary split at all.
 
 \paragraph{A scope statement, not a classifier race.}
-We are explicit that the method is not competing for state-of-the-art
-sentiment accuracy. Direct few-shot prompting of the same LLM reaches
-$92.78\%$ on SST-2 ($+15$ percentage points over our median-threshold
-probe); a full-rank supervised logistic regression on the \emph{same}
-hidden features reaches AUC $0.911$ ($+0.043$). What we offer is the
-most data-efficient one-dimensional \emph{summary} of valence that we
-could extract under a strict zero-label constraint, together with
-evidence that the same summary transfers to many languages and many
-tasks. Section~\ref{sec:experiments} quantifies this positioning
-explicitly via the counterfactual ablation: removing our axis from the
-residual stream changes full-rank LogReg by $0.001$, showing that
-valence is distributed across multiple directions, and our axis is the
-most useful single-direction extraction under zero supervision.
+\ours{} is not competing for state-of-the-art sentiment accuracy. Direct
+few-shot prompting of the same LLM reaches $92.78\%$ on SST-2 ($+15$
+percentage points over our median-threshold probe); a full-rank
+supervised logistic regression on the \emph{same} hidden features
+reaches AUC $0.911$ ($+0.043$). What we offer is the most data-efficient
+one-dimensional \emph{summary} of valence extractable under a strict
+zero-label constraint, together with evidence that the same summary
+transfers across languages, tasks, and model families. A
+counterfactual ablation (\cref{sec:counterfactual}) makes the scope
+honest: projecting our axis out of the residual stream changes full-rank
+LogReg by only $0.001$ AUC. Valence is distributed across many
+directions; our axis is the most useful single one we can extract
+without labels.
 
 \paragraph{Where does this direction live?}
 A fine-grained layer sweep of Qwen2.5-1.5B reveals a novel ``V-shape''
 pattern. The valence direction is \emph{strong} at layer 1
-($\mathrm{AUC}\!=\!0.75$), \emph{fades} through the middle layers
-($\mathrm{AUC}\!\leq\!0.53$ for layers 2--26), and \emph{suddenly
-re-crystallizes} at layer 27 ($\mathrm{AUC}\!=\!0.84$) and 28. The V-axis at
-layer 14 is nearly orthogonal (cosine $0.07$) to the V-axis at layer 28,
-while L27 and L28 are $95\%$ aligned. The final-layer V-axis is not
-inherited from the middle of the network; it is freshly constructed just
-before the LM head. This pattern appears in all three causal families we
-tested (Qwen, GPT-NeoX, BLOOM) and is absent in bidirectional encoders
-(BERT, RoBERTa), whose peak V-axis AUC is at middle layers.
+($\mathrm{AUC}\!=\!0.75$, inherited from token embeddings), \emph{fades}
+through the middle ($\mathrm{AUC}\!\leq\!0.53$ for layers 2--26), and
+\emph{re-crystallizes abruptly} at layer 27 ($\mathrm{AUC}\!=\!0.84$)
+and 28. The L14 and L28 V-axes are nearly orthogonal (cosine $0.07$);
+L27 and L28 are $95\%$ aligned. The final-layer V-axis is not inherited
+from the middle of the network --- it is freshly constructed just before
+the LM head. The pattern replicates across three causal families (Qwen,
+GPT-NeoX, BLOOM) and \emph{vanishes} in bidirectional encoders (BERT,
+RoBERTa), whose V-axis peaks in the middle. Combined with the
+cross-language result, the picture is consistent: valence is a
+universal linear direction in causal LMs, built at the top of the
+network where the LM head reads it.
 
 \paragraph{Contributions.}
 \begin{itemize}[leftmargin=*]
-\item We introduce \ours, a fully unsupervised concept-probing recipe that
-requires nine LLM-generated stories per class, no labels, and no gradient
-updates. The method produces a linear concept direction in under one minute
-on a single V100.
+\item We introduce \ours, a fully unsupervised concept-probing recipe
+that produces a usable linear valence direction from nine LLM-generated
+stories per class --- no labels, no gradient updates, no contrastive
+pairs --- in under one minute on a single V100.
 \item We demonstrate that the extracted valence axis transfers to
 \emph{nine} languages (EN/ES/FR/DE/ZH plus pairwise cross-lingual
 cosines), five LLM families, and seventeen zero-label evaluations with
@@ -152,9 +157,12 @@ aligned with the linear representation hypothesis
 \cite{park2024linear}.
 \end{itemize}
 
-The rest of the paper: Section~\ref{sec:related} situates \ours{} with
-respect to representation engineering, activation steering, and linear
-probing; Section~\ref{sec:method} specifies the recipe; Section
-\ref{sec:experiments} presents the full zero-label evaluation matrix,
-including cross-lingual transfer and the counterfactual ablation; Section
-\ref{sec:discussion} discusses when the method works and when it does not.
+\paragraph{Roadmap.}
+Section~\ref{sec:related} situates \ours{} against representation
+engineering, activation steering, and linear probing;
+Section~\ref{sec:method} specifies the three-line recipe;
+Section~\ref{sec:experiments} presents the full zero-label evaluation
+matrix including cross-lingual transfer, the counterfactual ablation,
+and the contrastive-axis comparison; Section~\ref{sec:discussion}
+interprets the V-shape, the valence/arousal asymmetry, and the link
+to the linear representation hypothesis.

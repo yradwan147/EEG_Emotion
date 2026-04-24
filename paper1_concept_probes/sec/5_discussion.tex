@@ -3,9 +3,9 @@
 
 \subsection{What does the V-shape tell us about LLM computation?}
 
-The striking observation that the V-axis at layer 14 is nearly orthogonal
-(cosine $0.067$) to the V-axis at layer 28, while layer 27 is 95\% aligned
-with layer 28, suggests a specific computational story.
+The V-axis at layer 14 is nearly orthogonal (cosine $0.067$) to the
+V-axis at layer 28, while layer 27 is $95\%$ aligned with layer 28.
+This invites a specific computational story.
 
 Early layers (L1--L3) inherit a \emph{word-level} valence signal from the
 token embeddings. Word embeddings like ``happy'' and ``sad'' are already
@@ -38,20 +38,18 @@ layer.
 
 \subsection{Cross-language robustness and real-world applicability}
 
-The cross-lingual transfer result (Table~\ref{tab:crosslang_transfer}) is
-the strongest evidence that \ours{} is useful in practice. In low-resource
-or rapid-prototyping deployments, sentiment labels may not exist in the
-target language at all. Our measurements show that a zero-label English
-axis, extracted once from 81 LLM-generated stories, classifies held-out
-stories in Spanish, French, German, and Chinese at AUC $\geq 0.949$ without
-translation, re-extraction, or any target-language labels. For settings
-that require a single probe deployable across many languages --- global
-product feedback monitoring, multilingual content safety triage, rapid
-A/B testing of marketing copy --- this is a substantially lower-cost entry
-point than per-language supervised fine-tuning. The method's
-data-efficiency curve (one story per class already beats supervised
-$N=10$) additionally makes it attractive for rapid iteration: a
-domain-specific V-axis can be regenerated in seconds on a V100.
+Cross-lingual transfer (Table~\ref{tab:crosslang_transfer}) is the
+strongest practical evidence that \ours{} is useful in deployment. A
+zero-label English axis, extracted once from 81 LLM-generated stories,
+classifies held-out stories in Spanish, French, German, and Chinese at
+AUC $\geq 0.949$ without translation, re-extraction, or target-language
+labels. For workflows that need a single probe across many languages ---
+global product-feedback monitoring, multilingual content-safety triage,
+rapid A/B testing of marketing copy --- this is a much lower-cost entry
+point than per-language supervised fine-tuning. The data-efficiency
+curve (one story per class already beats supervised $N=10$) additionally
+supports rapid iteration: a domain-specific V-axis can be regenerated in
+seconds on a V100.
 
 \subsection{When does \ours{} work?}
 

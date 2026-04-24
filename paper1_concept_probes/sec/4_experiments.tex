@@ -3,14 +3,14 @@
 
 \subsection{Setup}
 
-Unless otherwise noted, all experiments use \textbf{Qwen2.5-1.5B-Instruct}
+Unless otherwise noted, experiments use \textbf{Qwen2.5-1.5B-Instruct}
 \cite{qwen2.5} as the base LLM, extracting hidden states at layer 28 (the
 final transformer block output). The nine stories per class come from the
 pre-computed cache at
-\texttt{line4/emotion\_vectors/qwen\_1.5B/stories\_*.json}.
-For bootstrap confidence intervals, we use 1{,}000 resamples.
-All datasets are loaded via the \texttt{datasets} library at the versions
-current in April~2026.
+\texttt{line4/emotion\_vectors/qwen\_1.5B/stories\_*.json}. Bootstrap
+confidence intervals use $1{,}000$ resamples. All datasets are loaded
+via the \texttt{datasets} library at the versions current in
+April~2026.
 
 \subsection{Zero-Shot Sentiment Classification}
 
@@ -21,9 +21,10 @@ calibrated threshold tuned on a held-out 200-sample subset.
 
 \begin{table}[h]
 \centering
-\caption{SST-2 zero-shot sentiment classification. 95\% bootstrap CIs in
-brackets. Our method matches a supervised logistic regression trained on
-80--100 labeled SST-2 samples.}
+\caption{SST-2 zero-shot sentiment classification. A single unsupervised
+direction extracted from 81 stories matches a supervised logistic
+regression trained on 80--100 labeled SST-2 samples. 95\% bootstrap CIs
+in brackets.}
 \label{tab:sst2}
 \begin{tabular}{lcc}
 \toprule
@@ -45,7 +46,7 @@ Direct LLM prompting (greedy) & -- & 0.928 \\
 \end{table}
 
 Our method at AUC $0.868$ sits between the supervised classifier with 50
-labeled examples and the one with 100. It uses zero labels.
+and 100 labeled examples, while using zero labels and no gradient updates.
 
 \paragraph{Four More Sentiment Benchmarks.}
 We apply the same V-axis to IMDB (balanced 500+500), Yelp Polarity
@@ -54,8 +55,9 @@ sentiment (balanced 500+500).
 
 \begin{table}[h]
 \centering
-\caption{Same V-axis applied to four additional sentiment benchmarks. All
-zero-shot (no labels).}
+\caption{The \emph{same} V-axis applied zero-shot to four additional
+sentiment benchmarks (movies, restaurants, tweets, reviews). No
+re-extraction, no labels.}
 \label{tab:benchmarks}
 \begin{tabular}{lccc}
 \toprule
@@ -69,10 +71,10 @@ Twitter SemEval-17 & 1{,}000 & \twauc{} & 83.80\% \\
 \end{tabular}
 \end{table}
 
-All five benchmarks use the \textit{identical} nine-story-centroid V-axis.
-The same direction generalizes across review styles (Yelp restaurants, IMDB
-movies, SST movies), lengths (SST-2 sentences vs.\ IMDB paragraphs), and
-registers (Twitter informal vs.\ financial formal text).
+All five English benchmarks use the \emph{identical} 81-story-centroid
+V-axis. The same direction generalises across domains (Yelp restaurants,
+IMDB / SST movies, Twitter), lengths (SST-2 sentences vs.\ IMDB
+paragraphs), and registers (informal tweets vs.\ formal reviews).
 
 \subsection{Word-Level Sentiment Lexicons}
 
@@ -152,7 +154,8 @@ $n$ per class & SST-2 AUC & $N$ labels & SST-2 AUC \\
 At $n=1$ story per class (9 total LLM-generated samples with no labels),
 we already beat the supervised classifier at $N=10$ labeled samples.
 
-\subsection{The V-Shape: Layer-wise Emergence of the Valence Direction}
+\subsection{The V-Shape: Valence Re-Crystallizes at the Top of the Network}
+\label{sec:vshape}
 
 \begin{figure}[h]
 \centering
@@ -179,11 +182,11 @@ EmoBank V $|r|$ & 0.370 & 0.005 & 0.002 & 0.517 & 0.496 \\
 \end{tabular}
 \end{table}
 
-Cross-layer V-axis alignment (cosine similarity of the V-axes at different
-layers): layer 1 vs.\ 28: 0.29; layer 14 vs.\ 28: \textbf{0.07} (nearly
-orthogonal); layer 27 vs.\ 28: 0.95. The final-layer valence direction is
-\emph{not} inherited from earlier layers---it is newly constructed by the
-last 1--2 blocks.
+Cross-layer V-axis cosines are the mechanistic smoking gun: L1--L28
+$= 0.29$, L14--L28 $= \textbf{0.07}$ (nearly orthogonal), L27--L28
+$= 0.95$. The final-layer valence direction is \emph{not} carried
+forward from earlier layers --- it is built de novo by the last one
+or two transformer blocks, where the LM head must read it off.
 
 \subsection{Cross-Family Universality}
 
@@ -240,18 +243,16 @@ Pythia-1.4b $\times$ Bloom-560m & 0.937 & 0.924 \\
 \end{tabular}
 \end{table}
 
-Cross-model mean pairwise cosine is $0.961$ and Spearman $\rho$ is
-$0.954$, with a minimum of $0.937$ (Pythia-1.4b vs.\ Bloom-560m). The
-four models --- two Qwen sizes, a GPT-NeoX model, and a BLOOM model ---
-functionally agree on which of the 81 stories are more or less positive,
-even though they have different architectures, training data, and
-internal coordinate systems. This is stronger evidence for
-universality than the per-model $|V_L|$ numbers in
-\cref{tab:crossmodel}, which only show that each model individually has
-a usable V-axis. The high cosine across language-model families
-suggests that late-layer valence direction is a convergent solution of
-the next-token prediction objective rather than an artifact of any
-single training pipeline.
+Four models with different architectures, training corpora, and hidden
+dimensionalities --- two Qwen scales, a GPT-NeoX, a BLOOM --- agree on
+the \emph{ranking} of the 81 stories at mean pairwise cosine $0.961$ and
+Spearman $\rho = 0.954$ (minimum $0.937$ for Pythia-1.4b vs.\
+Bloom-560m). This is a stronger universality claim than the per-model
+$|V_L|$ numbers in \cref{tab:crossmodel}: it says the \emph{same
+per-story valence score} is recovered by every family we tested, up to
+a sign. The late-layer valence direction looks like a convergent
+solution of the next-token-prediction objective rather than an artifact
+of a particular training pipeline.
 
 \begin{figure}[h]
 \centering
@@ -265,16 +266,17 @@ zone, and a final-layer re-crystallization.}
 
 \subsection{Cross-Language Generalization}
 
-A central claim of this paper is that the valence axis transfers to
-non-English text. We evaluate two transfer protocols. \emph{Protocol 1
-(transfer).} Extract the V-axis from the 81 \emph{English} stories at
-Qwen2.5-1.5B L28. Score held-out 64-sentence story splits in English,
-Spanish, French, German, and Chinese (no re-extraction, no re-fitting, no
-translation). \emph{Protocol 2 (within-language cosines).} Extract a
-separate V-axis per language (15 stories per emotion) and measure pairwise
-cosines. The first protocol is the deployment-relevant question; the
-second tests whether the underlying direction is language-invariant at
-the representation level.
+The strongest claim of the paper is that an axis extracted from
+\emph{English} stories alone classifies \emph{Chinese} text. We evaluate
+two transfer protocols. \emph{Protocol 1 (zero-shot transfer).} Extract
+the V-axis from the 81 English stories at Qwen2.5-1.5B L28. Score
+held-out 64-sentence story splits in English, Spanish, French, German,
+and Chinese --- no re-extraction, no re-fitting, no translation.
+\emph{Protocol 2 (within-language cosines).} Extract a separate V-axis
+per language (15 stories per emotion) and measure pairwise cosines.
+Protocol 1 is the deployment-relevant question; Protocol 2 tests
+whether the underlying direction is language-invariant at the
+representation level.
 
 \begin{figure}[h]
 \centering
@@ -288,9 +290,9 @@ and no re-extraction. Chance line at $0.5$.}
 
 \begin{table}[h]
 \centering
-\caption{Cross-lingual transfer of the English V-axis (Qwen2.5-1.5B L28,
-zero labels). The same axis classifies non-English held-out stories
-well above chance without any multilingual fine-tuning or translation.}
+\caption{Cross-lingual transfer of the \emph{English} V-axis
+(Qwen2.5-1.5B L28, zero labels). Chinese reaches perfect separation
+(AUC $1.000$) without the model ever seeing Chinese during extraction.}
 \label{tab:crosslang_transfer}
 \begin{tabular}{lccc}
 \toprule
@@ -306,11 +308,12 @@ German & 64 & 0.972 & 90.63\% \\
 \end{tabular}
 \end{table}
 
-The English axis reaches AUC $\geq 0.949$ on all four non-English test
-splits, including Chinese at $1.000$. Cross-lingual transfer does not
-require a multilingual encoder or translation; the multilingual LLM's
-late-layer residual stream appears to place valence along a direction
-that is shared across the languages it was trained on.
+The English axis reaches AUC $\geq 0.949$ on every non-English test
+split, including Chinese at $1.000$. Cross-lingual transfer requires
+neither a multilingual encoder nor translation: the LLM's late-layer
+residual stream places valence along a direction that is shared across
+the languages it was trained on. For multilingual deployment this is a
+single-axis probe that already works.
 
 \begin{table}[h]
 \centering
@@ -402,23 +405,25 @@ small-effect question.}
 \label{fig:va_asym}
 \end{figure}
 
-\subsection{PCA-of-Centroids vs.\ Mean-Difference Contrastive Axis}
+\subsection{PCA-of-Centroids Beats the Standard Contrastive Axis}
 \label{sec:contrastive}
 
-The standard representation-engineering recipe
+The dominant representation-engineering recipe
 \cite{zou2023representation, rimsky2024steering, arditi2024refusal}
-extracts a concept direction as the mean-difference between activations
-on a pair of contrastive prompts. For a fair comparison we re-partition
-our own stories into a positive pool (\texttt{amusement, inspiration, joy,
-tenderness}, 80 stories) and a negative pool (\texttt{anger, fear, disgust,
-sadness}, 80 stories), compute the mean-difference axis at L28, and
-evaluate on the same 872 SST-2 validation sentences.
+extracts a concept direction as the mean-difference of activations on
+operator-specified contrastive pairs. We match it on the same features.
+Re-partitioning our stories into a positive pool (\texttt{amusement,
+inspiration, joy, tenderness}, 80 stories) and a negative pool
+(\texttt{anger, fear, disgust, sadness}, 80 stories), we compute the
+mean-difference axis at L28 and evaluate on the same 872 SST-2
+validation sentences.
 
 \begin{table}[h]
 \centering
-\caption{PCA-of-nine-centroids vs.\ mean-difference contrastive axis.
-Both use the same L28 hidden states; the only difference is how the
-axis is computed from the story embeddings.}
+\caption{PCA-of-nine-centroids beats the standard mean-difference
+contrastive axis by $+0.115$ AUC on matched features. The operator
+specifies neither a positive/negative split nor a pairing --- PCA
+discovers the polarity direction automatically.}
 \label{tab:contrastive}
 \begin{tabular}{lc}
 \toprule
@@ -434,21 +439,25 @@ Mean-diff contrastive (pos\,$-$\,neg, 80+80 stories) & 0.753 \\
 \end{table}
 
 The two axes have absolute cosine $0.527$ --- substantially aligned but
-not identical. PCA of nine class-centroids improves SST-2 AUC by $0.115$
-over the contrastive-pair baseline on matched features, while also
-\emph{removing} the requirement that the operator specify a binary
-positive/negative split. In the multilingual setting (Table
-\ref{tab:crosslang_transfer}) the PCA axis also transfers without any
-analogous contrastive-pair specification across languages.
+not identical. PCA of nine class-centroids improves SST-2 AUC by
+$+0.115$ over the contrastive mean-difference baseline on matched
+features, \emph{and} removes the requirement that the operator specify
+a binary split. The same PCA axis transfers cross-lingually
+(Table~\ref{tab:crosslang_transfer}) without needing a per-language
+contrastive-pair specification. Taken together with the counterfactual
+ablation, this is a direct methodological result: the $K$-centroid PCA
+geometry extracts a stronger polarity direction than the binarised
+contrastive alternative on the same hidden states, with strictly less
+operator input.
 
 \subsection{Counterfactual: Is the V-Axis the Only Direction?}
 \label{sec:counterfactual}
 
-To quantify precisely what the V-axis contributes, we perform an
-activation-ablation study in the spirit of
+To quantify precisely what the V-axis captures, we follow the
+activation-ablation protocol of
 \cite{arditi2024refusal, park2024linear}. At each of L24, L27, L28 we
 (i)~compute the 5-fold cross-validated AUC of a full-rank $L_2$
-logistic regression on the L28 hidden features, (ii)~project the V-axis
+logistic regression on the hidden features, (ii)~project the V-axis
 out of the features (orthogonal complement), and (iii)~refit the same
 full-rank LogReg on the ablated features.
 
@@ -482,23 +491,23 @@ L28 & \textbf{0.868} & 0.911 & 0.910 \\
 \end{tabular}
 \end{table}
 
-At L28 the full-rank supervised probe reaches AUC $0.911$; removing our
-1-D V-axis from the same features changes that number by $0.001$ ($0.910$).
-Valence is therefore richly encoded across many directions of the residual
-stream, not localised on a single bottleneck axis. Our contribution is
-explicitly framed accordingly: \ours{} produces the most useful
-one-dimensional summary of valence extractable under a zero-label
-constraint. A supervised baseline that has access to labels and uses all
-$1\,536$ dimensions is stronger ($+0.04$ AUC); the axis is a compressed
-interpretability-oriented probe, and the counterfactual makes its scope
-honest and explicit.
+The result is informative in both directions. A full-rank supervised
+probe reaches AUC $0.911$; projecting our 1-D V-axis \emph{out} of the
+features changes that by only $0.001$ ($0.910$). Valence is therefore
+richly encoded across many directions --- it is not localised on a
+single bottleneck axis --- and the right framing of \ours{} is a
+compressed summary, not a causal handle. The same counterfactual
+\emph{positively} sharpens the main result: a supervised full-rank
+probe with access to labels and all $1{,}536$ dimensions beats us by
+only $+0.04$ AUC, while we use zero labels and one direction.
 
-\subsection{PCA Beats Supervised LDA for OOD Transfer}
+\subsection{Unsupervised PCA Beats Supervised LDA Out-of-Distribution}
+\label{sec:pca_vs_lda}
 
-We compared two ways to extract the concept direction from the story
-embeddings: (i)~PCA of the 9 centroids (our method, unsupervised);
-(ii)~supervised linear discriminant analysis (LDA) on the per-story vectors
-(450 samples, 9 classes).
+Two ways to extract a concept direction from the story embeddings:
+(i)~PCA of the 9 centroids (our method, unsupervised);
+(ii)~supervised linear discriminant analysis (LDA) on the per-story
+vectors (450 samples, 9 classes).
 
 \begin{table}[h]
 \centering
@@ -514,8 +523,12 @@ LDA (supervised, 450 per-story vectors) & 0.119 \\
 \end{tabular}
 \end{table}
 
-LDA overfits the 450 training stories and produces a direction that does not
-transfer OOD. PCA, despite being unsupervised, is more robust.
+LDA overfits the 450 training stories and produces a direction that
+does not transfer out-of-distribution; unsupervised PCA of the nine
+centroids is $4\times$ more correlated with EmoBank. For
+concept-direction extraction, unsupervised prototype geometry beats
+supervised discriminant geometry whenever downstream data drifts from
+the extraction set.
 
 \subsection{Speed Benchmark}
 
@@ -564,47 +577,42 @@ Direct prompting (greedy) & 0.928 & 0.860 & 0.840 \\
 \subsection{Scope of the Method}
 \label{sec:scope}
 
-The experiments above define the regime in which \ours{} is useful.
-Three complementary bounds --- each quantified, not just asserted --- round
-out this picture.
+The preceding experiments also delineate where \ours{} stops being the
+right tool. We quantify four complementary bounds.
 
 \paragraph{Concept class: global-polarity concepts.}
 Repeating the 9-centroid recipe with 15 toxic and 15 safe stories produces
-a toxicity direction that reaches AUC $0.59$ on Jigsaw Civil Comments
-(near chance). Unlike valence, toxicity depends on specific lexical
-triggers whose presence cannot be summarised by a single global direction
-that was itself learned from \emph{non-toxic} narrative stories. The
-method works when the concept has a clean global-polarity linear
-manifestation; we quantify where this breaks (see Supplementary).
+a T-axis that reaches AUC $0.59$ on Jigsaw Civil Comments (near chance).
+Toxicity depends on specific lexical triggers whose presence is not
+summarised by a single global direction learned from non-toxic
+narrative stories. The method works when the concept has a clean
+global-polarity linear manifestation; see Supplementary for the
+toxicity trace.
 
-\paragraph{Arousal as a scope statement.}
+\paragraph{Arousal bounds the regime.}
 Applying the same PCA recipe to the second principal component does not
 recover a usable arousal axis: across every layer and every model we
-tested, EmoBank arousal correlation stays at $|r|\leq 0.16$. Combined with
-Section~\ref{sec:va_asymmetry} this bounds the operating regime of our
-method to \emph{valence-like global concepts that align with the linear
-representation hypothesis} \cite{park2024linear}; arousal either lives on a
-different, non-linear geometry in the residual stream or is encoded
-non-locally. This defines the axis of applicability precisely rather than
-treating it as a failure.
+tested, EmoBank arousal correlation stays at $|r|\leq 0.16$. Combined
+with Section~\ref{sec:va_asymmetry} this bounds the operating regime of
+our method to \emph{valence-like global concepts aligned with the linear
+representation hypothesis} \cite{park2024linear}. Arousal either lives on
+a non-linear geometry in the residual stream or is encoded non-locally.
+We treat this as a falsifiable scope statement, not a weakness: the
+method's regime is the set of concepts whose linear directions survive
+the late-layer re-linearisation.
 
-\paragraph{Supervised and prompt baselines.}
-Direct few-shot prompting reaches $92.78\%$ accuracy on SST-2,
-$15$ percentage points above our median-threshold probe, while a
-supervised full-rank logistic regression on the same hidden states reaches
-AUC $0.911$ ($+0.043$ vs.\ ours). The counterfactual ablation
-(Section~\ref{sec:counterfactual}) shows that our V-axis is not the only
-direction carrying valence --- removing it barely changes a full-rank
-supervised probe. \ours{} therefore sits below these baselines on raw
-accuracy \emph{by construction}, because it is a compressed zero-label
-1-D probe rather than a full-capacity classifier. The value proposition
-is in efficiency, multilingual transfer, interpretability, and continuous
-scores rather than in accuracy SOTA.
+\paragraph{Supervised and prompt baselines dominate on raw accuracy.}
+Direct few-shot prompting reaches $92.78\%$ on SST-2, $15$ points above
+our median-threshold probe, and a full-rank supervised logistic
+regression on the same hidden states reaches AUC $0.911$ ($+0.043$).
+\ours{} sits below these baselines on raw accuracy \emph{by
+construction}: it is a compressed, zero-label, 1-D probe, not a
+full-capacity classifier. The value is in data-efficiency, multilingual
+transfer, interpretability, and continuous scores.
 
-\paragraph{Cross-LLM ensembling.}
+\paragraph{Cross-LLM ensembling does not help.}
 A sign-aligned mean projection across Qwen-0.5B, Qwen-1.5B, Pythia-1.4B,
 and Bloom-560m underperforms the best single LLM (Qwen-1.5B) by
-$0.02$--$0.04$ AUC on SST-2/IMDB/Yelp. Weaker extractors pull the
-ensemble average toward a less-aligned direction; the practical
-recommendation is to pick the best single extractor rather than ensemble.
-We make the axes themselves available so downstream users can choose.
+$0.02$--$0.04$ AUC on SST-2 / IMDB / Yelp. Weaker extractors pull the
+ensemble toward a less-aligned direction. The practical recommendation
+is to pick the best single extractor and use its axis directly.

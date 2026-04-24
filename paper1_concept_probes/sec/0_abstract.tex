@@ -1,37 +1,36 @@
 \begin{abstract}
 Can a useful sentiment classifier be extracted from a language model with
-\emph{zero} human labels, a handful of generated stories, and three lines
-of linear algebra? We show that the answer is yes. We introduce \ours, a
-fully unsupervised recipe that generates nine short stories for each of nine
-emotion categories (81 LLM-generated paragraphs, no polarity labels),
-mean-pools the final-layer residual stream, and takes the first principal
-component of the nine category centroids as a \emph{valence axis}.
-Projecting held-out text onto this single 1\,536-dimensional direction
+\emph{zero} human labels, nine generated stories per class, and three lines
+of linear algebra? We show that the answer is yes, and that the resulting
+direction is startlingly universal. We introduce \ours: generate nine short
+stories for each of nine emotion categories (81 LLM-generated paragraphs,
+no polarity labels), mean-pool the final-layer residual stream, and take
+the first principal component of the nine category centroids as a
+\emph{valence axis}. Projecting held-out text onto this single direction
 gives AUC \sstauc{} on SST-2, \imdbauc{} on IMDB, \yelpauc{} on Yelp
-Polarity, and \twauc{} on Twitter SemEval-17, correlates
-\huliur{} with the Hu~\& Liu 6{,}789-word lexicon and \warrinerr{}
-with the Warriner continuous valence norms --- all from the \emph{same} 81
-stories and no supervised training. Applying the \emph{English} axis
-zero-shot to non-English held-out stories produces transfer AUC $0.949$
-(Spanish), $0.991$ (French), $0.972$ (German), and $1.000$ (Chinese),
-confirming that the direction is cross-lingual at extraction. A supervised
-logistic regression on the same hidden features needs $N\!\approx\!100$
-SST-2 labels to match our zero-label AUC and the axis is stable across
-model scale (Qwen2.5-1.5B and 7B both give $|r|\!=\!0.494$ on EmoBank).
-The method is robust in a second sense: it is the most data-efficient
-one-dimensional summary of valence we can find. A full-rank logistic
-regression on the residual stream reaches AUC $0.911$; ablating our axis
-from the features changes that to $0.910$, showing that valence is
-richly encoded across many directions and we merely extract the single
-most useful one under a zero-label constraint. The same PCA recipe
-\emph{also} outperforms the standard contrastive mean-difference axis of
-Zou et al.\ and Arditi et al.\ ($0.868$ vs.\ $0.753$, $+0.115$ AUC) without
-requiring the operator to pre-specify a positive/negative split. Layer-wise
-probing reveals a sharp ``V-shape'': valence appears at layer 1
-(embedding-level), fades through the context-integration middle, then
-re-crystallizes at the final two transformer blocks. This pattern is
-universal across Qwen, GPT-NeoX, and BLOOM families. We position \ours{}
-as a simple, deployment-oriented probe: zero labels, nine languages
-tested, one axis, seventeen evaluations, and \speedup{} faster than direct
-prompting.
+Polarity, and \twauc{} on Twitter SemEval-17, correlates \huliur{} with
+the Hu~\& Liu 6{,}789-word lexicon and \warrinerr{} with the Warriner
+continuous valence norms --- all from the \emph{same} 81 English stories
+and no supervised training. Applied zero-shot, the \emph{English} axis
+transfers to held-out stories in Spanish (AUC $0.949$), French ($0.991$),
+German ($0.972$), and Chinese (\emph{$1.000$}), without translation or
+re-extraction. A supervised logistic regression on the same hidden
+features needs $N\!\approx\!100$ SST-2 labels to match our zero-label
+AUC, and the axis is stable across model scale (Qwen2.5-1.5B and 7B both
+reach $|r|\!=\!0.494$ on EmoBank) and family (Qwen, Pythia, BLOOM all
+produce functionally aligned per-story rankings at mean cosine $0.961$).
+The recipe \emph{also} beats the standard contrastive mean-difference
+extraction of Zou et al.\ and Arditi et al.\ on matched features by
+$+0.115$ AUC ($0.868$ vs.\ $0.753$), without requiring the operator to
+supply a positive/negative split. A layer-wise sweep reveals a sharp
+``V-shape'': valence is present at layer 1, fades through the
+context-integration middle, and \emph{re-crystallizes} at the final two
+transformer blocks --- a pattern universal across three causal families
+and absent in bidirectional encoders. A counterfactual ablation makes
+the scope honest: a full-rank supervised probe on the same features
+reaches AUC $0.911$, and projecting our axis \emph{out} changes that by
+only $0.001$; valence is richly distributed, and our axis is the most
+useful one-dimensional summary extractable under a zero-label
+constraint. The method is zero-label, nine-language, one-axis,
+seventeen-evaluation, and \speedup{} faster than direct prompting.
 \end{abstract}
