@@ -15,15 +15,32 @@ stories with pseudo-labels inherited from the generation prompt;
 logistic regression; (iii)~we are specifically interested in the
 \emph{direction} of variation, not just the decodability.
 
-\paragraph{Concept direction discovery.}
+\paragraph{Concept direction discovery and representation engineering.}
 A parallel line of work extracts concept directions for activation steering
-\cite{turner2024activation, rimsky2024steering, zou2023representation}. These
-methods typically use contrastive pairs: pairs of prompts differing in the
-target concept. Our method uses nine \emph{class centroids} rather than
-contrastive pairs, which is simpler (no alignment needed) and more scalable
-to multi-class concepts. We also show that \emph{generation is sufficient}:
-the LLM itself produces the class-exemplars, so no human labels or curated
-datasets are required.
+and interpretability
+\cite{turner2024activation, rimsky2024steering, zou2023representation,
+arditi2024refusal}. These methods typically use contrastive pairs: pairs
+of prompts differing in the target concept (honest/dishonest,
+harmful/harmless, happy/sad). The direction is the mean-difference of the
+paired activations at a chosen layer. Park, Choe and Veitch
+\cite{park2024linear} formalise the assumption that such linear directions
+exist as the \emph{linear representation hypothesis} and derive geometric
+tests (principal angle, subspace alignment) for when a concept lies in a
+low-dimensional affine slice. \ours{} differs from this family in two
+practical ways. First, the operator does \emph{not} write contrastive
+pairs; we sample nine stories per category and let the first principal
+component of the nine centroids discover the polarity axis automatically.
+Second, we compare directly: on matched Qwen-1.5B L28 features, the
+mean-difference contrastive axis gives SST-2 AUC $0.753$, while
+PCA-of-nine-centroids gives $0.868$ ($+0.115$). The 9-centroid geometry
+therefore recovers a stronger polarity direction than the binarised
+contrastive alternative, while requiring less operator effort.
+Relatedly, linear-direction work on lexical polarity
+\cite{mikolov2013linguistic, bolukbasi2016man} establishes that
+linguistically-meaningful concepts can live on single directions in
+pretrained embeddings; \ours{} extends this to \emph{instruction-tuned
+LLM residual streams} and to \emph{sentence-level} valence with zero
+labels.
 
 \paragraph{Emotion-vector distillation from LLMs.}
 Several recent papers use LLM-derived emotion vectors as auxiliary signals
@@ -48,6 +65,20 @@ Liu). Classical sentiment lexicons such as NRC VAD
 thousands to tens of thousands of hand-labeled words. We reach competitive
 correlation with these lexicons (Pearson 0.62--0.76) using only
 the nine story centroids and no human labels.
+
+\paragraph{Cross-lingual representation transfer.}
+Multilingual sentence encoders \cite{conneau2020unsupervised} share a
+representation space across languages by explicit multilingual
+pre-training. Instruction-tuned LLMs are trained on large mostly-English
+corpora with smaller non-English sub-corpora, and it is not guaranteed
+that concept directions extracted from English internals will transfer to
+other languages. We show that the English V-axis, applied zero-shot to
+held-out stories in Spanish, French, German, and Chinese, produces AUCs
+in the $0.949$--$1.000$ range, and that within-language extracted axes
+are similarly usable. This is a practical cross-lingual robustness result
+complementing multilingual encoder work: a single zero-label English
+axis is a usable multilingual valence probe on the multilingual
+instruction-tuned LLM we tested.
 
 \paragraph{Sudden-emergence findings.}
 Phase-transition phenomena in transformer training have received recent

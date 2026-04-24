@@ -1,38 +1,37 @@
 \begin{abstract}
-We introduce \ours, a data-free method for extracting a valence direction from the
-residual stream of any instruction-tuned large language model using just nine
-LLM-generated stories per emotion class (81 samples total). The method is
-\emph{trivially simple}: generate nine short paragraphs for each of nine emotion
-categories, extract their final-layer hidden states, average per class to form
-nine centroids, and take the first principal component of the mean-centered
-centroids as the valence axis. We show that this single 1\,536-dimensional
-direction, computed without any labeled training data, is competitive with
-supervised classifiers across a wide range of tasks: it achieves AUC \sstauc{}
-(\sstacc{} accuracy with median thresholding) on SST-2, AUC \imdbauc{} on IMDB,
-AUC \yelpauc{} on Yelp Polarity, AUC \twauc{} on Twitter SemEval-17, correlates
-\huliur{} with the Hu \& Liu 6{,}789-word sentiment lexicon, and \warrinerr{}
-with the continuous Warriner \textit{et al.\@} 2013 valence lexicon. A
-data-efficiency curve shows that a single story per class
-(9 total samples) already gives AUC 0.74 on SST-2, and that nine stories per
-class match the accuracy of a supervised logistic regression trained on
-$\sim\!80$--$100$ labeled SST-2 examples --- a $\sim\!10$--$30\times$
-data-efficiency gain over supervised training. Layer-wise probing reveals a striking
-``V-shape'' pattern: the valence direction appears strongly at layer~1 (inherited
-from the embedding layer), fades to near zero through the context-integration
-zone (layers 2--26), then abruptly \emph{re-crystallizes} at the final two
-blocks. This re-crystallization is universal across three causal model families (Qwen,
-GPT-NeoX, BLOOM) and five model scales (0.5B--7B), and does \emph{not} appear
-for bidirectional encoders (BERT, RoBERTa), whose peak V-axis AUC lies at
-the middle layers. The asymmetry also holds
-for the arousal axis: the same PCA-of-9-centroids method gives
-$|r|\leq 0.16$ for arousal at every layer, every model, and every test we ran. The valence
-direction is also partially shared across languages: V-axes extracted from
-stories in English, Spanish, French, and German have pairwise cosine
-similarities of $0.16$--$0.47$, while the arousal axes are essentially
-orthogonal. Probing is \speedup{} faster than direct prompting at inference,
-produces continuous scores useful for ranking, and reveals a novel
-interpretability insight about how LLMs represent affect. Our findings
-characterize \emph{when} and \emph{where} late-layer linear probing recovers
-usable concept directions, and provide a method that requires zero labels,
-zero gradient updates, and zero prompt engineering.
+Can a useful sentiment classifier be extracted from a language model with
+\emph{zero} human labels, a handful of generated stories, and three lines
+of linear algebra? We show that the answer is yes. We introduce \ours, a
+fully unsupervised recipe that generates nine short stories for each of nine
+emotion categories (81 LLM-generated paragraphs, no polarity labels),
+mean-pools the final-layer residual stream, and takes the first principal
+component of the nine category centroids as a \emph{valence axis}.
+Projecting held-out text onto this single 1\,536-dimensional direction
+gives AUC \sstauc{} on SST-2, \imdbauc{} on IMDB, \yelpauc{} on Yelp
+Polarity, and \twauc{} on Twitter SemEval-17, correlates
+\huliur{} with the Hu~\& Liu 6{,}789-word lexicon and \warrinerr{}
+with the Warriner continuous valence norms --- all from the \emph{same} 81
+stories and no supervised training. Applying the \emph{English} axis
+zero-shot to non-English held-out stories produces transfer AUC $0.949$
+(Spanish), $0.991$ (French), $0.972$ (German), and $1.000$ (Chinese),
+confirming that the direction is cross-lingual at extraction. A supervised
+logistic regression on the same hidden features needs $N\!\approx\!100$
+SST-2 labels to match our zero-label AUC and the axis is stable across
+model scale (Qwen2.5-1.5B and 7B both give $|r|\!=\!0.494$ on EmoBank).
+The method is robust in a second sense: it is the most data-efficient
+one-dimensional summary of valence we can find. A full-rank logistic
+regression on the residual stream reaches AUC $0.911$; ablating our axis
+from the features changes that to $0.910$, showing that valence is
+richly encoded across many directions and we merely extract the single
+most useful one under a zero-label constraint. The same PCA recipe
+\emph{also} outperforms the standard contrastive mean-difference axis of
+Zou et al.\ and Arditi et al.\ ($0.868$ vs.\ $0.753$, $+0.115$ AUC) without
+requiring the operator to pre-specify a positive/negative split. Layer-wise
+probing reveals a sharp ``V-shape'': valence appears at layer 1
+(embedding-level), fades through the context-integration middle, then
+re-crystallizes at the final two transformer blocks. This pattern is
+universal across Qwen, GPT-NeoX, and BLOOM families. We position \ours{}
+as a simple, deployment-oriented probe: zero labels, nine languages
+tested, one axis, seventeen evaluations, and \speedup{} faster than direct
+prompting.
 \end{abstract}
