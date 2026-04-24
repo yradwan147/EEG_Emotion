@@ -119,7 +119,7 @@ axis captures continuous valence not just sign.
 
 \subsection{Data Efficiency: How Few Stories Are Enough?}
 
-\begin{figure}[h]
+\begin{figure}[t]
 \centering
 \includegraphics[width=0.7\textwidth]{nshot_curve}
 \caption{Data-efficiency curve. \emph{Top}: SST-2 AUC as a function of the
@@ -157,7 +157,7 @@ we already beat the supervised classifier at $N=10$ labeled samples.
 \subsection{The V-Shape: Valence Re-Crystallizes at the Top of the Network}
 \label{sec:vshape}
 
-\begin{figure}[h]
+\begin{figure}[t]
 \centering
 \includegraphics[width=0.9\textwidth]{vshape_qwen15B}
 \caption{Per-layer SST-2 AUC of the V-axis extracted at each layer,
@@ -254,7 +254,7 @@ a sign. The late-layer valence direction looks like a convergent
 solution of the next-token-prediction objective rather than an artifact
 of a particular training pipeline.
 
-\begin{figure}[h]
+\begin{figure}[t]
 \centering
 \includegraphics[width=0.9\textwidth]{vshape_crossmodel}
 \caption{V-shape pattern on three model families. Top: Qwen2.5-1.5B (28
@@ -278,7 +278,7 @@ Protocol 1 is the deployment-relevant question; Protocol 2 tests
 whether the underlying direction is language-invariant at the
 representation level.
 
-\begin{figure}[h]
+\begin{figure}[t]
 \centering
 \includegraphics[width=0.85\textwidth]{fig_crosslang}
 \caption{English V-axis transfers zero-shot to four non-English languages.
@@ -394,7 +394,7 @@ test, the valence direction is extractable and the arousal direction is not.
 The maximum arousal $|r|$ we observed at any layer in any model is 0.16
 (Warriner lexicon at L28), still well below the valence number.
 
-\begin{figure}[h]
+\begin{figure}[t]
 \centering
 \includegraphics[width=0.85\textwidth]{va_asymmetry}
 \caption{Valence vs.\ arousal layer-wise on Qwen2.5-1.5B. Valence (green)
@@ -461,7 +461,7 @@ logistic regression on the hidden features, (ii)~project the V-axis
 out of the features (orthogonal complement), and (iii)~refit the same
 full-rank LogReg on the ablated features.
 
-\begin{figure}[h]
+\begin{figure}[t]
 \centering
 \includegraphics[width=0.85\textwidth]{fig_counterfactual}
 \caption{V-axis ablation at L24/L27/L28 on SST-2. The blue bar is the
