@@ -149,7 +149,7 @@ where the longer schedule $B$ alone beats the mixed ensemble by a narrow
 margin; the mixed ensemble still wins over the matched same-length
 baseline.
 
-\begin{figure}[h]
+\begin{figure}[tb]
 \centering
 \includegraphics[width=0.75\textwidth]{fig_scaling_law}
 \caption{Ensemble gain vs.\ headroom $(1 - \text{individual accuracy})$
@@ -216,7 +216,7 @@ Snapshot ensemble (1 run, 5 cyclic-LR snapshots) & 0.8946 ($-0.0046$) \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[h]
+\begin{figure}[tb]
 \centering
 \includegraphics[width=0.85\textwidth]{cifar10_baselines_bar}
 \caption{CIFAR-10 head-to-head ensemble comparison at matched compute.
@@ -326,7 +326,7 @@ $T_B=75$ epochs and linearly interpolate between their weights
 $w(\alpha)=(1-\alpha) w_A + \alpha w_B$, $\alpha \in [0,1]$, measuring
 the train and test loss at each step.
 
-\begin{figure}[h]
+\begin{figure}[tb]
 \centering
 \includegraphics[width=0.85\textwidth]{loss_landscape_interp}
 \caption{Train/test loss along the linear interpolation between a
@@ -355,7 +355,7 @@ for all 10 FACED d6 seeds. The two trajectories converge to the
 there---the 150ep group is still at $\approx$0.25 of initial LR at
 epoch 100 and spends 50 more epochs drifting before stopping.
 
-\begin{figure}[h]
+\begin{figure}[tb]
 \centering
 \includegraphics[width=0.75\textwidth]{training_curves_100_vs_150}
 \caption{Validation BAcc curves for 100ep and 150ep d6 seeds on FACED. The
@@ -420,7 +420,7 @@ $T_B$ & Mean ind.\ $T_B$ & 5-seed ens.\ $T_B$ & \textbf{Mixed 10-model} \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[h]
+\begin{figure}[tb]
 \centering
 \includegraphics[width=0.72\textwidth]{fig_endpoint_sweep}
 \caption{Mixed 10-model BAcc on FACED as a function of $T_B$ with
@@ -469,7 +469,7 @@ distinct in weight space: they inhabit two separate
 neighborhoods, not one broad basin visited at two points along a cosine
 schedule.
 
-\begin{figure}[h]
+\begin{figure}[tb]
 \centering
 \includegraphics[width=0.72\textwidth]{fig_pca_basin}
 \caption{Weight-space PCA of all 10 FACED d6 checkpoints. PC1 accounts
@@ -506,7 +506,7 @@ trainer (\cref{sec:calib}): weight averaging across trajectories that
 live in different basins collapses the ensemble's uncertainty rather
 than combining it.
 
-\begin{figure}[h]
+\begin{figure}[tb]
 \centering
 \includegraphics[width=0.95\textwidth]{fig_mode_connectivity}
 \caption{Linear interpolation loss on FACED. Solid red:
@@ -528,7 +528,7 @@ ensemble (rightmost, yellow) achieves $39.53\%$ accuracy on this
 subset, $+10.68$~pp above the 100ep consensus and $+10.28$~pp above the
 150ep consensus; the gain is cleanly localized to the disagreement set.
 
-\begin{figure}[h]
+\begin{figure}[tb]
 \centering
 \includegraphics[width=0.78\textwidth]{fig_disagreement_decomposition}
 \caption{Per-method accuracy on the 253 disagreement samples
