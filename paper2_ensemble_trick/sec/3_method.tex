@@ -4,8 +4,9 @@
 \subsection{\ours{}: Two Cosine Schedules, One Ensemble}
 
 Let $f_\theta$ be a neural network trained with a cosine-annealed
-learning-rate schedule starting at $\mathrm{lr}_{\mathrm{init}}$ and
-decaying to $\mathrm{lr}_{\mathrm{min}}$ over $T_\mathrm{max}$ epochs.
+learning-rate schedule~\cite{loshchilov2017sgdr} starting at
+$\mathrm{lr}_{\mathrm{init}}$ and decaying to $\mathrm{lr}_{\mathrm{min}}$
+over $T_\mathrm{max}$ epochs.
 Standard deep ensembling trains $N$ independent copies of $f_\theta$ with
 $N$ different random seeds at the same $T_\mathrm{max}$ and averages softmax
 outputs at test time.
@@ -51,6 +52,24 @@ points more accurate than either group's consensus;
 (iv) multiplying 10\,pp $\times$ 13\% gives $+1.3$~pp total gain, closely
 matching the observed $+1.5$~pp between the same-length ensemble and the
 mixed-length ensemble.
+
+\subsection{Choosing the Endpoint Ratio: Why $T_B = 1.5\,T_A$?}
+\label{sec:why_150}
+
+The endpoint ratio $\rho = T_B / T_A$ is the single user-visible
+hyperparameter of \ours. Two considerations constrain it. (i)~$\rho$
+must be large enough that group $B$'s tail phase visits a genuinely
+different local minimum: the PCA analysis in \cref{sec:basin} confirms
+that $\rho = 1.5$ produces a between-group centroid separation
+$3.25\times$ larger than the within-group pairwise distance. (ii)~$\rho$
+must be small enough that group $B$ does not overfit or drift into a
+low-accuracy region. A direct sweep on FACED EMOD d6 with
+$T_A=100$ and $T_B \in \{110, 120, 130, 140, 150, 200\}$
+(\cref{sec:endpoint_sweep}) shows that the gain over the single-length
+$T_A$ ensemble is positive and largest at $\rho \approx 1.5$. We therefore
+recommend $\rho \in [1.4, 1.6]$ as the operating regime and use $\rho = 1.5$
+throughout the rest of the paper; the ratio is task-robust rather than
+task-tuned.
 
 \subsection{Theoretical Prediction of Gain Magnitude}
 

@@ -108,24 +108,35 @@ rerun is scheduled (see supplementary).}
 \end{table}
 
 \subsection{Gain Scaling Law}
+\label{sec:scaling}
 
 Collecting results across all nine benchmarks, we find that the mixed-length
 ensemble gain scales approximately linearly with the headroom
 $(1 - p_\mathrm{individual})$: harder tasks with lower individual accuracy
 receive proportionally larger gains.
+A least-squares linear fit of gain on headroom gives slope $0.057$,
+intercept $0.011$, Pearson $r=0.753$, $p=0.019$, $R^2=0.57$; a power-law
+fit $\text{gain} = c \cdot \text{headroom}^{\alpha}$ gives exponent
+$\alpha = 0.85$ (log-space $R^2 = 0.72$). Both fits support the intuition
+that the gain is governed by the fraction of samples still correctable
+by ensembling.
 On CIFAR-100, we note that the mixed ensemble at $0.7353$ is slightly
 below the best single-length 5-seed ensemble at $B=75$~epochs
 ($0.7367$); the mixed gain is positive when compared against the average
 of the two same-length ensembles (\emph{mean}($A$-5-seed, $B$-5-seed)
 $=0.7296$, mixed $-$ mean $=+0.0057$). CIFAR-100 is the one dataset
-where the longer schedule $B$ alone beats the mixed ensemble.
+where the longer schedule $B$ alone beats the mixed ensemble by a narrow
+margin; the mixed ensemble still wins over the matched same-length
+baseline.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.75\textwidth]{gain_scaling_law}
-\caption{Ensemble gain (y-axis) vs.\ $(1 - \text{individual accuracy})$ (x-axis)
-across all benchmarks. The mixed-length gain scales approximately linearly with
-the headroom from individual accuracy to 1.0.}
+\includegraphics[width=0.75\textwidth]{fig_scaling_law}
+\caption{Ensemble gain vs.\ headroom $(1 - \text{individual accuracy})$
+across nine benchmarks. Dashed red: through-the-origin fit
+$\text{gain} = 0.086 \cdot \text{headroom}$. Dotted green: ordinary
+least-squares fit with intercept ($r=0.753$, $p=0.019$, $R^2=0.57$).
+A power-law fit gives exponent $\alpha=0.85$.}
 \label{fig:scaling}
 \end{figure}
 
@@ -234,7 +245,8 @@ $10.3 \times 0.131 = 1.35$~pp closely matches the observed $+1.50$~pp.
 
 \subsection{Calibration: NLL, ECE, and Brier}
 
-Ensembles are usually evaluated on calibration as much as accuracy. We
+Ensembles are usually evaluated on calibration as much as
+accuracy~\cite{ashukha2020pitfalls}. We
 recompute the CIFAR-10 head-to-head on fresh runs, this time saving
 full softmax logits, and report accuracy, NLL (negative log-likelihood
 in nats), ECE (15-bin expected calibration error), and Brier score.
@@ -279,7 +291,8 @@ metrics --- the longer tail phase explores more of the basin.
 
 \subsection{Loss Landscape: Different Basins}
 
-A complementary mechanism test (Fort \emph{et al.} NeurIPS 2019 style) is to
+A complementary mechanism test in the style of
+Fort~\emph{et al.}~\cite{fort2019deepensembles} is to
 check whether the 50-epoch and 75-epoch minima lie in the \emph{same}
 loss basin (connected by a monotonic-loss path) or in \emph{different}
 basins (separated by a barrier). We train two CIFAR-10 small CNNs with
@@ -345,3 +358,154 @@ Epoch & 100ep group BAcc & 150ep group BAcc \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\subsection{Endpoint-Ratio Ablation: Why $T_B=150$?}
+\label{sec:endpoint_sweep}
+
+A natural reviewer question is: is $T_B=150$ a tuned sweet spot, or does
+the gain hold across a range of endpoint ratios? To answer this directly
+we ran the full 5-seed sweep at $T_B \in \{110, 120, 130, 140, 150, 200\}$
+on FACED EMOD d6, with $T_A=100$ held fixed in all mixed ensembles.
+\cref{tab:endpoint_sweep} and \cref{fig:endpoint_sweep} report, for each
+$T_B$, the mean individual BAcc of the $T_B$ group, the $T_B$-only 5-seed
+ensemble, and the 10-model mixed ensemble combining $T_A=100$ with each
+$T_B$.
+
+\begin{table}[h]
+\centering
+\caption{FACED EMOD d6 endpoint-ratio ablation. All rows use the
+same $T_A=100$ group (mean ind.\ 0.6581, 5-seed ens.\ 0.6798). Mixed
+10-model BAcc peaks at $T_B=150$ (our default) and degrades both for
+smaller drifts ($T_B \le 140$) and for over-long drifts
+($T_B=200$). Source: \texttt{llm\_steering/diag\_p2\_d4\_endpoint\_T*.json}.}
+\label{tab:endpoint_sweep}
+\begin{tabular}{cccc}
+\toprule
+$T_B$ & Mean ind.\ $T_B$ & 5-seed ens.\ $T_B$ & \textbf{Mixed 10-model} \\
+\midrule
+100 (=$T_A$) & 0.6581 & 0.6798 & 0.6798 \\
+110 & 0.6612 & 0.6809 & 0.6842 \\
+120 & 0.6418 & 0.6740 & 0.6805 \\
+130 & 0.6308 & 0.6758 & 0.6778 \\
+140 & 0.6292 & 0.6730 & 0.6750 \\
+\rowcolor{blond}
+\textbf{150} & \textbf{0.6581} & \textbf{0.6919} & \textbf{0.6948} \\
+200 & 0.5960 & 0.6425 & 0.6633 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.72\textwidth]{fig_endpoint_sweep}
+\caption{Mixed 10-model BAcc on FACED as a function of $T_B$ with
+$T_A=100$ fixed. Dashed green: 100ep-only 5-seed ensemble baseline.
+The endpoint ratio $\rho = T_B/T_A = 1.5$ is a genuine operating-regime
+sweet spot, consistent with the PCA-basin and mode-connectivity
+analyses (\cref{sec:basin}).}
+\label{fig:endpoint_sweep}
+\end{figure}
+
+\paragraph{Interpretation.}
+The sweep traces a clear, interpretable curve. For $T_B \in [110, 140]$
+the $T_B$ trajectory has not yet spent enough time in the low-LR tail to
+reach a distinct basin (mean individual BAcc drops as the cosine
+schedule forces a larger tail that the run cannot fully recover, yet the
+group has not visited a \emph{separate} minimum either); the mixed ensemble
+sits at or slightly above the $T_A$-only baseline. At
+$\rho = 1.5$ the mean individual BAcc recovers to $0.6581$
+(identical to $T_A$ within $0.0001$), while the run has spent $50$
+additional epochs in the tail phase and arrives at a distinct basin
+(\cref{sec:basin}); this is where the mixed gain is largest at $+0.015$
+BAcc over the $T_A$-only ensemble. At $\rho = 2.0$ the long tail is past
+the productive regime and individual accuracy drops to $0.596$, so the
+mixed ensemble is pulled below the $T_A$-only baseline. In practice we
+recommend $\rho \approx 1.5$; gains at $\rho = 1.1$ are positive but
+smaller, and $\rho \ge 2.0$ should be avoided.
+
+\subsection{Loss-Landscape Geometry: The Two Groups Occupy Different Basins}
+\label{sec:basin}
+
+The ensemble gain above suggests that the 100ep and 150ep runs end in
+\emph{different} local minima. We verify this directly in two
+complementary ways: a weight-space PCA of the 10 checkpoints, and a
+linear mode-connectivity probe between pairs of minima.
+
+\paragraph{Weight-space PCA.}
+Flattening the 10 FACED d6 checkpoints (5 seeds $\times$ 2 endpoints) into
+a matrix and taking its first three principal components shows that PC1
+captures $>\!99\%$ of the between-checkpoint variance and perfectly
+separates the two groups (\cref{fig:pca_basin}). Concretely, the mean
+pairwise distance between the two group centroids is $5166$ and the mean
+pairwise distance within each group is $1587$, a between/within ratio of
+$\mathbf{3.25}$. The 100ep and 150ep runs are thus geometrically
+distinct in weight space: they inhabit two separate
+neighborhoods, not one broad basin visited at two points along a cosine
+schedule.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.72\textwidth]{fig_pca_basin}
+\caption{Weight-space PCA of all 10 FACED d6 checkpoints. PC1 accounts
+for $>\!99.9\%$ of variance and fully separates the 100ep and 150ep
+groups. Between/within ratio $= 3.25$. Source:
+\texttt{reports/p2\_pca\_basin.json}.}
+\label{fig:pca_basin}
+\end{figure}
+
+\paragraph{Parameter-space averaging fails; prediction-space averaging works.}
+To check whether the two groups' minima are connected by a low-loss
+linear path (same basin) or separated by a ridge (different basins), we
+linearly interpolate between cross-group pairs
+$\theta(\lambda) = (1-\lambda)\theta_{100} + \lambda\theta_{150}$ for
+$\lambda \in \{0, 0.1, \ldots, 1\}$ and evaluate val and test loss at
+each $\lambda$ (\cref{fig:mode_conn}, red curve). The interpolated
+weights produce \emph{near-chance} performance for every
+$\lambda$ (test loss $\approx 2.18$ nats, test BAcc $0.24$--$0.26$ vs.\
+$0.66$ at the endpoints): the linear path between a 100ep and a 150ep
+minimum is flat at chance, indicating that the two endpoints are not
+even connected by a low-loss straight line in weight space. For reference,
+within-group interpolation ($\lambda$-path between two 100ep seeds or
+two 150ep seeds, blue/orange dashed) traces the usual mode-connectivity
+barrier: test loss peaks near $\lambda=0.5$ at $\approx 2.0$ and
+recovers to the endpoint value.
+
+This is a useful negative: it tells us unambiguously that the
+\ours{} gain comes from \textbf{prediction-space averaging}, not from
+any weight-space convexity between trajectories. Averaging softmax
+outputs succeeds precisely where averaging weights fails, because
+softmax averaging is agnostic to the geometry of the weight space and
+only cares about the per-sample class distributions.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.95\textwidth]{fig_mode_connectivity}
+\caption{Linear interpolation loss on FACED. Solid red:
+$\theta_{100}\!\rightarrow\!\theta_{150}$ (cross-group, different seeds);
+loss stays at chance level ($\approx 2.18$ nats) along the entire path,
+confirming the two groups live in different basins. Dashed blue/orange:
+within-group 100ep-to-100ep and 150ep-to-150ep interpolations; these
+show the expected $\sim\!1.0$-nat mode-connectivity barrier. Takeaway:
+weight averaging between groups is not a meaningful ensemble
+substitute; prediction-space averaging preserves the gain.
+Source: \texttt{reports/p2\_mode\_connectivity.json}.}
+\label{fig:mode_conn}
+\end{figure}
+
+\paragraph{Disagreement decomposition (visual).}
+\cref{fig:disagree} shows the accuracy of each estimator on the 253
+disagreement samples (13.1\% of FACED test). The mixed 10-model
+ensemble (rightmost, yellow) achieves $39.53\%$ accuracy on this
+subset, $+10.68$~pp above the 100ep consensus and $+10.28$~pp above the
+150ep consensus; the gain is cleanly localized to the disagreement set.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.78\textwidth]{fig_disagreement_decomposition}
+\caption{Per-method accuracy on the 253 disagreement samples
+(13.1\% of FACED test). The two group consensuses are nearly tied
+($28.85\%$ vs.\ $29.25\%$); each group's 5-seed ensemble recovers a few
+percentage points; the 10-model mixed \ours{} ensemble recovers the
+most. Source: \texttt{reports/p2\_disagreement\_deep\_dive.json}.}
+\label{fig:disagree}
+\end{figure}

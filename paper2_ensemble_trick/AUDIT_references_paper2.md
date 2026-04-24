@@ -126,16 +126,39 @@ added in a final polish pass.
 Last compile at 05:22 (commit 5a0f808): **0 undefined-citation
 warnings**. Bibliography renders [1]–[18] correctly.
 
-## Overall Verdict: **PASS (with 4 soft recommendations)**
+## Overall Verdict: **PASS (with 2 remaining soft recommendations)**
 
 1. Fix the 3 placeholder citations (same as Paper 1 — it's the same
    "LLM-KD for EEG" list in Section 2).
 2. Optionally prune 60 orphaned bib entries from the carryover.
-3. Consider adding a citation for "cosine learning rate schedule"
-   (Loshchilov & Hutter 2017 SGDR) in Section 3 where the cosine
-   decay is introduced — currently uncited, just described.
-4. Add `fort2019deepensembles` bib entry and cite at Section 4.8
-   (loss landscape) where the "Fort et al. NeurIPS 2019" methodology
-   is referenced.
+
+Addressed in cycle 74n (see below).
+
+## Round 2 additions (cycle 74n, 2026-04-24)
+
+Added 3 new bib entries and wired them into the paper:
+
+| Key | Added in | Used in | Purpose |
+|---|---|---|---|
+| `loshchilov2017sgdr` | refs.bib | sec/3_method.tex (cosine schedule definition) | Cite SGDR original for cosine LR decay |
+| `fort2019deepensembles` | refs.bib | sec/4_experiments.tex (loss-landscape subsection) | Cite Fort et al. 2019 for loss-landscape-perspective methodology |
+| `ashukha2020pitfalls` | refs.bib | sec/4_experiments.tex (calibration subsection intro) | Cite NLL/ECE/Brier best-practice reference |
+
+Ensemble-baselines coverage checked:
+- Lakshminarayanan 2017 deep ensembles → `lakshminarayanan2017simple` ✓
+- Izmailov 2018 SWA → `izmailov2018averaging` ✓
+- Huang 2017 snapshot → `huang2017snapshot` ✓
+- Wen 2020 BatchEnsemble → `wen2020batchensemble` ✓
+- Garipov 2018 FGE / mode connectivity → `garipov2018loss` ✓
+- Fort 2019 loss landscape → `fort2019deepensembles` ✓ (new)
+- Ashukha 2020 calibration → `ashukha2020pitfalls` ✓ (new)
+
+All seven canonical ensemble references now present and cited.
+
+### Verdict Round 2
+**PASS.** All ensembling-baseline references per user's core directive
+("Follow baselines, modality tests, and analyses from top NeurIPS
+ensemble papers") are cited in the bibliography and grounded in the
+main text.
 
 No hard blockers. Paper 2 compiles clean with all citations resolved.

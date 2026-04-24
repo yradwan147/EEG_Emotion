@@ -26,8 +26,11 @@ four calibration metrics (accuracy, NLL, ECE, Brier) while adding
 \emph{zero} hyperparameter tuning and a single additional training run.
 
 A theoretical decomposition shows that \ours-induced diversity is
-proportional to the ``unused'' individual-accuracy headroom: gain scales from
-\facedgain{} on FACED (individual mean 0.66) down to +0.14\% on MNIST
-(individual mean 0.985). The trick is most valuable where ensembling is
-most needed---on capacity-bound students near their effective ceiling.
+proportional to the ``unused'' individual-accuracy headroom: across nine
+benchmarks the gain obeys a power-law in headroom
+($\alpha\!=\!0.85$, Pearson $r\!=\!0.75$, $p\!=\!0.019$, $R^2\!=\!0.57$
+for a linear fit), ranging from \facedgain{} on FACED (individual mean
+0.66) down to +0.14\% on MNIST (individual mean 0.985). The trick is most
+valuable where ensembling is most needed---on capacity-bound students
+near their effective ceiling.
 \end{abstract}

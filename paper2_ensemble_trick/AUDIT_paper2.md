@@ -110,3 +110,51 @@ Reference sanity:
 
 ## Overall Verdict
 Paper 2 is **ready for visual inspection** with minor action items noted. All numerical content verified. Pending TBD numbers will be filled in as the remaining ensemble-trick jobs complete before the 2026-04-16 07:00 IBEX maintenance window.
+
+## Pass C — Round 2 numerical audit (cycle 74n, 2026-04-24)
+
+Newly-added numbers in this edit round:
+
+### Abstract update
+- Power-law exponent $\alpha=0.85$ → `reports/p2_scaling_law_fit.json` power_law_fit.alpha_exponent 0.8506 → OK ✓
+- Pearson $r=0.75$, $p=0.019$ → pearson_correlation.r 0.7527, p_value 0.01926 → OK ✓
+- $R^2=0.57$ → fit_ols_linear.r_squared 0.5665 → OK ✓
+
+### Section 3 new subsection "Why $T_B = 1.5 T_A$?"
+- Between/within ratio 3.25 → `reports/p2_pca_basin.json` ratio_between_within 3.2545 → OK ✓
+- Endpoint sweep reference to \cref{sec:endpoint_sweep} → new subsection added in sec/4_experiments.tex
+
+### Section 4.5 Scaling Law update
+- slope 0.057, intercept 0.011 → fit_ols_linear.slope 0.05737, intercept 0.01055 → OK ✓
+- Pearson $r=0.753$, $p=0.019$, $R^2=0.57$ → OK ✓
+- Power-law $\alpha=0.85$, log-space $R^2=0.72$ → power_law_fit 0.8506, 0.7209 → OK ✓
+
+### Section 4 new "Endpoint-Ratio Ablation" subsection
+All values sourced from `llm_steering/diag_p2_d4_endpoint_T{110,120,130,140,150,200}.json`.
+- T_B=100 row: baseline; 0.6581 / 0.6798 / 0.6798 from 150-sweep JSON (mean_indiv_100, ensemble_100_only, and reference).
+- T_B=110: 0.6612 / 0.6809 / 0.6842 → T110.json mean_indiv_T 0.6612, ensemble_T_only 0.6809, ensemble_mixed_10 0.6842 → OK ✓
+- T_B=120: 0.6418 / 0.6740 / 0.6805 → T120.json 0.6418, 0.6740, 0.6805 → OK ✓
+- T_B=130: 0.6308 / 0.6758 / 0.6778 → T130.json 0.6308, 0.6758, 0.6778 → OK ✓
+- T_B=140: 0.6292 / 0.6730 / 0.6750 → T140.json 0.6292, 0.6730, 0.6750 → OK ✓
+- T_B=150: 0.6581 / 0.6919 / 0.6948 → T150.json 0.6581, 0.6919, 0.6948 → OK ✓
+- T_B=200: 0.5960 / 0.6425 / 0.6633 → T200.json 0.5960, 0.6425, 0.6633 → OK ✓
+
+### Section 4 new "Loss-Landscape Geometry" subsection
+- PCA centroid separation 5166 and within mean 1587 → p2_pca_basin.json pairwise_between_mean 5166.16, (pairwise_within_100 + pairwise_within_150)/2 = (675.67 + 2499.11)/2 = 1587.39 → OK ✓
+- Cross-group interpolation loss ≈ 2.18 nats, BAcc 0.24-0.26 → p2_mode_connectivity.json main_curve_theta100_to_theta150 endpoints ~2.18 loss, test_bacc 0.239-0.264 → OK ✓
+- Within-group barrier ~1.0 nat → p2_mode_connectivity.json barrier_within_group val 0.94 / 0.90, test 0.90 / 0.88 → OK ✓
+
+### Section 4 new "Disagreement decomposition" figure
+- 253 samples (13.1%) → p2_disagreement_deep_dive.json disagreement_set.size 253, fraction 0.1310 → OK ✓
+- 28.85% / 29.25% / 32.41% / 36.76% / 39.53% → all from p2_disagreement_deep_dive.json disagreement_set.acc_* fields → OK ✓
+- +10.68 pp gain = 39.53-28.85; +10.28 pp = 39.53-29.25 → OK (arithmetic)
+
+### New figure files
+- fig_endpoint_sweep.{png,pdf} → generated in this cycle via /tmp/make_p2_figs.py
+- fig_pca_basin.png → copied from reports/p2_pca_basin.png
+- fig_scaling_law.png → copied from reports/p2_scaling_law_fit.png
+- fig_mode_connectivity.png → copied from reports/p2_mode_connectivity.png
+- fig_disagreement_decomposition.{png,pdf} → generated in this cycle
+
+### Verdict Pass C
+**PASS**. All new numbers in cycle 74n edit trace cleanly to source JSONs. No values invented.

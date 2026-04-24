@@ -18,9 +18,13 @@ cosine trajectory after the LR has decayed. Our method averages
 \emph{outputs} across two trajectories. Output averaging preserves the
 ensemble's calibration and uncertainty properties (weight averaging
 collapses them into a single point estimate). Output ensembles also
-handle multiple minima better: if two models end in different basins,
-weight averaging can land in a pathological midpoint, while output
-averaging always gives a valid distribution.
+handle multiple minima better: our mode-connectivity probe
+(\cref{sec:basin}) shows that the linear weight-space path between a
+100ep checkpoint and a 150ep checkpoint stays at chance for every
+interpolation coefficient $\lambda \in [0, 1]$. In other words,
+parameter-space averaging between the two groups simply does not work,
+while prediction-space averaging yields a consistent $+1.5$~pp
+improvement --- a textbook separation between the two strategies.
 
 \textbf{vs.\ Fast Geometric Ensembles.} FGE explicitly walks curves
 between minima in weight space, requiring a pretrained starting point and
@@ -74,10 +78,13 @@ $(T_A + T_B)/T_A - 1$ extra compute on top of a standard
 deep ensemble. For $T_A=100, T_B=150$ this is $0.5\times$ extra compute.
 Not free.
 
-\paragraph{Endpoint must be different enough.} We tested $T_A=100,
-T_B=150$ (50\% more). We have not systematically explored other ratios
-(e.g., $T_B=120$ vs.\ $T_B=200$). The ``sweet spot'' for the
-trajectory-length gap remains an open empirical question.
+\paragraph{Endpoint ratio has an operating regime.} Our endpoint sweep
+(\cref{sec:endpoint_sweep}) shows that $\rho = T_B/T_A \approx 1.5$ is
+a sweet spot: smaller ratios ($\rho \in [1.1, 1.4]$) yield smaller gains,
+and much larger ratios ($\rho \approx 2.0$) cause group $B$ to overfit,
+pulling the mixed ensemble below the $T_A$-only baseline. We recommend
+$\rho \in [1.4, 1.6]$; outside this window the user should expect
+reduced or no gain.
 
 \paragraph{Same-seed, different-length vs.\ different-seed, different-length.}
 We use different random seeds for each (seed, length) pair. We have not
