@@ -25,6 +25,7 @@ from _lf_style import apply_lf_style, COLORS, save_dual, panel_label
 
 REPORTS = "/ibex/project/c2323/yousef/reports"
 OUT = "/ibex/project/c2323/yousef/paper_neurips26_final/figures/landmark"
+OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/landmark"
 
 
 # ---------------------- data loaders ----------------------
@@ -86,13 +87,13 @@ EMO_ORDER = ["Anger", "Disgust", "Fear", "Sadness", "Neutral",
 
 def main():
     apply_lf_style()
-    fig = plt.figure(figsize=(13.6, 8.6))
+    fig = plt.figure(figsize=(13.6, 9.0))
     gs = fig.add_gridspec(
         2, 2,
         width_ratios=[1.05, 1.05],
         height_ratios=[1.0, 1.0],
-        wspace=0.27, hspace=0.42,
-        left=0.065, right=0.985, bottom=0.075, top=0.90,
+        wspace=0.30, hspace=0.46,
+        left=0.065, right=0.985, bottom=0.085, top=0.88,
     )
 
     # ---------------- (a) TEXT ----------------
@@ -153,10 +154,11 @@ def main():
                         edgecolor=COLORS["green"], linewidth=0.8))
     ax_b.set_xticks(bx)
     ax_b.set_xticklabels(bars_x, fontsize=8.5)
-    ax_b.set_ylabel("Pearson r vs ground-truth valence  (OASIS, n=270 test images)")
-    ax_b.set_ylim(-0.18, 1.0)
+    ax_b.set_ylabel("Pearson r vs ground-truth valence\n(OASIS, n=270 test images)",
+                    fontsize=9, linespacing=1.05)
+    ax_b.set_ylim(-0.20, 1.05)
     ax_b.set_title("Vision (CLIP):  same recipe BEATS supervised ridge", loc="left")
-    panel_label(ax_b, "b", x=-0.13, y=1.04)
+    panel_label(ax_b, "b", x=-0.14, y=1.04)
 
     # ---------------- (c) EEG MODELS ----------------
     ax_c = fig.add_subplot(gs[1, 0])
@@ -246,14 +248,15 @@ def main():
     fig.suptitle(
         "A single valence direction extracted from 9 emotion stories is recovered "
         "across language, vision, EEG, and brain",
-        y=0.965, fontsize=13.0, fontweight="bold")
+        y=0.955, fontsize=13.0, fontweight="bold")
 
-    fig.text(0.5, 0.02,
+    fig.text(0.5, 0.022,
              "Same V-axis (Qwen-2.5 1.5B, 9 stories × 50 generations → PC1 at the final layer); "
              "no fine-tuning, no labeled examples seen at probe time.",
              ha="center", fontsize=8.5, color=COLORS["gray"])
 
     save_dual(fig, f"{OUT}/lf1_universal_vaxis_hero")
+    save_dual(fig, f"{OUT_PAPER}/lf1_universal_vaxis_hero")
 
 
 if __name__ == "__main__":

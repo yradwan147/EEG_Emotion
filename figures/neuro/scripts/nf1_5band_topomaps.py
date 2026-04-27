@@ -14,6 +14,7 @@ from _neuro_style import apply_neuro_style, COLORS, save_dual
 
 REPORTS = "/ibex/project/c2323/yousef/reports"
 OUT_DIR = "/ibex/project/c2323/yousef/paper_neurips26_final/figures/neuro"
+OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/neuro"
 
 # top-3 channels per band (ranked by |r|, computed from data)
 HIGHLIGHT_PER_BAND = None  # populated below
@@ -67,13 +68,13 @@ def main():
     print('region |r|:', region_vals)
 
     # ---------- figure layout ----------
-    fig = plt.figure(figsize=(12.0, 5.4))
+    fig = plt.figure(figsize=(12.6, 5.6))
     gs = fig.add_gridspec(
         2, 7,
-        width_ratios=[1.0, 1.0, 1.0, 1.0, 1.0, 0.04, 0.65],
+        width_ratios=[1.0, 1.0, 1.0, 1.0, 1.0, 0.05, 0.70],
         height_ratios=[3.4, 1.05],
-        left=0.025, right=0.985, top=0.86, bottom=0.10,
-        wspace=0.18, hspace=0.95,
+        left=0.025, right=0.975, top=0.86, bottom=0.10,
+        wspace=0.32, hspace=1.05,
     )
 
     cmap = plt.colormaps["RdBu_r"]
@@ -133,11 +134,10 @@ def main():
     # Colorbar axis (column 5 — small)
     cax = fig.add_subplot(gs[0, 5])
     cbar = fig.colorbar(ims[-1], cax=cax)
-    cbar.set_label("Pearson  r  (cohort EEG  vs.  LLM V-axis)",
-                   fontsize=9, labelpad=2)
+    cbar.set_label("Pearson  r  (V-axis encoding)",
+                   fontsize=9, labelpad=4)
     cbar.ax.tick_params(labelsize=8, length=2.5)
     # neat tick set
-    tick_step = 0.2
     cbar.set_ticks([-0.4, -0.2, 0.0, 0.2, 0.4])
 
     # Inset montage (column 6) — small head-position diagram
@@ -147,7 +147,8 @@ def main():
                          show=False, cmap='Greys', vlim=(-1, 1),
                          sensors='ko',
                          contours=0, outlines='head', extrapolate='head', res=64)
-    ax_montage.set_title("32-channel\n10–20 montage", fontsize=8, pad=2)
+    ax_montage.set_title("32-channel\n10–20 montage",
+                         fontsize=8, pad=8, fontweight='bold')
 
     # ---------- bottom: region mean |r| bar chart ----------
     ax_region = fig.add_subplot(gs[1, :5])
@@ -193,6 +194,7 @@ def main():
         fontsize=12, fontweight='bold', y=0.97)
 
     save_dual(fig, f"{OUT_DIR}/NF1_5band_topomaps")
+    save_dual(fig, f"{OUT_PAPER}/NF1_5band_topomaps")
     plt.close(fig)
 
 

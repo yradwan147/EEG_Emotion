@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _lf_style import apply_lf_style, COLORS, save_dual, panel_label
 
 OUT = "/ibex/project/c2323/yousef/paper_neurips26_final/figures/landmark"
+OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/landmark"
 
 
 # (label, BACC, std_or_None, phase)
@@ -129,6 +130,7 @@ def main():
                  fontsize=12, fontweight="bold", loc="left", pad=12)
 
     save_dual(fig, f"{OUT}/lf7_recipe_cascade")
+    save_dual(fig, f"{OUT_PAPER}/lf7_recipe_cascade")
 
 
 if __name__ == "__main__":

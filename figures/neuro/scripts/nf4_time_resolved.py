@@ -19,6 +19,7 @@ from _neuro_style import apply_neuro_style, COLORS, BAND_COLORS, save_dual
 
 REPORTS = "/ibex/project/c2323/yousef/reports"
 OUT_DIR = "/ibex/project/c2323/yousef/paper_neurips26_final/figures/neuro"
+OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/neuro"
 
 
 def main():
@@ -29,9 +30,9 @@ def main():
     bs    = data['time_resolved_best_stim']   # (5, 30)
     psp   = data['time_resolved_per_subj_peak']  # (5, Nsub)
 
-    fig = plt.figure(figsize=(12.0, 5.4))
-    gs = fig.add_gridspec(1, 2, left=0.06, right=0.985, top=0.83, bottom=0.11,
-                          wspace=0.22)
+    fig = plt.figure(figsize=(12.6, 5.6))
+    gs = fig.add_gridspec(1, 2, left=0.06, right=0.985, top=0.84, bottom=0.12,
+                          wspace=0.24)
 
     # --- helper: shade LPP windows ---
     def shade_lpp(ax):
@@ -80,23 +81,24 @@ def main():
 
     text_box = dict(boxstyle='round,pad=0.30', facecolor='white',
                     edgecolor='lightgray', linewidth=0.6, alpha=0.97)
-    # Place annotations in a vertical stack at right side (x=0.74)
+    # Annotations in a vertical stack high in the panel (clear of data),
+    # aligned right so all three boxes share a clean right edge.
     ax_a.annotate(fr"$\alpha$  $t={a_t}$s,  $|r|={abs(a_r):.2f}$",
-                  xy=(a_t, abs(a_r)), xytext=(0.80, 0.80),
+                  xy=(a_t, abs(a_r)), xytext=(0.97, 0.93),
                   textcoords='axes fraction',
                   fontsize=8.5, fontweight='bold', color=BAND_COLORS['alpha'],
                   ha='right', va='center', bbox=text_box,
                   arrowprops=dict(arrowstyle='->', lw=0.7,
                                   color=BAND_COLORS['alpha']))
     ax_a.annotate(fr"$\beta$  $t={b_t}$s,  $|r|={abs(b_r):.2f}$",
-                  xy=(b_t, abs(b_r)), xytext=(0.80, 0.69),
+                  xy=(b_t, abs(b_r)), xytext=(0.97, 0.83),
                   textcoords='axes fraction',
                   fontsize=8.5, fontweight='bold', color=BAND_COLORS['beta'],
                   ha='right', va='center', bbox=text_box,
                   arrowprops=dict(arrowstyle='->', lw=0.7,
                                   color=BAND_COLORS['beta']))
     ax_a.annotate(fr"$\gamma$  $t={g_t}$s,  $|r|={abs(g_r):.2f}$",
-                  xy=(g_t, abs(g_r)), xytext=(0.80, 0.58),
+                  xy=(g_t, abs(g_r)), xytext=(0.97, 0.73),
                   textcoords='axes fraction',
                   fontsize=8.5, fontweight='bold', color=BAND_COLORS['gamma'],
                   ha='right', va='center', bbox=text_box,
@@ -106,10 +108,11 @@ def main():
     ax_a.set_xlabel("time within clip  (seconds)", fontsize=9)
     ax_a.set_ylabel(r"cohort  $|r|$  (V-net DE  vs.  V-axis)", fontsize=9)
     ax_a.set_xlim(0, 29)
-    ax_a.set_ylim(0, 0.75)
+    ax_a.set_ylim(0, 0.78)
     ax_a.set_xticks(np.arange(0, 30, 5))
     ax_a.legend(loc='upper left', fontsize=8.5, frameon=True, ncol=5,
-                framealpha=0.95, handletextpad=0.4, columnspacing=0.6)
+                framealpha=0.95, handletextpad=0.4, columnspacing=0.6,
+                bbox_to_anchor=(0.0, 1.0))
     ax_a.grid(alpha=0.20, linewidth=0.4)
     ax_a.set_axisbelow(True)
     ax_a.set_title("(a)  All 28 stim:  early gamma, sustained alpha/beta",
@@ -143,20 +146,22 @@ def main():
     b_r2 = float(bs[bands.index('beta'), b_t2])
     text_box = dict(boxstyle='round,pad=0.30', facecolor='white',
                     edgecolor='lightgray', linewidth=0.5, alpha=0.95)
+    # Annotations placed at the right edge (after t≈22 the traces drop), so
+    # both the inset (bottom-center) and the legend (top-left) stay clear.
     ax_b.annotate(fr"$\alpha$  $t={a_t}$s,  $|r|={abs(a_r):.2f}$",
                   xy=(a_t, abs(a_r)),
-                  xytext=(0.34, 0.55),
+                  xytext=(0.97, 0.62),
                   textcoords='axes fraction',
                   fontsize=8.5, fontweight='bold', color=BAND_COLORS['alpha'],
-                  ha='left', va='center', bbox=text_box,
+                  ha='right', va='center', bbox=text_box,
                   arrowprops=dict(arrowstyle='->', lw=0.7,
                                   color=BAND_COLORS['alpha']))
     ax_b.annotate(fr"$\beta$  $t={b_t2}$s,  $|r|={abs(b_r2):.2f}$",
                   xy=(b_t2, abs(b_r2)),
-                  xytext=(0.34, 0.42),
+                  xytext=(0.97, 0.50),
                   textcoords='axes fraction',
                   fontsize=8.5, fontweight='bold', color=BAND_COLORS['beta'],
-                  ha='left', va='center', bbox=text_box,
+                  ha='right', va='center', bbox=text_box,
                   arrowprops=dict(arrowstyle='->', lw=0.7,
                                   color=BAND_COLORS['beta']))
 
@@ -172,8 +177,9 @@ def main():
     ax_b.set_title(r"(b)  9-stim emotional-pole subset:  alpha reaches |r| ≈ 0.78",
                    fontsize=10, fontweight='bold', loc='left', pad=4)
 
-    # Inset: per-subject peak-time histogram for alpha
-    ax_inset = ax_b.inset_axes([0.62, 0.55, 0.36, 0.38])
+    # Inset: per-subject peak-time histogram for alpha — placed in
+    # bottom-center where traces are lowest, avoiding all peaks.
+    ax_inset = ax_b.inset_axes([0.34, 0.06, 0.32, 0.33])
     bi_alpha = bands.index('alpha')
     bins = np.arange(0, 31, 2)
     ax_inset.hist(psp[bi_alpha], bins=bins, color=BAND_COLORS['alpha'],
@@ -194,6 +200,7 @@ def main():
         fontsize=12, fontweight='bold', y=0.97)
 
     save_dual(fig, f"{OUT_DIR}/NF4_time_resolved")
+    save_dual(fig, f"{OUT_PAPER}/NF4_time_resolved")
     plt.close(fig)
 
 

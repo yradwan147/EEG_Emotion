@@ -20,6 +20,7 @@ from _lf_style import apply_lf_style, COLORS, save_dual, panel_label
 REPORTS = "/ibex/project/c2323/yousef/reports"
 EXT_DIR = f"{REPORTS}/sota_ensemble_extension"
 OUT = "/ibex/project/c2323/yousef/paper_neurips26_final/figures/landmark"
+OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/landmark"
 
 CLASSES = ["Anger", "Disgust", "Fear", "Sadness", "Neutral",
            "Amusement", "Inspiration", "Joy", "Tenderness"]
@@ -92,12 +93,12 @@ def main():
     cm_best_n = cm_best / cm_best.sum(axis=1, keepdims=True).clip(1e-9)
     cm_ens_n = cm_ens / cm_ens.sum(axis=1, keepdims=True).clip(1e-9)
 
-    fig = plt.figure(figsize=(16.0, 8.0))
+    fig = plt.figure(figsize=(16.5, 8.2))
     gs = fig.add_gridspec(
         1, 4,
-        width_ratios=[1.0, 1.0, 0.75, 0.06],
-        wspace=0.40,
-        left=0.05, right=0.985, bottom=0.10, top=0.86,
+        width_ratios=[1.0, 1.0, 0.85, 0.06],
+        wspace=0.42,
+        left=0.05, right=0.985, bottom=0.10, top=0.84,
     )
 
     ax_a = fig.add_subplot(gs[0, 0])
@@ -123,19 +124,28 @@ def main():
                   for i in order]
     bars = ax_c.barh(y, delta[order], color=colors_for, height=0.66,
                      edgecolor="white", linewidth=0.7, zorder=3)
+    # primary delta values to the right of bars; transition (best→ens) to the
+    # FAR right margin for ALL rows, so left side stays clean for y-tick labels.
     for yi, di, ci in zip(y, delta[order], order):
-        ax_c.text(di + (0.003 if di >= 0 else -0.003), yi,
-                  f"{di:+.3f}\n({diag_best[ci]:.2f}→{diag_ens[ci]:.2f})",
+        # delta value just past bar tip
+        ax_c.text(di + (0.0030 if di >= 0 else -0.0030), yi,
+                  f"{di:+.3f}",
                   va="center", ha="left" if di >= 0 else "right",
-                  fontsize=7.5, color="black", linespacing=0.95)
+                  fontsize=8.5, color="black", fontweight="bold")
+        # transition (small, lower line)
+        ax_c.text(di + (0.0030 if di >= 0 else -0.0030), yi - 0.40,
+                  f"{diag_best[ci]:.2f}→{diag_ens[ci]:.2f}",
+                  va="top", ha="left" if di >= 0 else "right",
+                  fontsize=6.8, color="#666666")
     ax_c.axvline(0, color="black", lw=0.8)
     ax_c.set_yticks(y)
     ax_c.set_yticklabels([CLASSES[i] for i in order], fontsize=9)
     ax_c.set_xlabel("Δ per-class accuracy  (ensemble − single)")
-    ax_c.set_title("Where the ensemble fixes the single", loc="left", fontsize=11)
-    panel_label(ax_c, "c", x=-0.32, y=1.05)
-    ax_c.set_xlim(min(delta.min() * 1.45, -0.04),
-                  max(delta.max() * 1.45, 0.10))
+    ax_c.set_title("Where the ensemble fixes the single",
+                   loc="left", fontsize=11.0, pad=8)
+    panel_label(ax_c, "c", x=-0.30, y=1.05)
+    ax_c.set_xlim(-0.045, 0.105)
+    ax_c.set_ylim(-0.7, len(CLASSES) - 0.3)
 
     # colorbar for confusion matrices (on the right)
     cax = fig.add_subplot(gs[0, 3])
@@ -154,6 +164,7 @@ def main():
              ha="center", fontsize=8.5, color=COLORS["gray"])
 
     save_dual(fig, f"{OUT}/lf10_confusion_matrices")
+    save_dual(fig, f"{OUT_PAPER}/lf10_confusion_matrices")
 
 
 if __name__ == "__main__":

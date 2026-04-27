@@ -19,6 +19,7 @@ from _lf_style import apply_lf_style, COLORS, save_dual, panel_label
 
 REPORTS = "/ibex/project/c2323/yousef/reports"
 OUT = "/ibex/project/c2323/yousef/paper_neurips26_final/figures/landmark"
+OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/landmark"
 
 
 def main():
@@ -38,12 +39,12 @@ def main():
     rand_mean = k7["rand_mean_bacc"]
     rand_std = k7["rand_std_bacc"]
 
-    fig = plt.figure(figsize=(13.5, 5.8))
+    fig = plt.figure(figsize=(13.8, 6.0))
     gs = fig.add_gridspec(
         1, 2,
-        width_ratios=[1.4, 1.0],
+        width_ratios=[1.5, 1.0],
         wspace=0.28,
-        left=0.06, right=0.985, bottom=0.13, top=0.86,
+        left=0.06, right=0.985, bottom=0.13, top=0.84,
     )
 
     # ---------------- (a) scatter ----------------
@@ -102,10 +103,28 @@ def main():
               color="black", va="top",
               bbox=dict(boxstyle="round,pad=0.30", facecolor="white",
                         edgecolor=COLORS["lightgray"], linewidth=0.8))
-    # tag annotations
+    # tag annotations — hand-tuned offsets so labels don't pile up.
+    # Layout: place each tag adjacent to its point in a non-overlapping
+    # spoke pattern around the central cluster.
+    label_offsets = {
+        # tag             dx        dy        ha       va
+        "e100_s42":    (-0.004,  +0.0008, "right", "bottom"),
+        "e100_s123":   (+0.003,  -0.0008, "left",  "top"),
+        "e100_s456":   (-0.004,  -0.0009, "right", "top"),
+        "e100_s789":   (+0.003,  -0.0009, "left",  "top"),
+        "e100_s2025":  (-0.004,  +0.0009, "right", "bottom"),
+        "e150_s42":    (+0.003,  +0.0010, "left",  "bottom"),
+        "e150_s123":   (-0.001,  +0.0010, "right", "bottom"),
+        "e150_s456":   (+0.003,  +0.0009, "left",  "bottom"),
+        "e150_s789":   (-0.001,  +0.0010, "right", "bottom"),
+        "e150_s2025":  (+0.003,  -0.0009, "left",  "top"),
+    }
     for w, l, t in zip(within, loo, tags):
-        ax_a.annotate(t, xy=(w, l), xytext=(w + 0.002, l + 0.0001),
-                      fontsize=7, color=COLORS["gray"], va="center")
+        dx, dy, ha, va = label_offsets.get(
+            t, (+0.003, +0.0001, "left", "center"))
+        ax_a.text(w + dx, l + dy, t,
+                  fontsize=7.0, color="#444444", ha=ha, va=va,
+                  zorder=6)
 
     ax_a.set_xlabel("within-class V-axis residual |r|  (per ckpt)", fontsize=10.5)
     ax_a.set_ylabel("leave-one-out ensemble contribution  Δ BACC", fontsize=10.5)
@@ -158,6 +177,7 @@ def main():
         y=0.96, fontsize=12.5, fontweight="bold")
 
     save_dual(fig, f"{OUT}/lf8_two_tier_ensemble_theory")
+    save_dual(fig, f"{OUT_PAPER}/lf8_two_tier_ensemble_theory")
 
 
 if __name__ == "__main__":

@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _lf_style import apply_lf_style, COLORS, save_dual, panel_label
 
 OUT = "/ibex/project/c2323/yousef/paper_neurips26_final/figures/landmark"
+OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/landmark"
 
 
 # Format: (label, delta, p, source_id, n_seeds, std, tier)
@@ -153,6 +154,7 @@ def main():
              ha="center", fontsize=8.0, color=COLORS["gray"])
 
     save_dual(fig, f"{OUT}/lf9_all_interventions_forest")
+    save_dual(fig, f"{OUT_PAPER}/lf9_all_interventions_forest")
 
 
 if __name__ == "__main__":

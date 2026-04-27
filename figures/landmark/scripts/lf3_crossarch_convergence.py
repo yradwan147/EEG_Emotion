@@ -20,6 +20,7 @@ from _lf_style import apply_lf_style, COLORS, save_dual, panel_label
 
 REPORTS = "/ibex/project/c2323/yousef/reports"
 OUT = "/ibex/project/c2323/yousef/paper_neurips26_final/figures/landmark"
+OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/landmark"
 
 
 def get_arch(tag):
@@ -72,12 +73,12 @@ def main():
     abs_r_within = np.array(abs_r_within)
     print(f"  using {len(within)} ckpts with within-class data (out of {len(tags)})")
 
-    fig = plt.figure(figsize=(15.0, 5.4))
+    fig = plt.figure(figsize=(15.4, 5.6))
     gs = fig.add_gridspec(
         1, 3,
         width_ratios=[1.15, 1.15, 0.95],
-        wspace=0.30,
-        left=0.055, right=0.985, bottom=0.13, top=0.85,
+        wspace=0.34,
+        left=0.052, right=0.985, bottom=0.14, top=0.83,
     )
 
     # ---------------- (a) class-PC1 scatter ----------------
@@ -111,7 +112,7 @@ def main():
     ax_a.set_xlabel("class-mean PC1 V-axis  |r|")
     ax_a.set_ylabel("FACED 9-class BACC")
     ax_a.set_title("Better EEG models converge to the V-axis (class level)", loc="left")
-    panel_label(ax_a, "a", x=-0.10, y=1.045)
+    panel_label(ax_a, "a", x=-0.13, y=1.045)
     ax_a.legend(loc="lower right", fontsize=7.5, ncol=1, frameon=False)
 
     # ---------------- (b) within-class residual scatter ----------------
@@ -165,7 +166,7 @@ def main():
     ax_b.set_xlabel("within-class V-axis residual  |r|")
     ax_b.set_ylabel("FACED 9-class BACC")
     ax_b.set_title("Within-class residual: a sub-feature ensembling exploits", loc="left")
-    panel_label(ax_b, "b", x=-0.10, y=1.045)
+    panel_label(ax_b, "b", x=-0.13, y=1.045)
 
     # ---------------- (c) random direction null ----------------
     ax_c = fig.add_subplot(gs[0, 2])
@@ -179,18 +180,21 @@ def main():
                  label=f"95th pct = {p95:.2f}", zorder=3)
     ax_c.axvline(p99, color="black", ls="--", lw=0.9, alpha=0.6,
                  label=f"99th pct = {p99:.2f}", zorder=3)
+    # Percentile call-out: lower-left where the histogram is empty
     ax_c.text(0.03, 0.97,
               f"V-axis sits at the\n{pct:.0f}ᵗʰ percentile\n(p_one = {p_one:.3f}, n=100)",
-              transform=ax_c.transAxes, fontsize=10, fontweight="bold",
-              color=COLORS["red"], va="top",
-              bbox=dict(boxstyle="round,pad=0.30", facecolor="white",
+              transform=ax_c.transAxes, fontsize=9.5, fontweight="bold",
+              color=COLORS["red"], va="top", ha="left",
+              bbox=dict(boxstyle="round,pad=0.28", facecolor="white",
                         edgecolor=COLORS["red"], linewidth=0.8, alpha=0.95))
     ax_c.set_xlabel("Pearson r between BACC and |r|(direction)")
     ax_c.set_ylabel("count over 100 random directions")
     ax_c.set_title("V-axis is a top-decile direction\n(low-dim 9-class PC1 → wide null)",
                    loc="left", fontsize=10)
-    ax_c.legend(loc="upper right", fontsize=7.5, frameon=False)
-    panel_label(ax_c, "c", x=-0.13, y=1.045)
+    # Legend just below the percentile box, still within the empty upper region
+    ax_c.legend(loc="upper left", bbox_to_anchor=(0.03, 0.62),
+                fontsize=7.2, frameon=False, handlelength=2.0, handletextpad=0.5)
+    panel_label(ax_c, "c", x=-0.18, y=1.045)
 
     fig.suptitle(
         "Cross-architecture convergence: 36 EEG checkpoints all encode the LLM V-axis "
@@ -198,6 +202,7 @@ def main():
         y=0.965, fontsize=12.5, fontweight="bold")
 
     save_dual(fig, f"{OUT}/lf3_crossarch_convergence")
+    save_dual(fig, f"{OUT_PAPER}/lf3_crossarch_convergence")
 
 
 if __name__ == "__main__":

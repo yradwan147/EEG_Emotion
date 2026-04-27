@@ -28,6 +28,7 @@ from _lf_style import apply_lf_style, COLORS, save_dual, panel_label
 
 REPORTS = "/ibex/project/c2323/yousef/reports"
 OUT = "/ibex/project/c2323/yousef/paper_neurips26_final/figures/landmark"
+OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/landmark"
 
 EMO_PER_STIM_28 = (["Anger"] * 3 + ["Disgust"] * 3 + ["Fear"] * 3 + ["Sadness"] * 3
                    + ["Neutral"] * 4 + ["Amusement"] * 3 + ["Inspiration"] * 3
@@ -64,13 +65,13 @@ def main():
     llm_rows = ed["E2_per_llm_vs_eeg"]["rows"]  # [llm, family, r, p]
     llm_rows = sorted(llm_rows, key=lambda x: x[2], reverse=True)
 
-    fig = plt.figure(figsize=(14.0, 8.4))
+    fig = plt.figure(figsize=(14.4, 8.6))
     gs = fig.add_gridspec(
         2, 3,
         width_ratios=[1.6, 1.0, 1.0],
         height_ratios=[1.0, 1.0],
-        wspace=0.32, hspace=0.55,
-        left=0.06, right=0.985, bottom=0.07, top=0.85,
+        wspace=0.36, hspace=0.55,
+        left=0.06, right=0.97, bottom=0.07, top=0.85,
     )
 
     # ---------------- (a) MAIN scatter ----------------
@@ -107,15 +108,15 @@ def main():
               color=COLORS["darkblue"], va="top",
               bbox=dict(boxstyle="round,pad=0.30", facecolor="white",
                         edgecolor=COLORS["lightgray"], linewidth=0.8, alpha=0.95))
-    # subtitle annotation about pole stims
-    ax_a.text(0.97, 0.18,
-              "dashed circle: 9 stimuli from the three emotional poles\n"
-              "(Anger × 3, Amusement × 3, Tenderness × 3) — these alone\n"
-              "drive the cohort signal (n=9 → r = 0.870; n=19 mid-stim → r ≈ 0)",
-              transform=ax_a.transAxes, fontsize=7.8, color=COLORS["gray"],
-              va="bottom", ha="right",
-              bbox=dict(boxstyle="round,pad=0.25", facecolor="white",
-                        edgecolor=COLORS["lightgray"], linewidth=0.6, alpha=0.92))
+    # subtitle annotation about pole stims — placed BELOW the x-axis so it
+    # cannot overlap data points or the right-side emotion-class legend
+    ax_a.text(0.50, -0.18,
+              "dashed circle: 9 stimuli from the three emotional poles "
+              "(Anger × 3, Amusement × 3, Tenderness × 3)  —  these alone "
+              "drive the cohort signal\n(n=9 → r = 0.870;  n=19 mid-stim → r ≈ 0)",
+              transform=ax_a.transAxes, fontsize=7.6, color=COLORS["gray"],
+              va="top", ha="center", linespacing=1.20,
+              fontstyle="italic")
 
     ax_a.set_xlabel("CLIP V-axis projection of stimulus description  (z)",
                     fontsize=10)
@@ -124,10 +125,13 @@ def main():
     ax_a.set_title("Stimulus-level alignment: LLM V-axis vs FACED EEG (n=28)",
                    loc="left", fontsize=10.5, fontweight="bold")
     panel_label(ax_a, "a", x=-0.085, y=1.025)
-    ax_a.legend(loc="upper right", bbox_to_anchor=(0.99, 0.50),
-                fontsize=7.8, ncol=1, frameon=False,
+    # 3-column legend across the bottom inside the panel — places color
+    # legend in clear empty space below the regression cloud.
+    ax_a.legend(loc="lower right", bbox_to_anchor=(0.995, 0.005),
+                fontsize=7.5, ncol=3, frameon=True, framealpha=0.93,
                 title="emotion class", title_fontsize=8.0,
-                handletextpad=0.4)
+                handletextpad=0.4, columnspacing=0.8, labelspacing=0.30,
+                edgecolor="#cccccc")
 
     # ---------------- (b) NULL distribution ----------------
     ax_b = fig.add_subplot(gs[0, 1:])
@@ -191,15 +195,16 @@ def main():
     ax_c.set_title("18 LLMs predict the same EEG signal — Qwen-1.5B leads",
                    loc="left", fontsize=11, fontweight="bold")
     panel_label(ax_c, "c", x=-0.085, y=1.05)
-    # family legend
+    # family legend — placed OUTSIDE the plot to the right so bars stay clean
     used = []
     for f in families:
         if f not in used:
             used.append(f)
     handles = [plt.Rectangle((0, 0), 1, 1, color=family_colors.get(f, "#999")) for f in used]
-    ax_c.legend(handles, used, loc="lower right", fontsize=6.5, ncol=2, frameon=False,
-                title="LLM family", title_fontsize=7, handlelength=1.0, handletextpad=0.4,
-                columnspacing=0.8)
+    ax_c.legend(handles, used, loc="center left", bbox_to_anchor=(1.02, 0.5),
+                fontsize=7.0, ncol=1, frameon=False,
+                title="LLM family", title_fontsize=7.5,
+                handlelength=1.1, handletextpad=0.4)
     ax_c.set_xlim(-0.32, 0.55)
 
     # ---------------- super-title ----------------
@@ -209,6 +214,7 @@ def main():
         y=0.94, fontsize=12.5, fontweight="bold")
 
     save_dual(fig, f"{OUT}/lf2_eeg_llm_circle")
+    save_dual(fig, f"{OUT_PAPER}/lf2_eeg_llm_circle")
 
 
 if __name__ == "__main__":

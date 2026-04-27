@@ -18,6 +18,7 @@ from _neuro_style import apply_neuro_style, COLORS, BAND_COLORS, save_dual
 
 REPORTS = "/ibex/project/c2323/yousef/reports"
 OUT_DIR = "/ibex/project/c2323/yousef/paper_neurips26_final/figures/neuro"
+OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/neuro"
 
 FACED_CH = ['Fp1', 'Fp2', 'Fz', 'F3', 'F4', 'F7', 'F8',
             'FC1', 'FC2', 'FC5', 'FC6',
@@ -78,12 +79,12 @@ def main():
         print('using hard-coded FAA values:', e)
 
     # ---------- figure ----------
-    fig = plt.figure(figsize=(11.2, 4.4))
+    fig = plt.figure(figsize=(11.6, 4.6))
     gs = fig.add_gridspec(
         1, 3,
         width_ratios=[1.0, 1.45, 0.85],
-        left=0.05, right=0.985, top=0.86, bottom=0.13,
-        wspace=0.32,
+        left=0.05, right=0.985, top=0.86, bottom=0.14,
+        wspace=0.42,
     )
 
     # ------------------ (a) Frontal asymmetry pair scalp diagram ------------------
@@ -138,17 +139,20 @@ def main():
 
     ax_a.set_title("(a)  Frontal alpha asymmetry pairs",
                    fontsize=10, fontweight='bold', loc='left', pad=4)
-    ax_a.text(0.0, -0.15,
-              "right − left  alpha-DE  Δ\n(positive = Davidson direction)",
-              transform=ax_a.transAxes, fontsize=8, color=COLORS['gray'],
-              ha='left', va='top')
+    ax_a.text(0.50, -0.30,
+              "(positive Δ  =  Davidson direction)",
+              transform=ax_a.transAxes, fontsize=7.5,
+              color=COLORS['gray'], ha='center', va='top',
+              fontstyle='italic')
 
-    # tiny colorbar for the line colours
+    # tiny colorbar for the line colours — placed BELOW the head outline
+    # (inside (a) panel), not on the right edge where it bleeds into (b).
     sm = mpl.cm.ScalarMappable(norm=norm_pair, cmap=cmap_pair)
     sm.set_array([])
-    cax = ax_a.inset_axes([1.02, 0.18, 0.04, 0.56])
-    cbar = fig.colorbar(sm, cax=cax)
-    cbar.set_label("Δ × 10³", fontsize=7.5, labelpad=2)
+    cax = ax_a.inset_axes([0.20, -0.05, 0.60, 0.04])
+    cbar = fig.colorbar(sm, cax=cax, orientation='horizontal')
+    cbar.set_label("Δ × 10³  (right − left α-DE)",
+                   fontsize=7.5, labelpad=2)
     cbar.ax.tick_params(labelsize=7, length=2)
     cbar.set_ticks([-0.02, 0.0, 0.02])
     cbar.set_ticklabels(['−20', '0', '+20'])
@@ -232,6 +236,7 @@ def main():
         fontsize=11.5, fontweight='bold', y=0.99)
 
     save_dual(fig, f"{OUT_DIR}/NF2_davidson_faa")
+    save_dual(fig, f"{OUT_PAPER}/NF2_davidson_faa")
     plt.close(fig)
 
 

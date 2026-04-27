@@ -21,6 +21,7 @@ from _neuro_style import apply_neuro_style, COLORS, save_dual
 
 REPORTS = "/ibex/project/c2323/yousef/reports"
 OUT_DIR = "/ibex/project/c2323/yousef/paper_neurips26_final/figures/neuro"
+OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/neuro"
 
 FACED_CH = ['Fp1', 'Fp2', 'Fz', 'F3', 'F4', 'F7', 'F8',
             'FC1', 'FC2', 'FC5', 'FC6',
@@ -216,6 +217,7 @@ def main():
         fontsize=12, fontweight='bold', y=0.98)
 
     save_dual(fig, f"{OUT_DIR}/NF5_connectivity")
+    save_dual(fig, f"{OUT_PAPER}/NF5_connectivity")
     plt.close(fig)
 
 

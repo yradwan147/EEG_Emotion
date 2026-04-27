@@ -22,6 +22,7 @@ from _neuro_style import apply_neuro_style, COLORS, save_dual
 
 REPORTS = "/ibex/project/c2323/yousef/reports"
 OUT_DIR = "/ibex/project/c2323/yousef/paper_neurips26_final/figures/neuro"
+OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/neuro"
 
 EMOTIONS = ['Anger', 'Disgust', 'Fear', 'Sadness', 'Neutral',
             'Amusement', 'Inspiration', 'Joy', 'Tenderness']
@@ -64,11 +65,11 @@ def main():
     oracle      = data['per_subject_oracle_abs']
 
     # --------------- figure layout ----------------
-    fig = plt.figure(figsize=(13.0, 8.0))
+    fig = plt.figure(figsize=(13.6, 8.4))
     gs = fig.add_gridspec(
         2, 3,
-        left=0.06, right=0.985, top=0.92, bottom=0.07,
-        wspace=0.32, hspace=0.42,
+        left=0.06, right=0.985, top=0.91, bottom=0.075,
+        wspace=0.40, hspace=0.55,
     )
 
     # =========================================================================
@@ -76,9 +77,9 @@ def main():
     # =========================================================================
     ax_a = fig.add_subplot(gs[0, 0])
     labels = ['All 28\nstimuli',
-              'Anger + Amus.\n+ Tender.\n(n = 9)',
+              '9-stim pole\n(Ang+Amus\n+Tend)',
               'No Anger\n(n = 25)',
-              'No Anger / Amus.\n/ Tender.\n(n = 19)']
+              'No 9-stim\n(n = 19)']
     ord_keys = ['all_28', 'anger_amus_tend_9', 'no_anger_25', 'no_9emot_19']
     vals_o = [drop_vals[drop_keys.index(k)] for k in ord_keys]
     bar_cols = [COLORS['darkblue'], '#0d4373', COLORS['blue'], COLORS['gray']]
@@ -99,13 +100,13 @@ def main():
 
     ax_a.axhline(0, color='black', lw=0.5, alpha=0.6)
     ax_a.set_xticks(np.arange(4))
-    ax_a.set_xticklabels(labels, fontsize=8.5)
+    ax_a.set_xticklabels(labels, fontsize=8.0, linespacing=1.05)
     ax_a.set_ylabel(r"Cohort $r$ at PO3 / $\gamma$", fontsize=9)
-    ax_a.set_ylim(-0.20, 1.10)
+    ax_a.set_ylim(-0.20, 1.15)
     ax_a.grid(axis='y', alpha=0.25, linewidth=0.4)
     ax_a.set_axisbelow(True)
-    ax_a.set_title("(a)  The cohort signal collapses without 9 emotional-pole stim",
-                   fontsize=9.5, fontweight='bold', loc='left', pad=4)
+    ax_a.set_title("(a)  Cohort r collapses without 9 pole stim",
+                   fontsize=9.5, fontweight='bold', loc='left', pad=6)
 
     # =========================================================================
     # (b) Per-emotion drop Δ
@@ -133,8 +134,8 @@ def main():
     ax_b.grid(axis='x', alpha=0.25, linewidth=0.4)
     ax_b.set_axisbelow(True)
     ax_b.invert_yaxis()
-    ax_b.set_title("(b)  Anger contributes 32 % of the cohort signal alone",
-                   fontsize=9.5, fontweight='bold', loc='left', pad=4)
+    ax_b.set_title("(b)  Anger drives 32 % of the cohort signal",
+                   fontsize=9.5, fontweight='bold', loc='left', pad=6)
 
     # =========================================================================
     # (c) Scatter PO3/γ vs V-axis
@@ -263,6 +264,7 @@ def main():
         fontsize=12, fontweight='bold', y=0.97)
 
     save_dual(fig, f"{OUT_DIR}/NF3_9stim_simpson")
+    save_dual(fig, f"{OUT_PAPER}/NF3_9stim_simpson")
     plt.close(fig)
 
 
