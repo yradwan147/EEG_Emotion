@@ -205,6 +205,77 @@ residual mechanism of Section~\ref{sec:two-tier}.}
 \label{fig:confusion}
 \end{figure}
 
+\section{Concept-Library Transfer Matrix}
+\label{app:concept-library-full}
+
+The full $20\!\times\!20$ cross-concept transfer matrix (each row
+is the V-axis of source concept $i$ applied to the pole-vs-pole
+benchmark of target concept $j$, best-orientation AUC reported).
+Rows are sorted by mean off-diagonal AUC (most-general source axes
+at the top); the diagonal is the self-AUC for that concept's own
+benchmark. Bold = AUC $\ge 0.95$.
+
+\begin{table}[h]
+\centering
+\tiny
+\setlength\tabcolsep{1.7pt}
+\begin{tabular}{l|cccccccccccccccccccc}
+\toprule
+\textbf{src}$\setminus$\textbf{tgt}
+& \rotatebox{60}{auth}
+& \rotatebox{60}{cert}
+& \rotatebox{60}{cmpl}
+& \rotatebox{60}{conc}
+& \rotatebox{60}{cont}
+& \rotatebox{60}{deci}
+& \rotatebox{60}{emot}
+& \rotatebox{60}{envy}
+& \rotatebox{60}{fear}
+& \rotatebox{60}{grat}
+& \rotatebox{60}{guil}
+& \rotatebox{60}{hope}
+& \rotatebox{60}{host}
+& \rotatebox{60}{opti}
+& \rotatebox{60}{prid}
+& \rotatebox{60}{sarc}
+& \rotatebox{60}{sham}
+& \rotatebox{60}{spec}
+& \rotatebox{60}{surp}
+& \rotatebox{60}{urge}
+\\
+\midrule
+sarcasm     & \textbf{1.00} & \textbf{1.00} & 0.52 & \textbf{0.98} & 0.94 & 0.61 & \textbf{1.00} & 0.94 & \textbf{1.00} & \textbf{1.00} & 0.78 & 0.94 & 0.91 & \textbf{1.00} & 0.63 & \textbf{0.91} & \textbf{0.98} & 0.75 & 0.84 & \textbf{1.00} \\
+fear        & \textbf{0.98} & \textbf{0.98} & 0.72 & 0.73 & \textbf{0.98} & 0.83 & \textbf{1.00} & \textbf{1.00} & \textbf{1.00} & \textbf{1.00} & 0.94 & \textbf{0.97} & 0.92 & \textbf{1.00} & 0.52 & 0.72 & \textbf{0.95} & 0.56 & 0.88 & \textbf{1.00} \\
+envy        & \textbf{0.98} & 0.69 & \textbf{1.00} & 0.70 & \textbf{0.97} & \textbf{0.95} & \textbf{0.98} & \textbf{1.00} & \textbf{1.00} & 0.84 & \textbf{1.00} & 0.91 & 0.88 & 0.89 & 0.83 & 0.52 & \textbf{0.97} & 0.58 & 0.80 & \textbf{1.00} \\
+shame       & \textbf{1.00} & 0.61 & \textbf{1.00} & \textbf{1.00} & \textbf{0.98} & 0.70 & 0.59 & 0.89 & \textbf{1.00} & 0.91 & \textbf{1.00} & \textbf{1.00} & 0.77 & 0.91 & 0.73 & 0.94 & \textbf{1.00} & 0.70 & 0.86 & 0.89 \\
+hostility   & \textbf{1.00} & 0.83 & \textbf{0.97} & 0.83 & \textbf{1.00} & 0.75 & \textbf{1.00} & 0.94 & \textbf{1.00} & \textbf{1.00} & 0.58 & 0.91 & \textbf{0.95} & \textbf{1.00} & 0.56 & 0.63 & 0.86 & 0.64 & 0.86 & \textbf{1.00} \\
+concrete-   & 0.70 & \textbf{0.95} & \textbf{0.97} & \textbf{1.00} & 0.81 & 0.73 & \textbf{1.00} & 0.50 & \textbf{1.00} & \textbf{1.00} & 0.88 & 0.86 & 0.94 & 0.94 & 0.92 & 0.56 & 0.80 & 0.66 & \textbf{0.98} & \textbf{1.00} \\
+pride       & 0.72 & 0.88 & 0.88 & \textbf{1.00} & 0.89 & 0.75 & \textbf{1.00} & 0.58 & \textbf{0.97} & \textbf{1.00} & 0.55 & \textbf{0.95} & 0.86 & \textbf{0.97} & \textbf{0.98} & 0.88 & \textbf{0.97} & 0.50 & 0.88 & \textbf{1.00} \\
+certainty   & 0.92 & 0.78 & \textbf{1.00} & \textbf{1.00} & 0.81 & 0.63 & \textbf{0.97} & 0.83 & 0.67 & 0.78 & 0.53 & \textbf{1.00} & 0.72 & 0.92 & \textbf{0.97} & 0.70 & 0.91 & 0.86 & 0.89 & \textbf{1.00} \\
+guilt       & 0.78 & 0.91 & \textbf{1.00} & \textbf{1.00} & 0.73 & 0.86 & \textbf{1.00} & 0.81 & 0.75 & 0.58 & \textbf{1.00} & 0.84 & 0.89 & \textbf{0.95} & 0.80 & 0.73 & 0.83 & 0.72 & 0.88 & \textbf{1.00} \\
+hope        & 0.69 & 0.94 & 0.92 & \textbf{1.00} & 0.73 & 0.56 & \textbf{1.00} & 0.52 & \textbf{1.00} & 0.91 & 0.84 & \textbf{1.00} & \textbf{0.95} & 0.88 & 0.83 & 0.63 & 0.94 & 0.61 & \textbf{0.98} & \textbf{1.00} \\
+emotional   & 0.70 & 0.89 & 0.64 & \textbf{1.00} & \textbf{0.98} & 0.61 & \textbf{1.00} & 0.59 & \textbf{1.00} & \textbf{1.00} & 0.84 & 0.86 & 0.92 & \textbf{0.98} & 0.89 & 0.63 & 0.81 & 0.58 & 0.88 & \textbf{1.00} \\
+surprise    & 0.56 & \textbf{0.95} & \textbf{1.00} & \textbf{1.00} & 0.61 & 0.66 & \textbf{1.00} & 0.61 & 0.94 & \textbf{1.00} & 0.88 & \textbf{0.95} & 0.91 & \textbf{0.95} & 0.66 & 0.61 & 0.80 & 0.70 & \textbf{0.98} & \textbf{1.00} \\
+optimism    & 0.66 & \textbf{0.97} & \textbf{1.00} & \textbf{1.00} & 0.77 & 0.89 & \textbf{1.00} & 0.73 & \textbf{1.00} & \textbf{1.00} & 0.63 & 0.66 & 0.94 & \textbf{1.00} & 0.64 & 0.52 & 0.84 & 0.56 & \textbf{0.95} & \textbf{1.00} \\
+contempt    & \textbf{1.00} & 0.61 & \textbf{1.00} & 0.80 & \textbf{0.98} & 0.63 & \textbf{1.00} & 0.92 & \textbf{1.00} & \textbf{0.97} & \textbf{1.00} & \textbf{0.97} & 0.92 & 0.91 & 0.61 & 0.50 & 0.72 & 0.52 & 0.59 & \textbf{1.00} \\
+urgency     & \textbf{1.00} & \textbf{0.98} & 0.53 & \textbf{1.00} & \textbf{0.98} & 0.59 & \textbf{1.00} & 0.86 & \textbf{1.00} & \textbf{1.00} & 0.59 & 0.50 & 0.91 & \textbf{1.00} & 0.66 & 0.59 & 0.84 & 0.64 & 0.88 & \textbf{1.00} \\
+authoritive & \textbf{0.98} & 0.61 & \textbf{1.00} & 0.94 & 0.86 & 0.55 & 0.78 & 0.88 & \textbf{1.00} & 0.94 & 0.53 & \textbf{1.00} & 0.61 & 0.52 & \textbf{1.00} & \textbf{0.95} & \textbf{1.00} & 0.88 & 0.73 & 0.69 \\
+specificity & 0.67 & \textbf{0.97} & 0.70 & \textbf{0.95} & 0.84 & 0.63 & \textbf{1.00} & 0.59 & \textbf{0.95} & 0.66 & 0.64 & 0.83 & 0.83 & 0.67 & 0.91 & 0.61 & \textbf{1.00} & 0.78 & 0.88 & \textbf{1.00} \\
+gratitude   & 0.73 & \textbf{0.97} & \textbf{1.00} & \textbf{1.00} & 0.78 & \textbf{1.00} & 0.53 & 0.55 & 0.88 & \textbf{0.98} & 0.66 & 0.59 & 0.83 & \textbf{0.97} & 0.58 & 0.72 & \textbf{0.95} & 0.56 & 0.88 & \textbf{1.00} \\
+complexity  & 0.92 & 0.84 & \textbf{1.00} & \textbf{1.00} & \textbf{0.95} & 0.81 & 0.66 & 0.75 & 0.83 & 0.59 & \textbf{1.00} & \textbf{0.98} & 0.52 & 0.80 & 0.66 & 0.52 & 0.61 & 0.56 & 0.89 & 0.94 \\
+decisiveness& 0.52 & 0.70 & \textbf{0.97} & 0.92 & 0.86 & \textbf{1.00} & \textbf{1.00} & 0.55 & \textbf{1.00} & 0.63 & 0.55 & \textbf{1.00} & 0.58 & 0.50 & \textbf{0.95} & 0.78 & \textbf{1.00} & 0.70 & 0.59 & 0.94 \\
+\bottomrule
+\end{tabular}
+\caption{Cross-concept transfer matrix (best-orientation AUC).
+Diagonal: self-classification. Off-diagonal: source-axis-applied-to-target-benchmark
+AUC. Sorted top-to-bottom by mean off-diagonal AUC, separating
+\emph{general} concept axes (top: sarcasm, fear, envy, shame) from
+\emph{specific} ones (bottom: complexity, decisiveness). Mean
+diagonal $0.97$, mean off-diagonal $0.83$, gap $+0.13$ confirms
+concept specificity in the recipe.}
+\label{tab:concept-library-full}
+\end{table}
+
 \section{Negative Results Catalogue}
 \label{app:negatives}
 

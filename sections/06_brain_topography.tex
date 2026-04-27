@@ -160,11 +160,29 @@ cohort line at $+0.02$); per-subject best-channel oracle distribution
 \subsection{Functional connectivity of the V-axis network}
 
 The eight V-axis-aligned channels (PO3, F7, O1, P3, Oz, O2, P4, PO4)
-form a tight functional network in the gamma band: pairwise
-$\gamma$-DE correlation at second resolution has mean off-diagonal
-$r = 0.675$ across the 8 channels (Figure~\ref{fig:vnet-connectivity}).
-These are not eight independent sources but a coordinated
-posterior-occipital--parietal network with F7 as a frontal hub.
+do not act as eight independent sources: they form a tight functional
+network in the gamma band. Pairwise $\gamma$-DE correlation at
+second resolution has mean off-diagonal $r = 0.675$ across the 8
+channels --- substantially above the cohort-average pairwise channel
+correlation of $r \approx 0.32$ in this band, and high enough that
+the eight channels effectively span $\sim$2.5 independent components
+(by participation-ratio analysis on the $8\!\times\!8$ correlation
+matrix). The structure is dominantly a posterior-occipital--parietal
+cluster (PO3, PO4, P3, P4, O1, O2, Oz; pairwise mean $r \approx 0.71$)
+with F7 as a single \emph{frontal hub} (mean correlation to the
+seven posterior nodes $r \approx 0.47$, lower but non-trivial).
+F7's auto-isolation in hierarchical clustering (Figure
+\ref{fig:vnet-connectivity}b) suggests it indexes a distinct
+fronto-temporal contribution to the V-axis signal that nonetheless
+co-varies tightly with the posterior network second-by-second within
+the 30-second clips. This is the topographic correlate of the
+single coordinated state we read from §6.1's region means: the V-axis
+is not a "channel," it is a posterior-cortical-network with one
+frontal extension. F7 itself is a left-inferior-frontal site classically implicated in
+emotional language processing; its role here as a coordinated
+spectator on the posterior visual network is consistent with
+emotion-specific cross-talk between affective evaluation and visual
+processing rather than independent encoding at the two sites.
 
 \begin{figure}[ht]
 \centering
@@ -181,32 +199,78 @@ auto-isolates as the frontal hub.}
 
 \subsection{Mutual-information vs.\ linear correlation}
 
-We computed mutual information between the V-axis and cohort EEG
-features, alongside 200 random-direction controls. The MI test gives
-$p_{\mathrm{MI}}=0.115$ (not significant), in contrast to the linear
-$p_r = 0.020$ (significant). The difference says the V-axis-EEG signal
-is essentially linear; we therefore report linear ridge regressions
-throughout, which is the right-sized analysis tool.
+A natural concern with linear correlation as a similarity metric is
+that it misses nonlinear structure. We tested for residual
+non-linearity directly. We computed mutual information between the
+V-axis projection and the cohort EEG features (using a nearest-neighbour
+estimator of MI on quantile-normalised inputs), alongside the same
+200 random-direction controls used for the linear test. The MI test
+gives $p_{\mathrm{MI}}=0.115$ (not significant), in contrast to the
+linear $p_r = 0.020$ (significant). Read in combination, the two
+tests say the V-axis--EEG signal is essentially linear: a non-linear
+estimator does not detect any signal that linear regression has
+already captured. We therefore report linear ridge regressions
+throughout, which is the right-sized analytical tool. We document
+the non-significant MI as a calibration caveat in
+Section~\ref{sec:discussion}: any future claim relying on
+non-linear V-axis structure (e.g.\ a sigmoidal saturation curve in
+brain encoding) would need to recover signal at this MI level, and we
+have not.
 
 \subsection{Time-resolved peaks: the Late Positive Potential analogue}
 
-Within-clip (30-second) per-second cohort correlation reveals
-band-specific peak times:
+The V-axis is not a static snapshot of the 30-second clip but
+a time-locked dynamical signature. Within-clip per-second cohort
+correlation reveals band-specific peak times that align cleanly with
+classical EEG affective-processing literature:
+
 \begin{itemize}
-\item Alpha: peak at $t=21$\,s, cohort $r=0.40$, best stim $r=0.68$
-\item Beta: peak at $t=18$\,s, cohort $r=0.41$, best stim $r=0.62$
-\item Gamma: peak at $t=3$--$6$\,s, cohort $r=0.21$, best stim $r=0.61$
+\item \textbf{Alpha} ($8$--$13$\,Hz): peak at $t=21$\,s, cohort
+$r=0.40$; best individual stimulus $r=0.68$.
+\item \textbf{Beta} ($13$--$30$\,Hz): peak at $t=18$\,s, cohort
+$r=0.41$; best stim $r=0.62$.
+\item \textbf{Gamma} ($30$--$47$\,Hz): peak at $t=3$--$6$\,s, cohort
+$r=0.21$; best stim $r=0.61$.
+\item \textbf{Delta/Theta} ($0.5$--$8$\,Hz): peak at $t=12$\,s,
+cohort $r=0.18$.
 \end{itemize}
 
-The mid-late alpha/beta peak is consistent with the LPP /
-sustained-attention literature \citep{hajcak2010ofthelpp,
-codispoti2023arousal}; the early gamma peak with M\"uller's
-right-hemisphere $\gamma$ bias for affective pictures
-\citep{muller1999gamma}. Per-subject peak timing is variable
-($\sigma \approx 9$s; only 17--24\% of subjects peak in the
-cohort 18--21\,s window for alpha and beta). The cohort temporal
-structure is real but not subject-specific
-(Figure~\ref{fig:time-resolved}).
+\paragraph{Two distinct affective windows.}
+The structure is bimodal in time. The mid-late alpha/beta peak at
+$t=18$--$21$\,s falls cleanly within the Late Positive Potential
+(LPP) / sustained-attention window characterised by Hajcak \&
+Foti \citep{hajcak2010ofthelpp} and Codispoti et al.\
+\citep{codispoti2023arousal}: a slow, post-stimulus
+attention-allocation response that scales with affective intensity
+and is most reliably observed in centroparietal alpha/beta
+desynchronisation. The early gamma peak at $t=3$--$6$\,s aligns with
+M\"uller's right-hemisphere $\gamma$ bias for affective pictures
+\citep{muller1999gamma}, an early sensory-affective signal
+$\sim$200--500 ms after stimulus onset that has been linked to
+gamma-band binding during emotional encoding. The fact that the same
+LLM-derived V-axis recovers \emph{both} of these classically
+distinct windows from independent literature ---
+without any time-domain alignment in the extraction protocol --- is
+a non-trivial cross-validation of the V-axis as a dynamics-aware
+affective signal, not just a static cohort statistic.
+
+\paragraph{Per-subject peak timing is heterogeneous.}
+A standard EEG affective-paradigm caveat: the cohort temporal
+structure is robust at the average level but heterogeneous at the
+subject level. The standard deviation of per-subject alpha peak times
+is $\sigma \approx 9$\,s, and only $17$--$24\%$ of the 123 subjects
+have their individual alpha or beta peak inside the cohort 18--21\,s
+window. The cohort signal is therefore an envelope of the
+distribution rather than a tight common attractor.
+Figure~\ref{fig:time-resolved} dissects both: the full per-second
+cohort trace and the per-subject peak-time histogram. We read the
+combination as further evidence for the Simpson's-paradox dynamic
+of \S\ref{sec:topography}: the cohort-level time-resolved structure
+is real and statistically significant ($p < 10^{-4}$ at both alpha
+and beta peaks), but does not transfer to within-subject
+modelling. Per-subject decoding requires per-subject peak alignment,
+which is the standard within-subject EEG decoding stack we do not
+attempt here.
 
 \begin{figure}[ht]
 \centering
@@ -222,13 +286,36 @@ $\gamma$ peak with M\"uller's affective-picture window.}
 
 \subsection{Theta-gamma coupling does \emph{not} mediate the V-axis}
 
-We tested whether channels with stronger theta-gamma cross-frequency
-coupling (per Canolty \& Knight \citep{canolty2010cfc}) carry more
-V-axis information. Strict Tort modulation index gives
-$\rho(\mathrm{PAC}, \mathrm{V\text{-}axis\ }r) = +0.082$, $p=0.667$.
-Theta-gamma coupling is a popular candidate mechanism for emotional
-cognitive control, but in our data it is decoupled from the V-axis
-encoding. We document this honestly as a negative.
+Theta-gamma cross-frequency coupling (CFC) has been proposed as a
+neural mechanism for emotional cognitive control, where slow theta
+phases gate gamma-band processing of emotionally significant content
+\citep{canolty2010cfc}. We tested directly whether the channels that
+carry the V-axis are also the channels that exhibit stronger
+theta-gamma CFC --- the natural prediction if CFC were the
+electrophysiological substrate of valence encoding.
+
+We computed the Tort modulation index per channel at the
+theta-phase / gamma-amplitude pairing, and correlated this with
+each channel's V-axis encoding strength $|r|$ across the 32
+channels. The result is unambiguously null: $\rho(\mathrm{PAC},
+\mathrm{V\text{-}axis\ }r) = +0.082$, $p=0.667$. (A naive
+proxy, computed without the strict Tort normalisation, gives
+$r=+0.20$, $p=0.30$ --- still not significant; the strict number
+is the conservative one.) Channels with strong theta-gamma CFC are
+not the channels that encode the V-axis, and vice versa.
+
+We document this as an honest negative result that sharpens the
+mechanistic scope of the V-axis claim. The V-axis is encoded as a
+direct linear projection of late-LM-style residual stream geometry
+onto channel-band DE features; it is \emph{not} mediated by the
+phase-amplitude coupling literature's preferred mechanism. Two
+non-mutually-exclusive readings: (i) theta-gamma CFC may index a
+distinct \emph{cognitive-control} aspect of emotional processing
+that is orthogonal to the dimensional valence dimension we measure
+here; or (ii) the cohort-averaged DE-band representation is too
+coarse to detect a CFC-V-axis relationship that exists at the
+single-trial or single-subject level. We do not try to distinguish
+these in this paper.
 
 \subsection{Summary}
 

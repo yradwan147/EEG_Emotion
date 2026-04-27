@@ -75,17 +75,18 @@ The brain-side findings are stronger than we initially anticipated.
 For video-evoked emotion on FACED, the V-axis is encoded
 predominantly in posterior visual cortex
 ($|r|_{\mathrm{occipital}}=0.21$ vs.\ $|r|_{\mathrm{frontal}}=0.16$),
-and Davidson's frontal-alpha asymmetry replicates qualitatively but at
-$\sim$10$\times$ smaller magnitude. We do not refute Davidson's
-hypothesis --- the frontal-alpha asymmetry is real, with
+and Davidson's frontal-alpha asymmetry replicates in direction at
+smaller magnitude than the posterior encoding. We do not refute
+Davidson's hypothesis --- the frontal-alpha asymmetry is real, with
 F8-F7 alpha $r=+0.0155$ and Fp2-Fp1 alpha $r=+0.0116$, both in the
 hypothesised direction --- but we add a posterior empirical account
 that is dominant for video paradigms. This complements
 the \emph{static-stimulus} literature
 \citep{davidson1992anterior,coan2004frontal} where Davidson's
-asymmetry was primarily characterised, and we read the
-$\sim 10\times$ magnitude gap as a paradigm effect rather than a
-contradiction.
+asymmetry was primarily characterised, and we read the magnitude
+difference as a paradigm effect (dynamic visual stimuli engaging
+posterior visual cortex) rather than a contradiction of within-subject
+FAA effects.
 
 The 9-stimulus emotional-pole structure (Section~\ref{sec:topography})
 sharpens the V-axis claim from "smooth gradient over all emotions" to
@@ -102,35 +103,84 @@ ours) are best made cohort-side.
 \subsection{Honest negatives}
 
 We document a number of negatives that are diagnostic rather than
-disqualifying:
-\begin{itemize}
-\item \textbf{Theta-gamma coupling does not mediate the V-axis}
-($\rho(\mathrm{PAC}, \mathrm{V\text{-}axis\ }r) = +0.082$, $p=0.667$).
-A popular candidate mechanism for emotional cognitive control
-\citep{canolty2010cfc} is decoupled from the V-axis encoding in our
-data.
-\item \textbf{Mutual information control is not significant}
-($p_{\mathrm{MI}}=0.115$, vs.\ $p_r=0.020$ for linear correlation).
-The relationship is essentially linear; this licences our use of
-ridge regression but rules out richer non-linear claims.
-\item \textbf{Random-direction null} on cross-architecture V-axis
-correlation places our $r=+0.885$ at the $93^{\mathrm{rd}}$
-percentile of the null ($p_{\mathrm{one}}=0.079$) --- above-random
-but not uniquely so. The within-class residual signal at
-$r=+0.74$, $p=0.014$ is the statistically robust claim;
-class-PC1 alignment is suggestive but not by itself dispositive.
-\item \textbf{Arousal does not exhibit the same brain convergence as
-valence.} We report the V-axis only for valence in the brain-alignment
-results. An arousal axis extracted via the same protocol predicts
-OASIS image-arousal at $r=0.803$ (Section~\ref{sec:vaxis-llms}), but
-its alignment to FACED EEG is substantially weaker
-($r \in [0.18, 0.41]$ across LLMs), consistent with the cross-modal
-arousal asymmetry observed in \citep{kurdi2017oasis}.
-\item \textbf{LLM-content of KD is irrelevant at this scale.} The
-\texttt{rand9} ablation matches LLM-9-D within $\pm 0.003$ BACC. KD
-provides architectural regularisation; its semantic content is below
-our resolution at strong baselines.
-\end{itemize}
+disqualifying. Each shapes the scope of one of our positive claims.
+
+\paragraph{Theta-gamma coupling does not mediate the V-axis.}
+The Tort modulation index across channels gives $\rho(\mathrm{PAC},
+\mathrm{V\text{-}axis\ }r) = +0.082$, $p=0.667$. Phase-amplitude
+coupling \citep{canolty2010cfc} is the most popular
+\emph{electrophysiological} candidate mechanism for emotional
+cognitive control, and it is fully decoupled from the V-axis
+encoding in our data. The V-axis is a cohort-DE-band linear
+projection phenomenon; it is not phase-amplitude mediated.
+
+\paragraph{Mutual information control is not significant.}
+$p_{\mathrm{MI}}=0.115$ vs.\ linear $p_r=0.020$ on the same
+random-direction null. The V-axis--EEG relationship is essentially
+linear: a non-linear similarity estimator does not detect signal
+above what linear regression captures. This licences our use of
+ridge regression as the right-sized analysis tool but rules out
+richer non-linear claims (e.g.\ a sigmoidal saturation in brain
+encoding, or band-band non-linear interactions). Future work
+seeking non-linear V-axis structure must clear this MI bar.
+
+\paragraph{Random-direction null places class-PC1 at 93rd percentile.}
+The cross-architecture class-PC1 r=+0.885 sits at the $93^{\mathrm{rd}}$
+percentile of a 100-direction matched-norm Gaussian null
+($p_{\mathrm{one}}=0.079$). The 9-class PC1 subspace is intrinsically
+low-dimensional, which gives a wide null distribution; an honest
+reading is that class-PC1 alignment is \emph{above-random but not
+uniquely so}. Our statistically robust claim is the within-class
+residual: $r=+0.74$, $p=0.014$ between residual $|r|$ and
+ensemble contribution. We foreground that as the primary claim and
+treat class-PC1 as suggestive supporting evidence.
+
+\paragraph{Arousal asymmetry: vision yes, text and brain no.}
+An arousal axis extracted via the same protocol predicts OASIS
+image-arousal at $r=0.803$ (beating supervised ridge $0.789$).
+However, the same axis fails on text (EmoBank A
+$|r| \in [0.01, 0.06]$; Warriner A $|r| \le 0.16$; max 13\%
+recovery rate vs.\ valence's $\ge 76\%$) and is substantially
+weaker on FACED EEG ($r \in [0.18, 0.41]$ across LLMs). Cross-language
+A-axes are essentially orthogonal. The asymmetry is consistent with
+the cross-modal arousal observation of \citep{kurdi2017oasis}, where
+arousal is more strongly modality-conditioned than valence. We
+explicitly limit V-axis brain claims to valence and discuss arousal
+extension as future work.
+
+\paragraph{LLM-content of KD is irrelevant at this scale.}
+Replacing the 9-D LLM-derived class prototypes with random
+orthonormal 9-D directions changes BACC by $\le 0.003$
+(\texttt{rand9} ablation, $0.6467$ vs.\ LLM-9D $0.6464$). At strong
+baselines, KD provides architectural regularisation; its semantic
+content is below our resolution. This is itself a saturation
+signature: by the time KD is applied, the network has already
+absorbed the class structure from the labels, and the soft-target
+geometry is a rotational invariant in the loss landscape.
+Importantly this does \emph{not} contradict the V-axis story: it
+specifically says that injecting V-axis information \emph{through
+KD} fails for the same reason all 25 V-axis interventions fail at
+the strong baseline (Section~\ref{sec:saturation}).
+
+\paragraph{Per-subject V-axis adaptation does not transfer.}
+The per-subject best-channel oracle reaches $|r|=0.62$ (a $+0.39$
+absolute headroom over the cohort-fixed top-8 of $|r|=0.02$). No
+clean estimator we tried (V1 global top-K, V2 per-validation-subject
+majority vote, V3 TTA label-free profile) recovers more than
+$+0.001$ over the cohort top-K. This is documented in
+Appendix~\ref{app:negatives}: the per-subject signal is real but
+not transferable through the simple selection rules we tested. A
+subject-conditioned channel-attention head trained on a small
+calibration set per subject is the natural follow-up
+(Section~\ref{sec:discussion}, future work).
+
+\paragraph{Cross-architecture ensembling does not add diversity.}
+Mixing $d \in \{4, 6, 8, 10\}$ EMOD checkpoints gives within-arch
+x-seed BACC $0.6798$ vs.\ cross-arch $0.6791$ (n.s.). The diversity
+that helps is intra-architecture, training-length-driven (mixing
+$e{=}100$ and $e{=}150$ at fixed $d{=}6$). We use this to argue that
+diversity in the within-class V-axis residual subspace is the lever,
+not depth or capacity diversity per se.
 
 \subsection{Limitations}
 
