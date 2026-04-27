@@ -1,7 +1,7 @@
 % Step 4 numbers (filled in directly; macros removed since finalize ran)
-\newcommand{\STEPFOURBASELINE}{$0.4319 \pm 0.0045$}
-\newcommand{\STEPFOURVAXIS}{$0.4325 \pm 0.0020$}
-\newcommand{\STEPFOURDELTA}{$+0.0006$}
+\newcommand{\STEPFOURBASELINE}{$0.4300 \pm 0.0079$}
+\newcommand{\STEPFOURVAXIS}{$0.4325 \pm 0.0040$}
+\newcommand{\STEPFOURDELTA}{$+0.0025$}
 
 \section{Replication on a Second EEG Dataset (SEED-V)}
 \label{sec:vaxis-brain-seedv}
@@ -95,9 +95,9 @@ Adding a V-axis topo-MSE auxiliary loss
 \{PO3, PO4, POz, Oz, O1, O2, P3, P4\}) on top of the same CBraMod-5s
 fine-tuning recipe was run with 5 baseline seeds and 5 V-axis-topo seeds
 (per-class V-axis target $v_{c} = (\text{proj\_canon})_{c}$ from the SEED-V
-V-axis npz). The signed mean delta is positive but tiny ($+0.0006$), within
-the 0.005 s.e.\ of either group: V-axis supervision is neither helpful nor
-harmful on SEED-V. Two factors likely explain this. (1) The SEED-V
+V-axis npz). The signed mean delta is positive but tiny ($+0.0025$),
+within the seed noise of either group: V-axis supervision is neither
+helpful nor harmful on SEED-V. Two factors likely explain this. (1) The SEED-V
 class-level V-axis is already sharply 5-valued (cohort class-level
 $r{=}{+}0.989$), so adding a class-level V-axis target on top of one-hot
 class supervision is largely redundant; FACED has 28 stimuli over 9
@@ -115,8 +115,8 @@ universal claim.
 \toprule
 Variant & BACC (mean $\pm$ s.e.\ across 5 seeds) & vs.\ baseline $\Delta$ \\
 \midrule
-Baseline (no V-axis loss) & $0.4319 \pm 0.0045$ & --- \\
-+ V-axis topo loss        & $0.4325 \pm 0.0020$ & $+0.0006$ \\
+Baseline (no V-axis loss) & $0.4300 \pm 0.0079$ & --- \\
++ V-axis topo loss        & $0.4325 \pm 0.0040$ & $+0.0025$ \\
 \bottomrule
 \end{tabular}
 \caption{SEED-V V-axis-as-supervision (Step 4 of replication). Numbers
@@ -144,7 +144,7 @@ Claim & FACED & SEED-V \\
 Cohort best-cell $r$        & $+0.478$ (PO3/$\gamma$)  & $+0.6159$ (P1/$\theta$) \\
 Posterior dominance ($r$)   & occ 0.21 vs.\ frontal 0.16 & occ $0.329$ vs.\ frontal $0.253$ \\
 Cross-arch $r(\mathrm{BACC},$~best-PC$~r)$ & $+0.885$ ($N{=}5$) & $+0.601$ (class), $+0.632$ (trial), $N{=}15$ \\
-V-axis supervision $\Delta$ & post-recipe $+$        & $+0.0006$ ($\textit{n.s.}$, 5 vs.\ 5 seeds) \\
+V-axis supervision $\Delta$ & post-recipe $+$        & $+0.0025$ ($\textit{n.s.}$, 5 vs.\ 5 seeds) \\
 \bottomrule
 \end{tabular}
 \caption{Replication summary. Numerical agreement is partial (different
