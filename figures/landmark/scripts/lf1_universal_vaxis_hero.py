@@ -251,7 +251,7 @@ def main():
         y=0.955, fontsize=13.0, fontweight="bold")
 
     fig.text(0.5, 0.022,
-             "Same V-axis (Qwen-2.5 1.5B, 9 stories × 50 generations → PC1 at the final layer); "
+             "Same V-axis (Qwen3.5 1.5B, 9 stories × 50 generations → PC1 at the final layer); "
              "no fine-tuning, no labeled examples seen at probe time.",
              ha="center", fontsize=8.5, color=COLORS["gray"])
 

@@ -5,7 +5,7 @@
 \item {\bf Claims}
     \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
     \item[] Answer: \answerYes{}
-    \item[] Justification: The abstract and introduction state five claims: (i) a universal valence axis extractable from 18 LLMs; (ii) cohort EEG--LLM correlation $r=0.87$; (iii) cross-architecture convergence ($r{=}{+}0.74$, $p{=}0.014$ in within-class residual subspace); (iv) a saturation theorem documented across 25 alignment interventions; (v) a new FACED 9-class SOTA at $0.6948$ BACC. Each is supported in Sections~\ref{sec:vaxis-llms}--\ref{sec:sota} with its primary table or figure, and the paper-grade subset is inventoried in the appendix and notes.
+    \item[] Justification: The abstract and introduction state five claims: (i) a universal valence axis extractable from 14 LLMs; (ii) cohort EEG--LLM correlation $r=0.87$; (iii) cross-architecture convergence ($r{=}{+}0.74$, $p{=}0.014$ in within-class residual subspace); (iv) a saturation theorem documented across 25 alignment interventions; (v) a new FACED 9-class SOTA at $0.6948$ BACC. Each is supported in Sections~\ref{sec:vaxis-llms}--\ref{sec:sota} with its primary table or figure, and the paper-grade subset is inventoried in the appendix and notes.
 
 \item {\bf Limitations}
     \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
@@ -80,6 +80,6 @@
 \item {\bf Declaration of LLM usage}
     \item[] Question: Does the paper describe the usage of LLMs if it is an important, original, or non-standard component of the core methods in this research?
     \item[] Answer: \answerYes{}
-    \item[] Justification: The V-axis is extracted from 18 named language models (Section~\ref{sec:vaxis-llms-universality}). Each is cited; sizes, architectures, and layer indices used for centroid extraction are documented in Sections~\ref{sec:vaxis-llms} and \ref{sec:vshape} and Appendix~\ref{app:vaxis-protocol}. LLMs were also used to generate paraphrases of the nine emotion-evocative stories (paraphrase generator: Qwen2.5-7B, temperature 0.7); the prompt and filter criteria are stated in Appendix~\ref{app:vaxis-protocol}.
+    \item[] Justification: The V-axis is extracted from 18 named language models (Section~\ref{sec:vaxis-llms-universality}). Each is cited; sizes, architectures, and layer indices used for centroid extraction are documented in Sections~\ref{sec:vaxis-llms} and \ref{sec:vshape} and Appendix~\ref{app:vaxis-protocol}. LLMs were also used to generate paraphrases of the nine emotion-evocative stories (paraphrase generator: Qwen3.5-7B, temperature 0.7); the prompt and filter criteria are stated in Appendix~\ref{app:vaxis-protocol}.
 
 \end{enumerate}

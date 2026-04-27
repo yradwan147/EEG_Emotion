@@ -95,7 +95,7 @@ def main():
     ax.set_xlabel("zero-shot probe |r| / AUC")
     ax.set_title("(a) Text: V-axis matches supervised classifiers", loc="left", fontsize=10)
     # subtitle
-    ax.text(0.46, len(vals) - 0.2, "Qwen-2.5 1.5B, 9 emotion stories → PC1\n(no fine-tuning, 0 labels seen)",
+    ax.text(0.46, len(vals) - 0.2, "Qwen3.5 1.5B, 9 emotion stories → PC1\n(no fine-tuning, 0 labels seen)",
             fontsize=7.5, color=COLORS["gray"], va="top")
 
     # ---------- Panel (b) brain ----------

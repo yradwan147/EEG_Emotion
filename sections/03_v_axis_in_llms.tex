@@ -32,16 +32,16 @@ throughout to reduce sampling noise.
 \subsection{Universality across language models}
 \label{sec:vaxis-llms-universality}
 
-We extract the V-axis from 18 language models spanning three orders of
-magnitude in scale (Qwen2.5 0.5B--72B, Qwen3.5 1.7B--32B, Llama-3
-8B--70B, Llama-4-Scout-17B, Mistral-7B, OLMo-7B, Phi-2 2.7B,
-Pythia-1.4B, BLOOM-560M, TinyLlama-1.1B, Gemma-27B, Gemma-4 31B). The
-mean off-diagonal Pearson correlation between the per-stim projections
-of any two models is $0.654$, with the strongest agreement among Qwen
-variants (Qwen-1.5B vs Qwen-14B: $r=0.94$). The behaviourally
-best-aligned models are mid-size Qwens; we observe an
-\emph{inverted-U} scaling law in which Qwen-1.5B at layer~28 leads on
-both pure language benchmarks and brain prediction (see
+We extract the V-axis from 14 language models spanning three orders of
+magnitude in scale (Qwen3.5 1.7B--32B, Llama-3 8B--70B,
+Llama-4-Scout-17B, Mistral-7B, OLMo-7B, Phi-2 2.7B, Pythia-1.4B,
+BLOOM-560M, TinyLlama-1.1B, Gemma-27B, Gemma-4 31B). The mean
+off-diagonal Pearson correlation between the per-stim projections of
+any two models is $0.654$, with the strongest agreement among Qwen3.5
+variants (Qwen3.5-1.7B vs Qwen3.5-14B: $r=0.94$). The behaviourally
+best-aligned models are mid-size Qwen3.5; we observe an
+\emph{inverted-U} scaling law in which Qwen3.5-1.7B at layer~28 leads
+on both pure language benchmarks and brain prediction (see
 Section~\ref{sec:vaxis-brain}), with Phi-2, Gemma-4-31B, and
 TinyLlama-1B falling out of the universal manifold (per-stim r vs
 behavioural valence: $0.077$, $0.092$, $-0.121$ respectively).
@@ -85,8 +85,9 @@ extraction.
 \label{sec:vshape}
 
 The V-axis is not inherited from input embeddings; it is \emph{newly
-computed} in late transformer layers. We sweep all 28 layers of Qwen
-1.5B and observe a sharp emergence at $L=27$ with axis quality dropping
+computed} in late transformer layers. We sweep all 28 layers of
+Qwen3.5-1.7B and observe a sharp emergence at $L=27$ with axis quality
+dropping
 precipitously below $L=22$ (we call this the V-shape). The cosine
 between input-layer V-axis and final-layer V-axis is only $0.291$, with
 mid-layer L14 at $0.067$ --- the late layer carries
@@ -156,7 +157,7 @@ Section~\ref{sec:discussion}.
 
 The V-axis is (i) extractable from any sufficiently capable LLM, (ii)
 quantitatively superior to lexicon-based and SBERT baselines on
-zero-shot sentiment, (iii) universal across 18 LLM families and
+zero-shot sentiment, (iii) universal across 14 LLM families and
 across English / multilingual / vision / 9-emotion-image variants,
 (iv) computed in late transformer layers rather than inherited from
 inputs, (v) compositional, and (vi) generic --- the same recipe

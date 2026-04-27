@@ -8,12 +8,12 @@ Three-panel layout:
  (b) NULL — permutation null distribution of r vs the V-axis observation, plus
      a random-CLIP-direction control bar.
  (c) 18-LLM RANK — bar chart showing per-LLM brain-prediction r at PO3/γ for
-     all 18 LLMs (Qwen-1.5B leading).
+     all 14 LLMs (Qwen3.5-1.7B leading).
 
 Numbers depicted (from headline_numbers.md, all_findings_catalog.md):
  - cohort r = +0.874 at PO3/γ (clip_bare_emotion → eeg_de_ridge_pred), p<10⁻⁹
  - random-direction control r ≈ 0.07
- - 18 LLMs: Qwen-1.5B leads at r=+0.411, p=0.030
+ - 14 LLMs: Qwen3.5-1.7B leads at r=+0.411, p=0.030
 """
 import os
 import sys
@@ -170,7 +170,7 @@ def main():
     y = np.arange(len(llm_names))[::-1]
     bars = ax_c.barh(y, llm_rs, color=bar_colors, edgecolor="white", linewidth=0.7,
                      height=0.78, zorder=3)
-    # thicker outline for Qwen-1.5B (top entry)
+    # thicker outline for Qwen3.5-1.7B (top entry)
     bars[0].set_edgecolor("black")
     bars[0].set_linewidth(1.5)
     # value labels
@@ -192,7 +192,7 @@ def main():
     ax_c.axvline(0, color="black", lw=0.6, zorder=1)
     ax_c.axvline(0.30, color=COLORS["gray"], ls=":", lw=0.7, alpha=0.7, zorder=1)
     ax_c.set_xlabel("Per-LLM brain-anchor Pearson r at PO3/γ  (* p<0.05)", fontsize=9.5)
-    ax_c.set_title("18 LLMs predict the same EEG signal — Qwen-1.5B leads",
+    ax_c.set_title("14 LLMs predict the same EEG signal — Qwen3.5-1.7B leads",
                    loc="left", fontsize=11, fontweight="bold")
     panel_label(ax_c, "c", x=-0.085, y=1.05)
     # family legend — placed OUTSIDE the plot to the right so bars stay clean
@@ -210,7 +210,7 @@ def main():
     # ---------------- super-title ----------------
     fig.suptitle(
         "The LLM valence axis predicts a clean, lateralised EEG response "
-        "at PO3/γ across 28 stimuli and 18 LLMs",
+        "at PO3/γ across 28 stimuli and 14 LLMs",
         y=0.94, fontsize=12.5, fontweight="bold")
 
     save_dual(fig, f"{OUT}/lf2_eeg_llm_circle")

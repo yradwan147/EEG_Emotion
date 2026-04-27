@@ -82,9 +82,9 @@ Section~\ref{sec:topography} reports the full drop-class table
 topographically, and shows that the same nine-stimulus weighting
 analytically pushes the V-axis ceiling to $r=0.714$.
 
-\subsection{18 LLMs predict the brain; the rank is consistent with text}
+\subsection{14 LLMs predict the brain; the rank is consistent with text}
 
-Computing the V-axis from each of the 18 language models in
+Computing the V-axis from each of the 14 language models in
 Section~\ref{sec:vaxis-llms} and projecting onto the FACED EEG
 manifold (best cell, PO3/$\gamma$):
 
@@ -95,7 +95,7 @@ manifold (best cell, PO3/$\gamma$):
 \toprule
 Rank & LLM & V-axis $\!\to\!$ EEG $r$ & $p$ \\
 \midrule
-1 & Qwen-1.5B          & $+0.411$ & $0.030$ \\
+1 & Qwen3.5-1.7B          & $+0.411$ & $0.030$ \\
 2 & Qwen-14B           & $+0.400$ & $0.035$ \\
 3 & Qwen-3B            & $+0.386$ & $0.042$ \\
 4 & Qwen-72B           & $+0.382$ & $0.045$ \\
@@ -108,7 +108,7 @@ $\vdots$ & $\vdots$    & $\vdots$ & $\vdots$ \\
 \bottomrule
 \end{tabular}
 \caption{Per-LLM brain-prediction quality. The same inverted-U scaling
-law observed on text benchmarks (Qwen-1.5B optimal) holds at the
+law observed on text benchmarks (Qwen3.5-1.7B optimal) holds at the
 brain level. Phi-2 and Gemma-4-31B fall out, mirroring their
 text-domain anomalies.}
 \label{tab:llm-brain}
@@ -150,7 +150,7 @@ The LLM-derived V-axis predicts cohort-averaged EEG responses on FACED
 at $r=0.87$ ($p<10^{-9}$). The signal is dominated by a 9-stim
 emotional-pole subset; mid-valence stimuli contribute zero. The
 ranking of LLMs on brain prediction is consistent with their text
-prediction quality (Qwen-1.5B optimal). The temporal dynamics align
+prediction quality (Qwen3.5-1.7B optimal). The temporal dynamics align
 with classical EEG affective markers. Sections~\ref{sec:convergence}
 and~\ref{sec:topography} extend the picture in two directions:
 artificial neural networks trained on this same EEG converge to the
