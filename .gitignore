@@ -6,3 +6,11 @@
 *.synctex.gz
 *.fdb_latexmk
 *.fls
+
+# Paper build artifacts
+main.aux
+main.log
+main.bbl
+main.blg
+main.out
+*.synctex.gz

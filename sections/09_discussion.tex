@@ -1,0 +1,200 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Three sides of the same triangle}
+
+We have shown that a single one-dimensional axis --- defined entirely
+from text via principal-component analysis of nine emotion-evocative
+stories --- predicts:
+\begin{enumerate}
+\item Five sentiment benchmarks at zero-shot AUC up to $0.953$
+(Yelp), \emph{exceeding} a logistic-regression baseline trained on
+$5{,}000$ in-domain samples on SST-2 (Section~\ref{sec:vaxis-llms}).
+\item Cohort EEG responses to 28 emotional video clips at $r=0.87$
+($p<10^{-9}$), with the signal localised to posterior visual cortex
+and consistent with the LPP / sustained-attention literature
+(Sections~\ref{sec:vaxis-brain}, \ref{sec:topography}).
+\item EEG-emotion classifier accuracy, with cross-architecture
+correlation $r=+0.885$ between V-axis encoding strength and BACC, and
+within-class V-axis residual correlation $r=+0.74$ ($p=0.014$) with
+ensemble contribution (Section~\ref{sec:convergence}).
+\end{enumerate}
+
+This is cross-modal evidence beyond the vision--language pair studied
+by Huh et~al.\ \citep{huh2024platonic}: \emph{the same one-dimensional
+direction emerges in language models trained on text, in human brains
+exposed to video, and in EEG models trained on those brains}. We read
+this as direct empirical support for the Platonic Representation
+Hypothesis, extended to a biological neural system.
+
+\subsection{The saturation theorem and representation alignment}
+
+The 25-intervention saturation result
+(Section~\ref{sec:saturation}) carries a strong negative for the
+representation-alignment literature: \emph{external alignment losses
+cannot help once the model has absorbed the alignment target from
+task supervision alone}. This refines the conventional reading of
+distillation, RSA, contrastive losses, and PEFT alignment: those
+mechanisms work in the under-trained regime, where any well-structured
+target is informative, and break down sharply at saturation.
+
+The transition we observe is sharp and recipe-dependent. On FACED, it
+sits in the BACC interval $[0.62, 0.66]$, which is approximately
+where every recently-published method (CBraMod, EmotionKD, EMOD)
+already lives. We do \emph{not} claim that representation alignment is universally
+useless --- weak baselines below the threshold are at worst unaffected
+by V-axis supervision (CBraMod 5-seed $\Delta \in [-0.005, +0.005]$,
+EMOD-vanilla $\Delta=+0.007$, all within seed noise). The clean
+finding is the \emph{transition}: V-axis goes from neutral at weak
+baselines to statistically significantly harmful at strong recipes.
+The saturation threshold for late-layer concept directions is a
+real, measurable, and surprisingly low watermark.
+
+\subsection{Two-tier ensembling and the source of practical gains}
+
+The two-tier picture (Section~\ref{sec:two-tier}) gives a precise
+mechanistic account of where ensemble gains come from on saturated
+networks. Tier 1 (the class-mean V-axis basin) is shared across seeds
+and contributes nothing to ensemble diversity; Tier 2 (the
+within-class V-axis residual) is seed-specific and is the source of
+the entire $+3.7$ percentage points we measure. This generalises
+classical bias--variance decomposition
+\citep{geman1992neural,krogh1995neural} to a representation-level
+statement: ensemble gain on a saturated network is variance reduction
+\emph{within the orthogonal complement of the converged subspace}.
+
+The same mechanism explains the well-known plateau of
+"mega-ensembles" --- once 5--10 seeds saturate the residual
+variance reduction, additional checkpoints add correlated noise. We
+observe this directly: 15-, 20-, 25-checkpoint pools all match or
+underperform our 10-checkpoint SOTA.
+
+\subsection{Implications for affective neuroscience}
+
+The brain-side findings are stronger than we initially anticipated.
+For video-evoked emotion on FACED, the V-axis is encoded
+predominantly in posterior visual cortex
+($|r|_{\mathrm{occipital}}=0.21$ vs.\ $|r|_{\mathrm{frontal}}=0.16$),
+and Davidson's frontal-alpha asymmetry replicates qualitatively but at
+$\sim$10$\times$ smaller magnitude. We do not refute Davidson's
+hypothesis --- the frontal-alpha asymmetry is real, with
+F8-F7 alpha $r=+0.0155$ and Fp2-Fp1 alpha $r=+0.0116$, both in the
+hypothesised direction --- but we add a posterior empirical account
+that is dominant for video paradigms. This complements
+the \emph{static-stimulus} literature
+\citep{davidson1992anterior,coan2004frontal} where Davidson's
+asymmetry was primarily characterised, and we read the
+$\sim 10\times$ magnitude gap as a paradigm effect rather than a
+contradiction.
+
+The 9-stimulus emotional-pole structure (Section~\ref{sec:topography})
+sharpens the V-axis claim from "smooth gradient over all emotions" to
+"anger-versus-warm-positive contrast across nine clips". The Simpson's-paradox
+dynamic --- cohort $r=0.48$, per-subject mean $r=-0.06$, oracle
+$|r|=0.62$ --- locates the population effect at the
+\emph{between-subject} level, with substantial inter-subject
+heterogeneity in how the V-axis is topographically encoded. This is
+consistent with Sani et~al.\ \citep{sani2024crosssubject} and
+suggests that within-subject EEG-emotion modelling will benefit from
+per-subject channel selection, while between-subject claims (such as
+ours) are best made cohort-side.
+
+\subsection{Honest negatives}
+
+We document a number of negatives that are diagnostic rather than
+disqualifying:
+\begin{itemize}
+\item \textbf{Theta-gamma coupling does not mediate the V-axis}
+($\rho(\mathrm{PAC}, \mathrm{V\text{-}axis\ }r) = +0.082$, $p=0.667$).
+A popular candidate mechanism for emotional cognitive control
+\citep{canolty2010cfc} is decoupled from the V-axis encoding in our
+data.
+\item \textbf{Mutual information control is not significant}
+($p_{\mathrm{MI}}=0.115$, vs.\ $p_r=0.020$ for linear correlation).
+The relationship is essentially linear; this licences our use of
+ridge regression but rules out richer non-linear claims.
+\item \textbf{Random-direction null} on cross-architecture V-axis
+correlation places our $r=+0.885$ at the $93^{\mathrm{rd}}$
+percentile of the null ($p_{\mathrm{one}}=0.079$) --- above-random
+but not uniquely so. The within-class residual signal at
+$r=+0.74$, $p=0.014$ is the statistically robust claim;
+class-PC1 alignment is suggestive but not by itself dispositive.
+\item \textbf{Arousal does not exhibit the same brain convergence as
+valence.} We report the V-axis only for valence in the brain-alignment
+results. An arousal axis extracted via the same protocol predicts
+OASIS image-arousal at $r=0.803$ (Section~\ref{sec:vaxis-llms}), but
+its alignment to FACED EEG is substantially weaker
+($r \in [0.18, 0.41]$ across LLMs), consistent with the cross-modal
+arousal asymmetry observed in \citep{kurdi2017oasis}.
+\item \textbf{LLM-content of KD is irrelevant at this scale.} The
+\texttt{rand9} ablation matches LLM-9-D within $\pm 0.003$ BACC. KD
+provides architectural regularisation; its semantic content is below
+our resolution at strong baselines.
+\end{itemize}
+
+\subsection{Limitations}
+
+\textbf{One emotion benchmark, one EEG dataset.} FACED 9-class is the
+strongest available 9-emotion benchmark, but the V-axis story would
+benefit from replication on richer affective datasets (e.g., DEAP,
+DREAMER, MAHNOB-HCI). We provide a partial cross-dataset transfer
+result (FACED $\to$ SEED-V class ranking $r=+0.96$) but the strongest
+claim is FACED-internal.
+
+\textbf{Cohort-side analysis.} Our brain alignment claims are made on
+123-subject \emph{cohort-averaged} EEG, not within-subject. The
+Simpson's-paradox dynamic of Section~\ref{sec:topography} is a
+limitation of this design. Within-subject decoding requires
+per-subject channel adaptation that we tested but did not find
+to transfer (the per-subject best-channel oracle reaches $|r|=0.62$
+but no clean estimator approaches this).
+
+\textbf{Saturation threshold is dataset-specific.} The
+$[0.62, 0.66]$ BACC window we identify is the FACED-9 saturation
+range. Other tasks will have different thresholds, set by the
+intrinsic difficulty of the labels and the capacity of the encoder.
+The qualitative shape of the saturation transition --- "helps weak,
+hurts strong" --- generalises in our cross-dataset checks
+(\S\ref{sec:saturation}); the precise location does not.
+
+\textbf{Negative results require the strong-baseline interpretation.}
+Twenty-five interventions failing at our recipe is consistent with
+saturation but also consistent with deficiencies of those particular
+intervention designs. We addressed this by sweeping each family
+across $\lambda$ values, including monotonic-destruction families
+that rule out "we used the wrong scale" as the explanation.
+
+\subsection{Future work}
+
+\textbf{Per-subject V-axis adaptation.} The per-subject best-channel
+oracle ($|r|=0.62$) suggests substantial untapped within-subject
+signal. A subject-conditioned channel-attention head trained on a
+small calibration set per subject would close the cohort-vs-individual
+gap in a paper-grade way.
+
+\textbf{Other concept directions.} The saturation theorem is stated
+for the V-axis; its generality across other late-layer concept
+directions \citep{arditi2024refusal} is open. Replicating the
+finding for arousal, dominance, formality, or refusal directions on
+their respective benchmarks is the natural next step.
+
+\textbf{Saturation as a model-selection signal.} The within-class
+residual $|r|$ is computable from any checkpoint and predicts
+ensemble contribution. Using it as an online model-selection signal
+during training (rather than as a post-hoc diagnostic) is a concrete
+engineering follow-up.
+
+\subsection{Conclusion}
+
+A single one-dimensional valence axis, extracted from nine short
+emotion-evocative stories, predicts language-model behaviour, EEG
+responses, and EEG classifier accuracy with quantitatively consistent
+strength. We frame this as cross-modal evidence for the Platonic
+Representation Hypothesis at biological scale, document a saturation
+theorem that bounds when this universal axis can serve as supervision,
+and operationalise the residual variance into a new FACED SOTA. The
+brain-side picture --- posterior visual cortex, $\sim$10$\times$
+weaker frontal asymmetry, 9-stimulus emotional-pole contrast,
+Simpson's-paradox between subjects --- positions the V-axis claim
+firmly within the affective-EEG literature while substantially
+extending it.

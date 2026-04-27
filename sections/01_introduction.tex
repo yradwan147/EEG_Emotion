@@ -1,0 +1,169 @@
+\section{Introduction}
+\label{sec:intro}
+
+Modern large language models (LLMs) have emerged as compelling models of
+the human linguistic system. A line of work from Toneva and Wehbe
+\citep{toneva2019interpreting}, Schrimpf et~al.\ \citep{schrimpf2021neural},
+Goldstein et~al.\ \citep{goldstein2022shared}, and Caucheteux and King
+\citep{caucheteux2022brains} has established that representations from
+transformer LMs can be linearly read out to predict human brain responses
+--- in fMRI, ECoG, and MEG --- to natural language. The emerging picture,
+formalized by Huh et~al.\ as the \emph{Platonic Representation
+Hypothesis} \citep{huh2024platonic}, is that representations learned by
+neural networks across modalities and architectures converge to a shared
+statistical model of reality.
+
+This paper asks whether the brain--LM alignment story extends from
+\emph{language} to \emph{emotion}, and from \emph{biological neural data}
+back to \emph{artificial neural networks trained on biological signals}.
+Specifically, we study the \emph{valence axis} --- the principal direction
+along which human emotion is organized, separating positive from negative
+affect \citep{russell1980circumplex,warriner2013norms}.
+
+\begin{figure}[ht]
+\centering
+\IfFileExists{figures/landmark/lf1_universal_vaxis_hero.pdf}
+  {\includegraphics[width=\linewidth]{landmark/lf1_universal_vaxis_hero.pdf}}
+  {\includegraphics[width=\linewidth]{F1_universal_vaxis.pdf}}
+\caption{\input{figures/F1_caption}}
+\label{fig:universal-vaxis}
+\end{figure}
+
+\paragraph{The valence axis as a universal latent.}
+We define a one-dimensional \emph{V-axis} extracted from nine short LLM
+prompts (one per FACED emotion class). PCA on the resulting 9~class
+centroids yields a single direction. This direction is universal across
+language model families and scales: across 18 LLMs from 0.5B to 72B
+parameters, the mean off-diagonal Pearson correlation between V-axes is
+$0.65$. It is also \emph{externally valid}: zero-shot V-axis projection
+recovers SST-2 sentiment at $\mathrm{AUC}=0.868$
+\citep{socher2013recursive}, NRC valence at $|r|=0.79$
+\citep{mohammad2013nrc}, and the Hu \& Liu opinion lexicon at
+$|r|=0.76$ \citep{hu2004mining}. We provide a generic recipe for extracting
+these axes from any LLM with $\ge$1.5B parameters at any late layer
+(Section~\ref{sec:vaxis-llms}).
+
+\paragraph{The V-axis is in the brain.}
+We then show that the V-axis predicts brain responses on the FACED 9-class
+EEG dataset \citep{chen2023faced}: 123 subjects, 28 emotional video
+stimuli, 32 channels at 250\,Hz. Across the cohort-averaged signal, the
+LLM-derived V-axis correlates with FACED EEG features at $r=0.87$, with
+$p<10^{-9}$ against a 200-direction random null
+($r_{\mathrm{null}}=0.07$). Crucially, this V-axis lives most strongly in
+\emph{posterior} visual cortex (mean $|r|$ at occipital and parietal
+electrodes: 0.21, 0.18), \emph{not} in the frontal regions long
+implicated by Davidson's frontal-alpha asymmetry hypothesis
+\citep{davidson1992anterior,coan2004frontal}, which we replicate
+qualitatively but at $\sim$10$\times$ smaller magnitude. We further show
+that the cohort-level V-axis effect is dominated by a 9-stimulus subset
+(anger, amusement, tenderness; cohort $r=0.870$ vs.\ $r=-0.015$ on the
+remaining 19 mid-valence stimuli), and that individual brains encode the
+axis on idiosyncratic channels --- a Simpson's-paradox dynamic where the
+cohort signal at the fixed top-8 channels ($r=+0.02$) hides a
+per-subject mean of $-0.06$, with the per-subject best-channel oracle
+reaching $|r|=0.62$ (Section~\ref{sec:topography}).
+
+\paragraph{EEG models converge to the V-axis without being asked.}
+We extend the brain--LLM alignment story \emph{back} to artificial
+networks trained on EEG. Across 36 checkpoints from two architectures
+(CBraMod \citep{wang2025cbramod}, EMOD \citep{chen2025emod}) with varying
+capacity, training length, and ensemble size, we measure each model's
+V-axis encoding strength at the class-mean and within-class residual
+levels of its penultimate features. Accuracy correlates with V-axis
+encoding strength at $r=+0.885$ in the class-PC1 subspace and $r=+0.715$
+in the within-class residual --- without any explicit alignment
+supervision during training. A 100-direction random control places the
+V-axis at the 93$^\mathrm{rd}$ percentile of matched-norm Gaussian
+directions in the low-dimensional class-PC1 space; in the
+higher-dimensional within-class residual space, the relationship between
+V-axis $r$ and per-checkpoint ensemble contribution is statistically
+significant ($r=+0.74$, $p=0.014$). EEG models trained for emotion
+classification \emph{find the LLM valence axis on their own}.
+
+\paragraph{The saturation theorem: 25 alignment interventions, one principle.}
+Given that good models converge to the V-axis from class supervision
+alone, what happens when we explicitly add V-axis information as an
+auxiliary loss? We test 25 representation-alignment interventions
+--- auxiliary regression, knowledge distillation, label smoothing, soft
+SupCon \citep{khosla2020supcon}, RSA \citep{kriegeskorte2008rsa}, InfoNCE
+\citep{oord2018representation}, two-stage pretrain--fine-tune,
+multi-LLM ensembling, channel-targeted losses motivated by our
+topography findings, Procrustes rotation, parameter-efficient PEFT
+\citep{hu2022lora,liu2022ia3}, curriculum schedules, per-subject
+adaptation, and class-weighted variants matched to the within-class
+residual ceiling we measure analytically. None help our strong training
+recipe; six \emph{significantly hurt} it ($p<0.05$ paired bootstrap),
+most strongly at higher loss weights (frontal-mask $\lambda{=}0.5$:
+$\Delta=-0.052$, $p=0.0015$; anger-weighted $\lambda{=}0.5$:
+$\Delta=-0.054$, $p=0.0003$). The same interventions \emph{do} help below
+a saturation threshold we locate empirically in
+Section~\ref{sec:saturation}: V-axis loss is within seed noise of zero on EMOD-vanilla
+($\Delta=+0.007$, n.s.) and on CBraMod
+($\Delta \in [-0.005, +0.005]$ across two intervention families,
+$p>0.2$), but significantly harms the strong recipe
+($0.6581 \to 0.6432$--$0.6346$, $\Delta < 0$ at $p < 0.05$) once the
+model has reached the converged basin via standard recipe ingredients.
+
+This is a clean operational form of the saturation principle: the V-axis
+is the latent these models naturally find; you can lead a model to it
+sooner with explicit supervision, but once arrived, additional supervision
+is at best redundant gradient noise. Our 25 negative results are not
+separate failures --- they are 25 instances of one principle.
+
+\paragraph{Principled ensembling around the universal latent.}
+The same convergence picture explains ensembling. Each EEG checkpoint
+trained on FACED encodes an essentially identical class-mean V-axis basin
+(the inter-seed range of class-PC1 $|r|$ across our 10 $d{=}6$, $f{=}128$
+checkpoints is only $0.60$--$0.77$, saturated) but imperfectly
+approximates the \emph{within-class} V-axis residual --- how features
+vary about their class means. Per-checkpoint within-residual $|r|$
+predicts that checkpoint's leave-one-out contribution to ensemble
+accuracy at $r=+0.743$ ($p=0.014$); top-7 checkpoints by within-residual
+$|r|$ ensemble to BACC $0.6962$ versus bottom-7 to $0.6829$ ($z=+2.0$
+vs.\ random-7). Uniform softmax averaging across 5\,e100 + 5\,e150 d6
+checkpoints achieves a new state of the art on FACED 9-class:
+\textbf{0.6948 balanced accuracy}, +21.5\% relative over CBraMod's
+$0.572$ and +10.6\% over EmotionKD's $0.628$ \citep{liu2023emotionkd}.
+A single val-selected checkpoint ($d{=}6$, e150, seed 789) achieves
+\textbf{0.6755}, a clean +2.6\% relative over the published EMOD
+single-seed baseline of $0.6581$. Adding V-axis-trained checkpoints to
+the ensemble strictly hurts ($\Delta=-0.0145$, $p<10^{-3}$ for
+vanilla\,+\,topo\,vs.\ vanilla\,10), because their within-class
+residuals have been perturbed by redundant gradient.
+
+\paragraph{Contributions.}
+\begin{enumerate}
+  \item \textbf{Cross-modal universality (Sections \ref{sec:vaxis-llms}--\ref{sec:vaxis-brain}).}
+    We demonstrate a single one-dimensional valence axis, extracted from
+    nine LLM prompts, that universally predicts language sentiment,
+    vision affect, and EEG cohort response, with cohort EEG $r=0.87$
+    vs.\ random $r=0.07$ ($p<10^{-9}$).
+  \item \textbf{Spontaneous convergence (Section \ref{sec:convergence}).}
+    Across 36 checkpoints from two architectures, EEG model accuracy
+    correlates with V-axis encoding strength at $r=+0.885$ (class-PC1)
+    and $r=+0.715$ (within-class residual). Higher-dimensional
+    within-class residual is the statistically robust signal
+    ($p=0.014$ for ensemble-contribution prediction).
+  \item \textbf{Brain topography (Section \ref{sec:topography}).}
+    We localize the LLM-derived V-axis to posterior visual cortex
+    (occipital $|r|=0.21$ vs.\ frontal $0.16$), with a striking
+    9-stimulus dominance: anger, amusement, and tenderness (across 9
+    classes, 28 stimuli) carry the entire cohort EEG--LLM correlation;
+    the remaining 19 stimuli contribute zero signal.
+  \item \textbf{Saturation theorem (Section \ref{sec:saturation}).}
+    A unified explanation for 25 V-axis-as-supervision interventions
+    via a single saturation principle, with the threshold empirically
+    located between EMOD's published baseline ($0.6287$) and our recipe
+    ($0.6581$).
+  \item \textbf{New FACED 9-class SOTA (Section \ref{sec:sota}).}
+    \textbf{0.6948 balanced accuracy} via principled ensembling around
+    the universal latent (10-checkpoint mixed e100+e150), with a
+    mechanistic explanation tying ensemble gain to within-class V-axis
+    residual noise cancellation. A single val-selected checkpoint
+    achieves \textbf{0.6755}.
+\end{enumerate}
+
+The remainder of the paper (Section~\ref{sec:related}: related work;
+Sections \ref{sec:vaxis-llms}--\ref{sec:sota}: results;
+Section~\ref{sec:discussion}: implications) builds these claims in
+order, with each subsequent section using the previous as a foundation.

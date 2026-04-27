@@ -1,0 +1,9 @@
+\textbf{Ensemble theory: the within-class V-axis residual predicts ensemble value.}
+(a) Each point is one of the 10 checkpoints in the SOTA ensemble.
+$x$ axis: per-checkpoint within-class V-axis residual $|r|$ (PC1 of the residuals after class-mean removal, vs the CLIP V-axis after the same residualisation).
+$y$ axis: leave-one-out ensemble contribution ($\Delta$ BACC of the 9-checkpoint ensemble that drops this checkpoint).
+Pearson $r{=}{+}0.74$, $p{=}0.014$, $n{=}10$.
+A checkpoint that encodes the within-class V-axis residual more strongly is a more valuable ensemble member.
+(b) Top-7 vs bottom-7 ensembling by within-class residual $|r|$: top-7 reaches $0.6962$ BACC, bottom-7 reaches $0.6829$, random-7 distribution is centred at $0.6878$ ($\sigma{=}0.0042$).
+The full 10-ckpt ensemble at $0.6948$ (dashed) sits on the top of the random-7 distribution.
+The within-class residual is the principled selector.

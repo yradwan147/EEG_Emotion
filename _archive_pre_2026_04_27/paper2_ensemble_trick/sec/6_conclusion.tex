@@ -1,0 +1,36 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We introduced \ours{}, a minimal modification to standard deep
+ensembling: train the same architecture with the same cosine schedule
+but two different $T_\mathrm{max}$ endpoints, and average the resulting
+softmax outputs. The two trajectories reach identical mean accuracy
+yet occupy distinct loss basins whose decision boundaries disagree on
+13\% of test samples---a free second source of ensemble diversity that
+costs one extra training run and zero hyperparameter tuning.
+
+Across 9 benchmarks, three modalities (EEG, images, text), and five
+architectures (axial transformer, small CNN, ResNet-18, MLP,
+DistilBERT), \ours{} delivers consistent gains over standard deep
+ensembles at matched compute, including a new state of the art on
+FACED 9-class EEG emotion classification (\facedacc{} BAcc, $+8.2\%$
+over the EMOD AAAI 2026 baseline and $+1.1$~pp over a 10-seed
+same-length deep ensemble) and a clean head-to-head sweep against SWA,
+snapshot ensembles, and 10-seed deep ensembles across accuracy, NLL,
+ECE, and Brier.
+
+The mechanism is transparent and predictive. The low-LR tail of the
+longer schedule drifts weights into a neighboring basin (confirmed by
+mode-connectivity probes and weight-space PCA), producing
+prediction-space diversity that weight averaging cannot reproduce. The
+per-sample decomposition $q \cdot g$ quantitatively predicts the
+ensemble gain ($0.131 \times 0.103 = 1.35$~pp, observed $1.50$~pp),
+and the gain scales as a power law in the headroom $(1-p_{\mathrm{ind}})$
+with $\alpha = 0.85$---so the trick pays off most on exactly the
+capacity-bound tasks where ensembling is most needed.
+
+A single integer change in the training schedule, a reliable gain
+beyond a true 10-seed deep ensemble, and a predictive scaling law that
+tells you in advance when to expect the gain: \ours{} is as close to a
+``free lunch'' as deep ensembling currently offers. We expect it to
+compose cleanly with any diversity axis that future work identifies.

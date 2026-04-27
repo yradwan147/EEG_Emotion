@@ -1,0 +1,540 @@
+\section{Experiments}
+\label{sec:experiments}
+
+We evaluate \ours{} along four lines of evidence. First, we show a
+headline SOTA on FACED EEG emotion classification
+(\cref{sec:faced}). Second, we demonstrate cross-modality generality on
+six image and text benchmarks (\cref{sec:image}), from which emerges a
+predictive scaling law
+(\cref{sec:scaling}). Third, we compare head-to-head against SWA,
+snapshot, and 10-seed deep ensembles on accuracy \emph{and} calibration
+(\cref{sec:baselines,sec:calib}). Fourth, we open the mechanism: a
+theoretical decomposition on FACED, weight-space PCA and
+mode-connectivity probes, and an endpoint-ratio sweep that answers
+``why $T_B=150$?'' empirically
+(\cref{sec:decomp,sec:curves,sec:endpoint_sweep,sec:basin}).
+
+\subsection{Setup}
+
+We test \ours{} on 9 benchmarks spanning three modalities (EEG, images,
+text) and multiple architectures:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{FACED} \cite{liu2024faced}: 9-class EEG emotion classification,
+10{,}332 samples (6{,}720 train / 1{,}680 val / 1{,}932 test).
+Architecture: EMOD axial-transformer with depth=6 (3 pretrained +
+3 random init), $n_\mathrm{filters}=128$.
+\item \textbf{SEED-V} \cite{zheng2019investigating}: 5-class EEG emotion
+classification. Same EMOD d6 architecture.
+\item \textbf{CIFAR-10}, \textbf{CIFAR-100} \cite{krizhevsky2009learning}:
+image classification with a small CNN (64$\to$128$\to$128$\to$256 channels,
+$\sim$500K params).
+\item \textbf{MNIST}, \textbf{Fashion-MNIST}: with small MLP (3 layers,
+FC-FC-FC) and small CNN respectively.
+\item \textbf{SVHN}: house number recognition with small CNN.
+\end{itemize}
+
+For each dataset, we train 5 seeds with $T_A$ epochs and 5 seeds with
+$T_B$ epochs (same augmentation, same optimizer, same LR schedule except
+for $T_\mathrm{max}$), then compare:
+(a)~individual-seed accuracy,
+(b)~5-seed same-length deep ensemble accuracy (gold-standard baseline),
+(c)~10-model mixed-length \ours{} ensemble accuracy.
+
+\subsection{EEG Emotion Classification: A New FACED SOTA}
+\label{sec:faced}
+
+\begin{table}[h]
+\centering
+\caption{FACED 9-class EEG emotion classification. EMOD d6 axial transformer,
+aug+LS+rand9 KD recipe. Our 10-model mixed-length ensemble is a new SOTA,
+$+5.3$~pp over the EMOD AAAI 2026 baseline.}
+\label{tab:faced}
+\begin{tabular}{lcc}
+\toprule
+Method & Balanced Acc & $\Delta$ over baseline \\
+\midrule
+REVE NeurIPS 2025 \cite{kostas2025reve} & 0.500 & $-$0.142 \\
+EMOD AAAI 2026 \cite{chen2026emod} & 0.642 & --- \\
+EMOD d3 + aug + LS=0.1 + rand9 KD (ours, cycle 72) & 0.6467 $\pm$ 0.007 & $+$0.005 \\
+EMOD d6 (3 pretrained + 3 random) single model & 0.6581 $\pm$ 0.007 & $+$0.016 \\
+EMOD d6 5-seed ensemble & 0.6798 & $+$0.038 \\
+EMOD d6 10-seed same-length ensemble & 0.6838 & $+$0.042 \\
+\rowcolor{blond}
+\textbf{EMOD d6 + d6\_e150 10-model \ours{}} & \textbf{\facedacc{}} & \textbf{$+$0.053} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{SEED-V 5-class EEG emotion classification. EMOD d6 cross-dataset
+transfer. No 150ep checkpoints available, so we only report the standard
+5-seed ensemble gain.}
+\label{tab:seedv}
+\begin{tabular}{lc}
+\toprule
+Method & Balanced Acc \\
+\midrule
+EMOD d3 + aug + KD (ours, cycle 244) & 0.3744 \\
+EMOD d6 + aug + rand9 KD, individual mean & 0.3743 $\pm$ 0.006 \\
+\rowcolor{blond}
+\textbf{EMOD d6 5-seed ensemble} & \textbf{\seedvacc{}} (\seedvgain{}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Crucially, \ours{} beats the 10-seed same-length deep ensemble
+($0.6838$) by $+1.1$~pp---a margin larger than the gap between the
+5-seed and 10-seed same-length ensembles---so the gain is not a matter
+of buying more seeds. Two trajectory-length groups at
+$N{=}5$ each outperform $N{=}10$ seed diversity. SEED-V confirms the
+picture at $+3.4\%$ cross-dataset.
+
+\subsection{Cross-Modality Validation: Images and Text}
+\label{sec:image}
+
+Having established the EEG headline, we next ask whether the same
+single-integer change transports to other modalities and architectures.
+We use standard small-CNN, MLP, ResNet-18, and DistilBERT backbones on
+seven additional benchmarks whose individual-model accuracies span the
+range from $\sim\!0.69$ (CIFAR-100) to $\sim\!0.98$ (MNIST).
+
+\begin{table}[h]
+\centering
+\caption{\ours{} on four image datasets with small CNN/MLP architectures.
+Each row: 5 seeds × 50ep (group A) + 5 seeds × 75ep (group B), mixed 10-model
+ensemble. Gain scales inversely with individual accuracy.}
+\label{tab:image}
+\begin{tabular}{lcccc}
+\toprule
+Dataset & Arch & Ind.\ mean & 5-seed ensemble & \textbf{10-model mixed} \\
+\midrule
+CIFAR-10 & Small CNN & 0.9015 & 0.9209 (+0.0194) & \textbf{\ciftenacc{} (+0.0238)} \\
+CIFAR-10 & ResNet-18 & 0.9452 & 0.9563 (+0.0111) & \textbf{0.9599 (+0.0147)} \\
+CIFAR-100 & Small CNN & 0.6886 & 0.7225 (+0.0339) & \textbf{0.7353 (+0.0467)} \\
+CIFAR-100 & ResNet-18 & 0.7707 & 0.8020 (+0.0313) & \textbf{0.8104 (+0.0397)} \\
+MNIST & MLP & 0.9849 & 0.9859 (+0.0010) & \textbf{0.9863 (+0.0014)} \\
+Fashion-MNIST & Small CNN & 0.9313 & 0.9418 (+0.0105) & \textbf{0.9434 (+0.0121)} \\
+SST-2 & DistilBERT & 0.9062 & 0.9094 (+0.0032) & 0.9094 (+0.0032) \\
+SVHN$^{\dagger}$ & Small CNN & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\\[0.4em]
+{\footnotesize $\dagger$: SVHN run excluded from main table. The short-CNN
+trainer used for this sweep had a training instability that caused 7 of
+10 seeds to fail to escape the uniform-prediction basin. A clean SVHN
+rerun is scheduled (see supplementary).}
+\end{table}
+
+\subsection{A Predictive Scaling Law for the Gain}
+\label{sec:scaling}
+
+A striking pattern emerges from the nine benchmarks together: the
+mixed-length ensemble gain is a \emph{predictable function} of how far
+each individual model is from ceiling. Every added modality confirms
+the same fit.
+A least-squares linear fit of gain on headroom gives slope $0.057$,
+intercept $0.011$, Pearson $r=0.753$, $p=0.019$, $R^2=0.57$; a power-law
+fit $\text{gain} = c \cdot \text{headroom}^{\alpha}$ gives exponent
+$\alpha = 0.85$ (log-space $R^2 = 0.72$). Both fits support the intuition
+that the gain is governed by the fraction of samples still correctable
+by ensembling.
+On CIFAR-100, we note that the mixed ensemble at $0.7353$ is slightly
+below the best single-length 5-seed ensemble at $B=75$~epochs
+($0.7367$); the mixed gain is positive when compared against the average
+of the two same-length ensembles (\emph{mean}($A$-5-seed, $B$-5-seed)
+$=0.7296$, mixed $-$ mean $=+0.0057$). CIFAR-100 is the one dataset
+where the longer schedule $B$ alone beats the mixed ensemble by a narrow
+margin; the mixed ensemble still wins over the matched same-length
+baseline.
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=0.75\textwidth]{fig_scaling_law}
+\caption{Ensemble gain vs.\ headroom $(1 - \text{individual accuracy})$
+across nine benchmarks. Dashed red: through-the-origin fit
+$\text{gain} = 0.086 \cdot \text{headroom}$. Dotted green: ordinary
+least-squares fit with intercept ($r=0.753$, $p=0.019$, $R^2=0.57$).
+A power-law fit gives exponent $\alpha=0.85$.}
+\label{fig:scaling}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\caption{Ensemble gain scales inversely with individual accuracy.}
+\label{tab:scaling}
+\begin{tabular}{lccc}
+\toprule
+Dataset & Ind.\ accuracy & Mixed gain & Ratio: gain/(1-ind.) \\
+\midrule
+FACED 9c EEG           & 0.6581 & +0.0367 & 0.107 \\
+SEED-V 5c EEG          & 0.3743 & +0.0340 & 0.054 \\
+CIFAR-100 CNN          & 0.6886 & +0.0467 & 0.150 \\
+CIFAR-100 ResNet-18    & 0.7707 & +0.0397 & 0.173 \\
+CIFAR-10 CNN           & 0.9015 & +0.0238 & 0.242 \\
+CIFAR-10 ResNet-18     & 0.9452 & +0.0147 & 0.268 \\
+Fashion-MNIST CNN      & 0.9313 & +0.0121 & 0.176 \\
+SST-2 DistilBERT       & 0.9062 & +0.0032 & 0.034 \\
+MNIST MLP              & 0.9849 & +0.0014 & 0.093 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Head-to-Head Against SWA, Snapshot, and Deep Ensembles}
+\label{sec:baselines}
+
+The scaling law predicts \emph{when} \ours{} helps; we next ask
+\emph{how much} it helps against standard alternatives at matched
+compute. On CIFAR-10 with the same small CNN we compare
+(i)~a 10-seed same-length deep ensemble, (ii)~Stochastic Weight
+Averaging (SWA start at epoch 30 of a 60-epoch run)~\cite{izmailov2018averaging},
+and (iii)~a snapshot ensemble with 5 cyclic-LR snapshots from a single
+run~\cite{huang2017snapshot}. All methods share hyperparameters and
+training code; \ours{} uses roughly the same compute as the 10-seed
+deep ensemble ($5\times50 + 5\times75 = 625$ vs.\ $10\times50 = 500$
+epochs, a $1.25\times$ increase).
+
+\begin{table}[h]
+\centering
+\caption{Head-to-head comparison with SWA, snapshot ensembles, and standard
+10-seed deep ensembling on CIFAR-10 with the same small CNN.
+Same total compute budget.}
+\label{tab:cifar10_baselines}
+\begin{tabular}{lcc}
+\toprule
+Method & Test Accuracy \\
+\midrule
+Single model, 50 epochs, mean of 10 seeds & 0.8992 \\
+Standard 5-seed deep ensemble (50ep) & 0.9209 (+0.0217) \\
+Standard 10-seed deep ensemble (50ep) & 0.9223 (+0.0231) \\
+SWA (60ep with SWA starting at 30) & 0.8918 ($-0.0074$) \\
+Snapshot ensemble (1 run, 5 cyclic-LR snapshots) & 0.8946 ($-0.0046$) \\
+\rowcolor{blond}
+\textbf{\ours{} (5$\times$50ep + 5$\times$75ep, 10 models mixed)} & \textbf{\ciftenacc{} (+0.0261)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=0.85\textwidth]{cifar10_baselines_bar}
+\caption{CIFAR-10 head-to-head ensemble comparison at matched compute.
+\ours{} beats every baseline including the 10-seed standard deep
+ensemble. SWA and snapshot ensembling both \emph{hurt} relative to the
+single-model mean on this small-CNN trainer, likely because they
+average over a narrow region of weight space.}
+\label{fig:cifar10_bar}
+\end{figure}
+
+\subsection{Calibration: NLL, ECE, and Brier at Matched Compute}
+\label{sec:calib}
+
+Ensembles are evaluated on calibration as much as
+accuracy~\cite{ashukha2020pitfalls}. We rerun the CIFAR-10 head-to-head
+on fresh seeds and save full softmax logits, then report accuracy, NLL
+(negative log-likelihood, nats), ECE (15-bin expected calibration
+error), and Brier score. (Accuracies differ slightly from
+\cref{tab:cifar10_baselines} because of the fresh seeds.)
+
+\begin{table}[h]
+\centering
+\caption{CIFAR-10 full-calibration comparison (same small CNN, fresh
+seeds; accuracy numbers differ slightly from Table~\ref{tab:cifar10_baselines}
+because of the fresh seeds). \ours{} sweeps all four metrics over SWA,
+snapshot, and a 10-seed same-length deep ensemble. Lower is better for
+NLL, ECE, Brier.}
+\label{tab:cifar10_calib}
+\begin{tabular}{lcccc}
+\toprule
+Method & Acc $\uparrow$ & NLL $\downarrow$ & ECE $\downarrow$ & Brier $\downarrow$ \\
+\midrule
+Single model (50ep) mean of 5 seeds & 0.8904 & 0.3469 & 0.0328 & 0.1637 \\
+SWA (60ep)                          & 0.8865 & 0.3537 & 0.0275 & 0.1688 \\
+Snapshot (5 cyclic snaps)           & 0.8882 & 0.3372 & 0.0180 & 0.1638 \\
+5-seed ens 50ep                     & 0.9058 & 0.2813 & 0.0126 & 0.1389 \\
+5-seed ens 75ep                     & 0.9146 & 0.2557 & 0.0104 & 0.1253 \\
+5-seed ens 100ep                    & 0.9190 & 0.2479 & 0.0125 & 0.1196 \\
+10-seed same-length 50ep            & 0.9078 & 0.2722 & 0.0101 & 0.1355 \\
+\rowcolor{blond}
+\textbf{\ours{} (5$\times$50ep + 5$\times$65ep)}   & 0.9126 & 0.2607 & 0.0098 & 0.1290 \\
+\rowcolor{blond}
+\textbf{\ours{} (5$\times$50ep + 5$\times$75ep)}   & 0.9149 & 0.2566 & 0.0107 & 0.1277 \\
+\rowcolor{blond}
+\textbf{\ours{} (5$\times$50ep + 5$\times$100ep)}  & \textbf{0.9168} & \textbf{0.2489} & \textbf{0.0096} & \textbf{0.1236} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Findings.}
+(i)~\ours{} with $T_B=100$ attains the best NLL, the best ECE, and the
+best Brier across the whole table. (ii)~SWA \emph{hurts} NLL relative
+to a single model ($0.3537$ vs.\ $0.3469$): weight averaging collapses
+the predictive distribution into a point estimate, while \ours{}
+preserves it by averaging outputs. (iii)~Across the endpoint-ratio
+sweep ($T_B \in \{65, 75, 100\}$) all four calibration metrics improve
+monotonically with $T_B$, consistent with a longer tail visiting more
+of the basin.
+
+\subsection{Mechanism (I): Theoretical Decomposition of the Gain}
+\label{sec:decomp}
+
+Having shown the gain across tasks and against baselines, we now open
+the mechanism box. On FACED d6 we save all 10 checkpoints and decompose
+the gain into within-group and cross-group contributions.
+
+\begin{table}[h]
+\centering
+\caption{Ensemble gain decomposition on FACED d6. 100ep and 150ep
+individual-seed means are identical within 0.0001; the 150ep ensemble is
+stronger because 150ep seeds are more diverse.}
+\label{tab:decomposition}
+\begin{tabular}{lc}
+\toprule
+Ensemble & Balanced Acc \\
+\midrule
+Individual 100ep mean (5 seeds) & 0.6581 \\
+Individual 150ep mean (5 seeds) & 0.6581 \\
+\midrule
+5-seed 100ep ensemble & 0.6798 ($+0.0218$) \\
+\textbf{5-seed 150ep ensemble} & \textbf{0.6919 ($+0.0338$)} \\
+\textbf{10-model mixed} & \textbf{\facedacc{} ($+0.0367$)} \\
+\midrule
+Mixed gain over 100ep alone & $+0.0150$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Decision-boundary analysis.}
+Of the 1{,}932 FACED test samples, 50.9\% have unanimous prediction from
+all 10 models; 13.1\% (253 samples) have a \emph{different} group
+consensus between 100ep and 150ep. On those 253 samples, the 100ep
+consensus accuracy is 28.85\%, the 150ep consensus accuracy is 29.25\%,
+and the mixed ensemble accuracy is 39.53\%---a gain of $+10.3$ percentage
+points on a subset of 13.1\% of the test set. The predicted overall gain
+$10.3 \times 0.131 = 1.35$~pp closely matches the observed $+1.50$~pp.
+
+\subsection{Mechanism (II): Same Seed, Different $T_\mathrm{max}$, Different Basins}
+\label{sec:curves}
+
+The decomposition predicts the magnitude of the gain; the next question
+is whether the two groups really occupy \emph{different local minima} or
+just two points in one wider basin. Following
+Fort~\emph{et al.}~\cite{fort2019deepensembles}, we train two CIFAR-10
+small CNNs with the \emph{same} random seed (2025) at $T_A=50$ and
+$T_B=75$ epochs and linearly interpolate between their weights
+$w(\alpha)=(1-\alpha) w_A + \alpha w_B$, $\alpha \in [0,1]$, measuring
+the train and test loss at each step.
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=0.85\textwidth]{loss_landscape_interp}
+\caption{Train/test loss along the linear interpolation between a
+$T_A=50$ and a $T_B=75$ CIFAR-10 checkpoint (same seed). Both endpoints
+are low-loss minima (train $\approx 0.05$--$0.12$), but the midway
+linear path has a \textbf{+0.25 nats train-loss barrier}
+and accuracy drops to $0.843$ ($-6$~pp). The two endpoints are not
+in the same basin --- they are separated by a loss ridge, directly
+confirming that trajectory-length variation drifts weights into a
+neighboring local minimum.}
+\label{fig:landscape}
+\end{figure}
+
+\paragraph{Result.} The train-loss barrier is $+0.2497$ and the
+test-loss barrier is $+0.1266$. The test accuracy at $\alpha=0.5$ is
+$0.8434$, compared to $0.8905$ at $\alpha=0$ and $0.9018$ at
+$\alpha=1$ --- a $-6$~pp drop. This is a textbook ``different basins''
+signature. Same seed, different $T_\mathrm{max}$, different minima.
+
+\subsection{Mechanism (III): Same Final Accuracy, Different Trajectories}
+
+If the two groups reach different minima, the per-epoch validation
+curves should reveal the divergence. We plot the full training curves
+for all 10 FACED d6 seeds. The two trajectories converge to the
+\emph{same} final accuracy but follow different routes to get
+there---the 150ep group is still at $\approx$0.25 of initial LR at
+epoch 100 and spends 50 more epochs drifting before stopping.
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=0.75\textwidth]{training_curves_100_vs_150}
+\caption{Validation BAcc curves for 100ep and 150ep d6 seeds on FACED. The
+100ep trajectory (solid) converges around epoch 100 at BAcc $\approx$0.677.
+The 150ep trajectory (dashed) is slightly behind at epoch 100 (still at
+BAcc $\approx$0.672, with LR $=0.25\times$ initial), then slowly ascends
+to the same final BAcc by epoch 149. The extra 50 epochs add zero mean
+accuracy but substantial parameter drift.}
+\label{fig:curves}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\caption{Per-epoch val BACC for 100ep and 150ep d6 FACED seeds (mean over
+5 seeds). Identical final accuracy, different trajectories.}
+\label{tab:trajectories}
+\begin{tabular}{lcc}
+\toprule
+Epoch & 100ep group BAcc & 150ep group BAcc \\
+\midrule
+25 & 0.6267 $\pm$ 0.0118 & 0.6186 $\pm$ 0.0057 \\
+50 & 0.6513 $\pm$ 0.0090 & 0.6516 $\pm$ 0.0046 \\
+75 & 0.6718 $\pm$ 0.0046 & 0.6577 $\pm$ 0.0079 \\
+99 & 0.6771 $\pm$ 0.0059 & 0.6722 $\pm$ 0.0058 \\
+149 & --- & 0.6776 $\pm$ 0.0040 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Ablation: The Endpoint Ratio is a Robust Operating Regime, Not a Tuned Constant}
+\label{sec:endpoint_sweep}
+
+A natural concern is that $T_B=150$ might be a cherry-picked sweet
+spot. To rule this out, we run the full sweep
+$T_B \in \{110, 120, 130, 140, 150, 200\}$ on FACED EMOD d6 with $T_A=100$
+held fixed. \cref{tab:endpoint_sweep} and \cref{fig:endpoint_sweep}
+report, for each $T_B$, the mean individual BAcc of the $T_B$ group,
+the $T_B$-only 5-seed ensemble, and the mixed 10-model ensemble formed
+by $T_A=100 \cup T_B$.
+
+\begin{table}[h]
+\centering
+\caption{FACED EMOD d6 endpoint-ratio ablation. All rows use the
+same $T_A=100$ group (mean ind.\ 0.6581, 5-seed ens.\ 0.6798). Mixed
+10-model BAcc peaks at $T_B=150$ (our default) and degrades both for
+smaller drifts ($T_B \le 140$) and for over-long drifts
+($T_B=200$). Source: \texttt{llm\_steering/diag\_p2\_d4\_endpoint\_T*.json}.}
+\label{tab:endpoint_sweep}
+\begin{tabular}{cccc}
+\toprule
+$T_B$ & Mean ind.\ $T_B$ & 5-seed ens.\ $T_B$ & \textbf{Mixed 10-model} \\
+\midrule
+100 (=$T_A$) & 0.6581 & 0.6798 & 0.6798 \\
+110 & 0.6612 & 0.6809 & 0.6842 \\
+120 & 0.6418 & 0.6740 & 0.6805 \\
+130 & 0.6308 & 0.6758 & 0.6778 \\
+140 & 0.6292 & 0.6730 & 0.6750 \\
+\rowcolor{blond}
+\textbf{150} & \textbf{0.6581} & \textbf{0.6919} & \textbf{0.6948} \\
+200 & 0.5960 & 0.6425 & 0.6633 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=0.72\textwidth]{fig_endpoint_sweep}
+\caption{Mixed 10-model BAcc on FACED as a function of $T_B$ with
+$T_A=100$ fixed. Dashed green: 100ep-only 5-seed ensemble baseline.
+The endpoint ratio $\rho = T_B/T_A = 1.5$ is a genuine operating-regime
+sweet spot, consistent with the PCA-basin and mode-connectivity
+analyses (\cref{sec:basin}).}
+\label{fig:endpoint_sweep}
+\end{figure}
+
+\paragraph{Interpretation.}
+The sweep traces an interpretable curve that matches the basin
+geometry. For intermediate $\rho \in (1.1, 1.4]$ the $T_B$ trajectory
+has not yet spent enough low-LR tail time to reach a distinct basin,
+and its individual accuracy is also transiently depressed because the
+cosine tail is stretched; the mixed ensemble sits just above the
+$T_A$-only baseline. At $\rho = 1.5$ the mean individual BAcc recovers
+to $0.6581$ (within $0.0001$ of $T_A$) while the run has spent 50
+additional epochs in the productive tail and settles in a
+geometrically distinct basin (\cref{sec:basin}); this is exactly where
+the mixed gain is maximal ($+0.015$ over $T_A$-only). At $\rho = 2.0$
+the long tail leaves the productive regime, individual accuracy drops
+to $0.596$, and the mixed ensemble is dragged below the baseline. The
+takeaway: \ours{} operates in a broad regime $\rho \in [1.4, 1.6]$
+with $\rho = 1.5$ as a task-robust default and $\rho \ge 2.0$ to be
+avoided.
+
+\subsection{Mechanism (IV): Different Basins, and Why Weight-Space Averaging Fails}
+\label{sec:basin}
+
+The endpoint sweep's sweet spot at $\rho=1.5$ coincides with the regime
+where the two groups reach distinct basins. We verify basin separation
+directly in two complementary ways on FACED: a weight-space PCA of the
+10 checkpoints, and a linear mode-connectivity probe between cross-group
+pairs.
+
+\paragraph{Weight-space PCA.}
+Flattening the 10 FACED d6 checkpoints (5 seeds $\times$ 2 endpoints) into
+a matrix and taking its first three principal components shows that PC1
+captures $>\!99\%$ of the between-checkpoint variance and perfectly
+separates the two groups (\cref{fig:pca_basin}). Concretely, the mean
+pairwise distance between the two group centroids is $5166$ and the mean
+pairwise distance within each group is $1587$, a between/within ratio of
+$\mathbf{3.25}$. The 100ep and 150ep runs are thus geometrically
+distinct in weight space: they inhabit two separate
+neighborhoods, not one broad basin visited at two points along a cosine
+schedule.
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=0.72\textwidth]{fig_pca_basin}
+\caption{Weight-space PCA of all 10 FACED d6 checkpoints. PC1 accounts
+for $>\!99.9\%$ of variance and fully separates the 100ep and 150ep
+groups. Between/within ratio $= 3.25$. Source:
+\texttt{reports/p2\_pca\_basin.json}.}
+\label{fig:pca_basin}
+\end{figure}
+
+\paragraph{Parameter-space averaging fails; prediction-space averaging works.}
+To check whether the two groups' minima are connected by a low-loss
+linear path (same basin) or separated by a ridge (different basins), we
+linearly interpolate between cross-group pairs
+$\theta(\lambda) = (1-\lambda)\theta_{100} + \lambda\theta_{150}$ for
+$\lambda \in \{0, 0.1, \ldots, 1\}$ and evaluate val and test loss at
+each $\lambda$ (\cref{fig:mode_conn}, red curve). The interpolated
+weights produce \emph{near-chance} performance for every
+$\lambda$ (test loss $\approx 2.18$ nats, test BAcc $0.24$--$0.26$ vs.\
+$0.66$ at the endpoints): the linear path between a 100ep and a 150ep
+minimum is flat at chance, indicating that the two endpoints are not
+even connected by a low-loss straight line in weight space. For reference,
+within-group interpolation ($\lambda$-path between two 100ep seeds or
+two 150ep seeds, blue/orange dashed) traces the usual mode-connectivity
+barrier: test loss peaks near $\lambda=0.5$ at $\approx 2.0$ and
+recovers to the endpoint value.
+
+This is a crisp design signal: \textbf{prediction-space averaging
+succeeds exactly where parameter-space averaging fails}. Output
+averaging is agnostic to the geometry of the weight space and only
+requires that the two predictive distributions disagree on the right
+samples, which is what our decomposition already confirmed. It also
+explains why SWA (which averages weights) \emph{hurts} NLL on this
+trainer (\cref{sec:calib}): weight averaging across trajectories that
+live in different basins collapses the ensemble's uncertainty rather
+than combining it.
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=0.95\textwidth]{fig_mode_connectivity}
+\caption{Linear interpolation loss on FACED. Solid red:
+$\theta_{100}\!\rightarrow\!\theta_{150}$ (cross-group, different seeds);
+loss stays at chance level ($\approx 2.18$ nats) along the entire path,
+confirming the two groups live in different basins. Dashed blue/orange:
+within-group 100ep-to-100ep and 150ep-to-150ep interpolations; these
+show the expected $\sim\!1.0$-nat mode-connectivity barrier. Takeaway:
+weight averaging between groups is not a meaningful ensemble
+substitute; prediction-space averaging preserves the gain.
+Source: \texttt{reports/p2\_mode\_connectivity.json}.}
+\label{fig:mode_conn}
+\end{figure}
+
+\paragraph{Disagreement decomposition (visual).}
+\cref{fig:disagree} shows the accuracy of each estimator on the 253
+disagreement samples (13.1\% of FACED test). The mixed 10-model
+ensemble (rightmost, yellow) achieves $39.53\%$ accuracy on this
+subset, $+10.68$~pp above the 100ep consensus and $+10.28$~pp above the
+150ep consensus; the gain is cleanly localized to the disagreement set.
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=0.78\textwidth]{fig_disagreement_decomposition}
+\caption{Per-method accuracy on the 253 disagreement samples
+(13.1\% of FACED test). The two group consensuses are nearly tied
+($28.85\%$ vs.\ $29.25\%$); each group's 5-seed ensemble recovers a few
+percentage points; the 10-model mixed \ours{} ensemble recovers the
+most. Source: \texttt{reports/p2\_disagreement\_deep\_dive.json}.}
+\label{fig:disagree}
+\end{figure}

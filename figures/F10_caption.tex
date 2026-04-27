@@ -1,0 +1,8 @@
+\textbf{The two-tier saturation picture.}
+(a) The V-axis is encoded at two scales in a converged EEG model.
+\emph{Tier 1} is the shared class-mean V-axis basin: 9 emotion centroids project onto a common one-dimensional valence axis, and this projection is consistent across checkpoints (the ``saturated'' tier — adding a V-axis loss cannot improve a structure the model already encodes).
+\emph{Tier 2} is the within-class V-axis residual: the per-trial structure that varies between seeds and is averaged out by ensembling.
+The $r{=}{+}0.74$ correlation between within-class residual and ensemble contribution (Fig.~F8) lives in this tier.
+(b) The saturation transition.
+Below the threshold (e.g.\ CBraMod or EMOD-d3 vanilla), the model has not yet converged to the V-axis basin and adding a V-axis loss helps slightly; above the threshold (d6 + aug + KD), the model is already in the basin and the same loss adds gradient noise without information, so it hurts.
+The 25+ interventions of Fig.~F9 form the empirical content of the cliff at the right of (b).

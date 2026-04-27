@@ -1,0 +1,109 @@
+\section{Introduction}
+\label{sec:intro}
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=\textwidth]{signature_mechanism}
+\caption{\textbf{Why \ours{} works.}
+\textbf{(A)} Training 5 seeds of the same model at $T_\mathrm{max}=100$
+and 5 more at $T_\mathrm{max}=150$ reaches nearly identical final
+validation accuracy (0.6771 vs.\ 0.6776, $<\!0.001$ apart).
+\textbf{(B)} Yet the two endpoints \emph{do not} lie in the same loss
+basin: linearly interpolating their weights crosses a $+0.25$~nats
+train-loss barrier, and test accuracy dips by $6$~percentage points in
+the middle.
+\textbf{(C)} On the 13\% of test samples where the 100ep group-consensus
+and 150ep group-consensus \emph{disagree}, the mixed ensemble is
+\textbf{+10.3~pp} more accurate than either single-length consensus. The
+macroscopic $+1.5$~pp ensemble gain is the product of this correction
+($10.3\%$) and the disagreement fraction ($13.1\%$).}
+\label{fig:hero}
+\end{figure}
+
+Deep ensembling \cite{lakshminarayanan2017simple} remains one of the
+most effective and widely deployed techniques for boosting accuracy and
+uncertainty calibration: train $N$ models with different random seeds,
+average their softmax outputs, and pay $N\times$ inference for a
+$\sim$1--3~pp accuracy boost. A decade of follow-up work has searched for
+stronger diversity sources that surpass seeds alone---snapshot ensembles
+via cyclic learning rates~\cite{huang2017snapshot}, Stochastic Weight
+Averaging (SWA)~\cite{izmailov2018averaging}, Fast Geometric
+Ensembling~\cite{garipov2018loss}, BatchEnsemble~\cite{wen2020batchensemble},
+and hyperparameter ensembles~\cite{wenzel2020hyperparameter}. These methods
+typically pay for extra diversity with custom schedules, weight averaging
+that collapses the predictive distribution, or additional training
+infrastructure.
+
+\paragraph{A free diversity axis.}
+We identify an additional source of ensemble diversity that standard deep
+ensembles completely ignore and that costs essentially nothing to exploit:
+the \emph{length} of the cosine schedule itself. Concretely, we train two
+groups of seeds with $T_\mathrm{max}=100$ and $T_\mathrm{max}=150$---the
+same optimizer, augmentation, seeds, and schedule shape, changing only one
+integer---and average softmax outputs across both groups. We call this
+trick \ours{}.
+
+This is the minimum possible modification to deep ensembling: no new loss,
+no new regularizer, no weight averaging, no custom LR curve. Yet it adds
+$+1.5$~pp on EEG emotion classification and $+0.4$--$0.5$~pp on image
+benchmarks \emph{beyond} what same-length deep ensembling at matched
+compute already gives. Remarkably, a two-run \ours{} ensemble ($N{=}2$
+trajectory-length groups) often matches or beats a 10-seed same-length
+ensemble: trajectory-length diversity and seed diversity attack different
+failure modes.
+
+\paragraph{Why does this work?}
+Naively, two runs that end at the same mean accuracy should behave like
+two seeds of the same ensemble. We show empirically this intuition is
+wrong. A cosine schedule truncated at $T_\mathrm{max}$ makes the
+\emph{path} through parameter space depend on $T_\mathrm{max}$, not just
+the final accuracy. At epoch 100 of a 150-epoch schedule the LR is still
+$\sim\!0.25\cdot \mathrm{lr}_{\mathrm{init}}$---a $250\times$ larger step
+than at epoch 100 of a 100-epoch schedule---and the model continues taking
+meaningful gradient steps for 50 more epochs before settling. This
+low-LR tail is an effective \emph{basin-exploration} phase: the model
+wanders into a neighboring local minimum at the same loss but with
+different per-sample decision boundaries.
+
+We confirm this directly. On FACED, the 100ep and 150ep trajectories reach
+the same mean BAcc ($0.6771$ vs.\ $0.6776$, $<\!0.0005$ apart) yet disagree
+on $13\%$ of test samples; on those disagreement samples the mixed
+ensemble is $+10.3$~pp more accurate than either group's consensus;
+$10.3\% \times 13.1\% = 1.35$~pp predicted gain closely matches the
+observed $+1.50$~pp. A weight-space PCA further separates the two groups
+into distinct centroids (between/within ratio $3.25$), and a
+mode-connectivity probe shows the linear path between a 100ep and a 150ep
+checkpoint stays at \emph{chance} for every interpolation coefficient---so
+parameter-space averaging fails precisely where prediction-space averaging
+succeeds.
+
+\paragraph{Contributions.}
+\begin{itemize}[leftmargin=*]
+\item \textbf{A new, essentially free ensemble-diversity axis.} \ours{}
+adds trajectory length to seed as a second source of ensemble diversity
+by changing a single integer in the training recipe---no new loss, no
+custom schedule, no weight averaging.
+\item \textbf{New FACED EEG emotion SOTA.} Our 10-model \ours{} ensemble
+reaches \facedacc{} balanced accuracy, $+5.3$~pp over the EMOD AAAI 2026
+baseline ($0.642$) and $+1.1$~pp over a true 10-seed same-length deep
+ensemble.
+\item \textbf{Cross-modality validation.} The same trick lifts 5 more
+benchmarks spanning two vision, one text, and a second EEG dataset
+(SEED-V $+3.4\%$, CIFAR-100 $+4.7\%$, CIFAR-10 $+2.4\%$, Fashion-MNIST
+$+1.2\%$, MNIST $+0.14\%$, SST-2 $+0.3\%$).
+\item \textbf{Head-to-head wins on all four calibration metrics.} Against
+SWA, snapshot ensembles, and 10-seed deep ensembles on CIFAR-10 at matched
+compute, \ours{} has the best accuracy, NLL, ECE, and Brier score.
+\item \textbf{A predictive scaling law.} Across nine benchmarks the
+ensemble gain is a power law in $(1 - p_{\mathrm{ind}})$ with exponent
+$\alpha=0.85$ (Pearson $r=0.75$, $p=0.019$, $R^2=0.57$)---the trick
+delivers the most exactly where ensembling is most needed.
+\item \textbf{Mechanistic evidence.} Weight-space PCA (between/within
+ratio $3.25$) and linear mode-connectivity probes show the two groups
+occupy distinct basins; prediction-space averaging succeeds precisely
+because parameter-space averaging across the basins does not.
+\item \textbf{Endpoint-ratio is task-robust, not task-tuned.} A direct
+sweep $T_B \in \{110, 120, 130, 140, 150, 200\}$ at fixed $T_A=100$
+identifies $\rho = T_B/T_A \approx 1.5$ as a universal sweet spot
+consistent with the basin-separation analysis.
+\end{itemize}

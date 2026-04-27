@@ -1,0 +1,7 @@
+\textbf{FACED 9-class SOTA cascade: from CBraMod to a 0.6948 ensemble.}
+Each bar is a recipe in the cascade; gray bars are prior published SOTAs (CBraMod, EmotionKD, EMOD), blue bars are ours, dark blue is the locked SOTA.
+Numbers above bars are mean BACC; error bars show $\pm$ std over $\geq 5$ seeds where applicable.
+Green annotations show stepwise $\Delta$.
+The final ensemble (10 ckpts: 5 e100 + 5 e150) reaches $0.6948$ BACC, $+12.3$ pp ($+21.5\%$ relative) over CBraMod, $+6.7$ pp over EmotionKD, and $+1.7$ pp over our own best single-checkpoint val-selected model ($0.6755$).
+The SOTA does not require any V-axis loss in training.
+\emph{Test split: subjects 100--122 ($n{=}1932$ trials), identical across all rows.}

@@ -1,0 +1,90 @@
+\section{Method}
+\label{sec:method}
+
+\subsection{Few-Shot Concept Probing}
+
+Given an instruction-tuned LLM $\mathcal{M}$ with $L$ transformer blocks, hidden
+size $d$, and a set of $K$ concept classes (in our main experiments, $K=9$
+emotion categories), \ours produces a concept direction $v \in \mathbb{R}^d$
+in the following five steps:
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Generate exemplars.} For each class $c \in \{1, \dots, K\}$, prompt
+$\mathcal{M}$ with a templated instruction of the form ``Write a very short
+paragraph (3--4 sentences) about $\langle$topic$\rangle$ where a character
+experiences intense $\langle$class name$\rangle$.'' Use $n$ different topics
+(default $n=9$) and sample once per topic with temperature $0.8$ and top-$p$
+$0.9$. This produces $n$ stories per class, $Kn$ total. No human label is
+ever used.
+
+\item \textbf{Extract hidden states.} For each story $s_{c,i}$, run
+$\mathcal{M}(s_{c,i})$ and extract the final-layer hidden state
+$h_L(s_{c,i}) \in \mathbb{R}^{T \times d}$. Mean-pool over the non-padded
+tokens (weighted by attention mask) to get a single vector
+$\bar h_{c,i} \in \mathbb{R}^d$.
+
+\item \textbf{Form centroids.} Average the $n$ story embeddings per class:
+$\mu_c = \frac{1}{n} \sum_i \bar h_{c,i}$.
+
+\item \textbf{Compute the concept direction.} Assemble the centroid matrix
+$M \in \mathbb{R}^{K \times d}$ with rows $\mu_c - \bar\mu$, where
+$\bar\mu = \frac{1}{K}\sum_c \mu_c$ is the global mean. Compute the SVD
+$M = U S V^\top$. Define the valence axis $v = V_{[:, 0]}$ (the first
+right singular vector, equivalently the first principal component).
+
+\item \textbf{Score downstream text.} For a new text $x$, compute $\bar h_L(x)$,
+then its projection
+$\pi(x) = \langle \bar h_L(x) - \bar\mu, \, v \rangle$. For binary
+classification we threshold at the median (no labels) or at a calibrated
+value (using a small held-out set). For continuous regression (e.g.,\
+lexicon valence) we correlate $\pi(x)$ with the ground-truth score.
+\end{enumerate}
+
+The entire pipeline contains zero trainable parameters, zero gradient updates,
+and zero human labels. The only ``supervision'' is the class names used in the
+prompt templates, which are part of the LLM's vocabulary and cost nothing
+to specify.
+
+\subsection{Choice of Emotion Categories}
+
+We use the nine FACED emotion categories
+(\texttt{amusement, inspiration, joy, tenderness, anger, fear, disgust,
+sadness, neutral}) from the Finer-Grained Affective Computing EEG Dataset
+\cite{liu2024faced}. This choice is deliberate: it spans the positive/negative
+valence axis (4 positive + 4 negative + 1 neutral), which maximizes between-class
+separation along the direction of interest. Ablations with 2 classes
+(positive/negative) and 27 classes (GoEmotions
+\cite{demszky2020goemotions}) show that 9-class is a local optimum.
+
+\subsection{Why First Principal Component?}
+
+The first PCA component of the centroid matrix maximizes
+$\sum_c (\mu_c - \bar\mu)^\top v$ subject to $\|v\| = 1$. In our setting,
+the centroids of positive emotions cluster together and negative emotions
+cluster together, with neutral between them. The direction of maximum
+variance therefore traces the valence axis (positive$\leftrightarrow$negative).
+The second PCA component corresponds to a candidate arousal axis
+(high-activation emotions vs.\ low-activation) but our experiments show it
+does not recover a usable direction. An ablation comparing PCA to supervised
+LDA (linear discriminant analysis) on the per-story vectors
+(\cref{sec:experiments}) shows that PCA is \emph{more robust} for
+out-of-distribution transfer.
+
+\subsection{Why the Final Layer?}
+
+Our layer-granular sweep (\cref{sec:experiments}) shows that the valence
+direction lives almost entirely at the final 1--2 transformer blocks, with
+a weaker signal at layer~1 inherited from token embeddings. We use layer
+$L$ (the output of the last transformer block, just before the LM head)
+as the extraction point by default. Cross-model experiments show that
+while the \emph{magnitude} of the final-layer V-axis varies across model
+families (higher in Qwen, lower in BLOOM), every model we tested has its
+strongest linear-valence signal in the final 1--3 blocks.
+
+\subsection{Complexity}
+
+Time: for Qwen2.5-1.5B on a single V100, generating 81 stories takes
+$\sim$30s; extracting hidden states takes $\sim$5s; SVD of a
+$9\times 1{,}536$ matrix is instantaneous. Downstream evaluation on 872 SST-2
+samples takes 16 ms/sample (batched). Space: 81 story embeddings
+($\sim$500 kB) and a single $1{,}536$-dim direction ($\sim$6 kB).

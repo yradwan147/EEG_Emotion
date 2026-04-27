@@ -1,0 +1,110 @@
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Brain--LM alignment.}
+Toneva and Wehbe \citep{toneva2019interpreting} first demonstrated that
+mid-layer transformer activations linearly predict fMRI responses to
+narrative text, and that fine-tuning towards the brain target voxels
+improves both the alignment and downstream NLP performance --- the
+\emph{targeted-voxel} fine-tuning paradigm we cite as our closest
+methodological precedent. Schrimpf et~al.\ \citep{schrimpf2021neural}
+showed across 43 LMs that next-word prediction performance correlates
+with brain-fit on fMRI/ECoG. Goldstein et~al.\
+\citep{goldstein2022shared} extended the picture to intracranial
+recordings; Caucheteux and King \citep{caucheteux2022brains} to MEG.
+Padakanti and Oota \citep{padakanti2025meg} (EMNLP 2025) provide the
+most direct methodological precedent for our brain-side analysis:
+per-sensor ridge alignment with topographic scalp maps as the
+publishable artifact. Our work differs by (i) using the EEG modality at
+full 123-subject scale, (ii) studying \emph{emotion} rather than
+language, (iii) showing the alignment goes both ways: LLM-derived
+directions predict brain responses, and EEG models converge to the same
+LLM-derived direction.
+
+\paragraph{Affective computing on FACED.}
+The FACED 9-class dataset \citep{chen2023faced} has emerged as a
+standard benchmark for fine-grained EEG emotion classification.
+CBraMod \citep{wang2025cbramod} (ICLR 2025) reports 0.572 BACC on the
+full 9-class task with a transformer foundation model pretrained on
+TUEG. EmotionKD \citep{liu2023emotionkd} (ACMMM 2023) reports 0.628 via
+knowledge distillation from a labelled teacher. EMOD
+\citep{chen2025emod} (AAAI 2026) reports 0.6287 with an axial
+transformer backbone using V--A contrastive supervision. REVE
+\citep{elouahidi2025reve} (NeurIPS 2025) sets a recent multi-task EEG
+benchmark; LaBraM \citep{jiang2024labram} (ICLR 2024 Spotlight) and
+EEGPT \citep{yue2024eegpt} provide additional foundation-model
+references.
+
+\paragraph{Representation alignment as auxiliary supervision.}
+Aligning a target representation to an auxiliary signal --- whether
+from a teacher network \citep{hinton2015distilling}, an alternative
+representation \citep{tian2020crd}, a similarity matrix
+\citep{kriegeskorte2008rsa,park2019rkd}, or human perceptual judgements
+\citep{sundaram2024perceptual} --- is a well-studied mechanism for
+inducing transferable structure. Recent work has explored cross-modal
+alignment via contrastive losses \citep{radford2021clip}, RSA-style
+structural matching, label smoothing relative to teacher distributions
+\citep{khosla2020supcon}, and parameter-efficient adaptation
+\citep{hu2022lora,liu2022ia3}. Our paper's negative results probe this
+literature: when the model has already converged to the alignment
+target via task supervision alone, adding any of these mechanisms
+\emph{cannot} help. We test 25 such mechanisms and confirm: above the
+saturation threshold, all hurt or do nothing.
+
+\paragraph{Concept directions and probing in LLMs.}
+A growing body of work demonstrates that abstract concepts often
+correspond to single directions in transformer hidden states. Arditi
+et~al.\ \citep{arditi2024refusal} (NeurIPS 2024) show that
+\emph{refusal} in instruction-tuned LMs is mediated by a single
+direction in residual-stream activations across 13 models up to 72B
+parameters; ablating this direction eliminates refusal, while adding
+it induces refusal. Earlier work in this style includes
+\citep{li2023inferencetime,zou2023repe,kim2018tcav}. Our V-axis is
+extracted analogously --- as the principal component of class-mean
+activations across nine emotion-story prompts --- and exhibits the
+same architecture-spanning universality.
+
+\paragraph{The Platonic Representation Hypothesis.}
+Huh et~al.\ \citep{huh2024platonic} (ICML 2024 position paper) argue
+that representations learned by neural networks across modalities and
+architectures converge to a shared statistical model of reality, and
+operationalize this via kernel alignment between vision and language
+backbones. Our work provides cross-modal evidence beyond the
+vision--language pair studied there: (i) LLM $\leftrightarrow$ human
+EEG (a biological neural system), and (ii) LLM $\leftrightarrow$ EEG
+models (an artificial neural
+network trained on biological signals), all converging to the same
+one-dimensional valence axis. The convergence we measure within EEG
+models trained on the same dataset is also a Platonic-style phenomenon
+at the single-modality level.
+
+\paragraph{Frontal asymmetry in emotion.}
+Davidson and colleagues
+\citep{davidson1992anterior,davidson2004wellbeing} proposed that
+approach versus withdrawal motivation is reflected in relative
+frontal-alpha asymmetry: greater left-frontal activation indexes
+positive affect / approach, and right-frontal activation indexes
+negative / withdrawal. The hypothesis has been replicated in many
+static-stimulus paradigms and has remained the dominant
+electrophysiological account of emotion in the EEG literature
+\citep{coan2004frontal}. Our brain topography results show that for
+\emph{video-evoked emotion} on FACED, the LLM-derived valence
+direction is predominantly encoded in posterior visual cortex
+($|r|_{\text{occipital}}=0.21$ vs.\ $|r|_{\text{frontal}}=0.16$), with
+Davidson's frontal asymmetry replicating qualitatively but at
+$\sim$10$\times$ smaller magnitude. We do not refute Davidson's
+hypothesis --- the frontal effect is real --- but we add an
+empirically more powerful account for video paradigms specifically.
+
+\paragraph{Ensemble theory.}
+Classical bias--variance decomposition
+\citep{geman1992neural,krogh1995neural} explains uniform softmax
+averaging as variance reduction across a fixed bias. Recent
+mechanistic work on linear-mode connectivity
+\citep{frankle2020linearmode,wortsman2022model} has shown that
+checkpoints from the same training run lie in approximately convex
+basins, sharing a coarse representation but differing in fine details.
+Our two-tier story --- saturated class-mean basin (Tier 1) plus
+seed-specific within-class residual (Tier 2) --- gives a
+representational version of this picture, with the residual explicitly
+identified as the \emph{V-axis} component.

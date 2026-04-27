@@ -1,0 +1,100 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{What distinguishes \ours{} from related ensemble methods?}
+
+The closest existing methods are snapshot ensembling (cyclic LR within one
+run) and SWA (weight averaging along one trajectory). Our method differs
+from both:
+
+\textbf{vs.\ Snapshot ensembling.} Snapshot ensembling runs \emph{one}
+training with cyclic LR restarts, collecting snapshots at each local
+minimum. Our method runs \emph{two separate} trainings with different
+$T_\mathrm{max}$, no cycles. Conceptually simpler (no LR modification) and
+preserves the original training recipe.
+
+\textbf{vs.\ SWA.} SWA averages \emph{weights} collected along a single
+cosine trajectory after the LR has decayed. Our method averages
+\emph{outputs} across two trajectories. Output averaging preserves the
+ensemble's calibration and uncertainty properties (weight averaging
+collapses them into a single point estimate). Output ensembles also
+handle multiple minima better: our mode-connectivity probe
+(\cref{sec:basin}) shows that the linear weight-space path between a
+100ep checkpoint and a 150ep checkpoint stays at chance for every
+interpolation coefficient $\lambda \in [0, 1]$. In other words,
+parameter-space averaging between the two groups simply does not work,
+while prediction-space averaging yields a consistent $+1.5$~pp
+improvement --- a textbook separation between the two strategies.
+
+\textbf{vs.\ Fast Geometric Ensembles.} FGE explicitly walks curves
+between minima in weight space, requiring a pretrained starting point and
+a curve-finding loss. Our method achieves comparable diversity by simply
+varying the endpoint of an already-used schedule---no extra training
+infrastructure, no new loss.
+
+\textbf{vs.\ Standard deep ensembles.} Deep ensembles differ only in seed.
+Our method adds \emph{trajectory length} as a second diversity axis on
+top of seed. The $+1.5$~pp gain we observe is on top of what a standard
+5-seed deep ensemble achieves.
+
+\subsection{Why is the gain largest for capacity-bound students?}
+
+Our experiments show a clean scaling: gain is largest on hard tasks with
+low individual accuracy. The mechanism is simple. At low individual
+accuracy, many test samples are near the decision boundary---the model
+is uncertain and its prediction is determined by small features. Different
+training trajectories find slightly different decision boundaries, and
+ensembling corrects errors on the samples where they disagree.
+
+On easy tasks (MNIST at 0.985 individual accuracy), essentially every
+test sample is confidently correct, so there are few disagreement samples
+and little gain. At the extreme of trivial tasks, ensembling gives zero
+gain (everything is unanimous and correct).
+
+\subsection{When should practitioners use \ours?}
+
+We recommend \ours{} when:
+\begin{itemize}[leftmargin=*]
+\item \textbf{Individual accuracy is in the 0.5--0.85 range.} This is where
+the gain is largest.
+\item \textbf{You already use a cosine LR schedule.} No modifications
+needed, just vary $T_\mathrm{max}$.
+\item \textbf{Compute budget permits a second training run.} The trick
+doubles training compute, though you can use smaller $T_B - T_A$ to
+reduce this.
+\item \textbf{Calibrated ensemble outputs matter.} Unlike SWA, \ours{}
+produces a true probabilistic ensemble, preserving uncertainty and
+calibration.
+\end{itemize}
+
+We \emph{do not} recommend it when individual accuracy is near ceiling
+(MNIST-level tasks) or when compute is so tight that a second training
+run is infeasible.
+
+\subsection{Limitations}
+
+\paragraph{Requires a second training run.} \ours{} costs roughly
+$(T_A + T_B)/T_A - 1$ extra compute on top of a standard
+deep ensemble. For $T_A=100, T_B=150$ this is $0.5\times$ extra compute.
+Not free.
+
+\paragraph{Endpoint ratio has an operating regime.} Our endpoint sweep
+(\cref{sec:endpoint_sweep}) shows that $\rho = T_B/T_A \approx 1.5$ is
+a sweet spot: smaller ratios ($\rho \in [1.1, 1.4]$) yield smaller gains,
+and much larger ratios ($\rho \approx 2.0$) cause group $B$ to overfit,
+pulling the mixed ensemble below the $T_A$-only baseline. We recommend
+$\rho \in [1.4, 1.6]$; outside this window the user should expect
+reduced or no gain.
+
+\paragraph{Same-seed, different-length vs.\ different-seed, different-length.}
+We use different random seeds for each (seed, length) pair. We have not
+tested whether the trick also works with the \emph{same} random seed for
+the 100ep and 150ep runs (only LR schedule differs). The non-determinism
+in SGD data ordering suggests this would still give some diversity.
+
+\paragraph{Ceiling-bound datasets give smaller gains.} The scaling law
+is also a scope statement: on tasks where individual accuracy is near
+ceiling (MNIST at 0.985, SST-2 at 0.91) the headroom is small and the
+gain is correspondingly small. We view this as predictive rather than
+limiting---the scaling fit tells practitioners in advance when the
+trick will and will not pay off.

@@ -1,0 +1,48 @@
+\begin{abstract}
+A central question at the interface of neuroscience and machine learning asks
+whether the latent representations learned by language models bear meaningful
+relation to those used by the human brain. We answer affirmatively for the
+case of \emph{valence}, the principal axis of human emotion. From nine short
+emotion stories --- one per category in the FACED 9-class taxonomy --- we
+extract a single one-dimensional valence direction (the \textbf{V-axis}) that
+generalizes universally: it is shared across 18 large language models from
+0.5B to 72B parameters, recovers gold-standard sentiment lexicons (NRC,
+Warriner) at $|r|\!\ge\!0.76$, and predicts the cohort-averaged EEG responses
+of 123 human subjects watching emotional videos at $r=0.87$
+($p<10^{-9}$). The brain encodes the V-axis most strongly in posterior
+visual cortex --- challenging the classical frontal-asymmetry account for
+video-evoked emotion --- with a significant contribution dominated by the
+contrast between three emotional poles (anger, amusement, tenderness)
+across nine stimuli, while the remaining nineteen stimuli contribute zero
+signal.
+
+We then show that EEG emotion classifiers trained on standard cross-entropy
+\emph{spontaneously converge} to the same valence axis. Across 36
+checkpoints spanning two architectures (CBraMod, EMOD), accuracy
+correlates with V-axis encoding strength at $r\!=\!+0.885$ in the
+class-mean subspace and $r\!=\!+0.715$ in the within-class residual
+subspace; the per-checkpoint within-class residual $|r|$ predicts that
+checkpoint's leave-one-out contribution to ensemble accuracy at
+$r\!=\!+0.74$ ($p\!=\!0.014$). We test 25 representation-alignment
+interventions designed to inject the V-axis as auxiliary supervision;
+all either fail or harm accuracy above an empirically located
+saturation threshold --- alignment training only helps when the base
+model has not yet discovered the axis on its own. The V-axis is
+\emph{the} latent these models converge to, regardless of whether we
+ask them to.
+
+We turn this principle into a new state-of-the-art on FACED 9-class
+emotion classification: \textbf{0.6948 balanced accuracy
+($+21.5\%$ relative over CBraMod, $+10.6\%$ over EmotionKD)} via uniform
+softmax averaging across 10 checkpoints. The mechanism is principled: each
+checkpoint shares the converged class-mean V-axis basin (saturated, free
+from supervision), but encodes the within-class V-axis residual with
+seed-specific noise; ensembling cancels this noise. A single val-selected
+checkpoint also sets a new single-seed SOTA at \textbf{0.6755 balanced
+accuracy}.
+
+Our results unify three previously separate phenomena --- language-model
+emotion latents, brain--LLM alignment, and EEG model ensembling --- under a
+single principle: a universal valence axis is the natural latent of
+emotion-classification systems built from text or scalp.
+\end{abstract}

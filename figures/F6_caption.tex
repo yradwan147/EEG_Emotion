@@ -1,0 +1,6 @@
+\textbf{V-axis supervision helps weak baselines and hurts strong ones.}
+Each point is one V-axis-as-supervision intervention plotted at its base recipe BACC ($x$) versus its observed $\Delta$ BACC ($y$, paired-mean over $\geq 3$ seeds).
+Below the saturation transition zone ($\sim\!0.62$--$0.66$) at the EMOD-d3 baseline, several interventions land near zero or slightly positive.
+Above the threshold, the same losses degrade the model: at the d6+aug+KD SOTA recipe, both Topo-optimal $\lambda{=}0.05$ ($\Delta{=}{-}0.015$) and EMODSTYLE $\lambda{=}0.5$ ($\Delta{=}{-}0.024$) become significantly negative.
+The 25+ interventions tested form a saturation cliff: external V-axis supervision is informative only when the model has not yet internalised the V-axis on its own.
+\textbf{Color}: \textcolor[HTML]{d62728}{red} significant negative ($p{<}0.05$); \textcolor[HTML]{ff7f0e}{orange} NS negative; \textcolor[HTML]{9ecae1}{light blue} NS positive.
