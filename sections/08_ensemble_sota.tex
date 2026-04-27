@@ -1,7 +1,7 @@
 \section{State of the Art via Principled Ensembling}
 \label{sec:sota}
 
-The saturation theorem of Section~\ref{sec:saturation} is not just a
+The saturation regularity of Section~\ref{sec:saturation} is not just a
 negative result. It implies a positive prescription: if external
 alignment cannot help a converged model, the only remaining lever is
 \emph{within-class V-axis variance}, which is exactly what averaging
@@ -92,7 +92,7 @@ diagnostic: replacing the LLM-derived 9-D class prototypes with random
 orthonormal 9-D directions costs $\leq 0.003$ BACC. KD-as-soft-target
 provides architectural regularisation at this scale; the
 \emph{semantic content} of the soft target adds nothing measurable.
-This is consistent with the saturation theorem: by the time the KD
+This is consistent with the saturation regularity: by the time the KD
 loss is added, the network has already absorbed the V-axis from the
 classification labels.
 
@@ -220,7 +220,7 @@ residual variance shrinks, and ensembling has nothing left to cancel.
 \subsection{Summary}
 
 We arrive at a new FACED SOTA of $0.6948$ BACC via a principled
-ensemble construction grounded in the saturation theorem: the
+ensemble construction grounded in the saturation regularity: the
 class-mean V-axis basin is shared across seeds, ensemble gain comes
 from seed-specific within-class V-axis residuals, and the recipe
 optimum is a 10-checkpoint $d{=}6$ pool spanning two training-length

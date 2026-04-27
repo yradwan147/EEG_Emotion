@@ -1,20 +1,22 @@
 \begin{abstract}
-A central question at the interface of neuroscience and machine learning asks
-whether the latent representations learned by language models bear meaningful
-relation to those used by the human brain. We answer affirmatively for the
-case of \emph{valence}, the principal axis of human emotion. From nine short
-emotion stories --- one per category in the FACED 9-class taxonomy --- we
-extract a single one-dimensional valence direction (the \textbf{V-axis}) that
-generalizes universally: it is shared across 18 large language models from
-0.5B to 72B parameters, recovers gold-standard sentiment lexicons (NRC,
-Warriner) at $|r|\!\ge\!0.76$, and predicts the cohort-averaged EEG responses
-of 123 human subjects watching emotional videos at $r=0.87$
-($p<10^{-9}$). The brain encodes the V-axis most strongly in posterior
-visual cortex --- challenging the classical frontal-asymmetry account for
-video-evoked emotion --- with a significant contribution dominated by the
-contrast between three emotional poles (anger, amusement, tenderness)
-across nine stimuli, while the remaining nineteen stimuli contribute zero
-signal.
+The Platonic Representation Hypothesis predicts that representations
+learned across modalities and architectures converge to a shared
+statistical model of reality. We provide empirical evidence at
+biological scale: \emph{a single one-dimensional latent direction
+emerges in language models, in human brains, and in EEG classifiers
+trained on those brains, and it is the same direction in all three.}
+We extract this direction --- the \textbf{V-axis} --- from nine short
+emotion stories, one per FACED class, by PCA on language-model story
+centroids. The same direction (i) is shared across 18 LLMs from 0.5B
+to 72B parameters and recovers sentiment lexicons (NRC, Warriner) at
+$|r|\!\ge\!0.76$ zero-shot; (ii) predicts cohort-averaged EEG of 123
+human subjects watching 28 emotional videos at $r=0.87$ ($p<10^{-9}$);
+(iii) emerges spontaneously in EEG classifiers trained only on the
+9-class label, and its emergence quantitatively predicts accuracy and
+ensemble contribution. The brain encodes the axis most strongly in
+posterior visual cortex for video-evoked emotion, with the cohort
+signal carried by an anger-versus-warm-positive contrast across nine
+of the 28 stimuli.
 
 We then show that EEG emotion classifiers trained on standard cross-entropy
 \emph{spontaneously converge} to the same valence axis. Across 36
@@ -41,8 +43,8 @@ seed-specific noise; ensembling cancels this noise. A single val-selected
 checkpoint also sets a new single-seed SOTA at \textbf{0.6755 balanced
 accuracy}.
 
-Our results unify three previously separate phenomena --- language-model
-emotion latents, brain--LLM alignment, and EEG model ensembling --- under a
-single principle: a universal valence axis is the natural latent of
-emotion-classification systems built from text or scalp.
+Together, these three sides --- LLM, brain, EEG-classifier --- show
+the same axis with quantitatively consistent strength, providing
+direct cross-modal evidence for the Platonic Representation Hypothesis
+extended to a biological neural system.
 \end{abstract}

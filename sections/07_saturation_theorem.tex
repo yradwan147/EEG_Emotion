@@ -1,4 +1,4 @@
-\section{The Saturation Theorem: V-axis as Supervision}
+\section{The Saturation Regularity: V-axis as Supervision}
 \label{sec:saturation}
 
 Sections~\ref{sec:vaxis-llms}--\ref{sec:topography} establish that the
@@ -9,9 +9,11 @@ explicitly supervising them with the V-axis?} We test this hypothesis
 exhaustively. Across 25 distinct intervention families spanning seven
 years of representation-alignment literature, the answer is uniformly
 \textbf{no} above a saturation threshold and \textbf{marginally yes}
-below it. We call this empirical regularity the \emph{saturation
-theorem} and devote this section to documenting, locating, and
-explaining it.
+below it. We call this empirical pattern the \emph{saturation
+regularity} and devote this section to documenting, locating, and
+explaining it. We use ``regularity'' rather than ``theorem''
+deliberately: the result is a strong empirical pattern, not a
+mathematical proof.
 
 \subsection{Twenty-five interventions, one verdict}
 
@@ -296,7 +298,7 @@ seed noise. None reach $p<0.05$ in the positive direction. Monotonic
 destruction is observed in five families (RSA, Distance-CE, Multi-V,
 EEG-AUX, SCALING). The transition between "helps" and "hurts" lies in
 the BACC interval $[0.62, 0.66]$ on FACED. We frame this as the
-empirical content of a \emph{saturation theorem}: late-layer concept
+empirical content of a \emph{saturation regularity}: late-layer concept
 probes are unhelpful supervision targets above the saturation
 threshold, exactly because they are already encoded by the converged
 network. The next section operationalises this theory into our SOTA
