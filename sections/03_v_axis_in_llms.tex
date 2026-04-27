@@ -76,7 +76,7 @@ inverted-U is real but small (Qwen3.5-1.7B 0.868 vs.\ Qwen3.5-7B
 0.848 vs.\ Qwen3.5-32B 0.831 on SST-2 zero-shot); above
 $\sim$1.7B parameters the recipe is essentially saturated.
 Per-LLM brain-alignment ranks recur with this same three-tier
-structure (Section~\ref{sec:vaxis-brain}, Table~\ref{tab:llm-brain}).
+structure (Section~\ref{sec:vaxis-brain}, Figure~\ref{fig:llm-brain}).
 
 \subsection{External validity on sentiment benchmarks}
 
@@ -148,31 +148,21 @@ encoder--decoder \citep{muennighoff2022mt0} fully recovers the
 zero-shot SST-2 result and \emph{exceeds} the English baseline in
 every language tested:
 
-\begin{table}[h]
+\begin{figure}[h]
 \centering
-\small
-\begin{tabular}{lrrrr}
-\toprule
-Extractor & Params & ja $\to$ SST-2 & ar $\to$ SST-2 & ru $\to$ SST-2 \\
-\midrule
-Qwen3.5-1.7B-Instruct (causal, EN-centric)  & 1.7B & 0.514 & 0.519 & 0.552 \\
-BLOOMZ-1B7 (multilingual, causal)            & 1.7B & 0.608 & 0.582 & 0.583 \\
-XLM-RoBERTa-large (multilingual, encoder)    & 560M & 0.627 & 0.580 & 0.517 \\
-BLOOMZ-7B1 (multilingual, causal)            & 7.1B & 0.514 & 0.571 & 0.503 \\
-\textbf{mT0-base (multilingual, enc--dec)}   & \textbf{277M} & $\mathbf{0.891}$ & $\mathbf{0.912}$ & $\mathbf{0.913}$ \\
-\midrule
-\emph{English-extractor reference} & 1.5B & \multicolumn{3}{c}{0.868 (Qwen3.5-1.7B EN baseline)} \\
-\bottomrule
-\end{tabular}
+\IfFileExists{figures/landmark/lf12_multilingual_grouped.pdf}
+  {\includegraphics[width=0.98\linewidth]{landmark/lf12_multilingual_grouped.pdf}}
+  {\includegraphics[width=0.98\linewidth]{landmark/lf12_multilingual_grouped.png}}
 \caption{Cross-lingual V-axis recovery. The English baseline failure
 of causal Qwen on non-English stories is an \emph{English-bias}
-phenomenon (chance-level AUC). Switching to a multilingual instruction-tuned encoder--decoder
-(mT0-base) recovers the SST-2 signal \emph{above} the English ceiling
-across three typologically distant languages, at $5\!\times$ smaller
-parameter count. The recipe transfers; what matters is the
-multilinguality of the extractor, not the language of the stories.}
-\label{tab:multilingual}
-\end{table}
+phenomenon (chance-level AUC). Switching to a multilingual
+instruction-tuned encoder--decoder (mT0-base) recovers the SST-2
+signal \emph{above} the English ceiling across three typologically
+distant languages, at $5\!\times$ smaller parameter count. The recipe
+transfers; what matters is the multilinguality of the extractor, not
+the language of the stories.}
+\label{fig:multilingual}
+\end{figure}
 
 The mT0-base result rules out a "valence is English-specific
 construct" objection: a 277M-parameter multilingual encoder--decoder
@@ -225,39 +215,23 @@ authored 9 stories per concept for 20 unrelated dimensions
 protocol. \textbf{20 of 20 concepts reach binary AUC $> 0.65$ on
 held-out test stories, and 17 of 20 reach AUC $\ge 0.95$}, with
 eleven concepts hitting a perfect AUC $=1.00$.
-Table~\ref{tab:concept-library} reports the full per-concept results.
+Figure~\ref{fig:concept-library} reports the full per-concept results.
 
-\begin{table}[h]
+\begin{figure}[h]
 \centering
-\small
-\begin{tabular}{lrr|lrr}
-\toprule
-Concept & AUC & $|\rho|$ & Concept & AUC & $|\rho|$ \\
-\midrule
-complexity        & 1.00 & 0.95 & gratitude         & 0.98 & 0.78 \\
-concreteness      & 1.00 & 0.80 & pride             & 0.98 & 0.48 \\
-decisiveness      & 1.00 & 0.68 & surprise          & 0.98 & 0.68 \\
-emotionality      & 1.00 & 0.75 & hostility         & 0.95 & 0.88 \\
-envy              & 1.00 & 0.57 & sarcasm           & 0.91 & 0.37 \\
-fear              & 1.00 & 0.83 & certainty         & 0.78 & 0.17 \\
-guilt             & 1.00 & 0.47 & specificity       & 0.78 & 0.72 \\
-hope              & 1.00 & 0.53 & \emph{toxicity (Jigsaw)} & \emph{0.59} & --- \\
-optimism          & 1.00 & 0.50 & & & \\
-shame             & 1.00 & 0.80 & \textbf{Mean (working 20)} & \textbf{0.97} & \textbf{0.62} \\
-urgency           & 1.00 & 0.77 & \textbf{Mean off-diagonal transfer} & \textbf{0.83} & --- \\
-authoritativeness & 0.98 & 0.88 & \textbf{Self -- transfer gap} & \textbf{+0.13} & --- \\
-contempt          & 0.98 & 0.73 & & & \\
-\bottomrule
-\end{tabular}
-\caption{The 9-story recipe is concept-generic. Binary AUC
-(pole-vs-pole) and rank monotonicity $|\rho|$ across the 9 ordered
-classes. 20 of 20 concepts produce a working axis (AUC $>0.65$); 17 of 20
-reach $\ge 0.95$. Toxicity is the lone substantive failure
-(see below). Mean off-diagonal transfer is reported across the
-$20\!\times\!20$ axis-application matrix; full matrix in
-Appendix~\ref{app:concept-library-full}.}
-\label{tab:concept-library}
-\end{table}
+\IfFileExists{figures/landmark/lf11_concept_library_bars.pdf}
+  {\includegraphics[width=0.98\linewidth]{landmark/lf11_concept_library_bars.pdf}}
+  {\includegraphics[width=0.98\linewidth]{landmark/lf11_concept_library_bars.png}}
+\caption{The 9-story recipe is concept-generic. Binary pole-vs-pole AUC
+across 20 unrelated concepts (sorted descending) plus the named failure
+(Jigsaw toxicity, AUC $0.59$). 20 of 20 concepts produce a working axis
+(AUC $>0.65$); 17 of 20 reach $\ge 0.95$; 11 are perfect. Mean
+off-diagonal transfer across the $20\!\times\!20$ axis-application
+matrix is $0.83$; full matrix in
+Appendix~\ref{app:concept-library-full}. Inside-bar labels report rank
+monotonicity $|\rho|$ across the 9 ordered classes.}
+\label{fig:concept-library}
+\end{figure}
 
 \paragraph{Cross-concept transfer matrix.}
 We further measured what happens when we apply the V-axis of one
@@ -281,7 +255,7 @@ captured-by-others AUC) are \textbf{specificity} ($0.65$) and
 \textbf{sarcasm} ($0.67$). Together this argues the recipe is a
 \emph{family} of late-layer concept extractors, with valence one
 member among many. We list the working concepts in
-Table~\ref{tab:concept-library}; the full $20\!\times\!20$
+Figure~\ref{fig:concept-library}; the full $20\!\times\!20$
 transfer matrix is reported in
 Appendix~\ref{app:concept-library-full}.
 

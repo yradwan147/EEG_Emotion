@@ -89,47 +89,24 @@ Computing the V-axis from each of the 18 language models in
 Section~\ref{sec:vaxis-llms} and projecting onto the FACED EEG
 manifold (best cell, PO3/$\gamma$):
 
-\begin{table}[h]
+\begin{figure}[h]
 \centering
-\small
-\begin{tabular}{llrcl}
-\toprule
-Tier & LLM (family, params) & $r$ vs.\ EEG-DE-Ridge & $r$ vs.\ behav. & 9-class $r$ \\
-\midrule
-\multirow{6}{*}{Top}
- & Qwen3.5-14B (Qwen)         & $+0.862$ & $+0.964$ & $+0.975$ \\
- & Mistral-7B (Mistral)       & $+0.861$ & $+0.935$ & $+0.945$ \\
- & Qwen3.5-3B  (Qwen)         & $+0.849$ & $+0.947$ & $+0.959$ \\
- & Qwen3.5-7B  (Qwen)         & $+0.846$ & $+0.957$ & $+0.970$ \\
- & Gemma-27B   (Gemma)        & $+0.815$ & $+0.807$ & $+0.838$ \\
- & Gemma-4-E2B ($L\!=\!17$)   & $+0.819$ & --- & --- \\
-\midrule
-\multirow{4}{*}{Mid}
- & Qwen3.5-1.7B               & $+0.792$ & $+0.938$ & $+0.949$ \\
- & Qwen3.5-72B                & $+0.776$ & $+0.923$ & $+0.934$ \\
- & Llama-4-Scout-17B          & $+0.652$ & $+0.826$ & $+0.854$ \\
- & Phi-2-3B                   & $+0.680$ & $+0.651$ & $+0.659$ \\
-\midrule
-\multirow{4}{*}{Out}
- & Pythia-1.4B                & $+0.414$ & $+0.276$ & $+0.282$ \\
- & Gemma-4-31B (final layer)  & $+0.092$ & --- & --- \\
- & TinyLlama-1.1B             & $+0.058$ & $+0.128$ & $+0.129$ \\
- & BLOOM-560M                 & $+0.162$ & $+0.031$ & $+0.035$ \\
-\bottomrule
-\end{tabular}
-\caption{Per-LLM brain-prediction quality. The 18-LLM brain ranking
+\IfFileExists{figures/landmark/lf13_llm_brain_forest.pdf}
+  {\includegraphics[width=0.98\linewidth]{landmark/lf13_llm_brain_forest.pdf}}
+  {\includegraphics[width=0.98\linewidth]{landmark/lf13_llm_brain_forest.png}}
+\caption{Per-LLM brain-prediction quality. The 18-LLM brain ranking (a)
 recapitulates the text-domain three-tier structure of
-Section~\ref{sec:vaxis-llms-universality}. Top tier: \emph{any} LLM
+Section~\ref{sec:vaxis-llms-universality} (b). Top tier: \emph{any} LLM
 that learned a clean valence concept ($r$ vs.\ behavioural $> 0.8$,
 $n{=}13$) recovers an EEG-correlated V-axis at mean $r$ vs.\ EEG of
 $+0.788 \pm 0.064$, irrespective of family or scale. Out tier: the
-three LLMs that did not learn a clean text-domain V-axis
-also fail to predict the brain. The brain prediction is therefore
-a \emph{universality} story (\emph{any} sufficiently capable LLM
-predicts EEG) rather than a scaling story (within-Qwen scaling
-$r=0.249$, $p=0.519$, $n=9$, n.s.).}
-\label{tab:llm-brain}
-\end{table}
+LLMs that did not learn a clean text-domain V-axis also fail to predict
+the brain. The brain prediction is therefore a \emph{universality}
+story (\emph{any} sufficiently capable LLM predicts EEG) rather than a
+scaling story (within-Qwen scaling $r=0.249$, $p=0.519$, $n=9$, n.s.).
+Error bars are Fisher-$z$ 95\% CIs over $n=28$ FACED stimuli.}
+\label{fig:llm-brain}
+\end{figure}
 
 \paragraph{Universality $\gg$ scale.}
 The 18-LLM brain prediction is a clean \emph{universality} signature:

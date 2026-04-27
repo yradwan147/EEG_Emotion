@@ -247,32 +247,24 @@ To verify that two-tier ensembling is a general phenomenon and not
 specific to FACED, we re-ran the same construction on three adjacent
 benchmarks --- a second EEG-emotion dataset and two image
 classification benchmarks --- using analogously sized models and
-matched ensemble sizes. Table~\ref{tab:ensemble-generality}
+matched ensemble sizes. Figure~\ref{fig:ensemble-generality}
 summarises the result.
 
-\begin{table}[h]
+\begin{figure}[h]
 \centering
-\small
-\begin{tabular}{lcccr}
-\toprule
-Benchmark / model & Single mean & 5-seed ensemble & $\Delta$ & Headroom $1{-}\bar{\mathrm{Acc}}$ \\
-\midrule
-FACED 9c (EEG, EMOD $d{=}6$)                  & $0.6581$ & $\mathbf{0.6948}$ & $+0.037$ & $0.342$ \\
-SEED-V 5c (EEG, EMOD $d{=}6$)                 & $0.3743$ & $0.4083$         & $+0.034$ & $0.626$ \\
-CIFAR-10 (small CNN)                          & $0.9015$ & $0.9253$         & $+0.024$ & $0.099$ \\
-MNIST (MLP)                                   & $0.9849$ & $0.9863$         & $+0.001$ & $0.015$ \\
-\bottomrule
-\end{tabular}
-\caption{Two-tier ensemble gain across four benchmarks. The
-empirical pattern is monotonic in headroom: $\Delta$BACC is largest
-where the single-model accuracy is furthest from the dataset
-ceiling, and shrinks to near-zero on MNIST where the saturated
-regime leaves no within-class residual variance to cancel. The
-slope of $\Delta$ vs.\ headroom across these four datasets is $\sim
-0.07$, with FACED and SEED-V near the linear regime and MNIST in
-the asymptotic-saturation regime.}
-\label{tab:ensemble-generality}
-\end{table}
+\IfFileExists{figures/landmark/lf14_ensemble_generality.pdf}
+  {\includegraphics[width=0.98\linewidth]{landmark/lf14_ensemble_generality.pdf}}
+  {\includegraphics[width=0.98\linewidth]{landmark/lf14_ensemble_generality.png}}
+\caption{Two-tier ensemble gain across four benchmarks. The empirical
+pattern is monotonic in headroom: $\Delta$BACC is largest where the
+single-model accuracy is furthest from the dataset ceiling, and
+shrinks to near-zero on MNIST where the saturated regime leaves no
+within-class residual variance to cancel. (a) Scatter of
+$\Delta$ vs.\ headroom $1{-}\bar{\mathrm{Acc}}$, with linear fit
+slope $\sim 0.05$. (b) Paired single-seed-mean vs.\ 5-seed-ensemble
+bars per benchmark, sorted by headroom.}
+\label{fig:ensemble-generality}
+\end{figure}
 
 \paragraph{The two-tier theory predicts this pattern.}
 As individual accuracy approaches the Bayes optimum, the
