@@ -67,24 +67,25 @@ def main():
 
     bar_colors = [color_for(a) for a in aucs]
 
-    fig = plt.figure(figsize=(10.6, 5.4))
-    gs = fig.add_gridspec(1, 1, left=0.075, right=0.975, bottom=0.31, top=0.86)
+    fig = plt.figure(figsize=(11.4, 5.8))
+    gs = fig.add_gridspec(1, 1, left=0.075, right=0.975, bottom=0.32, top=0.81)
     ax = fig.add_subplot(gs[0, 0])
 
     x = np.arange(n)
     bars = ax.bar(x, aucs, color=bar_colors, edgecolor="black",
                   linewidth=0.7, width=0.78, zorder=3)
 
-    # Threshold lines
+    # Threshold lines — labels placed on the LEFT spine in clear space below
+    # each line, so they never collide with bar tips on the right side.
     ax.axhline(0.95, color="black", lw=0.8, ls="--", alpha=0.55, zorder=2)
     ax.axhline(0.65, color="black", lw=0.8, ls=":",  alpha=0.55, zorder=2)
     ax.axhline(0.50, color=COLORS["gray"], lw=0.8, ls="-", alpha=0.55, zorder=2)
-    ax.text(n - 0.6, 0.952, "AUC = 0.95 (full success)", ha="right", va="bottom",
-            fontsize=8, color=COLORS["gray"])
-    ax.text(n - 0.6, 0.652, "AUC = 0.65 (working)", ha="right", va="bottom",
-            fontsize=8, color=COLORS["gray"])
-    ax.text(n - 0.6, 0.502, "chance = 0.50", ha="right", va="bottom",
-            fontsize=7.5, color=COLORS["gray"])
+    ax.text(-0.55, 0.945, "AUC = 0.95", ha="left", va="top",
+            fontsize=7.5, color=COLORS["gray"], style="italic")
+    ax.text(-0.55, 0.645, "AUC = 0.65", ha="left", va="top",
+            fontsize=7.5, color=COLORS["gray"], style="italic")
+    ax.text(-0.55, 0.495, "chance = 0.50", ha="left", va="top",
+            fontsize=7.0, color=COLORS["gray"], style="italic")
 
     # Annotate AUC value on top of each bar
     for xi, a in zip(x, aucs):
@@ -105,19 +106,17 @@ def main():
     ax.set_ylabel("Binary AUC (pole vs pole)", fontsize=10.5)
     ax.set_xlim(-0.7, n - 0.3)
 
-    # Hero stat box (top-right)
-    nbig = sum(1 for a in aucs if a >= 0.95 and a < 1.001 and a >= 0.95)
-    nperf = sum(1 for a in aucs if a >= 0.999)
-    nworking = sum(1 for a in aucs if a >= 0.65)
-    ax.text(0.985, 1.045,
+    # Hero stat box — placed at the TOP centred above the bars, in the
+    # cleared space (top=0.81 leaves ~0.19 of figure for title/subtitle/box).
+    fig.text(0.5, 0.86,
             f"17 / 20 concepts at AUC $\\geq$ 0.95   |   "
             f"11 / 20 perfect (AUC = 1.00)   |   "
             f"20 / 20 working (AUC $\\geq$ 0.65)   |   "
             f"1 named failure: toxicity",
-            transform=ax.transAxes, ha="right", va="top",
-            fontsize=8.5, color="black",
+            ha="center", va="center",
+            fontsize=8.8, color="black",
             bbox=dict(facecolor="white", edgecolor=COLORS["lightgray"],
-                      pad=4, boxstyle="round,pad=0.25"))
+                      pad=5, boxstyle="round,pad=0.30"))
 
     legend_elems = [
         Patch(facecolor=COLORS["green"],  edgecolor="black",
@@ -133,7 +132,7 @@ def main():
     fig.text(0.075, 0.965,
              "The 9-story V-axis recipe is concept-generic across 20 unrelated dimensions",
              fontsize=12, fontweight="bold", ha="left")
-    fig.text(0.075, 0.92,
+    fig.text(0.075, 0.93,
              "Binary pole-vs-pole AUC, sorted; coloured by tier. Toxicity (Jigsaw) is the only substantive failure.",
              fontsize=9.5, ha="left", color=COLORS["gray"])
 

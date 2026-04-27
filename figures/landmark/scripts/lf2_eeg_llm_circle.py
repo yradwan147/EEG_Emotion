@@ -65,13 +65,13 @@ def main():
     llm_rows = ed["E2_per_llm_vs_eeg"]["rows"]  # [llm, family, r, p]
     llm_rows = sorted(llm_rows, key=lambda x: x[2], reverse=True)
 
-    fig = plt.figure(figsize=(14.4, 8.6))
+    fig = plt.figure(figsize=(15.0, 9.4))
     gs = fig.add_gridspec(
         2, 3,
         width_ratios=[1.6, 1.0, 1.0],
         height_ratios=[1.0, 1.0],
-        wspace=0.36, hspace=0.55,
-        left=0.06, right=0.97, bottom=0.07, top=0.85,
+        wspace=0.42, hspace=0.62,
+        left=0.06, right=0.96, bottom=0.13, top=0.86,
     )
 
     # ---------------- (a) MAIN scatter ----------------
@@ -110,12 +110,12 @@ def main():
                         edgecolor=COLORS["lightgray"], linewidth=0.8, alpha=0.95))
     # subtitle annotation about pole stims — placed BELOW the x-axis so it
     # cannot overlap data points or the right-side emotion-class legend
-    ax_a.text(0.50, -0.18,
-              "dashed circle: 9 stimuli from the three emotional poles "
-              "(Anger × 3, Amusement × 3, Tenderness × 3)  —  these alone "
-              "drive the cohort signal\n(n=9 → r = 0.870;  n=19 mid-stim → r ≈ 0)",
+    ax_a.text(0.50, -0.22,
+              "dashed circle: 9 emotional-pole stimuli (Anger × 3, Amusement × 3, "
+              "Tenderness × 3) — these alone drive the cohort signal\n"
+              "(n=9 → r = 0.870;  n=19 mid-stim → r ≈ 0)",
               transform=ax_a.transAxes, fontsize=7.6, color=COLORS["gray"],
-              va="top", ha="center", linespacing=1.20,
+              va="top", ha="center", linespacing=1.25,
               fontstyle="italic")
 
     ax_a.set_xlabel("CLIP V-axis projection of stimulus description  (z)",
@@ -125,13 +125,12 @@ def main():
     ax_a.set_title("Stimulus-level alignment: LLM V-axis vs FACED EEG (n=28)",
                    loc="left", fontsize=10.5, fontweight="bold")
     panel_label(ax_a, "a", x=-0.085, y=1.025)
-    # 3-column legend across the bottom inside the panel — places color
-    # legend in clear empty space below the regression cloud.
-    ax_a.legend(loc="lower right", bbox_to_anchor=(0.995, 0.005),
-                fontsize=7.5, ncol=3, frameon=True, framealpha=0.93,
-                title="emotion class", title_fontsize=8.0,
-                handletextpad=0.4, columnspacing=0.8, labelspacing=0.30,
-                edgecolor="#cccccc")
+    # emotion legend pushed BELOW the panel (below the dashed-circle caption) so
+    # it does not overlap any data points in the scatter cloud.
+    ax_a.legend(loc="upper center", bbox_to_anchor=(0.50, -0.34),
+                fontsize=7.6, ncol=9, frameon=False,
+                title="emotion class", title_fontsize=8.2,
+                handletextpad=0.35, columnspacing=1.1, labelspacing=0.30)
 
     # ---------------- (b) NULL distribution ----------------
     ax_b = fig.add_subplot(gs[0, 1:])
@@ -144,8 +143,8 @@ def main():
     p95 = np.percentile(null, 95)
     p995 = np.percentile(null, 99.5)
     ax_b.axvline(p95, color="black", lw=0.8, ls=":", alpha=0.6)
-    ax_b.text(p95, ax_b.get_ylim()[1] * 0.85, "  95th\n  pct.", fontsize=7,
-              color=COLORS["gray"], va="top")
+    ax_b.text(p95 + 0.015, ax_b.get_ylim()[1] * 0.55, "95th pct.", fontsize=7,
+              color=COLORS["gray"], va="center", ha="left", rotation=90)
     ax_b.set_xlabel("Pearson r between V-axis projection and EEG response", fontsize=9.5)
     ax_b.set_ylabel("permutation count (n=5000)", fontsize=9.5)
     ax_b.set_title("Permutation null:  the alignment is not coincidence",

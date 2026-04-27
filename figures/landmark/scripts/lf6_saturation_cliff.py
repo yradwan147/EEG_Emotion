@@ -150,14 +150,17 @@ def main():
                     arrowprops=dict(arrowstyle="-", color=COLORS["gray"],
                                     lw=0.7, alpha=0.7))
 
-    # cliff arrow — moved to upper-half so it doesn't pass through dots
-    ax.annotate("", xy=(0.6581, -0.022), xytext=(0.6235, -0.001),
+    # cliff arrow — placed on the right edge of the d3 cluster down to the SOTA
+    # cluster, so it does not visually run through the y=0 line or the cliff label.
+    ax.annotate("", xy=(0.6581, -0.022), xytext=(0.6235, -0.018),
                 arrowprops=dict(arrowstyle="->", color="black", lw=1.6, alpha=0.55))
-    ax.text(0.6390, -0.004, "the saturation cliff",
-            fontsize=10.0, ha="left", va="bottom",
-            fontweight="bold", color="black", alpha=0.85,
-            bbox=dict(boxstyle="round,pad=0.20", facecolor="white",
-                      edgecolor="#bbbbbb", linewidth=0.5, alpha=0.92))
+    # cliff label LIFTED into clear space above the y=0 line so it never
+    # collides with that line, the cluster, or any callouts.
+    ax.text(0.6420, 0.014, "the saturation cliff",
+            fontsize=10.0, ha="center", va="center",
+            fontweight="bold", color="black", alpha=0.95,
+            bbox=dict(boxstyle="round,pad=0.25", facecolor="white",
+                      edgecolor="#bbbbbb", linewidth=0.6, alpha=0.95))
 
     ax.set_xlabel("base recipe FACED 9-class BACC  (capacity dimension)", fontsize=10.5)
     ax.set_ylabel("Δ BACC from adding V-axis supervision", fontsize=10.5)

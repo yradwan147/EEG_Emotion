@@ -100,9 +100,9 @@ def main():
     rows_eeg = sorted(rows, key=lambda r: r["r_eeg"], reverse=True)
     rows_beh = sorted(rows, key=lambda r: r["r_beh"], reverse=True)
 
-    fig = plt.figure(figsize=(13.5, 6.6))
-    gs = fig.add_gridspec(1, 2, left=0.13, right=0.99, bottom=0.10, top=0.86,
-                          wspace=0.40)
+    fig = plt.figure(figsize=(13.8, 7.2))
+    gs = fig.add_gridspec(1, 2, left=0.13, right=0.99, bottom=0.10, top=0.83,
+                          wspace=0.42)
 
     def render(ax, rows_sorted, key, lo_key, hi_key, title, xlabel, xlim):
         n = len(rows_sorted)
@@ -117,9 +117,10 @@ def main():
                     elinewidth=1.0, capsize=2.5, capthick=0.9, zorder=3)
         ax.scatter(rs, y, s=70, c=cols, edgecolor="black", linewidths=0.7,
                    zorder=4)
-        # value annotation
-        for yi, ri in zip(y, rs):
-            ax.text(ri + 0.012, yi, f"{ri:+.3f}", ha="left", va="center",
+        # value annotation — placed to the right of the upper CI cap so it
+        # never sits ON a dot or its error bar.
+        for yi, ri, rh in zip(y, rs, hi):
+            ax.text(rh + 0.018, yi, f"{ri:+.3f}", ha="left", va="center",
                     fontsize=7.5, color="black", family="monospace")
         ax.axvline(0, color="black", lw=0.8, alpha=0.5)
         ax.set_yticks(y)
@@ -133,12 +134,12 @@ def main():
            "r_eeg", "eeg_lo", "eeg_hi",
            "(a) Brain prediction: r vs cohort EEG-DE-Ridge",
            r"r vs cohort EEG (PO3/$\gamma$, $n=28$ stim)",
-           xlim=(-0.05, 1.05))
+           xlim=(-0.10, 1.20))
     render(fig.add_subplot(gs[0, 1]), rows_beh,
            "r_beh", "beh_lo", "beh_hi",
            "(b) Text anchor: r vs behavioural valence",
            r"r vs behavioural valence ($n=28$ stim)",
-           xlim=(-0.05, 1.05))
+           xlim=(-0.10, 1.20))
 
     # Legend (centered above plots)
     legend_elems = [
@@ -149,10 +150,11 @@ def main():
         Patch(facecolor=COLORS["red"], edgecolor="black",
               label=r"out tier ($r_{\mathrm{behav}} < 0.6$, n=3)"),
     ]
+    # Legend BELOW the suptitle in cleared space, ABOVE the panel titles.
     fig.legend(handles=legend_elems, loc="upper center", ncol=3,
-               fontsize=9.5, frameon=False, bbox_to_anchor=(0.55, 0.93))
+               fontsize=9.5, frameon=False, bbox_to_anchor=(0.55, 0.91))
 
-    fig.text(0.13, 0.96,
+    fig.text(0.13, 0.965,
              "18 language models predict cohort EEG; the rank tracks text-domain V-axis quality",
              fontsize=12.0, fontweight="bold", ha="left")
 

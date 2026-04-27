@@ -54,26 +54,33 @@ def main():
     # Panel a: Δ vs headroom scatter + fit
     ax_a = fig.add_subplot(gs[0, 0])
 
-    # Scatter
+    # Scatter — hand-tuned label offsets so each text block lands in clear
+    # space and the corresponding Δ line sits below it without colliding
+    # with neighbouring points.
+    label_layout = {
+        "SEED-V":  dict(dx=+0.020, dy=+0.0035, ha="left",  va="bottom"),
+        "FACED":   dict(dx=-0.020, dy=+0.0035, ha="right", va="bottom"),
+        "CIFAR":   dict(dx=+0.020, dy=-0.0010, ha="left",  va="top"),
+        "MNIST":   dict(dx=+0.020, dy=+0.0035, ha="left",  va="bottom"),
+    }
     for h, d, lab, mod in zip(headroom, deltas, labels, mods):
         col = MOD_COLORS[mod]
         ax_a.scatter([h], [d], s=180, color=col, edgecolor="black",
                      linewidths=0.9, zorder=4)
-        # offset annotation depending on point
-        dx, dy = 0.012, 0.001
-        ha = "left"
-        if "MNIST" in lab:
-            dx, dy = -0.012, 0.0015; ha = "right"
-        if "CIFAR" in lab:
-            dx, dy = 0.012, -0.003; ha = "left"
-        if "FACED" in lab:
-            dx, dy = -0.012, 0.0018; ha = "right"
-        ax_a.annotate(lab, xy=(h, d), xytext=(h + dx, d + dy),
-                      fontsize=8.5, ha=ha, va="bottom",
-                      fontweight="bold")
-        ax_a.text(h + dx, d + dy - 0.0035 if ha == "left" else d + dy - 0.0035,
-                  fr"$\Delta$ = {d:+.3f}", fontsize=7.5,
-                  ha=ha, color=COLORS["gray"])
+        key = next((k for k in label_layout if k in lab), None)
+        cfg = label_layout[key]
+        tx = h + cfg["dx"]
+        ty = d + cfg["dy"]
+        ax_a.text(tx, ty, lab, fontsize=8.5, ha=cfg["ha"], va=cfg["va"],
+                  fontweight="bold", linespacing=1.0)
+        # delta annotation just below or above the bold label
+        delta_dy = -0.0042 if cfg["va"] == "bottom" else +0.0042
+        # for two-line labels, push delta further from the label baseline
+        delta_dy *= 2.0
+        ax_a.text(tx, ty + delta_dy, fr"$\Delta$ = {d:+.3f}",
+                  fontsize=7.5, ha=cfg["ha"],
+                  va="top" if cfg["va"] == "bottom" else "bottom",
+                  color=COLORS["gray"])
 
     # Linear fit (forced through origin not quite — use OLS)
     coef = np.polyfit(headroom, deltas, 1)

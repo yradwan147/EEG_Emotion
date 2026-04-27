@@ -259,3 +259,160 @@ heatmap.
 Note: the audit produced 36 pages, not the 32 noted in the brief — that earlier
 count likely predates the appendix expansion (Section 10 alone is ~5 pages with
 LF9/LF10 figures); page count is not a regression from this audit.
+
+---
+
+## Second pass — eliminate all overlaps (Apr 27 evening)
+
+After the first pass, the user reported that overlaps remained. This is a
+systematic re-audit of all 18 paper figures with the goal of eliminating
+EVERY overlap between any two text/legend/data elements. Each figure was
+read at full resolution, every defect catalogued, the script edited, and
+the new render re-inspected until clean.
+
+### LF1 — Universal V-Axis Hero
+- **Defects this pass:** (a) data caption "9 emotion stories → PCA → V-axis" overlapped bar value labels at the lower-right; (b) "+0.033 beats supervised" badge collided with the green bar's "r=+0.869" tip label; (d) emotion-class legend (3-col, lower-right) overlapped the lower-right scatter cloud; "chance" axvline label overlapped the bottom-most bar.
+- **Fixes:** Caption moved BELOW x-axis label as italic centred text. Green badge dropped lower into mid-bar empty area; arrow shortened. Emotion legend moved BELOW panel (d) as a single 9-column row. "chance" label re-positioned at len(rows)-0.4 with explicit ylim. Figsize 13.6→14.2, hspace 0.46→0.55, top 0.88→0.86.
+- **Iterations:** 3.
+- **Verdict:** Clean. No overlaps anywhere; legend is fully outside data.
+
+### LF2 — EEG-LLM Cohort Circle
+- **Defects this pass:** (a) emotion-class legend (3-col, lower-right) sat on top of the regression cloud's lower-right tail. Permutation-null "95th pct" label collided with histogram body.
+- **Fixes:** Emotion legend pushed BELOW panel (a) as a single 9-column row at bbox=(0.50, -0.34). "95th pct" label rotated 90° and placed adjacent to the dotted line at axes y=0.55 to clear histogram. Figsize 14.4→15.0, top 0.85→0.86, bottom 0.07→0.13.
+- **Iterations:** 2.
+- **Verdict:** Clean. The dashed-circle caption and emotion legend now stack below panel (a) with vertical breathing room.
+
+### LF3 — Cross-Arch Convergence
+- **Defects this pass:** (a) "lower right" 3-arch legend sat ON the bottom-right scatter points; (b) ring-callout caption box was crammed in the lower-right corner overlapping data; (c) percentile box at upper-left collided with the legend below it.
+- **Fixes:** All three panel legends/captions moved BELOW their panels into cleared margin (bottom=0.14→0.20, figsize height 5.6→6.4). (a) legend now 3-col below; (b) caption italic centred below x-label; (c) legend 3-col below percentile box.
+- **Iterations:** 1.
+- **Verdict:** Clean. Three-panel row with all auxiliary text in margin below.
+
+### LF6 — Saturation Cliff
+- **Defects this pass:** "the saturation cliff" callout sat ON the y=0 horizontal line, overlapping the EMOD d3 cluster line; cliff arrow passed through data dots.
+- **Fixes:** Cliff arrow start moved from y=-0.001 to y=-0.018 (down to cluster level). Cliff label LIFTED to y=+0.014, centred at x=0.6420 — sits cleanly in white space between EMOD d3 and d6 SOTA vertical guides, above y=0 line.
+- **Iterations:** 1.
+- **Verdict:** Clean. Saturation cliff label is now visually distinct and floats in clear space.
+
+### LF7 — Recipe Cascade
+- **Defects this pass:** None. EmotionKD/EMOD-AAAI inline reference and green delta arrows are well-spaced.
+- **Fixes:** None.
+- **Iterations:** 0.
+- **Verdict:** Clean.
+
+### LF8 — Two-Tier Ensemble Theory
+- **Defects this pass:** (a) some hand-tuned tag offsets still placed labels too close to neighbouring points; (b) "+0.0133" green badge overlapped the random-7 bar value label "0.6878".
+- **Fixes:** Tag offsets enlarged uniformly (dx 0.003→0.0035, dy 0.001→0.0011); switched the e150_s123/789 directions for clearer spokes. Margins added (x=0.05, y=0.08). Δ arrow lowered to bot_b-0.003 (below bar bases) so badge sits in clear space below all bars.
+- **Iterations:** 2.
+- **Verdict:** Clean.
+
+### LF9 — All Interventions Forest
+- **Defects this pass:** None — title, subtitle, legend, source IDs all in clean separate columns.
+- **Fixes:** None.
+- **Iterations:** 0.
+- **Verdict:** Clean.
+
+### LF10 — Confusion Matrices
+- **Defects this pass:** Panel (c) negative-bar transition labels (e.g. "0.69→0.68" for Disgust, Sadness) extended past the y-axis spine and crowded the y-tick labels.
+- **Fixes:** Extended xlim from (-0.045, 0.105) to (-0.070, 0.115), giving the negative labels clear margin space.
+- **Iterations:** 1.
+- **Verdict:** Clean.
+
+### LF11 — Concept Library Bars (NEW)
+- **Defects this pass:** Hero stat box (top-right inside panel) overlapped the bold suptitle and the 1.00 bar-tip value labels; threshold labels ("AUC = 0.95 (full success)") were on the right side overlapping orange and red bar tips.
+- **Fixes:** Hero stat box moved to a fig.text-centred position above the panel (y=0.86). Threshold labels moved to LEFT spine in italic gray. Figsize 10.6→11.4, top 0.86→0.81 to clear room for centred stat box.
+- **Iterations:** 1.
+- **Verdict:** Clean. Top of figure now reads: title → subtitle → stat box → bars.
+
+### LF12 — Multilingual Grouped (NEW)
+- **Defects this pass:** Qwen3.5-1.7B EN-extractor reference label (right-aligned at right edge) overlapped the tall green mT0 bar at right; "chance = 0.50" right-edge label sat ON the BLOOMZ-7B green bar at 0.50.
+- **Fixes:** Both threshold labels moved to LEFT side of plot (x=-0.45, ha="left"). Chance label placed BELOW the chance line (va="top") with ylim extended to 0.43. Reference label re-spaced.
+- **Iterations:** 2.
+- **Verdict:** Clean. All overlay text now sits on the empty left margin.
+
+### LF13 — LLM-Brain Forest (NEW)
+- **Defects this pass:** Per-bar value labels (e.g. "+0.961") were placed at r+0.012, sitting ON or directly behind the green dots; legend "top tier / middle tier / out tier" was crammed between suptitle and panel titles.
+- **Fixes:** Value labels now anchored to the upper CI cap (`hi[i] + 0.018`) so they always sit to the RIGHT of the error bar. xlim widened from (-0.05, 1.05) to (-0.10, 1.20). Figsize height 6.6→7.2, top 0.86→0.83, suptitle pushed up.
+- **Iterations:** 2.
+- **Verdict:** Clean. Each model row now has dot + CI bar + value label cleanly separated.
+
+### LF14 — Ensemble Generality (NEW)
+- **Defects this pass:** Panel (a) labels mixed up: "MNIST" label sat on top of its own dot; "CIFAR-10" label overlapped the orange dot; "Δ = +0.001" line for MNIST was clipped at axis bottom.
+- **Fixes:** Per-benchmark label_layout dict with hand-tuned (dx, dy, ha, va) so each label spokes outward from its dot. Δ-line offset doubled and direction-aware (above/below depending on label va).
+- **Iterations:** 1.
+- **Verdict:** Clean. Each dot has its label and Δ in its own quadrant.
+
+### LF15 — Concept Transfer Heatmap (NEW)
+- **Defects this pass:** None significant. The 20×20 heatmap is dense by design but cells, marginal bars, and labels are all readable.
+- **Fixes:** None.
+- **Iterations:** 0.
+- **Verdict:** Clean for an appendix-grade dense matrix.
+
+### NF1 — 5-band Topomaps
+- **Defects this pass:** None significant after first pass.
+- **Fixes:** None.
+- **Iterations:** 0.
+- **Verdict:** Clean.
+
+### NF2 — Davidson FAA
+- **Defects this pass:** None significant after first pass.
+- **Fixes:** None.
+- **Iterations:** 0.
+- **Verdict:** Clean.
+
+### NF3 — 9-stim Simpson
+- **Defects this pass:** Panel (c) emotion-class legend (lower-right, 2-col, framed) overlapped the lower-right scatter cluster (red Anger dots).
+- **Fixes:** Legend moved BELOW panel (c) at bbox=(-0.02, -0.18) as a 4-column row, frameless.
+- **Iterations:** 1.
+- **Verdict:** Clean.
+
+### NF4 — Time-Resolved
+- **Defects this pass:** None significant after first pass.
+- **Fixes:** None.
+- **Iterations:** 0.
+- **Verdict:** Clean.
+
+### NF5 — Connectivity
+- **Defects this pass:** None significant after first pass.
+- **Fixes:** None.
+- **Iterations:** 0.
+- **Verdict:** Clean.
+
+---
+
+## Most-iterated figures (this pass)
+
+1. **LF1** — 3 iterations (caption position, badge placement, legend relocation).
+2. **LF8, LF12, LF13** — 2 iterations each (label spoking, threshold label migration, value-label CI-anchoring).
+3. **LF2, LF3, LF6, LF10, LF11, LF14, NF3** — 1 iteration each.
+4. **LF7, LF9, LF15, NF1, NF2, NF4, NF5** — 0 iterations (already clean).
+
+## Most-common defect classes
+
+1. **Legends inside data clouds.** Lower-right and lower-left "in-panel" legends were
+   the single biggest source of overlap. Fix: move legends BELOW the panel as
+   horizontal n-column rows in cleared bottom margin.
+2. **Bar-tip value labels colliding with axhline labels.** When threshold lines
+   (chance, full-success) had right-edge labels, they sat ON the rightmost
+   bars. Fix: migrate threshold labels to the LEFT spine (italic gray).
+3. **Annotation callouts on top of horizontal reference lines.** "the saturation
+   cliff" sat on y=0; lifted into white space.
+4. **Per-point labels at constant offset, piling up in clusters.** Manual
+   per-point (dx, dy, ha, va) layout fixed every case.
+5. **Hero stat boxes inside panels overlapping suptitles.** Fix: move stat
+   boxes to fig.text positions in the cleared header area.
+6. **Forest-plot value labels sitting ON dots.** Fix: anchor labels to upper CI
+   cap, not to the dot's r value.
+
+## Final build verification
+
+`pdflatex → bibtex → pdflatex → pdflatex` ran clean.
+
+- **main.pdf**: 50 pages, 1.80 MB
+- **Warnings**: only cosmetic (`'h' → 'ht'`, hyperref Unicode tokens, a handful
+  of `Underfull \vbox` from float placements). No errors, no missing references,
+  no missing figures.
+- **Page count drop** (51 → 50 between intermediate builds) reflects tighter
+  figure layouts after this audit. Earlier 51-page build was after just the
+  first batch of fixes; the final 50-page count is with all figures cleaned.
+

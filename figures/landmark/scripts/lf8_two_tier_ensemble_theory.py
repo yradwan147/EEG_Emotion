@@ -105,19 +105,20 @@ def main():
                         edgecolor=COLORS["lightgray"], linewidth=0.8))
     # tag annotations — hand-tuned offsets so labels don't pile up.
     # Layout: place each tag adjacent to its point in a non-overlapping
-    # spoke pattern around the central cluster.
+    # spoke pattern around the central cluster, leaving extra distance for
+    # tags that would otherwise collide with neighbouring points.
     label_offsets = {
         # tag             dx        dy        ha       va
-        "e100_s42":    (-0.004,  +0.0008, "right", "bottom"),
-        "e100_s123":   (+0.003,  -0.0008, "left",  "top"),
-        "e100_s456":   (-0.004,  -0.0009, "right", "top"),
-        "e100_s789":   (+0.003,  -0.0009, "left",  "top"),
-        "e100_s2025":  (-0.004,  +0.0009, "right", "bottom"),
-        "e150_s42":    (+0.003,  +0.0010, "left",  "bottom"),
-        "e150_s123":   (-0.001,  +0.0010, "right", "bottom"),
-        "e150_s456":   (+0.003,  +0.0009, "left",  "bottom"),
-        "e150_s789":   (-0.001,  +0.0010, "right", "bottom"),
-        "e150_s2025":  (+0.003,  -0.0009, "left",  "top"),
+        "e100_s42":    (-0.0035, +0.0009, "right", "bottom"),
+        "e100_s123":   (+0.0035, -0.0009, "left",  "top"),
+        "e100_s456":   (-0.0035, -0.0010, "right", "top"),
+        "e100_s789":   (+0.0035, -0.0010, "left",  "top"),
+        "e100_s2025":  (-0.0035, +0.0010, "right", "bottom"),
+        "e150_s42":    (+0.0035, +0.0011, "left",  "bottom"),
+        "e150_s123":   (+0.0035, +0.0011, "left",  "bottom"),
+        "e150_s456":   (+0.0035, +0.0010, "left",  "bottom"),
+        "e150_s789":   (-0.0035, +0.0011, "right", "bottom"),
+        "e150_s2025":  (+0.0035, -0.0010, "left",  "top"),
     }
     for w, l, t in zip(within, loo, tags):
         dx, dy, ha, va = label_offsets.get(
@@ -125,6 +126,9 @@ def main():
         ax_a.text(w + dx, l + dy, t,
                   fontsize=7.0, color="#444444", ha=ha, va=va,
                   zorder=6)
+
+    # Add some breathing room so left/right edge tags are not clipped
+    ax_a.margins(x=0.05, y=0.08)
 
     ax_a.set_xlabel("within-class V-axis residual |r|  (per ckpt)", fontsize=10.5)
     ax_a.set_ylabel("leave-one-out ensemble contribution  Δ BACC", fontsize=10.5)
@@ -159,13 +163,15 @@ def main():
     ax_b.set_ylabel("FACED 9-class BACC (test)", fontsize=10.5)
     ax_b.set_ylim(0.670, 0.704)
 
-    # delta annotation top vs bot
-    ax_b.annotate("", xy=(2, top_b - 0.0007), xytext=(0, bot_b - 0.0007),
+    # delta annotation top vs bot — arrow placed LOW (near bar bases) so the
+    # arrowheads and the green badge cannot overlap any bar-tip value labels.
+    y_arrow = bot_b - 0.0030
+    ax_b.annotate("", xy=(2, y_arrow), xytext=(0, y_arrow),
                   arrowprops=dict(arrowstyle="<->", color=COLORS["green"], lw=1.6))
-    ax_b.text(1, (top_b + bot_b) / 2 - 0.001, f"+{top_b - bot_b:.4f}",
+    ax_b.text(1, y_arrow - 0.0015, f"+{top_b - bot_b:.4f}",
               color=COLORS["green"], fontweight="bold", fontsize=10.5,
-              ha="center", va="center",
-              bbox=dict(boxstyle="round,pad=0.20", facecolor="white",
+              ha="center", va="top",
+              bbox=dict(boxstyle="round,pad=0.22", facecolor="white",
                         edgecolor=COLORS["green"], lw=0.8))
     ax_b.set_title("Selecting by within-resid > random > bottom-7",
                    loc="left", fontsize=11.5)

@@ -73,12 +73,12 @@ def main():
     abs_r_within = np.array(abs_r_within)
     print(f"  using {len(within)} ckpts with within-class data (out of {len(tags)})")
 
-    fig = plt.figure(figsize=(15.4, 5.6))
+    fig = plt.figure(figsize=(15.6, 6.4))
     gs = fig.add_gridspec(
         1, 3,
         width_ratios=[1.15, 1.15, 0.95],
-        wspace=0.34,
-        left=0.052, right=0.985, bottom=0.14, top=0.83,
+        wspace=0.36,
+        left=0.052, right=0.985, bottom=0.20, top=0.82,
     )
 
     # ---------------- (a) class-PC1 scatter ----------------
@@ -113,7 +113,10 @@ def main():
     ax_a.set_ylabel("FACED 9-class BACC")
     ax_a.set_title("Better EEG models converge to the V-axis (class level)", loc="left")
     panel_label(ax_a, "a", x=-0.13, y=1.045)
-    ax_a.legend(loc="lower right", fontsize=7.5, ncol=1, frameon=False)
+    # legend BELOW the panel, 3 columns, in cleared margin
+    ax_a.legend(loc="upper left", bbox_to_anchor=(-0.02, -0.22),
+                fontsize=7.4, ncol=3, frameon=False,
+                handletextpad=0.5, columnspacing=1.2)
 
     # ---------------- (b) within-class residual scatter ----------------
     ax_b = fig.add_subplot(gs[0, 1])
@@ -155,14 +158,13 @@ def main():
               color="black", va="top",
               bbox=dict(boxstyle="round,pad=0.30", facecolor="white",
                         edgecolor=COLORS["lightgray"], linewidth=0.8))
-    # legend for ring-callouts
-    ax_b.text(0.965, 0.04,
-              "yellow ring: top-7 by within-resid → 0.6962 ens.\n"
-              "red dotted:  bottom-7 by within-resid → 0.6829 ens.",
-              transform=ax_b.transAxes, fontsize=7.4, color=COLORS["gray"],
-              ha="right", va="bottom",
-              bbox=dict(boxstyle="round,pad=0.20", facecolor="white",
-                        edgecolor=COLORS["lightgray"], linewidth=0.5, alpha=0.92))
+    # legend for ring-callouts — placed BELOW the x-axis label so it never
+    # overlaps the bottom-right data points or the axis label.
+    ax_b.text(0.50, -0.31,
+              "yellow ring: top-7 by within-resid → 0.6962 ens.    "
+              "red dotted: bottom-7 by within-resid → 0.6829 ens.",
+              transform=ax_b.transAxes, fontsize=7.5, color=COLORS["gray"],
+              ha="center", va="top", fontstyle="italic")
     ax_b.set_xlabel("within-class V-axis residual  |r|")
     ax_b.set_ylabel("FACED 9-class BACC")
     ax_b.set_title("Within-class residual: a sub-feature ensembling exploits", loc="left")
@@ -191,9 +193,10 @@ def main():
     ax_c.set_ylabel("count over 100 random directions")
     ax_c.set_title("V-axis is a top-decile direction\n(low-dim 9-class PC1 → wide null)",
                    loc="left", fontsize=10)
-    # Legend just below the percentile box, still within the empty upper region
-    ax_c.legend(loc="upper left", bbox_to_anchor=(0.03, 0.62),
-                fontsize=7.2, frameon=False, handlelength=2.0, handletextpad=0.5)
+    # Legend BELOW the panel, in the cleared margin (figsize/bottom were bumped)
+    ax_c.legend(loc="upper left", bbox_to_anchor=(-0.02, -0.22),
+                fontsize=7.4, frameon=False, ncol=3,
+                handlelength=2.0, handletextpad=0.5, columnspacing=1.4)
     panel_label(ax_c, "c", x=-0.18, y=1.045)
 
     fig.suptitle(

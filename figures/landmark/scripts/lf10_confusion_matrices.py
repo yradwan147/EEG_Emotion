@@ -144,7 +144,9 @@ def main():
     ax_c.set_title("Where the ensemble fixes the single",
                    loc="left", fontsize=11.0, pad=8)
     panel_label(ax_c, "c", x=-0.30, y=1.05)
-    ax_c.set_xlim(-0.045, 0.105)
+    # widen xlim left side so the (negative-bar) value+transition labels never
+    # collide with the y-tick labels of Disgust / Sadness on the y-axis spine.
+    ax_c.set_xlim(-0.070, 0.115)
     ax_c.set_ylim(-0.7, len(CLASSES) - 0.3)
 
     # colorbar for confusion matrices (on the right)

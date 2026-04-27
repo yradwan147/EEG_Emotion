@@ -172,9 +172,11 @@ def main():
 
     ax_c.set_xlabel(r"V-axis projection  (LLM)", fontsize=9)
     ax_c.set_ylabel(r"PO3 / $\gamma$  cohort DE", fontsize=9)
-    ax_c.legend(loc='lower right', frameon=True, fontsize=6.8, ncol=2,
-                handletextpad=0.3, columnspacing=0.5, borderaxespad=0.4,
-                framealpha=0.95, labelspacing=0.25)
+    # Legend pushed BELOW the panel — keeps the scatter cloud uncluttered.
+    ax_c.legend(loc='upper left', bbox_to_anchor=(-0.02, -0.18),
+                frameon=False, fontsize=6.8, ncol=4,
+                handletextpad=0.3, columnspacing=0.7,
+                labelspacing=0.25)
     ax_c.grid(alpha=0.2, linewidth=0.4)
     ax_c.set_axisbelow(True)
     ax_c.set_title("(c)  Per-stim view: PO3 / γ × V-axis",

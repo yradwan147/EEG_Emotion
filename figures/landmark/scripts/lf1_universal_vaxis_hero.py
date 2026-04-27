@@ -87,13 +87,13 @@ EMO_ORDER = ["Anger", "Disgust", "Fear", "Sadness", "Neutral",
 
 def main():
     apply_lf_style()
-    fig = plt.figure(figsize=(13.6, 9.0))
+    fig = plt.figure(figsize=(14.2, 9.6))
     gs = fig.add_gridspec(
         2, 2,
         width_ratios=[1.05, 1.05],
         height_ratios=[1.0, 1.0],
-        wspace=0.30, hspace=0.46,
-        left=0.065, right=0.985, bottom=0.085, top=0.88,
+        wspace=0.34, hspace=0.55,
+        left=0.065, right=0.985, bottom=0.10, top=0.86,
     )
 
     # ---------------- (a) TEXT ----------------
@@ -113,15 +113,18 @@ def main():
     ax_a.set_yticks(y)
     ax_a.set_yticklabels(labels)
     ax_a.axvline(0.5, color=COLORS["gray"], lw=0.7, ls="--", alpha=0.7, zorder=2)
-    ax_a.text(0.502, -0.85, "chance", color=COLORS["gray"], fontsize=7.5, va="top")
+    ax_a.text(0.502, len(rows) - 0.4, "chance", color=COLORS["gray"], fontsize=7.5,
+              va="center", ha="left")
     ax_a.set_xlim(0.45, 1.0)
+    ax_a.set_ylim(-0.7, len(rows) - 0.3)
     ax_a.set_xlabel("zero-shot probe score (AUC for binary tasks, |r| for lexicons)")
     ax_a.set_title("Text:  one direction matches supervised sentiment classifiers", loc="left")
     panel_label(ax_a, "a", x=-0.18, y=1.04)
-    ax_a.text(0.96, 0.05,
-              "9 emotion stories → PCA → V-axis\n0 fine-tuning, 0 sentiment labels seen",
+    # caption moved BELOW the x-axis label so it cannot collide with bar value labels
+    ax_a.text(0.5, -0.24,
+              "9 emotion stories  →  PCA  →  V-axis     (0 fine-tuning, 0 sentiment labels seen)",
               transform=ax_a.transAxes,
-              fontsize=7.8, color=COLORS["gray"], va="bottom", ha="right")
+              fontsize=7.6, color=COLORS["gray"], va="top", ha="center", style="italic")
 
     # ---------------- (b) VISION ----------------
     ax_b = fig.add_subplot(gs[0, 1])
@@ -143,14 +146,16 @@ def main():
     ax_b.axhline(0, color="black", lw=0.7, zorder=1)
     # V-axis beats supervised by this amount
     delta = v["vaxis"] - v["ridge"]
-    # arrow from ridge bar (1) up to V-axis bar (2)
-    ax_b.annotate("", xy=(2, v["vaxis"]), xytext=(1, v["ridge"]),
+    # short arrow from ridge bar (1) up to V-axis bar (2), placed in the
+    # MIDDLE of the bars so it does not collide with bar-tip "r = +x.xxx" labels
+    ax_b.annotate("",
+                  xy=(2, v["vaxis"] - 0.18), xytext=(1, v["ridge"] - 0.18),
                   arrowprops=dict(arrowstyle="->", color=COLORS["green"], lw=1.6))
-    ax_b.text(1.5, (v["vaxis"] + v["ridge"]) / 2 - 0.02,
+    ax_b.text(1.5, (v["vaxis"] + v["ridge"]) / 2 - 0.32,
               f"+{delta:.3f}\nbeats supervised",
               color=COLORS["green"],
-              fontweight="bold", fontsize=9, ha="center", va="top",
-              bbox=dict(boxstyle="round,pad=0.20", facecolor="white",
+              fontweight="bold", fontsize=9, ha="center", va="center",
+              bbox=dict(boxstyle="round,pad=0.30", facecolor="white",
                         edgecolor=COLORS["green"], linewidth=0.8))
     ax_b.set_xticks(bx)
     ax_b.set_xticklabels(bars_x, fontsize=8.5)
@@ -240,17 +245,20 @@ def main():
     ax_d.set_ylabel("EEG cohort response  (DE-ridge prediction, z-scored)")
     ax_d.set_title("Brain:  same axis predicts human EEG (FACED, 28 video stims)", loc="left")
     panel_label(ax_d, "d", x=-0.12, y=1.04)
-    ax_d.legend(loc="lower right", fontsize=7.0, ncol=3, frameon=False,
-                title="emotion class", title_fontsize=7.5,
-                handletextpad=0.4, columnspacing=0.8)
+    # emotion-class legend BELOW the panel so it cannot overlap any
+    # scatter points in the lower-right cluster.
+    ax_d.legend(loc="upper center", bbox_to_anchor=(0.50, -0.18),
+                fontsize=7.4, ncol=9, frameon=False,
+                title="emotion class", title_fontsize=8.0,
+                handletextpad=0.35, columnspacing=1.0)
 
     # ---------------- super-title ----------------
     fig.suptitle(
         "A single valence direction extracted from 9 emotion stories is recovered "
         "across language, vision, EEG, and brain",
-        y=0.955, fontsize=13.0, fontweight="bold")
+        y=0.945, fontsize=13.0, fontweight="bold")
 
-    fig.text(0.5, 0.022,
+    fig.text(0.5, 0.025,
              "Same V-axis (Qwen3.5 1.5B, 9 stories × 50 generations → PC1 at the final layer); "
              "no fine-tuning, no labeled examples seen at probe time.",
              ha="center", fontsize=8.5, color=COLORS["gray"])

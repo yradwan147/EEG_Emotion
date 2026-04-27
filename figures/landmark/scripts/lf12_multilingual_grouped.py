@@ -66,17 +66,19 @@ def main():
             ax.text(xi, v + 0.012, f"{v:.2f}", ha="center", va="bottom",
                     fontsize=7.5, color="black")
 
-    # English baseline
+    # English baseline — label placed on LEFT side at x=-0.45 so it sits
+    # in the empty margin and never overlaps the tall mT0 bars on the right.
     ax.axhline(EN_BASELINE, color=COLORS["red"], lw=1.4, ls="--", zorder=4,
                alpha=0.85)
-    ax.text(n_groups - 0.55, EN_BASELINE + 0.014,
-            f"Qwen3.5-1.7B English-extractor reference (SST-2 EN AUC = {EN_BASELINE:.3f})",
-            ha="right", va="bottom", fontsize=8.5, color=COLORS["red"])
+    ax.text(-0.45, EN_BASELINE + 0.012,
+            f"Qwen3.5-1.7B EN-extractor reference  (SST-2 EN AUC = {EN_BASELINE:.3f})",
+            ha="left", va="bottom", fontsize=8.5, color=COLORS["red"])
 
-    # Chance line
+    # Chance line — label BELOW the line in the left margin (lower ylim slightly
+    # so the label has room beneath the chance line without colliding with bars)
     ax.axhline(0.50, color="black", lw=0.8, ls=":", alpha=0.65, zorder=2)
-    ax.text(n_groups - 0.55, 0.508, "chance = 0.50", ha="right", va="bottom",
-            fontsize=8, color=COLORS["gray"])
+    ax.text(-0.45, 0.494, "chance = 0.50", ha="left", va="top",
+            fontsize=7.8, color=COLORS["gray"])
 
     # Highlight mT0 group
     ax.axvspan(n_groups - 1 - 0.45, n_groups - 1 + 0.45,
@@ -96,7 +98,7 @@ def main():
 
     ax.set_xticks(x)
     ax.set_xticklabels([row[0] for row in ROWS], fontsize=8.5)
-    ax.set_ylim(0.45, 1.0)
+    ax.set_ylim(0.43, 1.0)
     ax.set_ylabel("SST-2 zero-shot AUC", fontsize=11)
     ax.set_xlim(-0.55, n_groups - 0.45)
 
