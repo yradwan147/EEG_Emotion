@@ -35,7 +35,7 @@ Section~\ref{sec:vaxis-brain}.
 \paragraph{Story prompts.} Nine emotion-evocative stories (one per
 FACED class), each 1--3 sentences. Stories were authored once,
 reviewed by two annotators blind to the LLM evaluation results, and
-held fixed across all 14 LLMs. Full prompt list in supplementary
+held fixed across all 18 LLMs. Full prompt list in supplementary
 materials.
 
 \paragraph{Paraphrase generation.} For each story, we generate $n=50$
@@ -56,12 +56,12 @@ $c_k = \frac{1}{50} \sum_{i=1}^{50} h_{k,i}^{(L)}$ for $k=1,\dots,9$.
 $9 \times D$ matrix and run mean-centred PCA. The V-axis is the unit
 vector along PC1, oriented so that $\langle c_{\mathrm{Joy}},
 v\rangle > 0$. PC1 explains 41--58\% of the across-class variance
-across the 14 models we tested (median 49\%).
+across the 18 models we tested (median 49\%).
 
 \paragraph{Robustness.} Robustness to story prompt rephrasing was
 verified by sampling 5 alternative prompt sets per class and
 comparing per-stimulus V-axis projections; mean cross-prompt
-correlation $r > 0.93$ (across 14 models). Robustness to paraphrase
+correlation $r > 0.93$ (across 18 models). Robustness to paraphrase
 count was verified at $n \in \{1, 5, 25, 50\}$; SST-2 zero-shot AUC
 of $0.74$ at $n=1$, saturating to $0.868$ at $n=5$.
 
