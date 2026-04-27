@@ -1,6 +1,6 @@
 % =====================================================================
 % Universal Valence Axis: From Language Models to Human EEG
-% NeurIPS 2026 submission — placeholder shell (set up 2026-04-27)
+% NeurIPS 2026 submission
 % =====================================================================
 
 \documentclass{article}
@@ -10,16 +10,15 @@
 % \usepackage[preprint]{neurips_2026}           % arXiv preprint
 % \usepackage[final]{neurips_2026}              % camera-ready
 
-% === Core packages requested by spec ===
+% === Core packages ===
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{amsfonts}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{hyperref}
-
-% === Additional standard niceties ===
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
 \usepackage{url}
 \usepackage{microtype}
 \usepackage{xcolor}
@@ -27,6 +26,8 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{multirow}
+\usepackage{nicefrac}
+\usepackage{enumitem}
 
 \graphicspath{{figures/}}
 
@@ -57,10 +58,22 @@
 \input{sections/08_ensemble_sota}
 \input{sections/09_discussion}
 
+\newpage
+{\small
 \bibliographystyle{plainnat}
 \bibliography{references}
+}
 
+\newpage
+\input{sections/checklist}
+
+\newpage
 \appendix
+\section*{Supplementary Material}
+\addcontentsline{toc}{section}{Supplementary Material}
+\renewcommand{\thesection}{S\arabic{section}}
+\setcounter{section}{0}
+
 \input{sections/10_appendix}
 
 \end{document}

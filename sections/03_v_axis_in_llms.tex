@@ -116,13 +116,41 @@ emotion-evocative \emph{images} via CLIP visual encoders
 dataset on valence at $r=0.869$ and on arousal at $r=0.803$, beating
 the supervised baselines reported by Kurdi et al.\ \citep{kurdi2017oasis}.
 
-\subsection{Compositionality}
+\subsection{Compositionality and concept-library generality}
 
 The V-axis is compositional. Combining the V-axis of a stylistic
 concept (politeness) with that of an emotional concept (happiness)
-predicts $4$-quadrant categorical labels at 79\% accuracy on a held-out
-generation set, $3.16\times$ above chance. We use this as a
+predicts $4$-quadrant categorical labels at 79\% accuracy on a
+held-out generation set, $3.16\times$ above chance. We use this as a
 sanity check on the linear structure of the axis space.
+
+The same nine-prompt PCA recipe extends well beyond emotion. Across a
+20-concept library spanning emotional, stylistic, and abstract
+dimensions (fear, urgency, hope, shame, complexity, concreteness,
+authoritativeness, optimism, decisiveness, $\dots$),
+\textbf{17 of 20 concepts reach AUC $\ge 0.95$} on their target
+benchmark, with eleven hitting AUC $=1.00$. Notable failures sharpen
+scope: toxicity (Jigsaw) yields AUC $0.59$, near random, suggesting
+the concept is more distributed in residual-stream geometry than the
+late-layer principal-component recipe captures. The recipe is a
+\emph{generic} concept-extraction tool, not specific to valence.
+
+\subsection{Specificity controls}
+
+Two specificity tests rule out template-level confounds.
+\textbf{Nonce-word ablation}: substituting all content words in the
+nine emotion stories with phonologically valid nonce words drops
+SST-2 AUC from $0.868$ to $0.524$ (chance), confirming that the
+V-axis encodes \emph{semantic content} rather than syntactic or
+prompt-template artefacts. \textbf{Arousal asymmetry}: the same
+protocol applied to an arousal axis yields strong vision results
+(OASIS arousal $r=0.803$, beating the supervised ridge baseline) but
+text-domain failure across all LLMs we tested (EmoBank arousal
+$|r| \in [0.01, 0.06]$; Warriner arousal $|r| \le 0.16$; max 13\%
+recovery rate vs.\ valence $\ge 76\%$). This asymmetry --- valence
+transfers, arousal does not --- recurs in the brain analyses of
+Section~\ref{sec:vaxis-brain} and we discuss it as a limitation in
+Section~\ref{sec:discussion}.
 
 \subsection{Summary}
 
@@ -131,5 +159,8 @@ quantitatively superior to lexicon-based and SBERT baselines on
 zero-shot sentiment, (iii) universal across 18 LLM families and
 across English / multilingual / vision / 9-emotion-image variants,
 (iv) computed in late transformer layers rather than inherited from
-inputs, and (v) compositional. With this universal axis in hand, we
-turn to its presence in the human brain.
+inputs, (v) compositional, and (vi) generic --- the same recipe
+recovers 17 of 20 unrelated concepts at AUC $\ge 0.95$. Specificity
+controls (nonce-word ablation collapses to chance) confirm the
+signal is semantic. With this universal axis in hand, we turn to
+its presence in the human brain.

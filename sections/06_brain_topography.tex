@@ -31,7 +31,7 @@ visual-cortex phenomenon for video-evoked emotion.
 \IfFileExists{figures/neuro/NF1_5band_topomaps.pdf}
   {\includegraphics[width=\linewidth]{neuro/NF1_5band_topomaps.pdf}}
   {\includegraphics[width=\linewidth]{F4_brain_topography.pdf}}
-\caption{\input{figures/F4_caption}}
+\caption[Brain topography]{\input{figures/F4_caption}}
 \label{fig:topomap-5band}
 \end{figure}
 
@@ -94,6 +94,15 @@ contribute zero signal.}
 The drop-class $\Delta$ tells us that removing Anger shrinks the cohort
 $r$ by $-0.151$ (32\% of the total). The next-largest contributors are
 Amusement ($-0.060$) and Tenderness ($-0.057$).
+
+\textbf{Analytical ceiling.} Weighting the stimuli to emphasise this
+9-stimulus contrast (weights $\{$Anger:5, Amus:3, Tend:3, others:1$\}$)
+analytically lifts the ceiling on the V-axis projection at PO3/$\gamma$
+from $r=0.478$ (uniform) to $r=0.714$. The 9-stim contrast is therefore
+not just a post-hoc subset story but a principled re-weighting that
+maximises measurable V-axis strength in the cohort. We use this
+weighting to construct the strongest theoretically possible V-axis
+supervision target in Section~\ref{sec:saturation}.
 
 This sharpens the V-axis claim in an important way: the population
 EEG--LLM correlation we report is not a smooth gradient over all

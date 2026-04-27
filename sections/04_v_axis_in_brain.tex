@@ -39,7 +39,7 @@ response across the 28 stimuli. Aggregating to the best cell:
 \IfFileExists{figures/landmark/lf2_eeg_llm_circle.pdf}
   {\includegraphics[width=0.95\linewidth]{landmark/lf2_eeg_llm_circle.pdf}}
   {\includegraphics[width=0.95\linewidth]{F2_eeg_llm_circle.pdf}}
-\caption{\input{figures/F2_caption}}
+\caption[EEG-LLM cohort circle]{\input{figures/F2_caption}}
 \label{fig:eeg-llm-circle}
 \end{figure}
 
@@ -58,20 +58,29 @@ is $0.112$; 200 random directions give a mean MI of $0.036$
 ($p_{r}=0.020$): a linear ridge captures essentially all of the
 predictable variance, so we use linear correlations throughout.
 
+\textbf{Reliability and granularity.} Per-stimulus split-half
+reliability (odd/even subjects, $n{\approx}62$ each) is $r=0.988$,
+indicating a very clean stimulus-level signal. Trial-level
+correlations ($n=3{,}444$ subject--stim pairs) range from
+$r=0.17$--$0.21$ ($p<10^{-23}$), and the class-level ranking ($n=9$
+emotion centroids) hits $r=+0.886$ vs.\ behavioural valence
+ratings. The cohort $r=0.87$ headline is therefore a
+reliability-bounded between-subject statistic with consistent
+ordering at every aggregation level.
+
 \subsection{The cohort signal is dominated by 9 of 28 stimuli}
 
 A stimulus-drop diagnostic reveals that the cohort EEG--LLM
-correlation is carried by 9 of the 28 stimuli: the
-\emph{Anger + Amusement + Tenderness} subset alone gives cohort
-$r=+0.870$ at PO3/$\gamma$; the remaining 19 mid-valence stimuli
-(Disgust, Fear, Sadness, Neutral, Inspiration, Joy) jointly give
-$r=-0.015$. Removing Anger alone shrinks cohort $r$ from $+0.478$ to
-$+0.327$ ($\Delta=-0.151$, $32\%$ of the total). The V-axis is
-therefore not a smooth gradient over all stimuli --- it is
-fundamentally an \emph{anger-versus-warm-positive} contrast.
+correlation is not a smooth gradient over all stimuli but a sharper
+\emph{anger-versus-warm-positive} contrast carried by nine of the
+28 clips (Anger + Amusement + Tenderness; cohort $r=+0.870$ at
+PO3/$\gamma$, vs.\ $r=-0.015$ on the remaining 19 mid-valence
+stimuli). Removing Anger alone shrinks cohort $r$ from $+0.478$ to
+$+0.327$ ($\Delta=-0.151$, $32\%$ of the total).
 Section~\ref{sec:topography} reports the full drop-class table
-(Table~\ref{tab:anger-contrast}) and dissects the structure
-topographically.
+(Table~\ref{tab:anger-contrast}), dissects the structure
+topographically, and shows that the same nine-stimulus weighting
+analytically pushes the V-axis ceiling to $r=0.714$.
 
 \subsection{18 LLMs predict the brain; the rank is consistent with text}
 

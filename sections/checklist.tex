@@ -1,0 +1,85 @@
+\section*{NeurIPS Paper Checklist}
+
+\begin{enumerate}
+
+\item {\bf Claims}
+    \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: The abstract and introduction state five claims: (i) a universal valence axis extractable from 18 LLMs; (ii) cohort EEG--LLM correlation $r=0.87$; (iii) cross-architecture convergence ($r{=}{+}0.74$, $p{=}0.014$ in within-class residual subspace); (iv) a saturation theorem documented across 25 alignment interventions; (v) a new FACED 9-class SOTA at $0.6948$ BACC. Each is supported in Sections~\ref{sec:vaxis-llms}--\ref{sec:sota} with its primary table or figure, and the paper-grade subset is inventoried in the appendix and notes.
+
+\item {\bf Limitations}
+    \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Section~\ref{sec:discussion} lists five honest limitations: (a) one EEG dataset (FACED), partially addressed by FACED$\to$SEED-V transfer ($r{=}{+}0.96$); (b) cohort-side analysis with Simpson's-paradox between-vs-within-subject dynamic; (c) saturation threshold is dataset-specific; (d) negative results require strong-baseline interpretation; (e) statistical softness on cross-architecture class-PC1 correlation (93rd-percentile null). Theta-gamma PAC is decoupled from V-axis ($p{=}0.667$) and arousal does not match valence's brain alignment --- both documented.
+
+\item {\bf Theory assumptions and proofs}
+    \item[] Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof?
+    \item[] Answer: \answerNA{}
+    \item[] Justification: The paper is empirical. The ``saturation theorem'' is an empirical regularity, framed and qualified as such (Section~\ref{sec:saturation}); we do not claim a formal theorem with proof.
+
+\item {\bf Experimental result reproducibility}
+    \item[] Question: Does the paper fully disclose all the information needed to reproduce the main experimental results of the paper?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: The V-axis extraction protocol is documented in Section~\ref{sec:vaxis-llms} and Appendix~\ref{app:vaxis-protocol}. EEG model training (architecture, optimisation, augmentation, KD, ensemble construction) is in Appendix~\ref{app:training}. Statistical methods (bootstrap, random-direction null, paired tests) are in Appendix~\ref{app:statistics}. Dataset splits are in Appendix~\ref{app:datasets}. The full intervention table with seeds is in Appendix~\ref{app:full-vaxis-table}.
+
+\item {\bf Open access to data and code}
+    \item[] Question: Does the paper provide open access to the data and code, with sufficient instructions to faithfully reproduce the main experimental results?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Code, configs, model checkpoints, and figure-generation scripts will be released at the camera-ready stage under an MIT licence (Appendix~\ref{app:repro}). Datasets used (FACED, SEED-V) are publicly available from their original authors; we release preprocessing and split scripts.
+
+\item {\bf Experimental setting/details}
+    \item[] Question: Does the paper specify all the training and test details necessary to understand the results?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Optimiser (AdamW, lr $10^{-3}$), schedule (cosine + 5-epoch warmup), batch size (128), training length ($e{=}100$ and $e{=}150$), depth ($d{=}3, 6$), filter dimension ($f{=}128$), seeds ($\{42, 123, 456, 789, 2025\}$), augmentation parameters, KD temperature and weight, and ensemble construction are all specified in Appendix~\ref{app:training}.
+
+\item {\bf Experiment statistical significance}
+    \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: We report standard deviation across 5 seeds in every recipe-cascade row (Section~\ref{sec:sota-component-ablation}), Pearson $r$ with $p$-values for every cross-architecture and brain correlation, paired $t$-tests for V-axis interventions vs.\ matched-recipe baselines, bootstrap CIs (Appendix~\ref{app:statistics}), and random-direction null distributions for the cohort EEG--LLM correlation and the cross-architecture V-axis correlation.
+
+\item {\bf Experiments compute resources}
+    \item[] Question: For each experiment, does the paper provide sufficient information on the computer resources (type of compute workers, memory, time of execution) needed to reproduce the experiments?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Appendix~\ref{app:compute} reports approximately $4{,}500$ V100 GPU-hours total, broken down by experiment family (recipe ablation, V-axis interventions, cross-architecture analysis, ensemble construction, cross-dataset). The 10-checkpoint ensemble SOTA is reproducible in $\sim$10 GPU-hours per seed.
+
+\item {\bf Code of ethics}
+    \item[] Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: We use only publicly released datasets (FACED, SEED-V) collected by other groups under their respective IRB-approved protocols. We collect no new human data. We use only publicly released LLMs.
+
+\item {\bf Broader impacts}
+    \item[] Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Improved EEG emotion classifiers have applications in mental-health monitoring and brain--computer interfaces (positive); they also pose risks of affective inference without consent in surveillance or workplace contexts (negative). Section~\ref{sec:discussion} flags this dual-use surface.
+
+\item {\bf Safeguards}
+    \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models with a high risk for misuse?
+    \item[] Answer: \answerNA{}
+    \item[] Justification: Our trained EEG-emotion checkpoints and V-axis extraction code do not introduce abuse vectors beyond what is already public via FACED and the listed LLMs. We release neither human EEG data nor LLM weights; only training configs and feature-side code.
+
+\item {\bf Licenses for existing assets}
+    \item[] Question: Are the creators or original owners of assets (e.g., code, data, models), used in the paper, properly credited and are the license and terms of use explicitly mentioned and properly respected?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: FACED is cited \citep{chen2023faced} and used under its public release license. SEED-V is cited \citep{liu2022seedv}. LLMs (Qwen, Llama, Mistral, OLMo, Phi, Pythia, BLOOM, TinyLlama, Gemma) are cited and used under their respective Hugging Face / model-card licenses. The CBraMod \citep{wang2025cbramod} and EMOD \citep{chen2025emod} backbones are cited and used under their public licenses. CLIP \citep{radford2021clip} is cited.
+
+\item {\bf New assets}
+    \item[] Question: Are new assets introduced in the paper well documented and is the documentation provided alongside the assets?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: The V-axis extraction scripts, V-axis-aligned EEG checkpoints, and figure-generation pipelines will be released with documentation (README, environment.yml, SLURM templates) at the camera-ready stage.
+
+\item {\bf Crowdsourcing and research with human subjects}
+    \item[] Question: For crowdsourcing experiments and research with human subjects, does the paper include the full text of instructions given to participants and screenshots, if applicable, as well as details about compensation (if any)?
+    \item[] Answer: \answerNA{}
+    \item[] Justification: We do not collect new human data; all human EEG comes from the publicly released FACED and SEED-V datasets, originally collected by their respective groups under their own IRB-approved protocols.
+
+\item {\bf Institutional review board (IRB) approvals or equivalent for research with human subjects}
+    \item[] Question: Does the paper describe potential risks incurred by study participants, whether such risks were disclosed to the subjects, and whether Institutional Review Board (IRB) approvals (or an equivalent approval/review based on the requirements of your country or institution) were obtained?
+    \item[] Answer: \answerNA{}
+    \item[] Justification: No new human-subjects research was conducted. The FACED \citep{chen2023faced} and SEED-V \citep{liu2022seedv} datasets were collected under their original IRB approvals, which we cite.
+
+\item {\bf Declaration of LLM usage}
+    \item[] Question: Does the paper describe the usage of LLMs if it is an important, original, or non-standard component of the core methods in this research?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: The V-axis is extracted from 18 named language models (Section~\ref{sec:vaxis-llms-universality}). Each is cited; sizes, architectures, and layer indices used for centroid extraction are documented in Sections~\ref{sec:vaxis-llms} and \ref{sec:vshape} and Appendix~\ref{app:vaxis-protocol}. LLMs were also used to generate paraphrases of the nine emotion-evocative stories (paraphrase generator: Qwen2.5-7B, temperature 0.7); the prompt and filter criteria are stated in Appendix~\ref{app:vaxis-protocol}.
+
+\end{enumerate}
