@@ -163,6 +163,21 @@ residuals have been perturbed by redundant gradient.
     achieves \textbf{0.6755}.
 \end{enumerate}
 
+\paragraph{What this result is not.}
+The saturation regularity is an \emph{empirical} pattern measured
+across 25 representation-alignment intervention families on FACED
+9-class; it is not a mathematical theorem with a proof. The
+brain-side picture is cohort-averaged across 123 subjects; the
+between-subject signal is robust ($r{=}0.87$) but masks substantial
+within-subject heterogeneity that we document as a Simpson's-paradox
+caveat (Section~\ref{sec:topography}). The saturation threshold we
+locate is dataset-specific: the qualitative shape (neutral $\to$
+harmful as the base recipe strengthens) generalises in our
+cross-dataset checks, but the precise BACC interval $[0.62, 0.66]$
+is FACED-9 specific. Deep cross-dataset replication of the saturation
+regularity is the most consequential limitation of this work and is
+discussed in Section~\ref{sec:discussion}.
+
 The remainder of the paper (Section~\ref{sec:related}: related work;
 Sections \ref{sec:vaxis-llms}--\ref{sec:sota}: results;
 Section~\ref{sec:discussion}: implications) builds these claims in

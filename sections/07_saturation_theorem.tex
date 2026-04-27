@@ -15,6 +15,37 @@ explaining it. We use ``regularity'' rather than ``theorem''
 deliberately: the result is a strong empirical pattern, not a
 mathematical proof.
 
+\subsection{Statement of the regularity}
+\label{sec:saturation-statement}
+
+\begin{quote}
+\textbf{Saturation Regularity.} \emph{Let $f_\theta$ be a classifier
+whose penultimate features $H \in \mathbb{R}^{N \times D}$ encode a
+target concept direction $v \in \mathbb{R}^D$ at strength
+$\rho(\theta) := |\langle \mathrm{PC}_1(H_{\mathrm{class\text{-}mean}}),
+v\rangle|$. There exists a saturation threshold $\rho^*$ such that for
+$\rho(\theta) > \rho^*$, supplementing the task loss with any
+auxiliary loss $\mathcal{L}_v(H, v)$ at weight $\lambda > 0$ produces
+$\mathbb{E}[\Delta \mathrm{BACC}] \leq 0$ across the families of
+auxiliary losses tested.}
+\end{quote}
+
+This is an \emph{empirical} statement, not a theorem. We do not prove
+it analytically. We support it with: (i) 13 / 25 interventions
+producing statistically significant accuracy decrements at the strong
+recipe ($p < 0.05$, paired across 5 seeds); (ii) five intervention
+families showing \emph{monotonic} destruction as $\lambda$ increases
+(no positive setpoint exists); (iii) a unidirectional saturation
+transition from neutral at weak baselines (CBraMod, EMOD-vanilla,
+all $p > 0.2$) to significantly harmful at strong recipes (full
+EMOD-d6 + LS + KD + aug, $\Delta\!\in\![-0.024, -0.015]$, $p < 0.05$);
+and (iv) a direct mechanism check (\S\ref{sec:saturation-statement}
++ \S\ref{sec:within-class-mechanism}) showing that V-axis supervision
+moves the class-PC1 component of $H$ but leaves the within-class
+residual --- where the ensemble gain lives --- numerically untouched.
+For FACED-9 the empirical threshold sits in the BACC interval
+$\rho^* \in [0.62, 0.66]$.
+
 \subsection{Twenty-five interventions, one verdict}
 
 We tested V-axis supervision via every standard alignment mechanism we

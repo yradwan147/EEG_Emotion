@@ -109,10 +109,18 @@ top-$7$ and bottom-$7$ by $\mathrm{within\text{-}resid\text{-}r}$
 \item $\Delta = +0.0133$ vs.\ random-7 baseline ($z = +2.0$).
 \end{itemize}
 
-This is the central mechanistic claim of our paper: \textbf{ensemble
-gain is concentrated in the within-class V-axis residual}, not in any
-arbitrary representational structure. Section~\ref{sec:sota}
-operationalises this into our SOTA result.
+This is the central mechanistic claim of our paper. We name it for
+later reference:
+\begin{quote}
+\textbf{Residual Contribution Law.} \emph{For a saturated EEG
+classifier with within-class residual encoding of the V-axis at
+$|r| = \rho_k$, that checkpoint's leave-one-out contribution to a
+softmax-averaged ensemble scales linearly with $\rho_k$, with slope
+$\hat\beta = +0.74$ ($p = 0.014$, $n = 10$, FACED 9-class).}
+\end{quote}
+Ensemble gain is concentrated in the within-class V-axis residual,
+not in any arbitrary representational structure.
+Section~\ref{sec:sota} operationalises this into our SOTA result.
 
 \subsection{The class-PC1 basin is saturated}
 

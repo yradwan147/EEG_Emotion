@@ -1,50 +1,53 @@
 \begin{abstract}
-The Platonic Representation Hypothesis predicts that representations
-learned across modalities and architectures converge to a shared
-statistical model of reality. We provide empirical evidence at
-biological scale: \emph{a single one-dimensional latent direction
-emerges in language models, in human brains, and in EEG classifiers
-trained on those brains, and it is the same direction in all three.}
-We extract this direction --- the \textbf{V-axis} --- from nine short
-emotion stories, one per FACED class, by PCA on language-model story
-centroids. The same direction (i) is shared across 18 LLMs from 0.5B
-to 72B parameters and recovers sentiment lexicons (NRC, Warriner) at
-$|r|\!\ge\!0.76$ zero-shot; (ii) predicts cohort-averaged EEG of 123
-human subjects watching 28 emotional videos at $r=0.87$ ($p<10^{-9}$);
-(iii) emerges spontaneously in EEG classifiers trained only on the
-9-class label, and its emergence quantitatively predicts accuracy and
-ensemble contribution. The brain encodes the axis most strongly in
-posterior visual cortex for video-evoked emotion, with the cohort
-signal carried by an anger-versus-warm-positive contrast across nine
-of the 28 stimuli.
+\textbf{Late-layer concept directions are not free real estate for
+supervision.} We show that once a network has absorbed a concept from
+task supervision alone, adding the same concept as an auxiliary loss
+is at best a no-op and at worst harmful --- a regularity we call
+\emph{saturation}. We discover and quantify saturation by studying
+the principal axis of human emotion (the \textbf{V-axis}, valence)
+across language models, human brains, and EEG emotion classifiers.
 
-We then show that EEG emotion classifiers trained on standard cross-entropy
-\emph{spontaneously converge} to the same valence axis. Across 36
-checkpoints spanning two architectures (CBraMod, EMOD), accuracy
-correlates with V-axis encoding strength at $r\!=\!+0.885$ in the
-class-mean subspace and $r\!=\!+0.715$ in the within-class residual
-subspace; the per-checkpoint within-class residual $|r|$ predicts that
-checkpoint's leave-one-out contribution to ensemble accuracy at
-$r\!=\!+0.74$ ($p\!=\!0.014$). We test 25 representation-alignment
-interventions designed to inject the V-axis as auxiliary supervision;
-all either fail or harm accuracy above an empirically located
-saturation threshold --- alignment training only helps when the base
-model has not yet discovered the axis on its own. The V-axis is
-\emph{the} latent these models converge to, regardless of whether we
-ask them to.
+The V-axis itself is universal: extracted from nine short emotion
+stories via PCA on language-model centroids, it is shared across 18
+LLMs (0.5B--72B parameters), recovers sentiment lexicons (NRC,
+Warriner) at $|r|\!\ge\!0.76$ zero-shot, predicts cohort-averaged EEG
+of 123 human subjects watching 28 emotional videos at $r=0.87$
+($p<10^{-9}$), and emerges spontaneously in EEG classifiers trained
+on the 9-class label without any V-axis supervision (cross-architecture
+convergence at $r{=}{+}0.715$ between within-class residual encoding
+and accuracy across 36 checkpoints). Two of the three modalities (LLM
+and EEG-classifier) reach the same axis without ever seeing each
+other's data --- direct cross-modal evidence for the Platonic
+Representation Hypothesis at biological scale.
 
-We turn this principle into a new state-of-the-art on FACED 9-class
-emotion classification: \textbf{0.6948 balanced accuracy
-($+21.5\%$ relative over CBraMod, $+10.6\%$ over EmotionKD)} via uniform
-softmax averaging across 10 checkpoints. The mechanism is principled: each
-checkpoint shares the converged class-mean V-axis basin (saturated, free
-from supervision), but encodes the within-class V-axis residual with
-seed-specific noise; ensembling cancels this noise. A single val-selected
-checkpoint also sets a new single-seed SOTA at \textbf{0.6755 balanced
-accuracy}.
+\textbf{Saturation.} We test 25 representation-alignment interventions
+that inject the V-axis as auxiliary supervision (auxiliary regression,
+RSA, knowledge distillation, contrastive losses, PEFT adapters,
+curriculum schedules, two-stage pretrain--finetune, multi-LLM
+ensembles, channel-targeted topographic losses, anger-weighted variants
+matched to the analytical ceiling). Above an empirically located
+saturation threshold, \emph{none help}: 13 produce statistically
+significant accuracy decrements ($\Delta\text{BACC} \le -0.013$,
+$p<0.05$) and five families exhibit \emph{monotonic} destruction with
+intervention strength. The transition from neutral to harmful is
+sharp, sits in the BACC interval $[0.62, 0.66]$ on FACED-9, and
+disappears at weak baselines (5-seed CBraMod $\Delta\!\in\![-0.005,
++0.005]$, all $p>0.2$).
 
-Together, these three sides --- LLM, brain, EEG-classifier --- show
-the same axis with quantitatively consistent strength, providing
-direct cross-modal evidence for the Platonic Representation Hypothesis
-extended to a biological neural system.
+\textbf{Mechanism.} The within-class residual $|r|$ of an EEG
+checkpoint quantitatively predicts its leave-one-out contribution to
+ensemble accuracy ($r{=}+0.74$, $p{=}0.014$, $n{=}10$) --- a result
+we term the \emph{Residual Contribution Law}. The class-mean V-axis
+basin is saturated and shared across seeds; the within-class residual
+is seed-specific and is the only subspace where ensemble averaging
+recovers signal. We operationalise this into a new FACED 9-class SOTA:
+\textbf{0.6948 BACC ensemble} ($+21.5\%$ relative over CBraMod) and
+\textbf{0.6755 single-checkpoint} (val-selected).
+
+\emph{What this result is not.} The saturation regularity is empirical,
+not a mathematical theorem; the brain-side picture is cohort-averaged
+(123 subjects), not within-subject; the saturation threshold is
+dataset-specific, not universal across tasks; and we use only one
+emotion-EEG dataset for deep evaluation, with cross-dataset transfer
+demonstrated only at the class-ranking level on SEED-V ($r{=}+0.96$).
 \end{abstract}
