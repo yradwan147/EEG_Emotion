@@ -5,81 +5,216 @@
 \item {\bf Claims}
     \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
     \item[] Answer: \answerYes{}
-    \item[] Justification: The abstract and introduction state five claims: (i) a universal valence axis extractable from 18 LLMs; (ii) cohort EEG--LLM correlation $r=0.87$; (iii) cross-architecture convergence ($r{=}{+}0.74$, $p{=}0.014$ in within-class residual subspace); (iv) a saturation regularity documented across 25 alignment interventions; (v) a new FACED 9-class SOTA at $0.6948$ BACC. Each is supported in Sections~\ref{sec:vaxis-llms}--\ref{sec:sota} with its primary table or figure, and the paper-grade subset is inventoried in the appendix and notes.
+    \item[] Justification: The abstract and introduction state five claims supported by experiments in the paper: (i) a universal valence axis (V-axis) extractable from 18 LLMs; (ii) cohort EEG--LLM correlation of $r=0.87$ ($p<10^{-9}$) on FACED, replicated at $r=+0.62$ on SEED-V; (iii) cross-architecture convergence ($r{=}{+}0.715$ between within-class residual encoding and BACC across 36 checkpoints; per-checkpoint within-residual $|r|$ predicts ensemble contribution at $r{=}{+}0.74$, $p{=}0.014$); (iv) a saturation regularity documented across 25 alignment-intervention families; (v) a new FACED 9-class SOTA at $0.6948$ BACC ensemble / $0.6755$ single checkpoint. Each claim is supported in Sections~\ref{sec:vaxis-llms}--\ref{sec:sota} with its primary table or figure.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the abstract and introduction do not include the claims made in the paper.
+        \item The abstract and/or introduction should clearly state the claims made, including the contributions made in the paper and important assumptions and limitations. A \answerNo{} or \answerNA{} answer to this question will not be perceived well by the reviewers.
+        \item The claims made should match theoretical and experimental results, and reflect how much the results can be expected to generalize to other settings.
+        \item It is fine to include aspirational goals as motivation as long as it is clear that these goals are not attained by the paper.
+    \end{itemize}
 
 \item {\bf Limitations}
     \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
     \item[] Answer: \answerYes{}
-    \item[] Justification: Section~\ref{sec:discussion} lists five honest limitations: (a) one EEG dataset (FACED), partially addressed by FACED$\to$SEED-V transfer ($r{=}{+}0.96$); (b) cohort-side analysis with Simpson's-paradox between-vs-within-subject dynamic; (c) saturation threshold is dataset-specific; (d) negative results require strong-baseline interpretation; (e) statistical softness on cross-architecture class-PC1 correlation (93rd-percentile null). Theta-gamma PAC is decoupled from V-axis ($p{=}0.667$) and arousal does not match valence's brain alignment --- both documented.
+    \item[] Justification: A ``What this result is not'' boxed paragraph in Section~\ref{sec:intro} names the empirical-not-mathematical scope of the saturation regularity, the cohort-not-within-subject scope of the brain analyses, and the FACED-specific saturation threshold. Section~\ref{sec:discussion} expands these into a numbered limitations subsection: (a) two EEG datasets (FACED deep, SEED-V replicates 3/4 brain claims; V-axis-as-supervision is FACED-specific); (b) cohort-side analysis with explicit Simpson's-paradox dynamic; (c) saturation threshold dataset-specific; (d) negative results require strong-baseline interpretation; (e) cross-architecture class-PC1 correlation softened by 93rd-percentile null-direction control. Theta-gamma PAC null and arousal-axis brain-side failure are documented.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper has no limitation while the answer \answerNo{} means that the paper has limitations, but those are not discussed in the paper.
+        \item The authors are encouraged to create a separate ``Limitations'' section in their paper.
+        \item The paper should point out any strong assumptions and how robust the results are to violations of these assumptions (e.g., independence assumptions, noiseless settings, model well-specification, asymptotic approximations only holding locally). The authors should reflect on how these assumptions might be violated in practice and what the implications would be.
+        \item The authors should reflect on the scope of the claims made, e.g., if the approach was only tested on a few datasets or with a few runs. In general, empirical results often depend on implicit assumptions, which should be articulated.
+        \item The authors should reflect on the factors that influence the performance of the approach. For example, a facial recognition algorithm may perform poorly when image resolution is low or images are taken in low lighting. Or a speech-to-text system might not be used reliably to provide closed captions for online lectures because it fails to handle technical jargon.
+        \item The authors should discuss the computational efficiency of the proposed algorithms and how they scale with dataset size.
+        \item If applicable, the authors should discuss possible limitations of their approach to address problems of privacy and fairness.
+        \item While the authors might fear that complete honesty about limitations might be used by reviewers as grounds for rejection, a worse outcome might be that reviewers discover limitations that aren't acknowledged in the paper. The authors should use their best judgment and recognize that individual actions in favor of transparency play an important role in developing norms that preserve the integrity of the community. Reviewers will be specifically instructed to not penalize honesty concerning limitations.
+    \end{itemize}
 
 \item {\bf Theory assumptions and proofs}
     \item[] Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof?
     \item[] Answer: \answerNA{}
-    \item[] Justification: The paper is empirical. The ``saturation regularity'' is an empirical pattern, framed and qualified as such (Section~\ref{sec:saturation}); we do not claim a formal theorem with proof.
+    \item[] Justification: The paper is empirical. The ``saturation regularity'' (Section~\ref{sec:saturation}) is stated explicitly as an empirical pattern, not a mathematical theorem; we do not claim a proof. The boxed Statement of the Regularity in \S\ref{sec:saturation-statement} writes out what would be the formal claim and the empirical pillars supporting it (13 / 25 statistically significant negatives, 5 monotonic-destruction families, unidirectional saturation transition, direct mechanism check). The Residual Contribution Law in \S\ref{sec:within-class-mechanism} is an empirical regression claim (slope $\hat\beta = +0.74$, $p = 0.014$, $n = 10$), not a theorem.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not include theoretical results.
+        \item All the theorems, formulas, and proofs in the paper should be numbered and cross-referenced.
+        \item All assumptions should be clearly stated or referenced in the statement of any theorems.
+        \item The proofs can either appear in the main paper or the supplemental material, but if they appear in the supplemental material, the authors are encouraged to provide a short proof sketch to provide intuition.
+        \item Inversely, any informal proof provided in the core of the paper should be complemented by formal proofs provided in appendix or supplemental material.
+        \item Theorems and Lemmas that the proof relies upon should be properly referenced.
+    \end{itemize}
 
 \item {\bf Experimental result reproducibility}
-    \item[] Question: Does the paper fully disclose all the information needed to reproduce the main experimental results of the paper?
+    \item[] Question: Does the paper fully disclose all the information needed to reproduce the main experimental results of the paper to the extent that it affects the main claims and/or conclusions of the paper (regardless of whether the code and data are provided or not)?
     \item[] Answer: \answerYes{}
-    \item[] Justification: The V-axis extraction protocol is documented in Section~\ref{sec:vaxis-llms} and Appendix~\ref{app:vaxis-protocol}. EEG model training (architecture, optimisation, augmentation, KD, ensemble construction) is in Appendix~\ref{app:training}. Statistical methods (bootstrap, random-direction null, paired tests) are in Appendix~\ref{app:statistics}. Dataset splits are in Appendix~\ref{app:datasets}. The full intervention table with seeds is in Appendix~\ref{app:full-vaxis-table}.
+    \item[] Justification: The V-axis extraction protocol (story prompts, paraphrase generation, hidden-state extraction, PCA-PC1 with Joy-positive orientation) is documented in Section~\ref{sec:vaxis-llms} and Appendix~\ref{app:vaxis-protocol}. EEG model training (architecture, optimisation, augmentation, KD, ensemble construction, exact seed list) is in Appendix~\ref{app:training}. Statistical methods (bootstrap, random-direction null, paired tests) are in Appendix~\ref{app:statistics}. Dataset splits (subjects 0--79 / 80--99 / 100--122 train/val/test on FACED) are in Appendix~\ref{app:datasets}. The full intervention table with seeds and JSON pointers is in Appendix~\ref{app:full-vaxis-table}.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not include experiments.
+        \item If the paper includes experiments, a \answerNo{} answer to this question will not be perceived well by the reviewers: Making the paper reproducible is important, regardless of whether the code and data are provided or not.
+        \item If the contribution is a dataset and\slash or model, the authors should describe the steps taken to make their results reproducible or verifiable.
+        \item Depending on the contribution, reproducibility can be accomplished in various ways. For example, if the contribution is a novel architecture, describing the architecture fully might suffice, or if the contribution is a specific model and empirical evaluation, it may be necessary to either make it possible for others to replicate the model with the same dataset, or provide access to the model. In general. releasing code and data is often one good way to accomplish this, but reproducibility can also be provided via detailed instructions for how to replicate the results, access to a hosted model (e.g., in the case of a large language model), releasing of a model checkpoint, or other means that are appropriate to the research performed.
+        \item While NeurIPS does not require releasing code, the conference does require all submissions to provide some reasonable avenue for reproducibility, which may depend on the nature of the contribution. For example
+        \begin{enumerate}
+            \item If the contribution is primarily a new algorithm, the paper should make it clear how to reproduce that algorithm.
+            \item If the contribution is primarily a new model architecture, the paper should describe the architecture clearly and fully.
+            \item If the contribution is a new model (e.g., a large language model), then there should either be a way to access this model for reproducing the results or a way to reproduce the model (e.g., with an open-source dataset or instructions for how to construct the dataset).
+            \item We recognize that reproducibility may be tricky in some cases, in which case authors are welcome to describe the particular way they provide for reproducibility. In the case of closed-source models, it may be that access to the model is limited in some way (e.g., to registered users), but it should be possible for other researchers to have some path to reproducing or verifying the results.
+        \end{enumerate}
+    \end{itemize}
 
 \item {\bf Open access to data and code}
-    \item[] Question: Does the paper provide open access to the data and code, with sufficient instructions to faithfully reproduce the main experimental results?
+    \item[] Question: Does the paper provide open access to the data and code, with sufficient instructions to faithfully reproduce the main experimental results, as described in supplemental material?
     \item[] Answer: \answerYes{}
-    \item[] Justification: Code, configs, model checkpoints, and figure-generation scripts will be released at the camera-ready stage under an MIT licence (Appendix~\ref{app:repro}). Datasets used (FACED, SEED-V) are publicly available from their original authors; we release preprocessing and split scripts.
+    \item[] Justification: Code, configs, model checkpoints, and figure-generation scripts will be released at the camera-ready stage under an MIT licence (Appendix~\ref{app:repro}). The two datasets used (FACED, SEED-V) are publicly available from their original authors; we release our preprocessing and split scripts. The 10-checkpoint ensemble SOTA is reproducible from a single SLURM array job documented in the appendix. Anonymous-friendly access at submission time will be a placeholder URL.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that paper does not include experiments requiring code.
+        \item Please see the NeurIPS code and data submission guidelines (\url{https://neurips.cc/public/guides/CodeSubmissionPolicy}) for more details.
+        \item While we encourage the release of code and data, we understand that this might not be possible, so \answerNo{} is an acceptable answer. Papers cannot be rejected simply for not including code, unless this is central to the contribution (e.g., for a new open-source benchmark).
+        \item The instructions should contain the exact command and environment needed to run to reproduce the results. See the NeurIPS code and data submission guidelines (\url{https://neurips.cc/public/guides/CodeSubmissionPolicy}) for more details.
+        \item The authors should provide instructions on data access and preparation, including how to access the raw data, preprocessed data, intermediate data, and generated data, etc.
+        \item The authors should provide scripts to reproduce all experimental results for the new proposed method and baselines. If only a subset of experiments are reproducible, they should state which ones are omitted from the script and why.
+        \item At submission time, to preserve anonymity, the authors should release anonymized versions (if applicable).
+        \item Providing as much information as possible in supplemental material (appended to the paper) is recommended, but including URLs to data and code is permitted.
+    \end{itemize}
 
 \item {\bf Experimental setting/details}
-    \item[] Question: Does the paper specify all the training and test details necessary to understand the results?
+    \item[] Question: Does the paper specify all the training and test details (e.g., data splits, hyperparameters, how they were chosen, type of optimizer) necessary to understand the results?
     \item[] Answer: \answerYes{}
-    \item[] Justification: Optimiser (AdamW, lr $10^{-3}$), schedule (cosine + 5-epoch warmup), batch size (128), training length ($e{=}100$ and $e{=}150$), depth ($d{=}3, 6$), filter dimension ($f{=}128$), seeds ($\{42, 123, 456, 789, 2025\}$), augmentation parameters, KD temperature and weight, and ensemble construction are all specified in Appendix~\ref{app:training}.
+    \item[] Justification: Optimiser (AdamW, $\mathrm{lr}=10^{-3}$, $\beta_1=0.9$, $\beta_2=0.999$, weight decay $10^{-2}$), schedule (cosine + 5-epoch warmup), batch size $128$, training length $e \in \{100, 150\}$ epochs, depth $d \in \{3, 6\}$, filter dimension $f=128$, seeds $\{42, 123, 456, 789, 2025\}$, augmentation parameters (Gaussian $\sigma=0.05\cdot\mathrm{std}$, channel dropout $p=0.15$, temporal masking $\leq 5\%$, all at $p=0.6$), KD ($\lambda_{\mathrm{KD}}=0.5$, $T=1.0$, rand9 9-D orthonormal teacher), and ensemble construction (10 ckpts split as 5 $\times$ $e=100$ + 5 $\times$ $e=150$, uniform softmax averaging) are all specified in Appendix~\ref{app:training}.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not include experiments.
+        \item The experimental setting should be presented in the core of the paper to a level of detail that is necessary to appreciate the results and make sense of them.
+        \item The full details can be provided either with the code, in appendix, or as supplemental material.
+    \end{itemize}
 
 \item {\bf Experiment statistical significance}
     \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
     \item[] Answer: \answerYes{}
-    \item[] Justification: We report standard deviation across 5 seeds in every recipe-cascade row (Section~\ref{sec:sota-component-ablation}), Pearson $r$ with $p$-values for every cross-architecture and brain correlation, paired $t$-tests for V-axis interventions vs.\ matched-recipe baselines, bootstrap CIs (Appendix~\ref{app:statistics}), and random-direction null distributions for the cohort EEG--LLM correlation and the cross-architecture V-axis correlation.
+    \item[] Justification: We report standard deviation across 5 seeds in every recipe-cascade row (Section~\ref{sec:sota-component-ablation}); Pearson $r$ with $p$-values for every cross-architecture and brain correlation (Sections~\ref{sec:vaxis-brain}, \ref{sec:convergence}); paired $t$-tests for V-axis interventions vs.\ matched-recipe baselines (Section~\ref{sec:saturation}); $B=10{,}000$ subject-resampled bootstrap CIs and Fisher-$z$ $p$-values for cohort EEG correlations (Appendix~\ref{app:statistics}); 200-direction matched-norm random-direction null distributions for the cohort EEG--LLM correlation; 100-direction null for the cross-architecture V-axis correlation; permutation $p$-values for the causal ablation (\S\ref{sec:within-class-mechanism}, $z = +10.87$, $p < 10^{-26}$ on the smoke checkpoint).
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not include experiments.
+        \item The authors should answer \answerYes{} if the results are accompanied by error bars, confidence intervals, or statistical significance tests, at least for the experiments that support the main claims of the paper.
+        \item The factors of variability that the error bars are capturing should be clearly stated (for example, train/test split, initialization, random drawing of some parameter, or overall run with given experimental conditions).
+        \item The method for calculating the error bars should be explained (closed form formula, call to a library function, bootstrap, etc.)
+        \item The assumptions made should be given (e.g., Normally distributed errors).
+        \item It should be clear whether the error bar is the standard deviation or the standard error of the mean.
+        \item It is OK to report 1-sigma error bars, but one should state it. The authors should preferably report a 2-sigma error bar than state that they have a 96\% CI, if the hypothesis of Normality of errors is not verified.
+        \item For asymmetric distributions, the authors should be careful not to show in tables or figures symmetric error bars that would yield results that are out of range (e.g., negative error rates).
+        \item If error bars are reported in tables or plots, the authors should explain in the text how they were calculated and reference the corresponding figures or tables in the text.
+    \end{itemize}
 
 \item {\bf Experiments compute resources}
     \item[] Question: For each experiment, does the paper provide sufficient information on the computer resources (type of compute workers, memory, time of execution) needed to reproduce the experiments?
     \item[] Answer: \answerYes{}
-    \item[] Justification: Appendix~\ref{app:compute} reports approximately $4{,}500$ V100 GPU-hours total, broken down by experiment family (recipe ablation, V-axis interventions, cross-architecture analysis, ensemble construction, cross-dataset). The 10-checkpoint ensemble SOTA is reproducible in $\sim$10 GPU-hours per seed.
+    \item[] Justification: Appendix~\ref{app:compute} reports approximately $4{,}500$ V100 GPU-hours total, broken down by experiment family: $\sim$600 for the recipe ablation cascade, $\sim$1{,}200 for the 25 V-axis-supervision interventions, $\sim$800 for the 36-checkpoint cross-architecture analysis, $\sim$1{,}200 for ensemble construction and val--test rank diagnostics, $\sim$700 for cross-dataset (SEED-V) experiments. The 10-checkpoint ensemble SOTA result is reproducible in $\sim$10 GPU-hours per seed. V-axis extraction is CPU-cheap ($\sim$10 minutes per LM on a single 80\,GB GPU). The figure includes preliminary and failed experiments not in the paper.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not include experiments.
+        \item The paper should indicate the type of compute workers CPU or GPU, internal cluster, or cloud provider, including relevant memory and storage.
+        \item The paper should provide the amount of compute required for each of the individual experimental runs as well as estimate the total compute.
+        \item The paper should disclose whether the full research project required more compute than the experiments reported in the paper (e.g., preliminary or failed experiments that didn't make it into the paper).
+    \end{itemize}
 
 \item {\bf Code of ethics}
-    \item[] Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics?
+    \item[] Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics \url{https://neurips.cc/public/EthicsGuidelines}?
     \item[] Answer: \answerYes{}
-    \item[] Justification: We use only publicly released datasets (FACED, SEED-V) collected by other groups under their respective IRB-approved protocols. We collect no new human data. We use only publicly released LLMs.
+    \item[] Justification: We use only publicly released datasets (FACED \citep{chen2023faced}, SEED-V \citep{liu2022seedv}) collected by other groups under their respective IRB-approved protocols. We collect no new human data. We use only publicly released LLMs under their published licences.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the authors have not reviewed the NeurIPS Code of Ethics.
+        \item If the authors answer \answerNo, they should explain the special circumstances that require a deviation from the Code of Ethics.
+        \item The authors should make sure to preserve anonymity (e.g., if there is a special consideration due to laws or regulations in their jurisdiction).
+    \end{itemize}
 
 \item {\bf Broader impacts}
     \item[] Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
     \item[] Answer: \answerYes{}
-    \item[] Justification: Improved EEG emotion classifiers have applications in mental-health monitoring and brain--computer interfaces (positive); they also pose risks of affective inference without consent in surveillance or workplace contexts (negative). Section~\ref{sec:discussion} flags this dual-use surface.
+    \item[] Justification: Improved EEG emotion classifiers have applications in mental-health monitoring and brain--computer interfaces (positive); they also pose risks of affective inference without consent in surveillance, workplace, or advertising contexts (negative). Section~\ref{sec:discussion} flags this dual-use surface and notes that the V-axis extraction protocol applied to EEG could in principle reduce the calibration-data burden for affective inference systems --- a feature that cuts both ways. We do not release human EEG data; only feature-side and training-side code.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that there is no societal impact of the work performed.
+        \item If the authors answer \answerNA{} or \answerNo, they should explain why their work has no societal impact or why the paper does not address societal impact.
+        \item Examples of negative societal impacts include potential malicious or unintended uses (e.g., disinformation, generating fake profiles, surveillance), fairness considerations (e.g., deployment of technologies that could make decisions that unfairly impact specific groups), privacy considerations, and security considerations.
+        \item The conference expects that many papers will be foundational research and not tied to particular applications, let alone deployments. However, if there is a direct path to any negative applications, the authors should point it out. For example, it is legitimate to point out that an improvement in the quality of generative models could be used to generate Deepfakes for disinformation. On the other hand, it is not needed to point out that a generic algorithm for optimizing neural networks could enable people to train models that generate Deepfakes faster.
+        \item The authors should consider possible harms that could arise when the technology is being used as intended and functioning correctly, harms that could arise when the technology is being used as intended but gives incorrect results, and harms following from (intentional or unintentional) misuse of the technology.
+        \item If there are negative societal impacts, the authors could also discuss possible mitigation strategies (e.g., gated release of models, providing defenses in addition to attacks, mechanisms for monitoring misuse, mechanisms to monitor how a system learns from feedback over time, improving the efficiency and accessibility of ML).
+    \end{itemize}
 
 \item {\bf Safeguards}
-    \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models with a high risk for misuse?
+    \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models that have a high risk for misuse (e.g., pre-trained language models, image generators, or scraped datasets)?
     \item[] Answer: \answerNA{}
-    \item[] Justification: Our trained EEG-emotion checkpoints and V-axis extraction code do not introduce abuse vectors beyond what is already public via FACED and the listed LLMs. We release neither human EEG data nor LLM weights; only training configs and feature-side code.
+    \item[] Justification: Our trained EEG-emotion checkpoints and V-axis extraction code do not introduce abuse vectors beyond what is already public via FACED, SEED-V, and the listed pre-trained LLMs. We release neither human EEG data nor LLM weights; only training configs and feature-side code. We assess the dual-use risk in the broader-impacts statement.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper poses no such risks.
+        \item Released models that have a high risk for misuse or dual-use should be released with necessary safeguards to allow for controlled use of the model, for example by requiring that users adhere to usage guidelines or restrictions to access the model or implementing safety filters.
+        \item Datasets that have been scraped from the Internet could pose safety risks. The authors should describe how they avoided releasing unsafe images.
+        \item We recognize that providing effective safeguards is challenging, and many papers do not require this, but we encourage authors to take this into account and make a best faith effort.
+    \end{itemize}
 
 \item {\bf Licenses for existing assets}
     \item[] Question: Are the creators or original owners of assets (e.g., code, data, models), used in the paper, properly credited and are the license and terms of use explicitly mentioned and properly respected?
     \item[] Answer: \answerYes{}
-    \item[] Justification: FACED is cited \citep{chen2023faced} and used under its public release license. SEED-V is cited \citep{liu2022seedv}. LLMs (Qwen, Llama, Mistral, OLMo, Phi, Pythia, BLOOM, TinyLlama, Gemma) are cited and used under their respective Hugging Face / model-card licenses. The CBraMod \citep{wang2025cbramod} and EMOD \citep{chen2025emod} backbones are cited and used under their public licenses. CLIP \citep{radford2021clip} is cited.
+    \item[] Justification: FACED is cited \citep{chen2023faced} and used under its public release license; SEED-V is cited \citep{liu2022seedv}. All 18 LLMs (Qwen3.5 family, Llama-3, Llama-4-Scout, Mistral-7B, OLMo-7B, Phi-2, Pythia, BLOOM, TinyLlama, Gemma-27B, Gemma-4) are cited and used under their respective Hugging Face / model-card licenses. The CBraMod \citep{wang2025cbramod} and EMOD \citep{chen2025emod} backbones are cited and used under their public licenses. CLIP \citep{radford2021clip} is cited.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not use existing assets.
+        \item The authors should cite the original paper that produced the code package or dataset.
+        \item The authors should state which version of the asset is used and, if possible, include a URL.
+        \item The name of the license (e.g., CC-BY 4.0) should be included for each asset.
+        \item For scraped data from a particular source (e.g., website), the copyright and terms of service of that source should be provided.
+        \item If assets are released, the license, copyright information, and terms of use in the package should be provided. For popular datasets, \url{paperswithcode.com/datasets} has curated licenses for some datasets. Their licensing guide can help determine the license of a dataset.
+        \item For existing datasets that are re-packaged, both the original license and the license of the derived asset (if it has changed) should be provided.
+        \item If this information is not available online, the authors are encouraged to reach out to the asset's creators.
+    \end{itemize}
 
 \item {\bf New assets}
     \item[] Question: Are new assets introduced in the paper well documented and is the documentation provided alongside the assets?
     \item[] Answer: \answerYes{}
-    \item[] Justification: The V-axis extraction scripts, V-axis-aligned EEG checkpoints, and figure-generation pipelines will be released with documentation (README, environment.yml, SLURM templates) at the camera-ready stage.
+    \item[] Justification: The V-axis extraction scripts, V-axis-aligned EEG checkpoints, and figure-generation pipelines will be released with documentation (README, environment.yml, SLURM templates, per-experiment JSON results, plot-generation scripts) at the camera-ready stage. Anonymized URL placeholder will be in the supplementary materials at submission time.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not release new assets.
+        \item Researchers should communicate the details of the dataset\slash code\slash model as part of their submissions via structured templates. This includes details about training, license, limitations, etc.
+        \item The paper should discuss whether and how consent was obtained from people whose asset is used.
+        \item At submission time, remember to anonymize your assets (if applicable). You can either create an anonymized URL or include an anonymized zip file.
+    \end{itemize}
 
 \item {\bf Crowdsourcing and research with human subjects}
     \item[] Question: For crowdsourcing experiments and research with human subjects, does the paper include the full text of instructions given to participants and screenshots, if applicable, as well as details about compensation (if any)?
     \item[] Answer: \answerNA{}
-    \item[] Justification: We do not collect new human data; all human EEG comes from the publicly released FACED and SEED-V datasets, originally collected by their respective groups under their own IRB-approved protocols.
+    \item[] Justification: We do not collect new human data; all human EEG comes from the publicly released FACED \citep{chen2023faced} and SEED-V \citep{liu2022seedv} datasets, originally collected by their respective groups under their own IRB-approved protocols.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not involve crowdsourcing nor research with human subjects.
+        \item Including this information in the supplemental material is fine, but if the main contribution of the paper involves human subjects, then as much detail as possible should be included in the main paper.
+        \item According to the NeurIPS Code of Ethics, workers involved in data collection, curation, or other labor should be paid at least the minimum wage in the country of the data collector.
+    \end{itemize}
 
 \item {\bf Institutional review board (IRB) approvals or equivalent for research with human subjects}
     \item[] Question: Does the paper describe potential risks incurred by study participants, whether such risks were disclosed to the subjects, and whether Institutional Review Board (IRB) approvals (or an equivalent approval/review based on the requirements of your country or institution) were obtained?
     \item[] Answer: \answerNA{}
     \item[] Justification: No new human-subjects research was conducted. The FACED \citep{chen2023faced} and SEED-V \citep{liu2022seedv} datasets were collected under their original IRB approvals, which we cite.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not involve crowdsourcing nor research with human subjects.
+        \item Depending on the country in which research is conducted, IRB approval (or equivalent) may be required for any human subjects research. If you obtained IRB approval, you should clearly state this in the paper.
+        \item We recognize that the procedures for this may vary significantly between institutions and locations, and we expect authors to adhere to the NeurIPS Code of Ethics and the guidelines for their institution.
+        \item For initial submissions, do not include any information that would break anonymity (if applicable), such as the institution conducting the review.
+    \end{itemize}
 
 \item {\bf Declaration of LLM usage}
-    \item[] Question: Does the paper describe the usage of LLMs if it is an important, original, or non-standard component of the core methods in this research?
+    \item[] Question: Does the paper describe the usage of LLMs if it is an important, original, or non-standard component of the core methods in this research? Note that if the LLM is used only for writing, editing, or formatting purposes and does \emph{not} impact the core methodology, scientific rigor, or originality of the research, declaration is not required.
     \item[] Answer: \answerYes{}
-    \item[] Justification: The V-axis is extracted from 18 named language models (Section~\ref{sec:vaxis-llms-universality}). Each is cited; sizes, architectures, and layer indices used for centroid extraction are documented in Sections~\ref{sec:vaxis-llms} and \ref{sec:vshape} and Appendix~\ref{app:vaxis-protocol}. LLMs were also used to generate paraphrases of the nine emotion-evocative stories (paraphrase generator: Qwen3.5-7B, temperature 0.7); the prompt and filter criteria are stated in Appendix~\ref{app:vaxis-protocol}.
+    \item[] Justification: LLMs are central to the V-axis extraction protocol. The 18 language models from which we extract the V-axis are named in Section~\ref{sec:vaxis-llms-universality} and Appendix~\ref{app:vaxis-protocol}: Qwen3.5 (1.7B / 3B / 7B / 14B / 72B), Llama-3-8B, Llama-4-Scout-17B, Mistral-7B, OLMo-7B, Phi-2-2.7B, Pythia-1.4B, BLOOM-560M, TinyLlama-1.1B, Gemma-27B, Gemma-4-31B. The penultimate-layer hidden state ($L = L_{\max} - 1$, e.g., $L = 27$ of 28 for Qwen3.5-1.7B) is the source of all class centroids. We also use Qwen3.5-7B (temperature 0.7) as a paraphrase generator in pre-processing; the prompt is in Appendix~\ref{app:vaxis-protocol}. CLIP \citep{radford2021clip} (image encoder) is used for the cross-modal vision V-axis.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the core method development in this research does not involve LLMs as any important, original, or non-standard components.
+        \item Please refer to our LLM policy in the NeurIPS handbook for what should or should not be described.
+    \end{itemize}
 
 \end{enumerate}
