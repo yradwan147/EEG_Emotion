@@ -2,50 +2,47 @@
 \label{sec:related}
 
 \paragraph{Brain--LM alignment.}
-Toneva and Wehbe \citep{toneva2019interpreting} first showed that
+Toneva and Wehbe~\citep{toneva2019interpreting} first showed that
 mid-layer transformer activations predict fMRI responses to narrative
-text; Schrimpf et~al.\ \citep{schrimpf2021neural} (43 LMs vs.\
-fMRI/ECoG), Goldstein et~al.\ \citep{goldstein2022shared}
-(intracranial), Caucheteux and King \citep{caucheteux2022brains} (MEG),
-and Padakanti and Oota \citep{padakanti2025meg} (per-sensor topographic
-maps) extend the picture. We differ by working at full 123-subject EEG
-scale, studying \emph{emotion}, and showing alignment in both
-directions: LLM-derived directions predict brain responses, and EEG
-classifiers converge to the same direction.
+text; Schrimpf et~al.~\citep{schrimpf2021neural} ($43$ LMs against
+fMRI/ECoG), Goldstein et~al.~\citep{goldstein2022shared}
+(intracranial), Caucheteux and King~\citep{caucheteux2022brains}
+(MEG), and Padakanti and Oota~\citep{padakanti2025meg} (per-sensor
+topographic maps) extended the picture across modalities. We differ
+by working at full $123$-subject EEG scale, by studying \emph{emotion}
+rather than language, and by showing alignment in both directions:
+LLM-derived directions predict brain responses, and EEG classifiers
+trained on those brain signals converge to the same direction.
 
 \paragraph{Concept directions in LLMs.}
-Arditi et~al.\ \citep{arditi2024refusal} show that \emph{refusal} in
+Arditi et~al.~\citep{arditi2024refusal} showed that refusal in
 instruction-tuned LMs is mediated by a single direction in
 residual-stream activations; ablating it eliminates refusal, adding it
-induces it. Earlier work in this style includes
-\citep{li2023inferencetime,zou2023repe,kim2018tcav}. Our V-axis is
-extracted analogously --- principal component of class-mean activations
-across nine emotion-story prompts --- and exhibits the same
-architecture-spanning universality. We differ by (i) linking the
-LLM-side direction to a 123-subject biological neural system at the
-cohort level, and (ii) showing that an artificial classifier trained on
-those biological signals \emph{finds} the same direction, completing a
-three-way LLM--brain--EEG-classifier triangle.
+induces it. Earlier work in this family includes
+\citep{li2023inferencetime,zou2023repe,kim2018tcav}. The V-axis is
+extracted analogously---principal component of class-mean activations
+across nine emotion-story prompts---and exhibits the same
+architecture-spanning universality. We extend this line by linking
+the LLM-side direction to a $123$-subject biological neural system at
+the cohort level and by showing that an artificial classifier trained
+on those biological signals \emph{finds} the same direction,
+completing a three-way LLM--brain--classifier triangle.
 
-\paragraph{Platonic Representation Hypothesis, ensemble theory, and FAA.}
-Huh et~al.\ \citep{huh2024platonic} operationalise the Platonic
-Hypothesis via vision--language kernel alignment; we extend it to
+\paragraph{Platonic hypothesis, ensemble theory, and FAA.}
+Huh et~al.~\citep{huh2024platonic} operationalised the Platonic
+hypothesis through vision--language kernel alignment; we extend it to
 LLM$\leftrightarrow$brain and LLM$\leftrightarrow$EEG-classifier pairs.
-Our two-tier theory --- saturated class-mean basin (Tier 1) plus
-seed-specific within-class residual (Tier 2) --- gives a
-representation-level form of bias--variance \citep{geman1992neural,krogh1995neural}
-and linear-mode connectivity
-\citep{frankle2020linearmode,wortsman2022model}. Davidson's
-frontal-alpha asymmetry hypothesis
-\citep{davidson1992anterior,coan2004frontal,davidson2004wellbeing}
+The two-tier mechanism we identify---a saturated class-mean basin
+plus a seed-specific within-class residual---gives a representation-level
+form of bias--variance~\citep{geman1992neural,krogh1995neural} and
+linear-mode connectivity~\citep{frankle2020linearmode,wortsman2022model}.
+Davidson's frontal-alpha asymmetry hypothesis~\citep{davidson1992anterior,coan2004frontal,davidson2004wellbeing}
 remains the dominant electrophysiological account of emotion; we
-replicate it qualitatively at smaller magnitude and add a
-posterior-dominant account for video paradigms. We test 25 alignment
-mechanisms drawn from
-\citep{hinton2015distilling,tian2020crd,kriegeskorte2008rsa,park2019rkd,sundaram2024perceptual,radford2021clip,khosla2020supcon,hu2022lora,liu2022ia3}
-and confirm: above the saturation threshold, all hurt or do nothing.
-FACED-9 baselines we compare against are CBraMod $0.572$
-\citep{wang2025cbramod}, EmotionKD $0.628$ \citep{liu2023emotionkd}, and
-EMOD $0.6287$ \citep{chen2025emod}, with REVE \citep{elouahidi2025reve},
-LaBraM \citep{jiang2024labram}, and EEGPT \citep{yue2024eegpt} as
+replicate it qualitatively at smaller magnitude and add a posterior
+account for video paradigms. The $25$ alignment mechanisms we test are
+drawn from~\citep{hinton2015distilling,tian2020crd,kriegeskorte2008rsa,park2019rkd,sundaram2024perceptual,radford2021clip,khosla2020supcon,hu2022lora,liu2022ia3}.
+The FACED-9 baselines we compare against are
+CBraMod $0.572$~\citep{wang2025cbramod}, EmotionKD $0.628$~\citep{liu2023emotionkd},
+and EMOD $0.6287$~\citep{chen2025emod}, with REVE~\citep{elouahidi2025reve},
+LaBraM~\citep{jiang2024labram}, and EEGPT~\citep{yue2024eegpt} as
 foundation-model references.

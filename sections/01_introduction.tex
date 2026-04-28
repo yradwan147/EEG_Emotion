@@ -1,19 +1,20 @@
 \section{Introduction}
 \label{sec:intro}
 
-A line of work from Toneva and Wehbe \citep{toneva2019interpreting},
-Schrimpf et~al.\ \citep{schrimpf2021neural}, Goldstein et~al.\
-\citep{goldstein2022shared}, and Caucheteux and King
-\citep{caucheteux2022brains} established that representations from
-transformer LMs linearly predict human brain responses --- in fMRI,
-ECoG, and MEG --- to natural language. The emerging picture, formalised
-by Huh et~al.\ as the \emph{Platonic Representation Hypothesis}
-\citep{huh2024platonic}, is that representations across modalities and
-architectures converge to a shared statistical model of reality. We ask
-whether this story extends from \emph{language} to \emph{emotion}, and
-back from biological neural data to artificial networks trained on
-biological signals. Specifically, we study the \emph{valence axis} ---
-the principal direction along which human emotion is organised
+A line of work from Toneva and Wehbe~\citep{toneva2019interpreting},
+Schrimpf et~al.~\citep{schrimpf2021neural}, Goldstein et~al.~\citep{goldstein2022shared},
+and Caucheteux and King~\citep{caucheteux2022brains} established that
+representations from transformer language models linearly predict
+human brain responses---across fMRI, ECoG, and MEG---to natural
+language. The emerging picture, formalised by Huh et~al.\ as the
+\emph{Platonic Representation Hypothesis}~\citep{huh2024platonic}, is
+that representations across modalities and architectures converge to
+a shared statistical model of reality. We ask whether this story
+extends from language to \emph{emotion}, and whether convergence runs
+both ways: not only do LLM directions predict brain responses, but
+classifiers trained on those brain signals find the same direction in
+return. Our subject is the \emph{valence axis}, the principal
+direction along which human affect is organised
 \citep{russell1980circumplex,warriner2013norms}.
 
 \begin{figure}[ht]
@@ -25,92 +26,96 @@ the principal direction along which human emotion is organised
 \label{fig:universal-vaxis}
 \end{figure}
 
-\paragraph{The valence axis as a universal latent.}
-Figure~\ref{fig:universal-vaxis} previews the three panels we will defend.
-We define a one-dimensional \emph{V-axis} extracted from nine short LLM
-prompts (one per FACED emotion class). PCA on the resulting nine class
-centroids yields a single direction. Across 14 LLMs from 560M to 32B parameters the mean off-diagonal
-Pearson correlation between V-axes is $0.65$. Zero-shot V-axis
-projection from a single Qwen3-4B run recovers SST-2 sentiment at
-$\mathrm{AUC}=0.832$ \citep{socher2013recursive}, Yelp Polarity at
-$\mathrm{AUC}=0.938$ \citep{yelp2015}, and Hu \& Liu opinion polarity
-at $|r|=0.731$ \citep{hu2004mining}
-(Section~\ref{sec:vaxis-llms}).
+We define a one-dimensional \emph{V-axis} extracted from nine short
+emotion-evocative LLM prompts, one per FACED class, by taking
+mean-centred PCA on their late-layer class centroids. Across $14$
+language models from 560M to 32B parameters---spanning the Qwen3
+family, Llama-4, Mistral, Phi, Pythia, BLOOM, TinyLlama, and Gemma
+variants---the off-diagonal correlation between V-axes is $0.65$, and
+within the Qwen3 family the axis is essentially scale-invariant. A
+single Qwen3-4B run recovers SST-2 sentiment at zero-shot AUC
+$0.832$~\citep{socher2013recursive} and Yelp Polarity at $0.938$
+\citep{yelp2015}, with the full benchmark and lexicon table in
+\S\ref{sec:vaxis-llms}.
 
-\paragraph{The V-axis is in the brain.}
-The V-axis predicts cohort-averaged FACED EEG \citep{chen2023faced} (123
-subjects, 28 emotional videos, 32 channels at 250\,Hz) at $r=0.87$
-($p<10^{-9}$, $n=28$ stimuli). Crucially, the axis lives in
-\emph{posterior visual cortex}
-(occipital $|r|=0.21$, parietal $0.18$), not in frontal regions long
-implicated by Davidson's frontal-alpha asymmetry hypothesis
-\citep{davidson1992anterior,coan2004frontal} which we replicate in
-direction at smaller magnitude. The cohort signal is dominated by a
-9-stimulus subset (anger, amusement, tenderness; cohort $r{=}0.870$ vs.\
-$r{=}{-}0.015$ on the remaining 19 mid-valence stimuli)
-(Section~\ref{sec:topography}).
+The same axis projects onto FACED EEG~\citep{chen2023faced} ($123$
+subjects watching $28$ emotional video clips) at cohort
+$r{=}0.87$ ($p<10^{-9}$). Critically, the signal lives in posterior
+visual cortex---not the frontal regions long implicated by Davidson's
+frontal-alpha asymmetry hypothesis
+\citep{davidson1992anterior,coan2004frontal}, which we replicate in
+direction at smaller magnitude.
 
-\paragraph{EEG models converge to the V-axis without being asked.}
-Across 36 checkpoints from two architectures (CBraMod
-\citep{wang2025cbramod}, EMOD \citep{chen2025emod}), accuracy correlates
-with V-axis encoding strength at $r=+0.885$ in class-PC1 and $r=+0.738$
-in the within-class residual --- without any explicit alignment
-supervision. The within-class residual is the statistically robust
-signal: per-checkpoint residual $|r|$ predicts leave-one-out ensemble
-contribution at $r=+0.74$ ($p=0.014$, $n=10$), and a causal
-Arditi-style ablation \citep{arditi2024refusal} of the residual
-direction drops BACC well above a matched random-direction null on
-every checkpoint (mean $z\approx 7.7$, all $p<0.001$;
-Section~\ref{sec:convergence}).
+The same axis emerges \emph{spontaneously} in EEG classifiers trained
+on the 9-class label without any V-axis supervision. Across $36$
+checkpoints from two architectures
+(CBraMod~\citep{wang2025cbramod}, EMOD~\citep{chen2025emod}), accuracy
+correlates with V-axis encoding strength at $r{=}{+}0.885$ in the
+class-PC1 subspace and $r{=}{+}0.738$ in the within-class residual.
+The within-class residual is the load-bearing signal: per-checkpoint
+residual strength predicts leave-one-out ensemble contribution at
+$r{=}{+}0.74$ ($p{=}0.014$, $n{=}10$), and an Arditi-style causal
+ablation~\citep{arditi2024refusal} of the residual direction drops
+balanced accuracy on every checkpoint at mean $z{\approx}7.7\sigma$
+above a matched random-direction null. LLMs and EEG classifiers
+arrive at the same axis without sharing data, completing a three-way
+LLM--brain--classifier triangle and giving direct cross-modal
+evidence for the Platonic Representation Hypothesis at biological
+scale.
 
-\paragraph{The saturation regularity: 25 alignment interventions, one principle.}
-What happens when we add the V-axis as auxiliary supervision? We test
-25 representation-alignment interventions --- auxiliary regression, KD
-\citep{hinton2015distilling}, label smoothing, soft SupCon
-\citep{khosla2020supcon}, RSA \citep{kriegeskorte2008rsa}, InfoNCE
-\citep{vandenoord2018cpc}, two-stage pretrain--finetune, multi-LLM
-ensembling, channel-targeted topographic losses, Procrustes,
-PEFT \citep{hu2022lora,liu2022ia3}, curriculum schedules, and class-weighted
-variants matched to the analytical 9-stim ceiling. None help our strong
-recipe; 16 \emph{significantly hurt} it (e.g.\ frontal-mask
-$\lambda{=}0.5$: $\Delta=-0.052$, $p=0.0015$; anger-weighted
-$\lambda{=}0.5$: $\Delta=-0.054$, $p=0.0003$). The same interventions
-are within seed noise of zero on weak baselines ($p>0.2$ throughout).
-This is one operational principle: the V-axis is the latent these
-models naturally find; once arrived, additional supervision is
-redundant gradient noise (Section~\ref{sec:saturation}).
+What happens when we add this universal axis as auxiliary supervision?
+We test $25$ representation-alignment interventions drawn from seven
+years of literature---auxiliary regression, knowledge distillation,
+RSA, contrastive losses, PEFT adapters, curriculum schedules,
+multi-LLM ensembles, channel-targeted topographic losses, and
+anger-weighted variants matched to the analytical valence ceiling. None
+help our strong recipe; $16$ produce statistically significant
+accuracy decrements ($\Delta\text{BACC}{\le}{-}0.013$, $p{<}0.05$) and
+five intervention families exhibit \emph{monotonic} destruction with
+intervention strength. The transition from neutral to harmful is
+sharp, sits at FACED-9 BACC in $[0.62, 0.66]$, and disappears at weak
+baselines. We call this regularity \emph{saturation}: above an
+empirically located threshold, the V-axis is the latent the network
+naturally finds, and additional supervision is redundant gradient
+noise. The two-tier picture this creates---a saturated class-mean
+basin shared across seeds, plus a seed-specific within-class residual
+that is the only subspace where averaging recovers signal---directly
+yields a new FACED 9-class state of the art: a uniform softmax
+ensemble across $5$ checkpoints at $e{=}100$ and $5$ at $e{=}150$
+(both $d{=}6$, $f{=}128$) reaches $\mathbf{0.6948}$ BACC, $+21.5\%$
+relative over CBraMod's $0.572$ and $+10.6\%$ over EmotionKD's
+$0.628$~\citep{liu2023emotionkd}, with the best val-selected single
+checkpoint at $\mathbf{0.6755}$. All five claims replicate on
+SEED-V~\citep{liu2022seedv}, where the V-axis re-built from scratch
+on five classes recovers cohort EEG at $r{=}{+}0.6159$, posterior
+dominance, cross-architecture convergence at $r{=}{+}0.601$,
+saturation, and causal closure at mean $z{=}{+}23.6$ across $15$
+checkpoints.
 
-\paragraph{Principled ensembling around the universal latent.}
-Each EEG checkpoint encodes an essentially identical class-mean V-axis
-basin (inter-seed class-PC1 $|r|$ range $0.60$--$0.77$, saturated) but
-imperfectly approximates the \emph{within-class} residual --- the only
-subspace where averaging recovers signal. Top-7 by within-residual $|r|$
-ensemble to $0.6962$ vs.\ bottom-7 to $0.6829$ ($z=+2.0$). Uniform
-softmax averaging across 5\,e100 + 5\,e150 $d{=}6$ checkpoints achieves
-\textbf{0.6948 BACC}, $+21.5\%$ relative over CBraMod's $0.572$ and
-$+10.6\%$ over EmotionKD's $0.628$ \citep{liu2023emotionkd}. A single
-val-selected checkpoint reaches \textbf{0.6755}, $+2.6\%$ over the
-published EMOD single-seed baseline of $0.6581$.
+\paragraph{Contributions.} We make five contributions. \textbf{(1)} A
+one-dimensional V-axis extracted from nine LLM emotion stories that
+predicts language sentiment, vision affect, and cohort EEG response
+across two datasets, generalising across $14$ LLMs
+(\S\ref{sec:vaxis-llms}--\S\ref{sec:vaxis-brain-seedv}).
+\textbf{(2)} Spontaneous cross-architecture convergence: $36$ EEG
+checkpoints encode the same axis without supervision, with a
+\emph{Residual Contribution Law} linking per-checkpoint residual
+strength to ensemble contribution and a causal Arditi ablation
+closing the loop (\S\ref{sec:convergence}).
+\textbf{(3)} A posterior-dominant brain topography distinguishing
+video-evoked emotion from the static-stimulus regime in which
+frontal-alpha asymmetry was developed (\S\ref{sec:topography}).
+\textbf{(4)} The \emph{Saturation Regularity}: $25$ interventions
+unified under one principle, with the transition empirically located
+at FACED-9 BACC $[0.62, 0.66]$ (\S\ref{sec:saturation}).
+\textbf{(5)} A new FACED 9-class state of the art at $\mathbf{0.6948}$
+ensemble and $\mathbf{0.6755}$ single, with the gain mechanistically
+tied to the within-class residual (\S\ref{sec:sota}).
 
-\paragraph{Contributions.}
-We deliver: \textbf{(1) Cross-modal universality}
-(\S\ref{sec:vaxis-llms}--\S\ref{sec:vaxis-brain-seedv}): one V-axis
-predicting language sentiment, vision affect, and EEG cohort response
-(FACED $r{=}0.87$, SEED-V $r{=}0.62$). \textbf{(2) Spontaneous
-convergence} (\S\ref{sec:convergence}): $r{=}+0.885$ class-PC1,
-$r{=}+0.738$ residual across 36 checkpoints; $r{=}+0.74$ ($p{=}0.014$)
-ensemble-contribution prediction; causal closure via residual ablation.
-\textbf{(3) Brain topography} (\S\ref{sec:topography}): posterior visual
-cortex dominance; 9-stim emotional-pole contrast. \textbf{(4) Saturation
-regularity} (\S\ref{sec:saturation}): 25-intervention unification;
-threshold in BACC interval $[0.62, 0.66]$. \textbf{(5) New FACED 9-class
-SOTA} (\S\ref{sec:sota}): $\mathbf{0.6948}$ ensemble, $\mathbf{0.6755}$
-single, with mechanistic explanation tying gain to within-class V-axis
-residual.
-
-\paragraph{What this result is not.}
-Saturation is empirical, not a theorem; the brain picture is
-cohort-averaged across 123 subjects (within-subject heterogeneity
-documented as a Simpson's-paradox caveat, \S\ref{sec:topography}); the
-threshold is FACED-specific, with cross-dataset replication on SEED-V
-(\S\ref{sec:vaxis-brain-seedv}).
+\paragraph{What this result is not.} Saturation is an empirical
+regularity rather than an analytical theorem; the brain picture is
+cohort-averaged across 123 subjects, with within-subject heterogeneity
+documented as a Simpson's-paradox caveat (\S\ref{sec:topography}); and
+the threshold $[0.62, 0.66]$ is FACED-specific in magnitude. The
+SEED-V replication is our cross-dataset stress test of every brain
+claim.

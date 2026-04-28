@@ -1,15 +1,26 @@
 \section{EEG Models Converge to the LLM V-axis Without Being Asked}
 \label{sec:convergence}
 
-We collect 36 EEG-emotion checkpoints spanning two architectures
-(CBraMod \citep{wang2025cbramod}, EMOD \citep{chen2025emod}), three
-training regimes, and six recipe variants. For each checkpoint $m$ we
-extract balanced test accuracy and two V-axis encoding scores from the
-28-stimulus penultimate features $H(m)$: \textbf{class-PC1 alignment}
-$|\mathrm{corr}(\mathrm{PC}_1(\{\mu_k\}), v_{\mathrm{CLIP}})|$ across the
-9 class centroids $\mu_k$, and \textbf{within-class residual} alignment
-between the validation-selected best residual PC and the 28-stim CLIP
-V-axis residual.
+We collect $36$ EEG-emotion checkpoints spanning two architectures
+(CBraMod~\citep{wang2025cbramod} and EMOD~\citep{chen2025emod}),
+three training regimes, and six recipe variants. For each checkpoint
+we extract balanced test accuracy and two V-axis encoding scores
+from the $28$-stimulus penultimate features: a class-PC1 alignment
+$|\mathrm{corr}(\mathrm{PC}_1(\{\mu_k\}), v_{\mathrm{CLIP}})|$ across
+the nine class centroids, and a within-class residual alignment
+between the validation-selected best residual PC and the $28$-stim
+CLIP V-axis residual. Across $n{=}36$ checkpoints
+$\mathrm{Pearson}(\mathrm{BACC}, \mathrm{class\text{-}PC1\text{-}r}){=}{+}0.885$
+and $\mathrm{Pearson}(\mathrm{BACC}, \mathrm{within\text{-}resid\text{-}r}){=}{+}0.738$
+(Figure~\ref{fig:crossarch}). A $1000$-direction random Gaussian null
+matched in $L_2$ norm to $v_{\mathrm{CLIP}}$ places class-PC1 at the
+$93.5^{\mathrm{th}}$ percentile ($p_{\mathrm{one}}{=}0.066$); the
+9-class PC1 subspace is intrinsically low-dimensional ($\sigma{=}0.62$),
+so we foreground the within-class residual---operating in
+$D_{\mathrm{resid}}\approx D-9$---as the statistically robust signal.
+The class-PC1 basin itself is saturated across seeds
+($|r|\in[0.60, 0.77]$, mean $0.69 \pm 0.05$;
+Appendix~\ref{app:convergence-deep-dive}).
 
 \begin{figure}[ht]
 \centering
@@ -20,51 +31,35 @@ V-axis residual.
 \label{fig:crossarch}
 \end{figure}
 
-\paragraph{Both metrics correlate with accuracy.}
-Figure~\ref{fig:crossarch} summarises the three-panel result.
-Across $n{=}36$ checkpoints,
-$\mathrm{Pearson}(\mathrm{BACC}, \mathrm{class\text{-}PC1\text{-}r}) = +0.885$
-and $\mathrm{Pearson}(\mathrm{BACC}, \mathrm{within\text{-}resid\text{-}r}) = +0.738$.
-A 1000-direction random Gaussian null matched in $L_2$ norm to
-$v_{\mathrm{CLIP}}$ places class-PC1 at the $93.5^{\mathrm{th}}$
-percentile ($p_{\mathrm{one}}=0.066$); the 9-class PC1 subspace is
-intrinsically low-dimensional ($\sigma=0.62$). We therefore foreground
-the within-class residual --- operating in $D_{\mathrm{resid}} \approx
-D-9$ --- as the statistically robust signal. Per-arch breakdown, full null,
-and class-PC1 basin saturation ($|r|\in[0.60, 0.77]$ across 10 seeds,
-mean $0.69 \pm 0.05$) in Appendix~\ref{app:convergence-deep-dive}.
-
-\paragraph{Within-class residual predicts ensemble contribution.}
-Across the 10 vanilla $d{=}6$, $f{=}128$ checkpoints used to build our
-SOTA ensemble, leave-one-out contributions
+The within-class residual is operationally important because it
+predicts ensemble contribution. Across the $10$ vanilla $d{=}6$,
+$f{=}128$ checkpoints used to build our SOTA ensemble, leave-one-out
+contributions
 $\Delta_k = \mathrm{BACC}(\mathrm{ens}) - \mathrm{BACC}(\mathrm{ens}\setminus k)$
-correlate with within-residual $|r|$ at \textbf{$+0.743$} ($p=0.014$,
-$n=10$). Top-7 ensemble BACC: $\mathbf{0.6962}$; bottom-7: $\mathbf{0.6829}$;
-$\Delta=+0.0133$ vs.\ random-7 baseline ($z=+2.0$).
+correlate with within-residual $|r|$ at $\mathbf{+0.743}$ ($p{=}0.014$,
+$n{=}10$); a top-$7$ ensemble reaches $\mathbf{0.6962}$ BACC versus a
+bottom-$7$ ensemble at $\mathbf{0.6829}$, a $+0.0133$ gap above a
+random-$7$ baseline ($z{=}{+}2.0$).
 
 \begin{quote}
-\textbf{Residual Contribution Law.} \emph{For a saturated EEG classifier
-with within-class residual encoding of the V-axis at $|r| = \rho_k$,
-that checkpoint's leave-one-out contribution to a softmax-averaged
-ensemble scales linearly with $\rho_k$, with slope $\hat\beta = +0.74$
-($p = 0.014$, $n = 10$, FACED 9-class).}
+\textbf{Residual Contribution Law.} \emph{For a saturated EEG
+classifier with within-class residual encoding of the V-axis at
+$|r|=\rho_k$, that checkpoint's leave-one-out contribution to a
+softmax-averaged ensemble scales linearly with $\rho_k$, with slope
+$\hat\beta = +0.74$ ($p{=}0.014$, $n{=}10$, FACED 9-class).}
 \end{quote}
 
-\paragraph{Causal closure.}
-The Residual Contribution Law is correlational. An Arditi-style causal
-intervention \citep{arditi2024refusal} closes the loop: at inference
-time on each of the 10 SOTA-pool checkpoints, we project penultimate
-features onto the orthogonal complement of $v_{\mathrm{resid}}$ (no
-retraining). V-axis residual ablation produces $\Delta\mathrm{BACC}\in
-[-0.024, -0.006]$ (mean $-0.0157$); a matched random-direction control
-($n=20$ uniform on $\mathbb{S}^{D-1}$) is centred at $0$ with $\sigma
-\in [-0.0006, +0.0032]$. Every checkpoint clears the null parametrically
-at $p<0.001$ (one-sided, mean $z\approx 7.7$); the population-mean drop
-$\overline{\Delta\mathrm{BACC}}=-0.0157$ confirms that V-axis residual
-encoding is load-bearing across the pool
-(Appendix~\ref{app:convergence-deep-dive}, Figure~\ref{fig:lf16-causal}).
-
-External V-axis loss therefore optimises the \emph{saturated}
-class-mean component while perturbing the \emph{useful} within-class
-residual --- the prediction tested directly by the 25 interventions of
-Section~\ref{sec:saturation}.
+The Law is correlational; an Arditi-style causal
+intervention~\citep{arditi2024refusal} closes the loop. At inference
+time on each of the $10$ SOTA-pool checkpoints we project penultimate
+features onto the orthogonal complement of $v_{\mathrm{resid}}$
+without retraining. Residual ablation produces
+$\Delta\mathrm{BACC}\in[-0.024, -0.006]$ (mean $-0.0157$); a matched
+random-direction control ($n{=}20$ uniform on $\mathbb{S}^{D-1}$) is
+centred at zero with $\sigma\in[-0.0006, +0.0032]$. Every checkpoint
+clears the null parametrically at $p<0.001$ (one-sided, mean
+$z\approx 7.7$), confirming that V-axis residual encoding is
+load-bearing across the pool. External V-axis loss therefore
+optimises the \emph{saturated} class-mean component while perturbing
+the \emph{useful} within-class residual---the prediction we test
+directly via $25$ interventions in \S\ref{sec:saturation}.

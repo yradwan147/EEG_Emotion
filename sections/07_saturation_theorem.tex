@@ -2,9 +2,14 @@
 \label{sec:saturation}
 
 Can explicit V-axis supervision improve EEG-emotion classifiers?
-Across 25 distinct intervention families spanning seven years of
-representation-alignment literature, the answer is uniformly \textbf{no}
-above a saturation threshold.
+Across $25$ distinct intervention families spanning seven years of
+representation-alignment literature---auxiliary regression, knowledge
+distillation~\citep{hinton2015distilling}, RSA~\citep{kriegeskorte2008rsa},
+contrastive losses~\citep{khosla2020supcon,vandenoord2018cpc},
+PEFT adapters~\citep{hu2022lora,liu2022ia3}, curriculum schedules,
+multi-LLM ensembles, channel-targeted topographic losses, and
+anger-weighted variants matched to the analytical valence
+ceiling---the answer is uniformly no above a saturation threshold.
 
 \begin{quote}
 \textbf{Saturation Regularity.} \emph{Let $f_\theta$ be a classifier
@@ -16,65 +21,26 @@ loss $\mathcal{L}_v(H, v)$ at $\lambda > 0$ produces
 $\mathbb{E}[\Delta\mathrm{BACC}] \leq 0$ across the families tested.}
 \end{quote}
 
-This is an \emph{empirical} statement, not a theorem. We support it
-with: (i) 16 / 25 interventions producing statistically significant
-accuracy decrements at the strong recipe ($p<0.05$, paired across 5
-seeds; 14 sig.\ negative + 2 catastrophic); (ii) five intervention
-families showing \emph{monotonic} destruction as $\lambda$ increases
-(no positive setpoint exists); (iii) a unidirectional saturation
-transition from neutral at weak baselines (CBraMod, EMOD-vanilla, all
-$p>0.2$) to significantly harmful at strong recipes
-($\Delta\!\in\![-0.024, -0.015]$, $p<0.05$); and (iv) a direct
-mechanism check showing V-axis supervision moves class-PC1 by
-$+0.01$--$+0.36$ but moves the within-class residual by only
-$\sim 10^{-7}$ --- numerical zero. For FACED-9 the empirical threshold
-sits in $\rho^* \in [0.62, 0.66]$.
-
-\paragraph{Twenty-five interventions, one verdict.}
-The families: auxiliary regression (EMODSTYLE), topographic masking
-(frontal, occipital, topo-optimal, Procrustes), Davidson FAA
-\citep{davidson1992anterior}, \textbf{anger-weighted} matching the
-analytical 9-stim ceiling, RSA \citep{kriegeskorte2008rsa}, Distance-CE
-\citep{park2019rkd}, Multi-V, soft-target KD \citep{hinton2015distilling},
-PEFT \citep{hu2022lora,liu2022ia3}, pretrain-finetune, curriculum,
-init-priors, cross-dataset, data-fraction scaling, uncertainty-weighted
-multi-task \citep{kendall2018uncertainty}, InfoNCE
-\citep{vandenoord2018cpc}, ensemble extension. Largest significant
-decrements: RSA $\lambda{=}5.0$ $\Delta=-0.093$ ($p<10^{-4}$);
-Distance-CE $\tau{=}5.0$ $-0.397$ ($p<10^{-4}$, chance); pretrain-FT
-frozen $-0.401$ ($p<10^{-4}$, catastrophic); uncertainty multi-task
-$-0.067$ ($p<10^{-3}$); RSA $\lambda{=}1.0$ $-0.057$ ($p<10^{-3}$);
-anger-weighted $\lambda{=}0.5$ $-0.054$ ($p=0.0003$); frontal-mask
-$\lambda{=}0.5$ $-0.052$ ($p=0.0015$); SCALING $-0.045$ ($p<0.01$);
-FAA $\lambda{=}0.5$ $-0.044$ ($p=0.006$); topo-optimal $\lambda{=}0.1$
-$-0.013$ ($p=0.039$). Full 25-row table in
-Appendix~\ref{app:full-vaxis-table}.
-
-\paragraph{Monotonic destruction.}
-Five intervention families exhibit monotonic accuracy destruction as
-the V-axis weight is increased, the cleanest form of saturation
-evidence: RSA $\lambda \in \{0, 0.1, 0.5, 1.0, 5.0\}$ gives $0.624 \to
-0.610 \to 0.585 \to 0.566 \to 0.531$; Distance-CE $\tau \in \{0.5, 1.0,
-2.0, 5.0\}$ gives $0.516 \to 0.476 \to 0.395 \to 0.227$ (chance);
-Multi-V $\lambda \in \{0.05, 0.1, 0.5\}$: $0.622 \to 0.603 \to 0.581$;
-EEG-AUX MSE $\lambda \in \{0.1, 0.5\}$: $-0.016 \to -0.043$; SCALING
-$\lambda{=}0.5$ at $f \in \{0.1, 0.25, 0.5, 1.0\}$: $-0.002 \to -0.029
-\to -0.032 \to -0.045$. Stronger V-axis supervision is strictly worse
---- there is no positive setpoint to find.
-
-\paragraph{Locating the saturation transition.}
-V-axis supervision is within seed noise at weak baselines (CBraMod
-$0.572$+Topo $\Delta{=}-0.005$, $+$EMODSTYLE $+0.005$, EMOD-$d{=}3$
-vanilla+Topo $+0.007$; all n.s.\ at $n{=}4$--$5$) and produces a
-significant accuracy decrement at the strong recipe (EMOD-$d{=}6$
-full+Topo $\Delta{=}-0.015$, $+$EMODSTYLE $\Delta{=}-0.024$; both
-$p<0.05$); the transition is unidirectional in BACC $[0.62, 0.66]$
-(saturation cliff: Figure~\ref{fig:saturation-cliff},
-Appendix~\ref{app:saturation-extras}). Anger-weighting analytically
-maximises the V-axis ceiling ($r{=}0.714$ vs.\ $0.478$) yet is the
-worst single intervention ($\Delta{=}-0.054$, $p=0.0003$); even Path~B
-(adding 15--25 V-axis-trained ckpts to our 10-vanilla pool) yields a
-negative ensemble delta ($\Delta\!\in\![-0.0193, -0.0145]$,
-$p<0.001$). The 25 interventions
-reduce to one principle:
-\emph{saturated representation = unhelpful supervision target}.
+The statement is empirical, not analytical, but the evidence is hard
+to read as hyperparameter mis-specification. Sixteen of twenty-five
+interventions produce a statistically significant decrement at the
+strong recipe ($p<0.05$, paired across five seeds)---including the
+anger-weighted target that analytically maximises the V-axis ceiling
+($\Delta{=}{-}0.054$). Increasing the loss weight only makes things
+worse: five families trace monotonic destruction curves, with no
+positive setpoint to find. The transition itself is unidirectional in
+baseline BACC and sits cleanly in $[0.62, 0.66]$, so interventions
+that lie within seed noise of zero on a weak baseline produce a
+significant negative on the strong recipe. The mechanism check
+explains why: V-axis supervision moves class-PC1 encoding by $+0.01$
+to $+0.36$ while leaving the within-class residual untouched at
+$\sim 10^{-7}$---a numerical zero---so the auxiliary loss perturbs
+exactly the saturated component and never touches the load-bearing
+one. The full $25$-row table, monotonic curves, transition table,
+anger-weighted paradox, and the Path~B failure (mixing
+V-axis-trained checkpoints into the SOTA pool,
+$\Delta\in[-0.0193, -0.0145]$) are in
+Appendix~\ref{app:full-vaxis-table}--\ref{app:saturation-extras},
+along with the saturation cliff (Figure~\ref{fig:saturation-cliff}).
+Twenty-five interventions reduce to one principle: \emph{a saturated
+representation is an unhelpful supervision target}.

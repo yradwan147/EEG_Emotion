@@ -1,14 +1,17 @@
 \section{Replication on a Second EEG Dataset (SEED-V)}
 \label{sec:vaxis-brain-seedv}
 
-We re-test all five FACED claims on SEED-V \citep{liu2022seedv} (16
-subjects, 5 classes, 62 channels) with a V-axis re-built from scratch
-on the 5 SEED-V classes. All five re-emerge: cohort EEG--LLM
-$r{=}+0.6159$ at P1/$\theta$ ($p<10^{-5}$); posterior dominance
-$+0.076$; cross-arch $r{=}+0.601$ ($p=0.018$, $N{=}15$); supervision
-delta within seed noise ($\Delta=+0.0025$, n.s.); and causal closure ---
-Arditi-style ablation drops BACC on every one of the 15 SEED-V
-checkpoints, $\Delta\mathrm{BACC} \in [-0.029, -0.009]$ at mean $z=+23.6$
-above a matched random-direction null (all $p<0.001$), proportionally
-larger than FACED's effect. Full Step 1--5 numerics, FAA bars, and
-per-checkpoint details in Appendix~\ref{app:seedv-full}.
+A second EEG dataset, SEED-V~\citep{liu2022seedv}, lets us see whether
+the same picture emerges when nothing is shared with FACED. We
+re-build the V-axis from scratch on its five emotion classes on $16$
+subjects and $62$ channels and re-test every FACED claim. The cohort
+signal returns at $r{=}{+}0.6159$ ($p<10^{-5}$). The posterior gradient
+returns. Cross-architecture convergence holds at $r{=}{+}0.601$
+across $15$ stock CBraMod SEED-V checkpoints. Adding the V-axis as
+supervision again does nothing measurable. Most strikingly, the causal
+ablation replicates harder than on FACED: removing the V-axis residual
+direction drops accuracy on every one of the $15$ SEED-V checkpoints
+($\Delta\mathrm{BACC} \in [-0.029, -0.009]$) at mean
+$z{=}{+}23.6$---roughly three times the FACED effect---with no
+checkpoint surviving the null. Full numerics, FAA bars, and
+per-checkpoint details are in Appendix~\ref{app:seedv-full}.

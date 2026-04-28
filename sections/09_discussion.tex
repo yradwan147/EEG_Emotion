@@ -1,22 +1,46 @@
 \section{Discussion}
 \label{sec:discussion}
 
-A one-dimensional axis defined entirely from text via PCA on nine
-emotion stories predicts five sentiment benchmarks at zero-shot AUC up
-to $0.938$ (Yelp), 123-subject cohort EEG at $r{=}0.87$
-($p<10^{-9}$), and EEG-classifier accuracy ($r{=}+0.885$ class-PC1,
-$r{=}+0.74$ residual ensemble contribution, mean $z\approx 7.7\sigma$
-causal-ablation closure). All five claims replicate on SEED-V (cohort
-$r{=}+0.62$, posterior dominance, cross-arch $r{=}+0.601$, saturation,
-causal closure $z{=}+23.6$). This extends Huh et~al.\
-\citep{huh2024platonic} cross-modally: the same direction emerges in
-LMs, brains, and EEG classifiers trained on those brains. Twenty-five
-alignment interventions reduce to one principle: external alignment
-cannot help once the model has absorbed the target from task alone
-(transition sharp at FACED BACC $[0.62, 0.66]$). Ensemble gain on a
-saturated network is variance reduction \emph{in the orthogonal
-complement of the converged subspace}, generalising bias--variance
-\citep{geman1992neural} and linear-mode connectivity
-\citep{frankle2020linearmode} and yielding a new FACED 9-class SOTA
-($0.6948$ / $0.6755$). Per-subject residual adaptation is the natural
-next step (Appendix~\ref{app:discussion-extras},~\ref{app:negatives}).
+The picture we have drawn is a triangle: a single direction extracted
+from nine LLM stories, the cohort response of a hundred-plus subjects
+watching emotional videos, and the penultimate features of a
+classifier trained on those videos all converge on the same axis,
+without any of them seeing the others' data. This is the Platonic
+Representation Hypothesis~\citep{huh2024platonic} extended at
+biological scale, in both directions: LLM-derived directions predict
+brain responses, and brain-trained classifiers find the LLM-side
+direction in return. Every brain claim replicates on SEED-V---most
+sharply through a causal ablation whose effect is several times
+larger than on FACED---so the convergence is not a peculiarity of one
+recording.
+
+The negative half of the story is the part with consequences. Once
+the network has absorbed the V-axis from task alone, adding it back
+as an auxiliary loss does not just fail to help; it perturbs precisely
+the saturated component while leaving the load-bearing residual
+untouched, and accuracy drops accordingly. Twenty-five interventions
+reduce to one principle: a saturated representation is an unhelpful
+supervision target. The same observation gives a positive
+prescription: ensemble gain on a saturated network is variance
+reduction in the orthogonal complement of the converged
+subspace---generalising bias--variance \citep{geman1992neural} and
+linear-mode connectivity \citep{frankle2020linearmode}---and that is
+exactly what our $0.6948$/$0.6755$ FACED state of the art measures.
+
+The regularity points beyond emotion. Most modern recipes for concept
+supervision---structured knowledge distillation, representational
+similarity, contrastive auxiliary losses, soft-prompt
+projections---work by aligning a network's penultimate features with a
+chosen concept geometry. Saturation gives those gains a horizon: they
+sit in the regime where the task loss has not yet found the same
+geometry on its own, and that regime shrinks as task supervision
+strengthens. The dual prescription generalises in step. The only place
+left to gain on a saturated network is the orthogonal complement of
+its converged subspace, which is where ensembling, per-subject
+adaptation, and any other variance-reduction strategy must live. We
+expect both halves to recur wherever a concept direction is
+recoverable from task supervision alone---including beyond valence in
+LLMs, beyond emotion in EEG, and into vision-language models on
+perceptual axes. Per-subject residual adaptation that lifts the
+within-class signal without disturbing the basin is the immediate next
+step (Appendix~\ref{app:discussion-extras},~\ref{app:negatives}).

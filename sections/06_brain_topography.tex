@@ -1,14 +1,23 @@
 \section{Brain Topography of the Valence Axis}
 \label{sec:topography}
 
-\paragraph{Posterior visual cortex, not frontal asymmetry.}
-Region-mean $|r|$ at every (channel, band) pair on FACED: occipital
-(Oz, O1, O2, POZ, PO3, PO4) $\overline{|r|} = 0.212$; parietal $0.181$;
-central $0.180$; frontal (FP1, FP2, FPZ, F3, F4, FZ, F7, F8) $0.162$.
-Top single cells: PO3/$\gamma$ ($r{=}+0.48$), F7/$\beta$ ($-0.47$),
-O1/$\gamma$ ($+0.44$). The strongest spatial gradient runs
-posterior--anterior --- the V-axis is a predominantly visual-cortex
-phenomenon for video-evoked emotion (Figure~\ref{fig:topomap-5band}).
+Region-mean $|r|$ at every (channel, band) pair on FACED is
+$0.212$ in occipital channels (Oz, O1, O2, POZ, PO3, PO4), $0.181$
+in parietal, $0.180$ in central, and $0.162$ in frontal (FP1, FP2,
+FPZ, F3, F4, FZ, F7, F8). The strongest single cells are PO3/$\gamma$
+($r{=}{+}0.48$), F7/$\beta$ ($-0.47$), and O1/$\gamma$ ($+0.44$);
+the dominant spatial gradient runs posterior-to-anterior, so the
+V-axis is a predominantly visual-cortex phenomenon for video-evoked
+emotion (Figure~\ref{fig:topomap-5band}). Right-minus-left frontal-alpha
+asymmetry remains positive in our data (F4-F3 $+0.0062$, F8-F7
+$+0.0155$, Fp2-Fp1 $+0.0116$), consistent with Davidson's predicted
+direction~\citep{davidson1992anterior,coan2004frontal}, with the
+largest single frontal asymmetry at Fp2-Fp1/$\delta$ ($+0.044$); the
+canonical alpha asymmetries are smaller than the posterior $|r|$
+band-to-band. This is a paradigm-level finding for video-evoked
+emotion rather than a refutation of FAA, which was developed for
+static-stimulus paradigms; within-subject FAA effects are a separate
+question this cohort-level analysis does not address.
 
 \begin{figure}[ht]
 \centering
@@ -19,35 +28,19 @@ phenomenon for video-evoked emotion (Figure~\ref{fig:topomap-5band}).
 \label{fig:topomap-5band}
 \end{figure}
 
-\paragraph{Davidson FAA replicates qualitatively.}
-Right-minus-left frontal-alpha asymmetry is positive in our data
-(F4-F3 $+0.0062$, F8-F7 $+0.0155$, Fp2-Fp1 $+0.0116$), consistent with
-Davidson's predicted direction; the largest single frontal asymmetry is
-Fp2-Fp1 \emph{delta} ($+0.044$). The canonical alpha asymmetries are
-smaller than the posterior $|r|$ band-to-band. This is a paradigm-level
-finding for video-evoked emotion, not a refutation of FAA: Davidson's
-hypothesis was developed for static-stimulus paradigms
-\citep{davidson1992anterior,coan2004frontal}; within-subject FAA
-effects are a separate question this cohort-level analysis does not
-address.
-
-\paragraph{The cohort signal is a 9-stimulus emotional-pole contrast.}
-The cohort correlation is not a smooth gradient but an
-\emph{anger-versus-warm-positive} contrast carried by 9 clips: cohort
-$r{=}+0.870$ at PO3/$\gamma$ for Anger + Amusement + Tenderness, vs.\
-$r{=}-0.015$ for the remaining 19 mid-valence stimuli. Removing Anger
-alone shrinks cohort $r$ to $+0.327$ (32\% of the total). Anger-weighted
-$\{$5,3,3,1$\}$ analytically lifts the ceiling from $r=0.478$ to
-$r=0.714$ --- the strongest possible V-axis supervision target tested
-in Section~\ref{sec:saturation}.
-
-\paragraph{Caveats (Appendix~\ref{app:topography-deep-dive}).}
-\emph{Simpson's paradox}: cohort $r{=}0.48$ is between-subject;
-per-subject $r$ at those same channels is $-0.062$, oracle $|r|=0.616$
-\citep{sani2024crosssubject}. \emph{Time-resolved peaks} align with
-classical EEG markers --- $\alpha/\beta$ peak at $t{=}18$--$21$\,s in
-the LPP window
-\citep{hajcak2010ofthelpp,codispoti2023arousal}; early $\gamma$ at
-$t{=}3$--$6$\,s \citep{muller1999gamma}. \emph{Theta-gamma coupling
-does not mediate the V-axis}: $\rho(\mathrm{PAC}, \mathrm{V}r) =
-+0.082$, $p=0.667$ \citep{canolty2010cfc}.
+The cohort signal is not a smooth gradient but an
+\emph{anger-versus-warm-positive} contrast carried by nine clips:
+cohort $r{=}{+}0.870$ at PO3/$\gamma$ for Anger, Amusement, and
+Tenderness, against $r{=}{-}0.015$ for the remaining $19$ mid-valence
+stimuli. Removing Anger alone shrinks the cohort correlation to
+$+0.327$, and an anger-weighted target $\{5,3,3,1\}$ lifts the V-axis
+ceiling from $r{=}0.478$ to $r{=}0.714$---the strongest possible V-axis
+supervision target we test in \S\ref{sec:saturation}. The
+between-subject cohort effect coexists with a Simpson's paradox at
+the per-subject level (cohort $r{=}0.48$ vs.\ per-subject $-0.062$,
+oracle $|r|{=}0.616$~\citep{sani2024crosssubject}); the time-resolved
+peaks coincide with classical EEG markers in the LPP
+window~\citep{hajcak2010ofthelpp,codispoti2023arousal,muller1999gamma};
+theta-gamma phase-amplitude coupling does not mediate the
+V-axis~\citep{canolty2010cfc}. Full caveats and time-resolved analysis
+are in Appendix~\ref{app:topography-deep-dive}.
