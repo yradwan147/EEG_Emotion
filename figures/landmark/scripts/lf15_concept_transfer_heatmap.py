@@ -142,7 +142,7 @@ def main():
              fontsize=9.5, ha="left", color=COLORS["gray"])
 
     fig.text(0.5, 0.012,
-             "Source: reports/r6_concept_transfer_matrix.json (Qwen3.5-1.7B, layer 27, "
+             "Source: reports/r6_concept_transfer_matrix.json (Qwen3-4B, penultimate layer, "
              "12 train + 8 test stories per concept). "
              "Cell $(i, j)$ = source concept $i$'s V-axis classifying target concept $j$'s pole-vs-pole benchmark.",
              ha="center", fontsize=8.0, color=COLORS["gray"])

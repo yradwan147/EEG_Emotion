@@ -154,9 +154,9 @@ def main():
     # Legend (centered above plots)
     legend_elems = [
         Patch(facecolor=COLORS["green"], edgecolor="black",
-              label=r"top tier ($r_{\mathrm{behav}} \geq 0.85$, n=13)"),
+              label=r"top tier ($r_{\mathrm{behav}} \geq 0.85$, n=7)"),
         Patch(facecolor=COLORS["orange"], edgecolor="black",
-              label=r"middle tier ($0.6 \leq r_{\mathrm{behav}} < 0.85$, n=2)"),
+              label=r"middle tier ($0.6 \leq r_{\mathrm{behav}} < 0.85$, n=4)"),
         Patch(facecolor=COLORS["red"], edgecolor="black",
               label=r"out tier ($r_{\mathrm{behav}} < 0.6$, n=3)"),
     ]
@@ -165,7 +165,7 @@ def main():
                fontsize=9.5, frameon=False, bbox_to_anchor=(0.55, 0.91))
 
     fig.text(0.13, 0.965,
-             "18 language models predict cohort EEG; the rank tracks text-domain V-axis quality",
+             "14 language models predict cohort EEG; the rank tracks text-domain V-axis quality",
              fontsize=12.0, fontweight="bold", ha="left")
 
     fig.text(0.5, 0.022,

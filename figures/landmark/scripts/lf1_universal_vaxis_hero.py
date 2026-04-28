@@ -31,18 +31,18 @@ OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/landmark"
 # ---------------------- data loaders ----------------------
 
 def load_text_aucs():
-    with open(f"{REPORTS}/p1_task_matrix.json") as f:
-        d = json.load(f)
-    by_name = {t["task"]: t for t in d["tasks"]}
+    """Load Qwen3-4B headline benchmarks (the lead model used throughout the
+    paper)."""
+    with open("/ibex/project/c2323/yousef/llm_steering/qwen3_rerun_4B_results.json") as f:
+        q = json.load(f)["benchmarks"]
     rows = [
-        ("SST-2",       by_name["SST-2 (dev)"]["ours_value"], "AUC"),
-        ("IMDB",        by_name["IMDB"]["ours_value"], "AUC"),
-        ("Yelp",        by_name["yelp_polarity"]["ours_value"], "AUC"),
-        ("TweetEval",   by_name["tweet_eval_sentiment"]["ours_value"], "AUC"),
-        ("RottenTom.",  by_name["rotten_tomatoes"]["ours_value"], "AUC"),
-        ("SST-5 binary",by_name["SST-5 (binary collapse)"]["ours_value"], "AUC"),
-        ("Hu&Liu lex.", by_name["Hu&Liu-style lexicon (6.8k)"]["ours_value"], "|r|"),
-        ("Warriner V",  by_name["Warriner 2013 (3k sampled)"]["ours_value"], "|r|"),
+        ("SST-2",       q["sst2"]["auc"], "AUC"),
+        ("IMDB",        q["imdb"]["auc"], "AUC"),
+        ("Yelp",        q["yelp_polarity"]["auc"], "AUC"),
+        ("TweetEval",   q["tweet_eval"]["auc"], "AUC"),
+        ("RottenTom.",  q["rotten_tomatoes"]["auc"], "AUC"),
+        ("Hu&Liu lex.", q["huliu"]["pearson_abs"], "|r|"),
+        ("Warriner V",  q["warriner"]["V_pearson_abs"], "|r|"),
     ]
     return rows
 

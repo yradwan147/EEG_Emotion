@@ -23,7 +23,7 @@ ROWS = [
     ("CBraMod   (ICLR 2025 prior SOTA)",       0.5720, 0.0060, "prior"),
     ("EMOD vanilla replication  (d3, race-fix)", 0.6194, 0.0040, "replication"),
     ("+ aug  (p=0.6)",                         0.6343, 0.0040, "recipe"),
-    ("+ aug + KD  (rand9 9D)",                 0.6467, 0.0070, "recipe"),
+    ("+ aug + KD  (rand9 9D)",                 0.6439, 0.0070, "recipe"),
     ("+ d6 depth-doubling",                    0.6581, 0.0066, "recipe"),
     ("+ e150 single-ckpt  (val-selected SOTA)",0.6755, None,   "single_sota"),
     ("5-ckpt ensemble  (e100)",                0.6798, None,   "ensemble"),

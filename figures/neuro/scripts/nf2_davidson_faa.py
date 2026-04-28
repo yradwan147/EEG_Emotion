@@ -45,7 +45,7 @@ FAA_VALUES = {
     ('Fp2', 'Fp1', 'delta'): +0.044,
 }
 
-OCCIPITAL_R = 0.216
+OCCIPITAL_R = 0.212
 FRONTAL_ALPHA_MEAN = (0.0062 + 0.0155 + 0.0116) / 3.0  # = 0.0111
 
 

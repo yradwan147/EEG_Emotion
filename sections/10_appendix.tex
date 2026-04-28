@@ -59,11 +59,11 @@ $c_k = \frac{1}{50} \sum_{i=1}^{50} h_{k,i}^{(L)}$ for $k=1,\dots,9$.
 $9 \times D$ matrix and run mean-centred PCA. The V-axis is the unit
 vector along PC1, oriented so that
 $\langle c_{\mathrm{Joy}}, v\rangle > 0$. PC1 explains 41--58\% of the
-across-class variance across the 18 models tested (median 49\%).
+across-class variance across the 14 models tested (median 49\%).
 
 \paragraph{Robustness.} Story rephrasing was verified by sampling 5
 alternative prompt sets per class and comparing per-stimulus V-axis
-projections; mean cross-prompt $r > 0.93$ across 18 models. Paraphrase
+projections; mean cross-prompt $r > 0.93$ across 14 models. Paraphrase
 count was verified at $n \in \{1, 5, 25, 50\}$; SST-2 zero-shot AUC
 $0.74$ at $n=1$, rising to the canonical $0.832$ at $n=50$ for
 Qwen3-4B.
@@ -303,7 +303,7 @@ vs.\ behavioural valence. The cohort $r=0.87$ headline is
 reliability-bounded.
 
 \paragraph{14-LLM brain forest.}
-Per-LLM brain-prediction quality across all 18 models is shown in
+Per-LLM brain-prediction quality across all 14 models is shown in
 Figure~\ref{fig:llm-brain}: the top-tier 13 LLMs all clear their per-LLM
 random-direction nulls, while the out-tier sits at the median.
 
@@ -312,7 +312,7 @@ random-direction nulls, while the out-tier sits at the median.
 \IfFileExists{figures/landmark/lf13_llm_brain_forest.pdf}
   {\includegraphics[width=0.98\linewidth]{landmark/lf13_llm_brain_forest.pdf}}
   {\includegraphics[width=0.98\linewidth]{landmark/lf13_llm_brain_forest.png}}
-\caption{Per-LLM brain-prediction quality. Top-tier 13 LLMs all exceed
+\caption{Per-LLM brain-prediction quality. Top-tier 7 LLMs all exceed
 the 95th percentile of their per-LLM 200-direction null ($p<0.05$ each);
 out-tier 3 LLMs sit at the median or below. Restricted to top-tier the
 log-hidden-dim$\to r$ scaling is $r=+0.125$, $p=0.684$; within-Qwen3
@@ -941,7 +941,7 @@ each, and report the percentile of the empirical $|r|$ in the null
 distribution.
 
 \paragraph{Cross-architecture null.} For the 36-checkpoint cross-arch
-correlation, we sample $N=100$ random directions matched in norm to
+correlation, we sample $N=1000$ random directions matched in norm to
 $v_{\mathrm{CLIP}}$ and recompute the BACC--V-axis correlation. The
 null is distributed broadly ($\sigma=0.62$) due to the low intrinsic
 dimension of the class-PC1 subspace; we report the empirical
@@ -1029,9 +1029,10 @@ $\rho(\mathrm{PAC}, \mathrm{V}r) = +0.082$, $p=0.667$.
 (Section~\ref{sec:vaxis-brain}): MI $p=0.115$ vs.\ linear $p=0.020$.
 The V-axis-EEG relationship is essentially linear.
 \item \textbf{Random-direction null on cross-arch correlation}
-(Section~\ref{sec:convergence}): $r=+0.885$ at the $93^\mathrm{rd}$
-percentile, $p_{\mathrm{one}}=0.079$. Within-class residual
-($r=+0.74$, $p=0.014$) is the statistically robust signal.
+(Section~\ref{sec:convergence}): $r=+0.885$ at the $93.5^\mathrm{th}$
+percentile of a 1000-direction null, $p_{\mathrm{one}}=0.066$.
+Within-class residual ($r=+0.74$, $p=0.014$) is the statistically
+robust signal.
 \item \textbf{Per-subject V-axis adaptation does not transfer.} The
 per-subject best-channel oracle reaches $|r|=0.62$, but no clean
 estimator transfers more than $+0.001$ over the cohort top-K.

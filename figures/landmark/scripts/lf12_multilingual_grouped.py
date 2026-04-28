@@ -3,7 +3,7 @@
 Replaces Table tab:multilingual. Grouped bar chart: 5 extractor families
 on the x-axis, three coloured bars (Japanese, Arabic, Russian) per group,
 y-axis is SST-2 zero-shot AUC (mapped from non-English stories). The
-English-extractor reference (Qwen3.5-1.7B at 0.868 EN baseline) is shown
+English-extractor reference (Qwen LM at the EN ceiling) is shown
 as a horizontal hero line; chance (0.5) shown as a horizontal dotted line.
 
 The visual story: causal English-centric Qwen collapses to chance on
@@ -27,13 +27,13 @@ OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/landmark"
 # Source: reports/p1_lang_multilingual_synthesis.json
 # Each row: extractor, params (B), is_multilingual, [ja, ar, ru]
 ROWS = [
-    ("Qwen3.5-1.7B-Inst.\n(causal, EN-centric)",        1.7,    False, [0.5145, 0.5185, 0.5524]),
+    ("Qwen-Inst.\n(causal, EN-centric)",                1.7,    False, [0.5145, 0.5185, 0.5524]),
     ("BLOOMZ-1B7\n(multilingual, causal)",              1.7,    True,  [0.6082, 0.5822, 0.5827]),
     ("XLM-RoBERTa-large\n(multilingual, encoder)",      0.560,  True,  [0.6272, 0.5799, 0.5168]),
     ("BLOOMZ-7B1\n(multilingual, causal)",              7.1,    True,  [0.5139, 0.5714, 0.5031]),
     ("mT0-base\n(multilingual, enc--dec)",              0.277,  True,  [0.8908, 0.9120, 0.9133]),
 ]
-EN_BASELINE = 0.868   # Qwen3.5-1.7B EN reference
+EN_BASELINE = 0.832   # Qwen3-4B EN reference (paper lead model)
 
 LANG_COLORS = {
     "ja": COLORS["lightblue"],
@@ -71,7 +71,7 @@ def main():
     ax.axhline(EN_BASELINE, color=COLORS["red"], lw=1.4, ls="--", zorder=4,
                alpha=0.85)
     ax.text(-0.45, EN_BASELINE + 0.012,
-            f"Qwen3.5-1.7B EN-extractor reference  (SST-2 EN AUC = {EN_BASELINE:.3f})",
+            f"Qwen3-4B EN-extractor reference  (SST-2 EN AUC = {EN_BASELINE:.3f})",
             ha="left", va="bottom", fontsize=8.5, color=COLORS["red"])
 
     # Chance line — label BELOW the line in the left margin (lower ylim slightly

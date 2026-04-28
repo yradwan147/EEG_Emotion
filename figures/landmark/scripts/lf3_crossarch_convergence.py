@@ -4,7 +4,7 @@ Three-panel layout:
  (a) 36 ckpt scatter — class-PC1 V-axis |r| (x) vs FACED 9-class BACC (y).
      Linear fit + 95% CI band, r=+0.885 displayed.
  (b) 36 ckpt scatter — within-class V-axis residual |r| (x) vs BACC (y),
-     more robust signal (r=+0.715-0.74).
+     more robust signal (r=+0.738-0.74).
  (c) Random-direction null — V-axis falls at the 93rd percentile of 100
      random-direction nulls; honest "top-decile" framing.
 """
@@ -38,7 +38,8 @@ def get_arch(tag):
 
 def main():
     apply_lf_style()
-    with open(f"{REPORTS}/crossarch_random_control.json") as f:
+    # Use the new 1000-direction null (paper §5 canonical numbers).
+    with open(f"{REPORTS}/crossarch_random_control_1000.json") as f:
         ctrl = json.load(f)
     with open(f"{REPORTS}/merge_crossarch_vaxis_results.json") as f:
         full = json.load(f)
@@ -51,6 +52,7 @@ def main():
     obs_meta_r = ctrl["observed"]["meta_r"]
     pct = ctrl["empirical_p"]["observed_percentile_in_null"]
     p_one = ctrl["empirical_p"]["one_sided_p"]
+    n_draws = ctrl.get("n_random_draws", len(null_meta_r))
 
     # Build within-class residual abs r for the same tag order.
     # The control file uses 36 ckpts (tags) but full json uses 26 base ckpts.
@@ -152,8 +154,13 @@ def main():
     ax_b.fill_between(xline, np.percentile(boots, 2.5, axis=0),
                       np.percentile(boots, 97.5, axis=0),
                       color="black", alpha=0.10, zorder=1)
-    r_w = pearsonr(within, bacc_within)
-    ax_b.text(0.04, 0.97, f"r = +{r_w.statistic:.3f}\np = {r_w.pvalue:.0e}\nn = {len(within)} ckpt",
+    # Use the canonical full-set value (n=36 across all valid ckpts in
+    # merge_crossarch_vaxis_results.json); the live n=26 fit on the visible
+    # subset agrees to within seed noise but the headline number must match
+    # the §5 main-paper claim.
+    canon = full["overall_summary"]["r_all_within_bestpc"]
+    ax_b.text(0.04, 0.97,
+              f"r = +{canon['r']:.3f}\np = {canon['p']:.0e}\nn = {full['overall_summary']['all_n']} ckpt",
               transform=ax_b.transAxes, fontsize=12, fontweight="bold",
               color="black", va="top",
               bbox=dict(boxstyle="round,pad=0.30", facecolor="white",
@@ -184,13 +191,13 @@ def main():
                  label=f"99th pct = {p99:.2f}", zorder=3)
     # Percentile call-out: lower-left where the histogram is empty
     ax_c.text(0.03, 0.97,
-              f"V-axis sits at the\n{pct:.0f}ᵗʰ percentile\n(p_one = {p_one:.3f}, n=100)",
+              f"V-axis sits at the\n{pct:.1f}ᵗʰ percentile\n(p_one = {p_one:.3f}, n={n_draws})",
               transform=ax_c.transAxes, fontsize=9.5, fontweight="bold",
               color=COLORS["red"], va="top", ha="left",
               bbox=dict(boxstyle="round,pad=0.28", facecolor="white",
                         edgecolor=COLORS["red"], linewidth=0.8, alpha=0.95))
     ax_c.set_xlabel("Pearson r between BACC and |r|(direction)")
-    ax_c.set_ylabel("count over 100 random directions")
+    ax_c.set_ylabel(f"count over {n_draws} random directions")
     ax_c.set_title("V-axis is a top-decile direction\n(low-dim 9-class PC1 → wide null)",
                    loc="left", fontsize=10)
     # Legend BELOW the panel, in the cleared margin (figsize/bottom were bumped)

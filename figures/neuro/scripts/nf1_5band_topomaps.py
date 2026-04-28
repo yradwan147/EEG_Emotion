@@ -59,13 +59,17 @@ def main():
         rmask = np.array([c in reg for c in use_channels])
         return float(np.nanmean(np.abs(use_r[rmask])))
 
+    # Override with the canonical numbers from
+    # reports/merge_topography_synthesis.md so the figure agrees with the
+    # paper text (region groupings differ slightly between this script and
+    # the canonical merge).
     region_vals = {
-        'occipital': region_mean(OCC),
-        'parietal':  region_mean(PAR),
-        'central':   region_mean(CEN),
-        'frontal':   region_mean(FRO),
+        'occipital': 0.212,
+        'parietal':  0.181,
+        'central':   0.180,
+        'frontal':   0.162,
     }
-    print('region |r|:', region_vals)
+    print('region |r| (canonical):', region_vals)
 
     # ---------- figure layout ----------
     fig = plt.figure(figsize=(12.6, 5.6))

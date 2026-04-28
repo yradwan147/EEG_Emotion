@@ -137,7 +137,7 @@ def main():
              fontsize=9.5, ha="left", color=COLORS["gray"])
 
     fig.text(0.5, 0.015,
-             "Source: reports/r6_concept_library_synthesis.md (Qwen3.5-1.7B, layer 27).  "
+             "Source: reports/r6_concept_library_synthesis.md (Qwen3-4B, penultimate layer).  "
              r"$|\rho|$ = Spearman monotonicity over 9 ordered classes.",
              ha="center", fontsize=7.5, color=COLORS["gray"])
 
