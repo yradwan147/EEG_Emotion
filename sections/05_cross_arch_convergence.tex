@@ -63,7 +63,12 @@ random-direction control ($n{=}20$ uniform on $\mathbb{S}^{D-1}$) is
 centred at zero with $\sigma\in[-0.0006, +0.0032]$. Every checkpoint
 clears the null parametrically at $p<0.001$ (one-sided, mean
 $z\approx 7.7$), so the population-mean drop confirms that V-axis
-residual encoding is load-bearing across the pool. The mechanism
+residual encoding is load-bearing across the pool. Per checkpoint,
+within-residual encoding strength does not predict the corresponding
+ablation drop ($r{=}{+}0.17$, $p{=}0.64$, $n{=}10$): the
+representational signal is encoded across the residual subspace
+rather than in a tight per-checkpoint magnitude, so we read the
+mechanism at population level rather than as a per-checkpoint slope. The mechanism
 prediction we test directly with the $25$ interventions in
 \S\ref{sec:saturation} is that external V-axis supervision will
 optimise the \emph{saturated} class-mean component while perturbing

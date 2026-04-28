@@ -1,4 +1,4 @@
-\section{A Universal Valence Axis in Language Models}
+\section{A Shared Valence Axis Across Modern Language Models}
 \label{sec:vaxis-llms}
 
 We define the V-axis by a recipe that uses only nine sentences. Given
@@ -11,9 +11,13 @@ $c_1,\dots,c_9 \in \mathbb{R}^D$. Mean-centred PCA on the
 $9 \times D$ matrix gives the V-axis as the unit vector along
 $\mathrm{PC}_1$, oriented so that
 $\langle c_{\mathrm{Joy}}, v\rangle > 0$. Qwen3-4B at the penultimate
-layer ($L{=}35$ of $36$) is our lead model; the recipe is robust to
-paraphrase budget (zero-shot SST-2 AUC $0.74$ at $n{=}1$, rising to
-$0.832$ at $n{=}50$) and to prompt rephrasing (mean cross-prompt
+layer ($L{=}35$ of $36$) is our lead model. We chose it for compute
+parsimony among the seven Qwen3 sizes whose behavioural-valence
+correlations sit within $0.01$ of one another in our forest
+($0.94$--$0.95$, see Appendix~\ref{app:per-llm-deep-dive}); $4$B is
+the smallest size with this top-tier alignment. The recipe is robust
+to paraphrase budget (zero-shot SST-2 AUC $0.74$ at $n{=}1$, rising
+to $0.832$ at $n{=}50$) and to prompt rephrasing (mean cross-prompt
 $r{>}0.93$ across the LLMs we test). Full protocol and quality
 controls are in Appendix~\ref{app:vaxis-protocol}.
 
@@ -46,10 +50,21 @@ A single Qwen3-4B run gives this axis surprising external validity.
 Projecting onto it recovers SST-2 sentiment at zero-shot AUC
 $0.832$~\citep{socher2013recursive}---matching a supervised
 logistic-regression baseline trained on $5$k in-domain examples
-($0.837$)---and pushes Yelp Polarity to $0.938$~\citep{yelp2015}; the
-full sentiment table (IMDB, TweetEval, Rotten Tomatoes) and the two
-word-level lexicon recoveries (Hu \& Liu, Warriner) are in
-Appendix~\ref{app:per-llm-deep-dive}.
+($0.837$), beating an off-the-shelf SBERT prototype-cosine zero-shot
+baseline ($0.793$;~\citealp{reimers2019sbert}) and within $0.08$ of a
+$355$M-param RoBERTa-large-MNLI zero-shot entailment classifier
+($0.912$;~\citealp{liu2019roberta})---and pushes Yelp Polarity to
+$0.938$~\citep{yelp2015}; the full sentiment table (IMDB, TweetEval,
+Rotten Tomatoes) and the two word-level lexicon recoveries (Hu \& Liu,
+Warriner) are in Appendix~\ref{app:per-llm-deep-dive}. An Arditi-style same-model
+ablation~\citep{arditi2024refusal}---projecting the V-axis out of
+Qwen3-4B's own penultimate features---collapses the V-axis zero-shot
+decoder on SST-2 from $0.832$ to chance ($0.505$). A linear-probe
+classifier retrained on the now-ablated features only loses
+$0.0019$ AUC (still $z{=}{+}9.8$ above a $20$-direction matched-norm
+null), so the V-axis is the direction Qwen3-4B uses for zero-shot
+sentiment, even though some discriminative content remains in the
+orthogonal complement.
 
 The V-axis is a late-layer phenomenon: the cosine between the
 input-layer and the penultimate-layer V-axis stays below $0.30$

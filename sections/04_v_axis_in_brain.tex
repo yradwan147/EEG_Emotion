@@ -4,14 +4,21 @@
 We use FACED~\citep{chen2023faced}: $123$ subjects watching $28$
 emotional video clips, $32$ EEG channels at $250$\,Hz. From the cohort
 $28 \times 32 \times 5$ DE tensor (channel, band, stimulus, averaged
-over subjects and time), we project the CLIP-text V-axis onto each
-stimulus and correlate the $28$-dimensional projection against every
-(channel, band) cell. The strongest single cell sits at PO3/$\gamma$
-($r{=}{+}0.478$), and the stim-level cohort correlation reaches
-$r{=}{+}0.87$ ($n{=}28$, $p<10^{-9}$; Figure~\ref{fig:eeg-llm-circle}).
-The result holds against a battery of controls---random-direction null,
-split-half subject reliability, mutual-information non-linearity, and
-class-level ranking---catalogued in Appendix~\ref{app:brain-deep-dive}.
+over subjects and time), we fit a single ridge regression that
+predicts the V-axis projection from all $160$ channel--band features.
+The cohort-level prediction matches the V-axis at $r{=}{+}0.87$
+($n{=}28$ stimuli, $p<10^{-9}$ parametric; Figure~\ref{fig:eeg-llm-circle})
+---one ridge model on all features, not a multi-cell argmax.
+Per-cell raw correlations (no ridge) peak at PO3/$\gamma$ at
+$r{=}{+}0.478$ (uncorrected $p{=}0.010$); under Bonferroni or
+Benjamini--Hochberg FDR (q$=$0.05) over the $32{\times}5$ grid no
+single cell clears significance, so we treat per-cell results as
+descriptive and rely on the ridge prediction and on the region-mean
+contrast in \S\ref{sec:topography} for the load-bearing topographic
+claim. The headline correlation holds against a battery of
+controls---matched-norm random-direction null, split-half subject
+reliability, mutual-information non-linearity, and class-level
+ranking---catalogued in Appendix~\ref{app:brain-deep-dive}.
 
 \begin{figure}[ht]
 \centering

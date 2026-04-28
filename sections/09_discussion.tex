@@ -31,20 +31,10 @@ subspace---generalising bias--variance \citep{geman1992neural} and
 linear-mode connectivity \citep{frankle2020linearmode}---and that is
 exactly what our $0.6948$/$0.6755$ FACED state of the art measures.
 
-The regularity points beyond emotion. Most modern recipes for concept
-supervision---structured knowledge distillation, representational
-similarity, contrastive auxiliary losses, soft-prompt
-projections---work by aligning a network's penultimate features with a
-chosen concept geometry. Saturation gives those gains a horizon: they
-sit in the regime where the task loss has not yet found the same
-geometry on its own, and that regime shrinks as task supervision
-strengthens. The dual prescription generalises in step. The only place
-left to gain on a saturated network is the orthogonal complement of
-its converged subspace, which is where ensembling, per-subject
-adaptation, and any other variance-reduction strategy must live. We
-expect both halves to recur wherever a concept direction is
-recoverable from task supervision alone---including beyond valence in
-LLMs, beyond emotion in EEG, and into vision-language models on
-perceptual axes. Per-subject residual adaptation that lifts the
-within-class signal without disturbing the basin is the immediate next
-step (Appendix~\ref{app:discussion-extras},~\ref{app:negatives}).
+The regularity should generalise: modern recipes for concept
+supervision (KD, RSA, contrastive auxiliary losses, soft-prompt
+projections) all align penultimate features with a chosen geometry,
+and that gain has a horizon---it shrinks as task supervision finds
+the same geometry on its own. Per-subject residual adaptation, which
+lifts the within-class signal without disturbing the basin, is the
+immediate next step (Appendix~\ref{app:discussion-extras},~\ref{app:negatives}).

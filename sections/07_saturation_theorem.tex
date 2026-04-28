@@ -12,13 +12,14 @@ anger-weighted variants matched to the analytical valence
 ceiling---the answer is uniformly no above a saturation threshold.
 
 \begin{quote}
-\textbf{Saturation Regularity.} \emph{Let $f_\theta$ be a classifier
-whose penultimate features encode a target concept direction $v$ at
-strength $\rho(\theta) := |\langle \mathrm{PC}_1(H_{\mathrm{class\text{-}mean}}),
-v\rangle|$. There exists a saturation threshold $\rho^*$ such that for
-$\rho(\theta) > \rho^*$, supplementing the task loss with any auxiliary
-loss $\mathcal{L}_v(H, v)$ at $\lambda > 0$ produces
-$\mathbb{E}[\Delta\mathrm{BACC}] \leq 0$ across the families tested.}
+\textbf{Saturation: an empirical regularity.} \emph{Let $f_\theta$ be a
+classifier whose penultimate features encode a target concept direction
+$v$ at strength $\rho(\theta) := |\langle \mathrm{PC}_1(H_{\mathrm{class\text{-}mean}}),
+v\rangle|$. We observe an empirical threshold $\rho^*$ above which
+supplementing the task loss with any auxiliary loss $\mathcal{L}_v(H,
+v)$ at $\lambda > 0$ produces $\mathbb{E}[\Delta\mathrm{BACC}] \leq 0$
+across the $25$ families tested ($16/25$ at $p<0.05$, $0/25$ in the
+positive direction).}
 \end{quote}
 
 The statement is empirical, not analytical, but the evidence is hard
