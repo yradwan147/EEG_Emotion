@@ -49,7 +49,7 @@
 % Inline comment:  \kilich{my note here}
 %   Multi-paragraph safe (uses \color switch + \bfseries instead of
 %   \textcolor + \textbf, both of which forbid \par in arguments).
-\long\newcommand{\kilich}[1]{%
+\newcommand{\kilich}[1]{%
   \ifshowcomments%
     \begingroup
       \color{kilichcolor}\bfseries
@@ -71,7 +71,7 @@
 }
 
 % Margin-note version:  \kilichmn{my margin comment}
-\long\newcommand{\kilichmn}[1]{%
+\newcommand{\kilichmn}[1]{%
   \ifshowcomments%
     \marginpar{%
       \raggedright\footnotesize
