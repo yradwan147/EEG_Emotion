@@ -4,14 +4,25 @@
 A second EEG dataset, SEED-V~\citep{liu2022seedv}, lets us see whether
 the same picture emerges when nothing is shared with FACED. We
 re-build the V-axis from scratch on its five emotion classes on $16$
-subjects and $62$ channels and re-test every FACED claim. The cohort
-signal returns at $r{=}{+}0.6159$ ($p<10^{-5}$). The posterior gradient
-returns. Cross-architecture convergence holds at $r{=}{+}0.601$
-across $15$ stock CBraMod SEED-V checkpoints. Adding the V-axis as
-supervision again does nothing measurable. Most strikingly, the causal
-ablation replicates harder than on FACED: removing the V-axis residual
-direction drops accuracy on every one of the $15$ SEED-V checkpoints
-($\Delta\mathrm{BACC} \in [-0.029, -0.009]$) at mean
-$z{=}{+}23.6$---roughly three times the FACED effect---with no
-checkpoint surviving the null. Full numerics, FAA bars, and
-per-checkpoint details are in Appendix~\ref{app:seedv-full}.
+subjects and $62$ channels, and we re-test every FACED claim with no
+parameter shared between datasets. The cohort EEG--LLM signal returns
+at $r{=}{+}0.6159$ ($p<10^{-5}$) at the P1/$\theta$ cell, the same
+posterior-dominant gradient appears, and adding the V-axis as
+supervision again moves accuracy by a margin within seed noise. The
+within-Qwen3 universality story re-emerges as well: the broader
+$14$-LLM forest projects onto SEED-V EEG with the same three-tier
+structure we see on FACED.
+
+Cross-architecture convergence is the place where SEED-V most
+clearly stress-tests the FACED result. Across $15$ stock CBraMod
+SEED-V checkpoints, accuracy correlates with V-axis encoding strength
+at $r{=}{+}0.601$ ($p{=}0.018$)---a correlation built on a different
+EEG dataset, a different label space, and a different best cell, yet
+with the same sign and magnitude as FACED. The causal closure
+replicates harder still: ablating the V-axis residual direction at
+inference drops accuracy on every one of the $15$ checkpoints
+($\Delta\mathrm{BACC} \in [-0.029, -0.009]$, mean $-0.0173$) at mean
+$z{=}{+}23.6$ above a matched random-direction null---roughly three
+times the FACED effect, with no checkpoint surviving the null at
+$p<0.001$. Full Step 1--5 numerics, FAA bars, and per-checkpoint
+details are in Appendix~\ref{app:seedv-full}.

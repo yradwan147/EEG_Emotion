@@ -48,18 +48,32 @@ Appendix~\ref{app:ensemble-extras}.}
 \label{tab:sota}
 \end{table}
 
+The cascade starts from a faithful EMOD replication at $0.6194$ and
+walks up in six steps. Augmentation---temporal jitter, channel
+dropout, amplitude scaling, and Gaussian noise applied with
+$p{=}0.6$---contributes the largest single jump ($+0.0149$),
+reflecting the limited stimulus count per subject. Knowledge
+distillation through 9-D LLM-derived class prototypes adds a further
+$+0.0096$; a \texttt{rand9} ablation that swaps the prototypes for
+random orthonormal directions costs at most $0.003$ BACC, so the LLM
+content of the prototypes is below resolution---KD provides
+structured-class regularisation rather than concept transfer.
+Depth-doubling to $d{=}6$ adds another $+0.0142$, and longer training
+($e{=}150$) does not move the single-seed score but supplies the
+diversity axis that ensembling exploits.
+
 \paragraph{Two-tier ensemble theory.}
-The 10 $d{=}6$ checkpoints share an \emph{identical} class-PC1 basin
+The $10$ $d{=}6$ checkpoints share an \emph{identical} class-PC1 basin
 ($|r|\in[0.60, 0.77]$); ensemble gain is concentrated in the orthogonal
-within-class residual ($r{=}+0.743$, $p=0.014$). \textbf{Tier 1 (free)}:
-class-mean basin acquired deterministically --- no diversity.
-\textbf{Tier 2 (gain)}: residual encoded \emph{differently} by each
-seed; averaging cancels seed-specific noise without disturbing the
-basin. Mixing $e{=}100$ and $e{=}150$ ties at $0.6581$ single-seed but
-provides the most ensemble-relevant diversity axis: mixed ensemble
-$0.6948$ vs.\ $e{=}100$ alone $0.6798$. The mechanism generalises
-(Appendix~\ref{app:ensemble-extras}): $\Delta$BACC monotonic in headroom
-(near zero on MNIST); mega-ensembles plateau at 10 checkpoints
-($\le 0.6948$); cross-architecture mixing adds no diversity ---
-intra-architecture, training-length-driven diversity is what the
-within-class residual mechanism predicts.
+within-class residual ($r{=}{+}0.743$, $p{=}0.014$). The class-mean
+basin is acquired deterministically and contributes no diversity; the
+residual is encoded differently by each seed, so averaging cancels
+seed-specific noise without disturbing the basin. Mixing $e{=}100$
+and $e{=}150$ ties at $0.6581$ single-seed but provides the most
+ensemble-relevant diversity axis: the mixed $10$-checkpoint pool
+reaches $0.6948$ versus $0.6798$ for $e{=}100$ alone. The mechanism
+generalises (Appendix~\ref{app:ensemble-extras}): $\Delta$BACC is
+monotonic in headroom (near zero on MNIST), mega-ensembles plateau at
+ten checkpoints ($\le 0.6948$), and cross-architecture mixing adds no
+diversity---intra-architecture, training-length-driven diversity is
+what the within-class residual mechanism predicts.
