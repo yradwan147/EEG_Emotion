@@ -748,10 +748,10 @@ band, with the inter-architecture gap dominating the within-architecture
 spread.
 
 \paragraph{Random-direction null detail.}
-We sample 100 random Gaussian directions $w \in \mathbb{R}^{28}$ each
+We sample 1000 random Gaussian directions $w \in \mathbb{R}^{28}$ each
 matched in $L_2$ norm to $v_{\mathrm{CLIP}}$, and recompute the
 36-checkpoint correlation $\rho_w = \mathrm{Pearson}(\mathrm{BACC},\,
-|\mathrm{corr}(\mathrm{PC}_1(H(m)), w)|)$. The distribution of $\rho_w$ ($n=1000$ draws) has mean $-0.03$ and
+|\mathrm{corr}(\mathrm{PC}_1(H(m)), w)|)$. The distribution of $\rho_w$ has mean $-0.03$ and
 standard deviation $0.62$ (range $[-0.95, +0.95]$); the wide null is a
 consequence of the low intrinsic dimensionality of the class-PC1
 subspace ($D_{\mathrm{eff}}\!=\!9$). The empirical V-axis correlation

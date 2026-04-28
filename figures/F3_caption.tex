@@ -3,5 +3,5 @@
 $x$ axis: $|r|$ between class-PC1 of penultimate features and the CLIP V-axis (no V-axis loss used in any of these runs).
 $y$ axis: FACED 9-class balanced accuracy.
 Linear fit: $r{=}{+}0.885$, $p{=}7.8\!\times\!10^{-13}$, $n{=}36$.
-(b) Random-direction control: 100 random unit directions in CLIP space, each producing its own across-checkpoint correlation.
-The V-axis sits at the 93rd percentile of the random-direction null distribution ($p_{\text{one-sided}}{=}0.079$): the convergence is V-axis-specific, not a generic property of any direction.
+(b) Random-direction control: 1000 random unit directions in CLIP space, each producing its own across-checkpoint correlation.
+The V-axis sits at the 93.5th percentile of the random-direction null distribution ($p_{\text{one-sided}}{=}0.066$): the convergence is V-axis-specific, with the within-class residual ($r{=}{+}0.738$, $p{=}3\!\times\!10^{-7}$) carrying the statistically robust signal.

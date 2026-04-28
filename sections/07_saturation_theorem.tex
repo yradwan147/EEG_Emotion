@@ -65,14 +65,16 @@ $\lambda{=}0.5$ at $f \in \{0.1, 0.25, 0.5, 1.0\}$: $-0.002 \to -0.029
 \paragraph{Locating the saturation transition.}
 V-axis supervision is within seed noise at weak baselines (CBraMod
 $0.572$+Topo $\Delta{=}-0.005$, $+$EMODSTYLE $+0.005$, EMOD-$d{=}3$
-vanilla+Topo $+0.007$; all n.s.\ at $n{=}4$--$5$) and significantly
-harms the strong recipe (EMOD-$d{=}6$ full+Topo $\Delta{=}-0.015$,
-$+$EMODSTYLE $-0.024$; both $p<0.05$); the transition is unidirectional
-in BACC $[0.62, 0.66]$ (saturation cliff: Figure~\ref{fig:saturation-cliff},
+vanilla+Topo $+0.007$; all n.s.\ at $n{=}4$--$5$) and produces a
+significant accuracy decrement at the strong recipe (EMOD-$d{=}6$
+full+Topo $\Delta{=}-0.015$, $+$EMODSTYLE $\Delta{=}-0.024$; both
+$p<0.05$); the transition is unidirectional in BACC $[0.62, 0.66]$
+(saturation cliff: Figure~\ref{fig:saturation-cliff},
 Appendix~\ref{app:saturation-extras}). Anger-weighting analytically
 maximises the V-axis ceiling ($r{=}0.714$ vs.\ $0.478$) yet is the
 worst single intervention ($\Delta{=}-0.054$, $p=0.0003$); even Path~B
-(adding 15--25 V-axis-trained ckpts to our 10-vanilla pool) hurts
-($\Delta\!\in\![-0.0193, -0.0145]$, $p<0.001$). The 25 interventions
+(adding 15--25 V-axis-trained ckpts to our 10-vanilla pool) yields a
+negative ensemble delta ($\Delta\!\in\![-0.0193, -0.0145]$,
+$p<0.001$). The 25 interventions
 reduce to one principle:
 \emph{saturated representation = unhelpful supervision target}.
