@@ -7,11 +7,10 @@ re-build the V-axis from scratch on its five emotion classes on $16$
 subjects and $62$ channels, and we re-test every FACED claim with no
 parameter shared between datasets. The cohort EEG--LLM signal returns
 at $r{=}{+}0.6159$ ($p<10^{-5}$) at the P1/$\theta$ cell, the same
-posterior-dominant gradient appears, and adding the V-axis as
-supervision again moves accuracy by a margin within seed noise. The
-within-Qwen3 universality story re-emerges as well: the broader
-$14$-LLM forest projects onto SEED-V EEG with the same three-tier
-structure we see on FACED.
+posterior-dominant gradient appears (occipital $-$ frontal $+0.076$),
+and adding the V-axis as supervision again moves accuracy by a margin
+within seed noise ($\Delta{=}{+}0.0025$ across $5$ baseline and $5$
+V-axis seeds).
 
 Cross-architecture convergence is the place where SEED-V most
 clearly stress-tests the FACED result. Across $15$ stock CBraMod
