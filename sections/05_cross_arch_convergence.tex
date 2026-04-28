@@ -45,14 +45,15 @@ at $\mathbf{0.6829}$, a $+0.0133$ gap above a random-$7$ baseline
 ($z{=}{+}2.0$).
 
 \begin{quote}
-\textbf{Residual Contribution Law.} \emph{For a saturated EEG
+\textbf{Residual Contribution Regularity.} \emph{For a saturated EEG
 classifier with within-class residual encoding of the V-axis at
 $|r|=\rho_k$, that checkpoint's leave-one-out contribution to a
 softmax-averaged ensemble scales linearly with $\rho_k$, with slope
-$\hat\beta = +0.74$ ($p{=}0.014$, $n{=}10$, FACED 9-class).}
+$\hat\beta = +0.74$ ($p{=}0.014$, $n{=}10$, FACED 9-class). $n=10$ is
+small; we report this as an empirical regularity rather than a law.}
 \end{quote}
 
-The Law is correlational. An Arditi-style directional
+The regularity is correlational. An Arditi-style directional
 ablation~\citep{arditi2024refusal} on the EEG classifier---projecting
 the LLM-derived $v_{\mathrm{resid}}$ out of the penultimate features
 at inference time, without retraining---tightens the link from

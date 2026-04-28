@@ -8,7 +8,9 @@ the \emph{V-axis} of valence, across language models, human brains,
 and EEG emotion classifiers. Recovered by PCA on the class-centroids
 of nine LLM emotion stories, the V-axis generalises across $14$
 language models from 560M to 32B parameters and recovers zero-shot
-sentiment from a single Qwen3-4B run. The same axis predicts a ridge-regression read-out of the
+sentiment from a single Qwen3-4B run---above an off-the-shelf
+sentence-encoder zero-shot baseline and within $0.08$ AUC of an
+NLI-supervised RoBERTa-large. The same axis predicts a ridge-regression read-out of the
 cohort-averaged EEG of $123$ subjects watching $28$ emotional videos
 at $r{=}0.87$ ($p<10^{-9}$, single test on stim-level features), with
 the signal carried by an anger--warm-positive contrast on $9$ of the

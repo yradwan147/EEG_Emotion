@@ -24,7 +24,9 @@ as an auxiliary loss does not just fail to help; it perturbs precisely
 the saturated component while leaving the load-bearing residual
 untouched, and accuracy drops accordingly. Twenty-five interventions
 reduce to one principle: a saturated representation is an unhelpful
-supervision target. The same observation gives a positive
+supervision target. We locate the empirical transition at FACED-9
+BACC $[0.62, 0.66]$; the principle should hold elsewhere but the
+threshold magnitude is dataset- and architecture-specific. The same observation gives a positive
 prescription: ensemble gain on a saturated network is variance
 reduction in the orthogonal complement of the converged
 subspace---generalising bias--variance \citep{geman1992neural} and

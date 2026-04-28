@@ -441,7 +441,7 @@ seeds.}
 \label{tab:seedv-step4}
 \end{table}
 
-\paragraph{Step 5: SEED-V causal ablation (Arditi-style).}
+\paragraph{Step 5: SEED-V directional ablation (Arditi-style).}
 At inference time on each of the 15 SEED-V CBraMod checkpoints (5
 baseline + 5 augmented + 5 KD-midlayer) we project penultimate features
 onto the orthogonal complement of the trial-level best-PC V-axis
@@ -778,14 +778,14 @@ Single-seed variation in class-mean V-axis structure is small. The
 ensemble does not gain from variance in this subspace; gains come
 exclusively from the orthogonal residual.
 
-\paragraph{Causal ablation figure (LF16).}
+\paragraph{Directional ablation figure (LF16).}
 
 \begin{figure}[ht]
 \centering
 \IfFileExists{figures/landmark/lf16_causal_ablation.pdf}
   {\includegraphics[width=0.85\linewidth]{landmark/lf16_causal_ablation.pdf}}
   {\includegraphics[width=0.85\linewidth]{landmark/lf16_causal_ablation.png}}
-\caption{Causal ablation of $v_{\mathrm{resid}}$ on all 10 SOTA-pool
+\caption{Directional ablation of $v_{\mathrm{resid}}$ on all 10 SOTA-pool
 checkpoints. \emph{Top}: per-checkpoint BACC drops (red) compared to
 matched-norm random-direction ablation (grey); the V-axis effect is
 well above the null on every checkpoint (mean $z\approx 7.7$, all
