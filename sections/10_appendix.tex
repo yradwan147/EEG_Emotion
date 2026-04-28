@@ -69,7 +69,7 @@ $0.74$ at $n=1$, rising to the canonical $0.832$ at $n=50$ for
 Qwen3-4B.
 
 
-\section{Per-LLM Universality Deep Dive}
+\section{Per-LLM Cross-Architecture Convergence: Deep Dive}
 \label{app:per-llm-deep-dive}
 
 \paragraph{Sentiment benchmark table.}
@@ -116,7 +116,7 @@ regimes by per-stim correlation against a behavioural valence reference
 \item \textbf{Top tier} (per-stim $r > 0.85$, $n=7$): all six Qwen3
 sizes (Qwen3-14B $r=0.944$, Qwen3-4B $0.944$, Qwen3-8B $0.941$,
 Qwen3-32B $0.937$, Qwen3-0.6B $0.933$, Qwen3-1.7B $0.930$) plus
-Mistral-7B ($0.935$). This is the \emph{universal manifold}; within
+Mistral-7B ($0.935$). This is the \emph{modern-LLM manifold}; within
 Qwen3 it is exceptionally tight (mean $r_{\mathrm{behav}}=0.938 \pm
 0.005$, mean $r_{\mathrm{eeg}}=0.796 \pm 0.011$).
 \item \textbf{Middle tier} ($0.6 \leq r \leq 0.85$, $n=4$):
@@ -128,8 +128,8 @@ TinyLlama-1.1B ($0.128$), BLOOM-560M ($0.031$).
 
 The within-Qwen3 scaling is essentially flat ($r=+0.568$ between
 $\log(\mathrm{hidden\,dim})$ and per-stim $r_{\mathrm{behav}}$,
-$p=0.24$, $n=6$): once a model has joined the universal manifold,
-universality is \emph{not} a size-monotonic phenomenon. The Qwen3
+$p=0.24$, $n=6$): once a model has joined the modern-LLM manifold,
+convergence is \emph{not} a size-monotonic phenomenon. The Qwen3
 family $r_{\mathrm{eeg}}$ range is $[+0.781, +0.812]$ with standard
 deviation $\pm 0.011$, and the behaviourally best-aligned models are
 mid-size Qwen3 (4B--14B).
@@ -327,7 +327,7 @@ random-direction nulls, while the out-tier sits at the median.
 the 95th percentile of their per-LLM 200-direction null ($p<0.05$ each);
 out-tier 3 LLMs sit at the median or below. Restricted to top-tier the
 log-hidden-dim$\to r$ scaling is $r=+0.125$, $p=0.684$; within-Qwen3
-$r=+0.568$, $p=0.24$, $n=6$. Universality $\gg$ scale.}
+$r=+0.568$, $p=0.24$, $n=6$. Family-membership $\gg$ scale.}
 \label{fig:llm-brain}
 \end{figure}
 
@@ -352,8 +352,9 @@ text-domain $L=1$ peak anomaly: Gemma-4-E2B at $L=17$ predicts EEG at
 $r=0.819$ ($p \approx 10^{-7}$), Gemma-4-E4B at $L=21$ at $r=0.714$
 ($p \approx 2\times10^{-5}$). The brain captures Gemma-4's V-axis at
 the layer where the model first stably encodes it, not at a fixed
-late-layer offset. Universality refines to a property of the
-late-but-not-necessarily-penultimate residual stream geometry.
+late-layer offset. Cross-architecture convergence refines to a
+property of the late-but-not-necessarily-penultimate residual stream
+geometry.
 
 
 \section{SEED-V Replication Full Numerics}
@@ -455,7 +456,7 @@ centred at $0$ ($\bar{\Delta}_{\mathrm{rand}}=+0.00013 \pm 0.0008$).
 Per-checkpoint $z$-scores range $[+9.65, +44.92]$ (mean $+23.6$, all
 $p<0.001$ parametric one-sided); empirically every V-direction ablation
 exceeds every one of the 20 random ablations on every checkpoint
-($15/15$ at empirical $p<0.05$). The SEED-V causal effect is
+($15/15$ at empirical $p<0.05$). The SEED-V directional effect is
 proportionally larger than FACED (mean $\Delta/\mathrm{baseline}\approx
 3.9\%$ vs.\ $2.4\%$ on FACED) and the mean $z$ is $3\times$ FACED's. As
 on FACED, V-axis amplification (rather than ablation) is not
