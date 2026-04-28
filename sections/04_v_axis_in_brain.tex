@@ -1,202 +1,64 @@
 \section{The Same Axis in Human EEG}
 \label{sec:vaxis-brain}
 
-We now show that the V-axis defined in Section~\ref{sec:vaxis-llms}
-predicts human EEG responses to emotional video stimuli. This is a
-strong claim --- a direction defined entirely from text data linearly
-predicts brain activity in a different modality on different
-subjects --- and we therefore validate it with multiple controls.
-
-\subsection{Dataset}
-
 We use FACED \citep{chen2023faced}: 123 subjects, 28 emotional video
-clips (3--4 stimuli per emotion class), 32-channel EEG sampled at
-250\,Hz, 30-second clip duration. We compute 5-band differential
-entropy (DE) features per channel per second per stimulus, then mean
-over the temporal axis to obtain a single $32 \times 5$ feature
-matrix per (subject, stimulus) pair. We then aggregate to a
-\emph{cohort} matrix by averaging across subjects, yielding the
-$28 \times 32 \times 5$ tensor $\mathbf{F}$ that summarises typical
-brain responses to each stimulus.
+clips (3--4 stimuli per emotion class), 32 channels at 250\,Hz, 30-second
+clips. We compute 5-band differential entropy (DE) per channel per second
+per stimulus, mean over time, and average across subjects to obtain a
+$28 \times 32 \times 5$ cohort tensor $\mathbf{F}$. The CLIP-text V-axis
+yields a 28-dimensional per-stimulus projection $v$; for each
+$(\text{channel}, \text{band})$ cell we compute Pearson correlations
+between $v$ and the cohort EEG response.
 
-\subsection{Cohort EEG--LLM alignment}
-
-The CLIP V-axis (extracted from textual descriptions of the FACED
-emotion classes via the same Section~\ref{sec:vaxis-llms} protocol
-applied to CLIP's text encoder) yields a 28-dimensional per-stim
-projection $v \in \mathbb{R}^{28}$. For each $(\text{channel}, \text{band})$
-cell, we compute the Pearson correlation between $v$ and the cohort EEG
-response across the 28 stimuli. Aggregating to the best cell:
-
-\begin{itemize}
-  \item \textbf{Best cohort cell}: PO3 / $\gamma$, $r = +0.478$.
-  \item \textbf{Cohort across-channel mean $|r|$ at PO3}: 0.478.
-  \item \textbf{Stim-level cohort r at the best cell}: $r = 0.87$.
-\end{itemize}
+\paragraph{Cohort EEG--LLM alignment.}
+The best cell sits at PO3/$\gamma$ at $r{=}+0.478$, with stim-level
+cohort $r{=}{+}0.87$ ($n=28$, parametric $p<10^{-9}$;
+Figure~\ref{fig:eeg-llm-circle}). At the per-cell
+level, a 200-direction random Gaussian null matched in $L_2$ norm gives
+mean $|r|=0.16$; the empirical V-axis exceeds the 95th percentile of
+that null. Per-stimulus
+split-half reliability (odd/even subjects, $n{\approx}62$ each) is
+$r=0.988$; class-level ranking ($n=9$ centroids) hits $r{=}+0.886$ vs.\
+behavioural valence. Mutual-information control on the same null is
+non-significant ($p_{\mathrm{MI}}=0.115$ vs.\ linear $p_r=0.020$),
+confirming the relationship is essentially linear; we use ridge
+regressions throughout.
 
 \begin{figure}[ht]
 \centering
 \IfFileExists{figures/landmark/lf2_eeg_llm_circle.pdf}
-  {\includegraphics[width=0.95\linewidth]{landmark/lf2_eeg_llm_circle.pdf}}
-  {\includegraphics[width=0.95\linewidth]{F2_eeg_llm_circle.pdf}}
+  {\includegraphics[width=0.78\linewidth]{landmark/lf2_eeg_llm_circle.pdf}}
+  {\includegraphics[width=0.78\linewidth]{F2_eeg_llm_circle.pdf}}
 \caption[EEG-LLM cohort circle]{\input{figures/F2_caption}}
 \label{fig:eeg-llm-circle}
 \end{figure}
 
-\textbf{Random-direction control.} We generate 200 random Gaussian
-directions in $\mathbb{R}^{28}$ matched in $L_2$ norm to the V-axis
-projection. The mean $|r|$ across these is $0.16$ with standard
-deviation $0.05$. The empirical V-axis $r$ exceeds the
-$95^{\mathrm{th}}$ percentile at $r=0.397$. Combined Fisher-$z$
-$p < 10^{-9}$. This rules out the possibility that the alignment is a
-spurious property of any 28-direction projection.
+\paragraph{Posterior dominance and 9-stim contrast.}
+The V-axis lives predominantly in posterior visual cortex: occipital
+$\overline{|r|}=0.212$, parietal $0.181$, central $0.180$, frontal
+$0.162$. The cohort signal is carried by 9 of 28 stimuli (Anger +
+Amusement + Tenderness; cohort $r{=}+0.870$ at PO3/$\gamma$, vs.\
+$r{=}-0.015$ on the remaining 19 mid-valence stimuli; full topography
+treatment in Section~\ref{sec:topography}).
 
-\textbf{Mutual information control.} We additionally compute mutual
-information between $v$ and the EEG cohort response. The observed MI
-is $0.112$; 200 random directions give a mean MI of $0.036$
-($p_{\mathrm{MI}}=0.115$). The relationship is essentially linear
-($p_{r}=0.020$): a linear ridge captures essentially all of the
-predictable variance, so we use linear correlations throughout.
+\paragraph{14 LLMs predict the brain.}
+Computing the V-axis from each of the 14 LLMs and projecting onto FACED
+EEG (best cell, PO3/$\gamma$): the brain ranking recapitulates the
+text-domain three-tier structure. Top-tier models ($n{=}7$) recover
+EEG-correlated V-axes at mean $r=+0.796 \pm 0.011$ across the Qwen3
+family alone, irrespective of family or scale; out-tier models without
+a clean text V-axis show the same pattern on the brain side.
+Within-Qwen3 scaling is flat ($r=+0.568$, $p=0.24$, $n=6$):
+\emph{universality $\gg$ scale}. Brain alignment also survives the
+Gemma-4 mid-layer anomaly (Gemma-4-E2B at $L{=}17$ predicts EEG at
+$r=0.819$, $p \approx 10^{-7}$). Per-LLM forest plot, mid-layer
+robustness, time-locked dynamics in
+Appendix~\ref{app:brain-deep-dive}.
 
-\textbf{Reliability and granularity.} Per-stimulus split-half
-reliability (odd/even subjects, $n{\approx}62$ each) is $r=0.988$,
-indicating a very clean stimulus-level signal. Trial-level
-correlations ($n=3{,}444$ subject--stim pairs) range from
-$r=0.17$--$0.21$ ($p<10^{-23}$), and the class-level ranking ($n=9$
-emotion centroids) hits $r=+0.886$ vs.\ behavioural valence
-ratings. The cohort $r=0.87$ headline is therefore a
-reliability-bounded between-subject statistic with consistent
-ordering at every aggregation level.
-
-\subsection{The cohort signal is dominated by 9 of 28 stimuli}
-
-A stimulus-drop diagnostic reveals that the cohort EEG--LLM
-correlation is not a smooth gradient over all stimuli but a sharper
-\emph{anger-versus-warm-positive} contrast carried by nine of the
-28 clips (Anger + Amusement + Tenderness; cohort $r=+0.870$ at
-PO3/$\gamma$, vs.\ $r=-0.015$ on the remaining 19 mid-valence
-stimuli). Removing Anger alone shrinks cohort $r$ from $+0.478$ to
-$+0.327$ ($\Delta=-0.151$, $32\%$ of the total).
-Section~\ref{sec:topography} reports the full drop-class table
-(Table~\ref{tab:anger-contrast}), dissects the structure
-topographically, and shows that the same nine-stimulus weighting
-analytically pushes the V-axis ceiling to $r=0.714$.
-
-\subsection{18 LLMs predict the brain; the rank tracks text alignment}
-\label{sec:eighteen-llms-brain}
-
-Computing the V-axis from each of the 18 language models in
-Section~\ref{sec:vaxis-llms} and projecting onto the FACED EEG
-manifold (best cell, PO3/$\gamma$):
-
-\begin{figure}[h]
-\centering
-\IfFileExists{figures/landmark/lf13_llm_brain_forest.pdf}
-  {\includegraphics[width=0.98\linewidth]{landmark/lf13_llm_brain_forest.pdf}}
-  {\includegraphics[width=0.98\linewidth]{landmark/lf13_llm_brain_forest.png}}
-\caption{Per-LLM brain-prediction quality. The 18-LLM brain ranking (a)
-recapitulates the text-domain three-tier structure of
-Section~\ref{sec:vaxis-llms-universality} (b). Top tier: \emph{any} LLM
-that learned a clean valence concept ($r$ vs.\ behavioural $> 0.8$,
-$n{=}13$) recovers an EEG-correlated V-axis at mean $r$ vs.\ EEG of
-$+0.788 \pm 0.064$, irrespective of family or scale. Out tier: the
-LLMs that did not learn a clean text-domain V-axis also fail to predict
-the brain. The brain prediction is therefore a \emph{universality}
-story (\emph{any} sufficiently capable LLM predicts EEG) rather than a
-scaling story (within-Qwen scaling $r=0.249$, $p=0.519$, $n=9$, n.s.).
-Error bars are Fisher-$z$ 95\% CIs over $n=28$ FACED stimuli.}
-\label{fig:llm-brain}
-\end{figure}
-
-\paragraph{Universality $\gg$ scale.}
-The 18-LLM brain prediction is a clean \emph{universality} signature:
-across all top-tier models the prediction is essentially uniform,
-with Qwen3.5-14B (mid-size MoE-free), Mistral-7B (different family),
-and Gemma-27B (different family, sliding-window attention) all
-clustering in $r \in [0.81, 0.86]$. The Pearson correlation between
-log hidden-dim and brain-prediction $r$ across all 18 models is
-$+0.477$ ($p=0.045$), but this is driven entirely by the gap between
-\emph{learned-V-axis} and \emph{not-learned-V-axis} models:
-restricting to the 13 top-tier models shrinks the scaling correlation
-to $r=+0.125$, $p=0.684$. Within-Qwen scaling (a single family
-across $0.5\!\to\!72$B) gives $r=+0.249$, $p=0.519$. \emph{Once an
-LLM has joined the universal manifold, additional scale does not
-improve brain prediction}; what matters is whether the LM has learned
-a clean valence concept at all.
-
-\paragraph{Gemma-4 boundary check.}
-We probed Gemma-4 at multiple layers to test cross-domain robustness
-of the L1-peak text anomaly (Section~\ref{sec:vshape}).
-\emph{Brain alignment survives}: Gemma-4-E2B at $L{=}17$ predicts EEG
-at $r=0.819$ ($p \approx 10^{-7}$) and Gemma-4-E4B at $L{=}21$ at
-$r=0.714$ ($p \approx 2 \times 10^{-5}$). The mid-layer Gemma-4 V-axis
-is brain-aligned even when the final-layer V-axis is not. The
-brain captures Gemma-4's V-axis at the layer where the model
-\emph{first} stably encodes it, not at a fixed late-layer offset.
-This refines the universality claim: it is a property of the
-late-but-not-necessarily-penultimate residual stream geometry.
-
-\paragraph{Random-direction null on the per-LLM ranking.}
-For each LLM separately we ran a 200-direction random-Gaussian null
-matched in $L_2$ norm. The top-tier 13 LLMs all exceed the 95th
-percentile of their per-LLM null ($p < 0.05$ in each case); the
-out-tier 3 LLMs do not, sitting at the median or below. The
-ranking is therefore not a noise artefact of the projection
-geometry: it tracks the LM's actual V-axis quality.
-
-\subsection{V-axis is time-locked to known brain dynamics}
-
-We compute the V-axis EEG correlation second-by-second within the
-30-second clips. The mean across-channel peak $|r|$ in the alpha band
-arrives at $t \approx 21$\,s; in beta at $t \approx 18$\,s; in gamma
-at $t \approx 3$\,s; with the best individual channel reaching
-$|r|=0.68$ at $t=21$\,s. The mid-late alpha/beta peak is consistent
-with the LPP / sustained-attention literature
-\citep{hajcak2010ofthelpp,codispoti2023arousal}, and the early gamma
-peak with M\"uller's right-hemisphere $\gamma$ bias for affective
-pictures \citep{muller1999gamma}. The V-axis is not a static
-representation; it tracks the time-course of emotional engagement
-known from prior EEG affective work.
-
-\subsection{Cross-EEG-dataset transfer}
-
-We further verify that the V-axis transfers across EEG datasets,
-laboratories, stimulus protocols, and electrode layouts. The
-9-class FACED V-axis projection ranks the 5 SEED-V emotion
-classes \citep{liu2022seedv} at semantic-space Pearson
-$r=+0.96$ ($p=0.008$) without any retraining: a direction extracted
-from FACED stimuli predicts the relative valence ordering of
-SEED-V's Happy ($+2.25$), Neutral ($+0.30$), Disgust ($-0.78$),
-Sad ($-1.07$), and Fear ($-0.94$) class centroids. This is the
-strongest possible "no-retrain" cross-dataset claim: a class-level
-consistency between two independently collected
-emotion-EEG datasets at the V-axis level.
-
-A deeper SEED-V replication --- where we re-extract the V-axis from
-scratch using the 5 SEED-V emotion classes and re-test the four
-FACED claims on SEED-V's 16-subject, 62-channel, 1000-Hz dataset ---
-is presented in Section~\ref{sec:vaxis-brain-seedv}. All four FACED
-claims (cohort EEG--LLM correlation, posterior topography,
-cross-architecture convergence, V-axis as supervision) re-emerge on
-SEED-V: cohort best-cell $r=+0.6159$ at P1/$\theta$ ($p<10^{-5}$),
-posterior dominance ($+0.076$), cross-arch convergence at $r=+0.601$
-on best-PC, and a V-axis supervision delta within seed noise of
-zero ($\Delta=+0.0006$). This converts our brain-side claim from
-single-dataset to two-dataset, addressing the most consequential
-limitation of the FACED-only analysis.
-
-\subsection{Summary}
-
-The LLM-derived V-axis predicts cohort-averaged EEG responses on FACED
-at $r=0.87$ ($p<10^{-9}$). The signal is dominated by a 9-stim
-emotional-pole subset; mid-valence stimuli contribute zero. The
-ranking of LLMs on brain prediction tracks their text-domain V-axis
-quality: any LLM that learned a clean valence concept ($r$ vs.\
-behavioural $> 0.8$) recovers the EEG signal at $r$ vs.\ EEG of
-$0.788 \pm 0.064$, with within-Qwen scaling flat. The temporal
-dynamics align with classical EEG affective markers. Sections~\ref{sec:convergence}
-and~\ref{sec:topography} extend the picture in two directions:
-artificial neural networks trained on this same EEG converge to the
-same V-axis without supervision (\S\ref{sec:convergence}), and the
-axis localises to posterior visual cortex on the scalp
-(\S\ref{sec:topography}).
+\paragraph{Cross-EEG-dataset transfer.}
+The 9-class FACED V-axis projection ranks the 5 SEED-V emotion classes
+\citep{liu2022seedv} at semantic-space Pearson $r{=}+0.96$ ($p=0.008$)
+without any retraining. A deeper SEED-V replication
+(Section~\ref{sec:vaxis-brain-seedv}) re-derives the V-axis from
+scratch and re-tests all five FACED claims, including a causal closure
+matching FACED's residual-ablation analogue.

@@ -1,361 +1,73 @@
 \section{A Universal Valence Axis in Language Models}
 \label{sec:vaxis-llms}
 
-This section establishes the V-axis as a single one-dimensional direction
-that universally captures valence across language models. We define the
-extraction protocol, validate it against gold-standard sentiment
-benchmarks, characterize cross-model and cross-language generality, and
-show that the V-axis is computed in late transformer layers rather than
-inherited from input embeddings.
-
-\subsection{Extraction protocol}
-
+\paragraph{Extraction protocol.}
 Given a language model with hidden dimension $D$ and the FACED 9-emotion
-taxonomy $\mathcal{C}=\{$Anger, Disgust, Fear, Sadness, Neutral,
-Amusement, Inspiration, Joy, Tenderness$\}$, we author one short
-emotion-evocative story per class (one sentence to one paragraph). We
-generate $n=50$ paraphrases of each story by independent LLM calls, run
-each paraphrase through the model, and take the mean of the
-last-token hidden state at layer $L$. This yields nine class centroids
-$c_1,\dots,c_9 \in \mathbb{R}^D$. We then run PCA on the
-$9\!\times\!D$ centroid matrix and define the \textbf{V-axis} as the
-unit vector along $\mathrm{PC}_1$, oriented so that the projection of
-the Joy centroid onto it is positive. By construction, V-axis
-projections are 1-D scalars summarising where each class sits on the
-positive-vs-negative valence spectrum.
+taxonomy, we author one short emotion-evocative story per class, generate
+$n=50$ paraphrases per story by independent LLM calls, and take the mean
+last-token hidden state at the penultimate layer $L_{\max}{-}1$ to
+obtain nine class centroids $c_1,\dots,c_9 \in \mathbb{R}^D$. Mean-centred
+PCA on the $9 \times D$ matrix gives the \textbf{V-axis} as the unit
+vector along $\mathrm{PC}_1$, oriented so that
+$\langle c_{\mathrm{Joy}}, v\rangle > 0$. We use Qwen3-4B at the
+penultimate layer ($L_{\max}-1=35$ of 36) as the lead model unless
+otherwise stated; the recipe is robust to paraphrase budget (zero-shot
+SST-2 AUC $0.74$ at $n{=}1$, rising to $0.832$ at our canonical
+setting), and prompt-rephrasing robustness gives mean cross-prompt
+$r > 0.93$ across the LLMs we test (full protocol, paraphrase quality
+controls in Appendix~\ref{app:vaxis-protocol}).
 
-This procedure produces a useful axis with as few as $n=1$ paraphrase
-per class (zero-shot single-shot SST-2 AUC $0.74$,
-cycle~73s); five paraphrases gives saturating quality, and we use 50
-throughout to reduce sampling noise.
+\paragraph{Universality across 14 LLMs.}
+We extract the V-axis from 14 language models spanning three orders of
+magnitude (Qwen3 at all six dense sizes 0.6B--32B, Llama-4-Scout-17B,
+Mistral-7B, Phi-2-2.7B, Pythia-1.4B, BLOOM-560M, TinyLlama-1.1B,
+Gemma-27B, Gemma-4-31B). The mean off-diagonal Pearson correlation
+between per-stim V-axis projections is $0.65$. Three regimes emerge
+against a behavioural valence reference: a top tier ($n{=}7$, per-stim
+$r>0.85$): all six Qwen3 sizes plus Mistral-7B, mean $r_{\mathrm{behav}}=0.939$;
+a middle tier ($n{=}4$, $0.6 \le r \le 0.85$): Llama-4-Scout, Gemma-27B,
+Gemma-4-31B, Phi-2; an out-tier ($n{=}3$, $r<0.4$): Pythia-1.4B,
+TinyLlama-1.1B, BLOOM-560M. Within-Qwen3 scaling is essentially flat
+($r=+0.568$, $p=0.24$, $n=6$): universality is \emph{not} a
+size-monotonic phenomenon (full per-LLM table in
+Appendix~\ref{app:per-llm-deep-dive}).
 
-\subsection{Universality across language models}
-\label{sec:vaxis-llms-universality}
+\paragraph{External validity on sentiment.}
+Zero-shot AUCs at the V-axis projection (Qwen3-4B): SST-2 binary
+$0.832$ \citep{socher2013recursive} (matching a supervised LR baseline
+trained on 5k in-domain samples at $0.837$), IMDB $0.857$
+\citep{maas2011imdb}, Yelp Polarity $0.938$ \citep{yelp2015}, Twitter
+SemEval-2017 $0.927$ \citep{rosenthal2017semeval}, Rotten Tomatoes
+$0.799$ \citep{pang2005seeing}. The V-axis also recovers Hu \& Liu
+opinion polarity \citep{hu2004mining} at $|r|=0.731$ ($n{=}1500$
+sampled words) and Warriner et al.\ valence
+\citep{warriner2013norms} at $|r|=0.703$ ($n{=}3000$).
 
-We extract the V-axis from 18 language models spanning three orders of
-magnitude in scale (Qwen3.5 1.7B--72B, Llama-3 8B,
-Llama-4-Scout-17B, Mistral-7B, OLMo-7B, Phi-2 2.7B, Pythia-1.4B,
-BLOOM-560M, TinyLlama-1.1B, Gemma-27B, Gemma-4 31B). The mean
-off-diagonal Pearson correlation between the per-stim projections of
-any two models is $0.654$, with the strongest agreement among Qwen3.5
-variants (Qwen3.5-1.7B vs Qwen3.5-14B: $r=0.94$, Qwen3.5-7B vs
-Qwen3.5-14B: $r=0.96$). The behaviourally best-aligned models are
-mid-size Qwen3.5; we observe an \emph{inverted-U} scaling law on
-text benchmarks in which Qwen3.5-1.7B at layer~28 leads SST-2
-zero-shot ($0.868$), with mid-to-large Qwen3.5
-variants (3B--14B) tying on brain prediction
+\paragraph{V-shape: a late-layer phenomenon.}
+The V-axis is newly computed in late transformer layers, not inherited
+from input embeddings: cosine between input-layer and final-layer
+V-axis is small (under $0.30$ across Qwen3 sizes) with a sharp emergence
+in the last few layers. The same V-shape emerges across five LM families
+and across
+BERT, RoBERTa, DeBERTa, peaking at $L_{\max}{-}1$ --- ruling out
+tokeniser or training-objective artefacts. Gemma-4 is the lone outlier
+(text V-axis peaks at $L{=}1$); brain alignment survives at mid-layers
 (Section~\ref{sec:vaxis-brain}).
 
-\paragraph{Three regimes of cross-LLM agreement.}
-The 18-LLM universality is not uniform: models cluster into three
-regimes by per-stim correlation against behavioural valence, which
-we read as evidence that universality requires \emph{sufficient
-capacity to learn a clean valence concept}, not size per se. We
-report the per-stimulus alignment to a behavioural valence reference
-($n{=}28$ FACED stim, mean of $123$ subjects' valence ratings):
-
-\begin{itemize}
-\item \textbf{Top tier} (per-stim $r > 0.85$, $n=13$): Qwen3.5-14B
-($r=0.964$), Qwen3.5-7B ($0.957$), Qwen3.5-3B ($0.947$),
-Qwen3.5-1.7B ($0.938$), Qwen3.5-72B ($0.923$), Mistral-7B ($0.935$),
-Qwen3.5-0.5B ($0.891$), Llama-3-8B, OLMo-7B, Llama-4-Scout, plus
-three further Qwen3.5 variants. This is the \emph{universal manifold}.
-\item \textbf{Middle tier} ($0.6 < r < 0.85$, $n=2$): Gemma-27B
-($0.81$), Gemma-4-31B ($0.72$). Gemma-4 in particular is the
-architectural anomaly we discuss separately below.
-\item \textbf{Out-of-manifold} ($r < 0.4$, $n=3$): Pythia-1.4B
-($0.28$), TinyLlama-1.1B ($0.13$), BLOOM-560M ($0.03$). These models
-either failed to learn a clean valence concept or store it in a
-non-late-layer representation.
-\end{itemize}
-
-The within-Qwen scaling is essentially flat ($r=0.249$, $p=0.519$,
-$n=9$) once a model has joined the universal manifold:
-universality is \emph{not} a size-monotonic phenomenon. The
-inverted-U is real but small (Qwen3.5-1.7B 0.868 vs.\ Qwen3.5-7B
-0.848 vs.\ Qwen3.5-32B 0.831 on SST-2 zero-shot); above
-$\sim$1.7B parameters the recipe is essentially saturated.
-Per-LLM brain-alignment ranks recur with this same three-tier
-structure (Section~\ref{sec:vaxis-brain}, Figure~\ref{fig:llm-brain}).
-
-\subsection{External validity on sentiment benchmarks}
-
-We evaluate the V-axis as a \emph{zero-shot probe} on five sentiment
-benchmarks without any task-specific training:
-
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{lrr}
-\toprule
-Benchmark & V-axis AUC & Supervised LR (5k) \\
-\midrule
-SST-2 binary \citep{socher2013recursive}      & 0.868 & 0.837 \\
-IMDB \citep{maas2011imdb}                     & 0.895 & --- \\
-Yelp Polarity \citep{yelp2015}                & 0.953 & --- \\
-Twitter SemEval-2017 \citep{rosenthal2017semeval}      & 0.923 & --- \\
-Rotten Tomatoes (MR) \citep{pang2005seeing}   & 0.843 & --- \\
-\bottomrule
-\end{tabular}
-\caption{Zero-shot SST-2 AUC of $0.868$ exceeds a logistic regression
-baseline trained on $5{,}000$ in-domain samples ($0.837$), demonstrating
-that the V-axis carries the structure of the supervised problem
-\textit{without seeing any sentiment labels}.}
-\label{tab:vaxis-sentiment}
-\end{table}
-
-The V-axis also recovers three industry-standard valence lexicons
-zero-shot: NRC Emotion Lexicon \citep{mohammad2013nrc} valence
-($|r|=0.79$), Hu \& Liu opinion lexicon \citep{hu2004mining}
-($|r|=0.76$, $n=4{,}783$ words), and the Warriner et al.\ 13k word
-ratings \citep{warriner2013norms} ($|r|=0.66$). We also exceed an SBERT
-baseline at the same pipeline by $\Delta\,|r|\,\in\,[0.15,0.24]$,
-justifying the use of decoder-style language models for V-axis
-extraction.
-
-\subsection{V-shape emergence: a late-layer phenomenon}
-\label{sec:vshape}
-
-The V-axis is not inherited from input embeddings; it is \emph{newly
-computed} in late transformer layers. We sweep all 28 layers of
-Qwen3.5-1.7B and observe a sharp emergence at $L=27$ with axis quality
-dropping
-precipitously below $L=22$ (we call this the V-shape). The cosine
-between input-layer V-axis and final-layer V-axis is only $0.291$, with
-mid-layer L14 at $0.067$ --- the late layer carries
-fundamentally different information. The same V-shape emerges across
-five LM families (Qwen, Pythia, BLOOM, Llama-3, Phi-3-mini), and
-across bidirectional encoders BERT, RoBERTa, and DeBERTa, with the
-peak at layer~$L_{\max}-1$ in each case. This rules out artefacts of
-particular tokenisers or training objectives.
-
-The Gemma-4 family is the only outlier: its text V-axis peaks at $L=1$
-rather than the penultimate layer. Importantly, this anomaly is
-\emph{not} reflected in the brain alignment (Section~\ref{sec:vaxis-brain}):
-Gemma-4-E2B at $L=17$ predicts EEG at $r=0.819$, and Gemma-4-E4B at
-$L=21$ at $r=0.714$. Universality is robust to this architectural
-quirk.
-
-\subsection{Crosslingual and cross-modal generality}
-
-\paragraph{Multilingual transfer.}
-We translated the nine emotion stories into Japanese, Arabic, and
-Russian, and re-extracted the V-axis from four multilingual
-encoders. Direct application of an English-centric causal LM
-(Qwen3.5-1.7B) to non-English stories collapses to chance --- a clean
-English-bias diagnostic. Switching to the multilingual mT0-base
-encoder--decoder \citep{muennighoff2022mt0} fully recovers the
-zero-shot SST-2 result and \emph{exceeds} the English baseline in
-every language tested:
-
-\begin{figure}[h]
-\centering
-\IfFileExists{figures/landmark/lf12_multilingual_grouped.pdf}
-  {\includegraphics[width=0.98\linewidth]{landmark/lf12_multilingual_grouped.pdf}}
-  {\includegraphics[width=0.98\linewidth]{landmark/lf12_multilingual_grouped.png}}
-\caption{Cross-lingual V-axis recovery. The English baseline failure
-of causal Qwen on non-English stories is an \emph{English-bias}
-phenomenon (chance-level AUC). Switching to a multilingual
-instruction-tuned encoder--decoder (mT0-base) recovers the SST-2
-signal \emph{above} the English ceiling across three typologically
-distant languages, at $5\!\times$ smaller parameter count. The recipe
-transfers; what matters is the multilinguality of the extractor, not
-the language of the stories.}
-\label{fig:multilingual}
-\end{figure}
-
-The mT0-base result rules out a "valence is English-specific
-construct" objection: a 277M-parameter multilingual encoder--decoder
-extracts a V-axis from non-English stories that beats the English
-ceiling, suggesting the V-axis is genuinely a property of the LM's
-pretraining-induced affect representation rather than an artefact of
-English tokenisation or training data. Per-language V-axis cosines
-are moderate ($r_{en\text{--}es}=0.47$, $r_{en\text{--}fr}=0.16$,
-$r_{es\text{--}fr}=0.46$): different languages share substantial
-direction but not entirely, consistent with concept-level rather than
-token-level encoding.
-
-\paragraph{Cross-modal generality (CLIP vision).}
-The same protocol applied to nine emotion-evocative \emph{images}
-via CLIP visual encoders \citep{radford2021clip} yields a V-axis
-that ranks the OASIS image dataset \citep{kurdi2017oasis} on
-valence at Pearson $r=0.869$ and on arousal at $r=0.803$. Both
-\emph{beat} the supervised Ridge regressions trained on the OASIS
-labels themselves (valence $0.836$, arousal $0.789$), making the
-zero-shot V-axis the strongest known image-affect predictor on this
-benchmark. The valence and arousal CLIP axes are essentially
-orthogonal ($|\cos\theta|=0.013$), confirming clean dimensional
-separation in vision space. The image-arousal success contrasts
-sharply with the text-arousal failure (below), and we use this
-asymmetry to delineate the recipe's scope.
-
-\subsection{Compositionality and concept-library generality}
-\label{sec:concept-library}
-
-\paragraph{Compositional axis arithmetic.}
-The V-axis is compositional. Combining the V-axis of a stylistic
-concept (politeness) with that of an emotional concept (happiness)
-predicts $4$-quadrant categorical labels at 79\% accuracy on a
-held-out generation set, $3.16\times$ above chance, with uniform
-per-cell precision in the $[0.68, 0.86]$ range. Subtractive
-orthogonalisation (Gram--Schmidt removal of the valence component
-from the politeness axis) cleanly separates the two dimensions:
-happy-AUC $0.912 \to 0.988$ on the politeness-orthogonalised axis,
-while polite-AUC drops from $0.793 \to 0.560$. The two axes therefore
-behave as approximately linearly composable directions in the
-late-layer residual stream, validated downstream on natural text
-where the same composition predicts GoEmotions, SST-5, and Yelp
-quadrants at 41.8\%--46.7\% (well above chance, below the
-agent-authored 79\% — a documented scope refinement).
-
-\paragraph{Recipe generality across 20 concepts.}
-The same nine-prompt PCA recipe extends well beyond emotion. We
-authored 9 stories per concept for 20 unrelated dimensions
-(emotional, stylistic, abstract) and applied the identical extraction
-protocol. \textbf{20 of 20 concepts reach binary AUC $> 0.65$ on
-held-out test stories, and 17 of 20 reach AUC $\ge 0.95$}, with
-eleven concepts hitting a perfect AUC $=1.00$.
-Figure~\ref{fig:concept-library} reports the full per-concept results.
-
-\begin{figure}[h]
-\centering
-\IfFileExists{figures/landmark/lf11_concept_library_bars.pdf}
-  {\includegraphics[width=0.98\linewidth]{landmark/lf11_concept_library_bars.pdf}}
-  {\includegraphics[width=0.98\linewidth]{landmark/lf11_concept_library_bars.png}}
-\caption{The 9-story recipe is concept-generic. Binary pole-vs-pole AUC
-across 20 unrelated concepts (sorted descending) plus the named failure
-(Jigsaw toxicity, AUC $0.59$). 20 of 20 concepts produce a working axis
-(AUC $>0.65$); 17 of 20 reach $\ge 0.95$; 11 are perfect. Mean
-off-diagonal transfer across the $20\!\times\!20$ axis-application
-matrix is $0.83$; full matrix in
-Appendix~\ref{app:concept-library-full}. Inside-bar labels report rank
-monotonicity $|\rho|$ across the 9 ordered classes.}
-\label{fig:concept-library}
-\end{figure}
-
-\paragraph{Cross-concept transfer matrix.}
-We further measured what happens when we apply the V-axis of one
-concept to a different concept's pole-vs-pole benchmark. The
-$20\!\times\!20$ transfer matrix has self-AUC mean $0.97$ on the
-diagonal and off-diagonal mean $0.83$, a $+0.13$ gap that confirms
-the recipe extracts \emph{concept-specific} directions rather than a
-single global affect axis: if every concept axis collapsed onto
-valence, the off-diagonal would match the diagonal.
-The most general source axes (high mean off-diagonal, indicating
-concepts whose directions also classify other concepts) are
-\textbf{sarcasm} ($0.89$), \textbf{fear} ($0.88$), \textbf{envy} and
-\textbf{shame} ($0.87$) --- consistent with affect-laden concepts
-recovering each other. The most specific source axes are
-\textbf{decisiveness} ($0.78$) and \textbf{complexity} ($0.78$),
-where the late-layer direction is more concept-isolated. The most
-\emph{captured} concepts (high mean other-axis AUC) are
-\textbf{urgency} ($0.97$), \textbf{fear} ($0.95$), and
-\textbf{concreteness} ($0.94$); the most concept-specific (lowest
-captured-by-others AUC) are \textbf{specificity} ($0.65$) and
-\textbf{sarcasm} ($0.67$). Together this argues the recipe is a
-\emph{family} of late-layer concept extractors, with valence one
-member among many. We list the working concepts in
-Figure~\ref{fig:concept-library}; the full $20\!\times\!20$
-transfer matrix is reported in
-Appendix~\ref{app:concept-library-full}.
-
-\paragraph{The toxicity failure.}
-The single notable failure sharpens the scope of the recipe. Applied
-to the Jigsaw toxic-comment corpus, the toxicity axis attains AUC
-$0.59$ --- substantially below the working concepts above. Two
-hypotheses are consistent with the data: (i) toxicity is more
-distributed in residual-stream geometry than a single late-layer
-principal component captures (e.g.\ a low-rank $k\!>\!1$ subspace
-rather than a 1-D axis); or (ii) Qwen-generated toxic stories,
-filtered through alignment training, may be too mild to span the
-real Jigsaw distribution at the centroid level. Either way, the
-recipe cleanly fails on toxicity, which we read as evidence the
-recipe is concept-specific rather than a universal feature
-extractor: it works for valence and 19 other concepts in our
-library, and explicitly \emph{does not work} for one (toxicity).
-This is itself a useful diagnostic.
-
-\subsection{Specificity controls}
-\label{sec:specificity}
-
-Three specificity tests rule out template-level confounds and
-narrow the recipe's scope.
-
-\paragraph{Nonce-word ablation.}
-Substituting all content words in the nine emotion stories with
-phonologically valid English nonce words (preserving syntax and
-function words) drops SST-2 AUC from $0.868$ to $0.524$ --- chance
-performance to the second decimal. This is the single most decisive
-control in the paper: had the V-axis been a syntactic or
-prompt-template artefact, the nonce variant would have retained the
-template-level structure and produced a non-trivial axis. It does
-not. The signal is encoded in \emph{semantic content}.
-
-\paragraph{Random direction baseline.}
-Random Gaussian directions in the LM's residual stream, $L_2$-matched
-to the V-axis, give SST-2 AUC $\approx 0.51$ and lexicon $|r|
-\approx 0.10$ --- clean separation from the V-axis at every
-benchmark we evaluated. Bootstrap 95\% confidence intervals for the
-top numbers are tight: SST-2 AUC $[0.844, 0.890]$, EmoBank V $|r|
-\in [0.485, 0.512]$, Hu \& Liu $|r| \in [0.740, 0.776]$
-(1{,}000-sample bootstrap; see Appendix~\ref{app:statistics}).
-
-\paragraph{Arousal asymmetry: where the recipe fails.}
-The same protocol applied to an \emph{arousal} axis succeeds in
-vision but fails in text:
-
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{lrr}
-\toprule
-Benchmark & V-axis (valence) & A-axis (arousal) \\
-\midrule
-SST-2 binary AUC                          & $0.868$ & --- \\
-EmoBank V $|r|$  / EmoBank A $|r|$        & $0.49$  & $0.01$--$0.06$ \\
-Warriner V $|r|$ / Warriner A $|r|$       & $0.66$  & $\le 0.16$ \\
-NRC valence / arousal lexicon recovery rate & $\ge 76\%$ & $\le 13\%$ \\
-OASIS image valence ($r$) / arousal ($r$) & $\mathbf{0.869}$ & $\mathbf{0.803}$ \\
-FACED EEG cohort $r$                     & $\mathbf{0.870}$ (9-stim) & $r \!\in\![0.18, 0.41]$ \\
-\bottomrule
-\end{tabular}
-\caption{Valence transfers across modalities; arousal does not in
-text but does in vision. The same recipe applied to an arousal axis
-yields the strongest known zero-shot OASIS arousal predictor
-($r=0.803$, beating supervised ridge $0.789$) but collapses on all
-text benchmarks. Cross-language A-axes are essentially orthogonal,
-suggesting arousal is encoded text-modality-specifically.}
-\label{tab:arousal-asymmetry}
-\end{table}
-
-This asymmetry --- \emph{valence transfers, arousal does not in
-text} --- is itself a useful diagnostic. It rules out the trivial
-explanation that "any sufficiently rich PCA recipe gives any
-sufficiently graded affective axis." Arousal in text appears to be
-encoded along a much more distributed or non-linear subspace that
-the late-layer principal-component recipe does not access; the same
-recipe \emph{does} access it in vision. We carry this asymmetry
-into the brain analyses of Section~\ref{sec:vaxis-brain} (where we
-report the V-axis only for valence, with the arousal-EEG link
-substantially weaker at $r \in [0.18, 0.41]$ across LLMs) and discuss
-it as a scope limitation in Section~\ref{sec:discussion}.
-
-\paragraph{Prompt-rephrasing robustness.}
-Sampling 5 alternative prompt sets per class and recomputing the
-V-axis gives a mean cross-prompt per-stimulus correlation of
-$r > 0.93$ across the 18 LLMs we tested. The V-axis is not a fragile
-prompt-template artefact: paraphrastic stability of the source
-stories preserves the recovered direction.
-
-\subsection{Summary}
-
-The V-axis is (i) extractable from any sufficiently capable LLM, (ii)
-quantitatively superior to lexicon-based and SBERT baselines on
-zero-shot sentiment, (iii) universal across 18 LLM families and
-across English / multilingual / vision / 9-emotion-image variants,
-(iv) computed in late transformer layers rather than inherited from
-inputs, (v) compositional, and (vi) generic --- the same recipe
-recovers 17 of 20 unrelated concepts at AUC $\ge 0.95$. Specificity
-controls (nonce-word ablation collapses to chance) confirm the
-signal is semantic. With this universal axis in hand, we turn to
-its presence in the human brain.
+\paragraph{Generality, controls, and scope.}
+The recipe is concept-generic (20/20 working axes, 17/20 at AUC
+$\ge0.95$, $20\!\times\!20$ transfer-matrix gap $+0.13$;
+Appendix~\ref{app:concept-library}), cross-lingual (mT0-base
+\citep{muennighoff2022mt0} on Japanese/Arabic/Russian exceeds the
+English ceiling at $5\!\times$ smaller scale;
+Appendix~\ref{app:multilingual-vision}), and cross-modal (CLIP V-axis
+ranks OASIS \citep{kurdi2017oasis,radford2021clip} valence at
+$r=0.869$, arousal at $r=0.803$, both beating supervised ridge). Three
+specificity controls (Appendix~\ref{app:specificity-controls}) bound
+the recipe: nonce-word ablation drops SST-2 AUC to chance ($\approx
+0.52$, signal is semantic, not syntactic); random-Gaussian matched
+directions give SST-2 AUC $\approx 0.51$ and lexicon $|r|\approx 0.10$;
+arousal
+transfers in vision ($r=0.803$) and is below detection threshold in
+text (NRC arousal recovery $\le 13\%$ vs.\ valence $\ge 76\%$),
+delineating the scope of the recipe.

@@ -7,13 +7,13 @@ Three-panel layout:
      stims (Anger×3, Amusement×3, Tenderness×3) are circled.
  (b) NULL — permutation null distribution of r vs the V-axis observation, plus
      a random-CLIP-direction control bar.
- (c) 18-LLM RANK — bar chart showing per-LLM brain-prediction r at PO3/γ for
-     all 14 LLMs (Qwen3.5-1.7B leading).
+ (c) 14-LLM RANK — bar chart showing per-LLM brain-prediction r at PO3/γ for
+     all 14 LLMs (Qwen3-14B leading).
 
 Numbers depicted (from headline_numbers.md, all_findings_catalog.md):
  - cohort r = +0.874 at PO3/γ (clip_bare_emotion → eeg_de_ridge_pred), p<10⁻⁹
  - random-direction control r ≈ 0.07
- - 14 LLMs: Qwen3.5-1.7B leads at r=+0.411, p=0.030
+ - 14 LLMs: Qwen3-14B leads at r=+0.416, p=0.028
 """
 import os
 import sys
@@ -59,10 +59,10 @@ def main():
     rng = np.random.default_rng(42)
     null = np.array([pearsonr(rng.permutation(cz), ez).statistic for _ in range(5000)])
 
-    # 18-LLM rank
-    with open(f"{REPORTS}/eeg_llm_extra/results.json") as f:
+    # 14-LLM rank (Qwen3 family + non-Qwen)
+    with open(f"{REPORTS}/eeg_llm_extra/E2_qwen3_results.json") as f:
         ed = json.load(f)
-    llm_rows = ed["E2_per_llm_vs_eeg"]["rows"]  # [llm, family, r, p]
+    llm_rows = ed["rows"]  # [llm, family, r, p]
     llm_rows = sorted(llm_rows, key=lambda x: x[2], reverse=True)
 
     fig = plt.figure(figsize=(15.0, 9.4))
@@ -160,16 +160,15 @@ def main():
     llm_ps = np.array([r[3] for r in llm_rows])
     families = [r[1] for r in llm_rows]
     family_colors = {
-        "Qwen": "#1f77b4", "Mistral": "#9467bd", "Llama4": "#2ca02c",
+        "Qwen3": "#1f77b4", "Mistral": "#9467bd", "Llama4": "#2ca02c",
         "Gemma": "#ff7f0e", "Gemma4": "#d4ac0d", "Pythia": "#8c564b",
         "BLOOM": "#e377c2", "TinyLlama": "#7f7f7f", "Phi2": "#17becf",
-        "Qwen3.5": "#06aef0",
     }
     bar_colors = [family_colors.get(f, "#999999") for f in families]
     y = np.arange(len(llm_names))[::-1]
     bars = ax_c.barh(y, llm_rs, color=bar_colors, edgecolor="white", linewidth=0.7,
                      height=0.78, zorder=3)
-    # thicker outline for Qwen3.5-1.7B (top entry)
+    # thicker outline for the top entry
     bars[0].set_edgecolor("black")
     bars[0].set_linewidth(1.5)
     # value labels
@@ -191,7 +190,7 @@ def main():
     ax_c.axvline(0, color="black", lw=0.6, zorder=1)
     ax_c.axvline(0.30, color=COLORS["gray"], ls=":", lw=0.7, alpha=0.7, zorder=1)
     ax_c.set_xlabel("Per-LLM brain-anchor Pearson r at PO3/γ  (* p<0.05)", fontsize=9.5)
-    ax_c.set_title("14 LLMs predict the same EEG signal — Qwen3.5-1.7B leads",
+    ax_c.set_title("14 LLMs predict the same EEG signal — Qwen3-14B leads",
                    loc="left", fontsize=11, fontweight="bold")
     panel_label(ax_c, "c", x=-0.085, y=1.05)
     # family legend — placed OUTSIDE the plot to the right so bars stay clean

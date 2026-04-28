@@ -24,25 +24,16 @@ from _lf_style import apply_lf_style, COLORS, save_dual
 OUT = "/ibex/project/c2323/yousef/paper_neurips26_final/figures/landmark"
 OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/landmark"
 
-JSON = "/ibex/project/c2323/yousef/reports/merge_multi_llm_eeg_results.json"
+JSON_NONQWEN = "/ibex/project/c2323/yousef/reports/merge_multi_llm_eeg_results.json"
+JSON_QWEN3 = "/ibex/project/c2323/yousef/reports/merge_qwen3_eeg_results.json"
 
-# Hand-mapped display names (Qwen3.5 nomenclature; never Qwen2.5).
-DISPLAY = {
-    "qwen_0.5B":         "Qwen3.5-0.5B",
-    "qwen_1.5B":         "Qwen3.5-1.7B",
-    "qwen_3B":           "Qwen3.5-3B",
-    "qwen_7B":           "Qwen3.5-7B",
-    "qwen_14B":          "Qwen3.5-14B",
-    "qwen_32B":          "Qwen3.5-32B",
-    "qwen_72B":          "Qwen3.5-72B",
-    "qwen35_2B":         "Qwen3.5-2B",
-    "qwen14b_multillm":  "Qwen3.5-14B (alt)",
-    "qwen32b_multillm":  "Qwen3.5-32B (alt)",
+# Display labels for non-Qwen models taken from the broader bridge run.
+NONQWEN_DISPLAY = {
     "mistral_7B":        "Mistral-7B",
     "gemma_27B":         "Gemma-27B",
     "gemma4_31B":        "Gemma-4-31B (final L)",
     "bloom_560M":        "BLOOM-560M",
-    "phi2_3B":           "Phi-2-3B",
+    "phi2_3B":           "Phi-2-2.7B",
     "pythia_1.4B":       "Pythia-1.4B",
     "tinyllama_1B":      "TinyLlama-1.1B",
     "llama4_scout":      "Llama-4-Scout-17B",
@@ -72,24 +63,43 @@ def tier_color(rb):
 
 def main():
     apply_lf_style()
-    with open(JSON) as f:
-        data = json.load(f)
-
     rows = []
-    for llm in data["per_llm"]:
-        name = llm["name"]
+
+    # Qwen3 family from the new dedicated bridge run
+    with open(JSON_QWEN3) as fq:
+        qdata = json.load(fq)
+    for llm in qdata["per_llm"]:
+        name = llm["name"]                      # already "Qwen3-0.6B" etc.
         r_eeg = llm.get("r_vs_eeg_pred", {}).get("r")
         r_beh = llm.get("r_vs_behav_valence", {}).get("r")
         if r_eeg is None or r_beh is None:
             continue
         rows.append({
             "name": name,
-            "label": DISPLAY.get(name, name),
+            "label": name,
             "r_eeg": float(r_eeg),
             "r_beh": float(r_beh),
         })
 
-    n_stim = data["meta"]["n_stim"]  # 28
+    # Non-Qwen models from the broader bridge run (skip every Qwen entry)
+    with open(JSON_NONQWEN) as fn:
+        ndata = json.load(fn)
+    for llm in ndata["per_llm"]:
+        name = llm["name"]
+        if name not in NONQWEN_DISPLAY:
+            continue                            # skip qwen_*, qwen35_2B, alts
+        r_eeg = llm.get("r_vs_eeg_pred", {}).get("r")
+        r_beh = llm.get("r_vs_behav_valence", {}).get("r")
+        if r_eeg is None or r_beh is None:
+            continue
+        rows.append({
+            "name": name,
+            "label": NONQWEN_DISPLAY[name],
+            "r_eeg": float(r_eeg),
+            "r_beh": float(r_beh),
+        })
+
+    n_stim = qdata["meta"]["n_stim"]  # 28
     for r in rows:
         r["eeg_lo"], r["eeg_hi"] = fisher_z_ci(r["r_eeg"], n_stim)
         r["beh_lo"], r["beh_hi"] = fisher_z_ci(r["r_beh"], n_stim)

@@ -1,333 +1,53 @@
 \section{Brain Topography of the Valence Axis}
 \label{sec:topography}
 
-This section localises the LLM-derived V-axis on the scalp, sharpens
-the population-level signal into an emotional-pole contrast, and
-documents an important Simpson's-paradox dynamic: the cohort signal at
-the fixed top-8 channels ($r{=}{+}0.02$) hides a per-subject mean of
-$-0.06$, while a per-subject best-channel oracle reaches
-$|r|{=}0.62$. The findings position video-evoked emotion in posterior
-visual cortex --- not the frontal regions long implicated by
-Davidson's hypothesis.
-
-\subsection{Posterior visual cortex, not frontal asymmetry}
-
-We compute V-axis encoding strength at every (channel, band) pair on
-FACED. Region-mean $|r|$:
-\begin{itemize}
-\item Occipital (Oz, O1, O2, POZ, PO3, PO4): $\overline{|r|} = 0.212$
-\item Parietal (P3, P4, P7, P8, PZ, CP1, CP2, CP5, CP6): $\overline{|r|} = 0.181$
-\item Central (C3, C4, CZ, FC1, FC2, FC5, FC6, T7, T8): $\overline{|r|} = 0.180$
-\item Frontal (FP1, FP2, FPZ, F3, F4, FZ, F7, F8): $\overline{|r|} = 0.162$
-\end{itemize}
-
-Top single (channel, band) cells are PO3/$\gamma$ ($r=+0.48$), F7/$\beta$
-($r=-0.47$), and O1/$\gamma$ ($r=+0.44$). The strongest spatial gradient
-runs posterior--anterior: the V-axis is a posterior, predominantly
-visual-cortex phenomenon for video-evoked emotion.
+\paragraph{Posterior visual cortex, not frontal asymmetry.}
+Region-mean $|r|$ at every (channel, band) pair on FACED: occipital
+(Oz, O1, O2, POZ, PO3, PO4) $\overline{|r|} = 0.212$; parietal $0.181$;
+central $0.180$; frontal (FP1, FP2, FPZ, F3, F4, FZ, F7, F8) $0.162$.
+Top single cells: PO3/$\gamma$ ($r{=}+0.48$), F7/$\beta$ ($-0.47$),
+O1/$\gamma$ ($+0.44$). The strongest spatial gradient runs
+posterior--anterior --- the V-axis is a predominantly visual-cortex
+phenomenon for video-evoked emotion (Figure~\ref{fig:topomap-5band}).
 
 \begin{figure}[ht]
 \centering
 \IfFileExists{figures/neuro/NF1_5band_topomaps.pdf}
-  {\includegraphics[width=\linewidth]{neuro/NF1_5band_topomaps.pdf}}
-  {\includegraphics[width=\linewidth]{F4_brain_topography.pdf}}
+  {\includegraphics[width=0.85\linewidth]{neuro/NF1_5band_topomaps.pdf}}
+  {\includegraphics[width=0.85\linewidth]{F4_brain_topography.pdf}}
 \caption[Brain topography]{\input{figures/F4_caption}}
 \label{fig:topomap-5band}
 \end{figure}
 
-\textbf{Davidson FAA replicates in direction, with smaller magnitude
-than posterior encoding.} Right-minus-left frontal-alpha asymmetry
-across the three canonical pairs is positive in our data, consistent
-with the direction predicted by Davidson:
-\begin{itemize}
-\item F4-F3 alpha: $+0.0062$
-\item F8-F7 alpha: $+0.0155$
-\item Fp2-Fp1 alpha: $+0.0116$
-\end{itemize}
-The largest single frontal asymmetry sits in the \emph{delta} band
-rather than alpha (Fp2-Fp1 delta: $+0.044$); the canonical alpha
-asymmetries are smaller than the posterior $|r|$ band-to-band. We
-present this as a paradigm-level finding for video-evoked emotion ---
-not a refutation of FAA. Davidson's hypothesis was developed for
-static-stimulus paradigms \citep{davidson1992anterior,coan2004frontal};
-the magnitude difference here may reflect the dynamic visual content
-of FACED video stimuli, which engages posterior visual cortex strongly
-and has not been the primary domain of FAA studies. Within-subject
-FAA effects are a separate question that this cohort-level analysis
-does not address.
+\paragraph{Davidson FAA replicates qualitatively.}
+Right-minus-left frontal-alpha asymmetry is positive in our data
+(F4-F3 $+0.0062$, F8-F7 $+0.0155$, Fp2-Fp1 $+0.0116$), consistent with
+Davidson's predicted direction; the largest single frontal asymmetry is
+Fp2-Fp1 \emph{delta} ($+0.044$). The canonical alpha asymmetries are
+smaller than the posterior $|r|$ band-to-band. This is a paradigm-level
+finding for video-evoked emotion, not a refutation of FAA: Davidson's
+hypothesis was developed for static-stimulus paradigms
+\citep{davidson1992anterior,coan2004frontal}; within-subject FAA
+effects are a separate question this cohort-level analysis does not
+address.
 
-\begin{figure}[ht]
-\centering
-\IfFileExists{figures/neuro/NF2_davidson_faa.pdf}
-  {\includegraphics[width=0.95\linewidth]{neuro/NF2_davidson_faa.pdf}}
-  {}
-\caption{Frontal-alpha asymmetry replicates in direction with smaller
-magnitude than posterior V-axis encoding for these video stimuli. (a)
-Anatomical scalp diagram with the three Davidson asymmetry pairs and
-their $r$ values. (b) Per-pair alpha and delta asymmetry bars. (c)
-Direct comparison to the occipital region-mean $|r|=0.21$, presented
-as a paradigm-level observation for video-evoked emotion. We do not
-claim a refutation of within-subject FAA effects.}
-\label{fig:davidson-faa}
-\end{figure}
+\paragraph{The cohort signal is a 9-stimulus emotional-pole contrast.}
+The cohort correlation is not a smooth gradient but an
+\emph{anger-versus-warm-positive} contrast carried by 9 clips: cohort
+$r{=}+0.870$ at PO3/$\gamma$ for Anger + Amusement + Tenderness, vs.\
+$r{=}-0.015$ for the remaining 19 mid-valence stimuli. Removing Anger
+alone shrinks cohort $r$ to $+0.327$ (32\% of the total). Anger-weighted
+$\{$5,3,3,1$\}$ analytically lifts the ceiling from $r=0.478$ to
+$r=0.714$ --- the strongest possible V-axis supervision target tested
+in Section~\ref{sec:saturation}.
 
-\subsection{The 9-stim emotional-pole contrast}
-
-A drop-class diagnostic reveals that the cohort EEG--LLM correlation is
-carried by a 9-stimulus subset:
-
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{lr}
-\toprule
-Stimulus subset (out of 28 FACED stimuli) & Cohort $r$ at PO3/$\gamma$ \\
-\midrule
-All 28 stimuli (full)            & $+0.478$ \\
-Anger only ($n{=}3$)             & not estimable \\
-Anger + Amusement + Tenderness ($n{=}9$)   & $+0.870$ \\
-Excluding Anger ($n{=}25$)              & $+0.327$ \\
-Excluding Anger + Amusement + Tenderness ($n{=}19$) & $-0.015$ \\
-\bottomrule
-\end{tabular}
-\caption{The cohort V-axis effect is essentially an
-\emph{anger-versus-warm-positive} contrast across nine stimuli; the 19
-mid-valence stimuli (Disgust, Fear, Sadness, Neutral, Inspiration, Joy)
-contribute zero signal.}
-\label{tab:anger-contrast}
-\end{table}
-
-The drop-class $\Delta$ tells us that removing Anger shrinks the cohort
-$r$ by $-0.151$ (32\% of the total). The next-largest contributors are
-Amusement ($-0.060$) and Tenderness ($-0.057$).
-
-\textbf{Analytical ceiling.} Weighting the stimuli to emphasise this
-9-stimulus contrast (weights $\{$Anger:5, Amus:3, Tend:3, others:1$\}$)
-analytically lifts the ceiling on the V-axis projection at PO3/$\gamma$
-from $r=0.478$ (uniform) to $r=0.714$. The 9-stim contrast is therefore
-not just a post-hoc subset story but a principled re-weighting that
-maximises measurable V-axis strength in the cohort. We use this
-weighting to construct the strongest theoretically possible V-axis
-supervision target in Section~\ref{sec:saturation}.
-
-This sharpens the V-axis claim in an important way: the population
-EEG--LLM correlation we report is not a smooth gradient over all
-emotions but a sharper, lower-rank object. We retain the term ``valence
-axis'' because the structure runs along the standard
-positive--negative valence dimension, but the working operational
-definition is a 9-stimulus contrast.
-
-\subsection{Simpson's paradox: cohort signal vs.\ per-subject signal}
-
-A reviewer-grade caveat: the cohort signal of $r=0.48$ at PO3/$\gamma$
-is a \emph{between-subject} effect, not a within-subject effect. We
-verified this directly:
-\begin{itemize}
-\item \textbf{Cohort $r$ at fixed top-8 channels}: $+0.021$
-\item \textbf{Mean per-subject $r$ at fixed top-8 channels}: $-0.062$
-\item \textbf{Per-subject best-channel oracle (1 cell)}: $\overline{|r|}=0.551$
-\item \textbf{Per-subject best (channel, band) oracle}: $\overline{|r|}=0.616$
-\end{itemize}
-
-Individual brains encode the V-axis on idiosyncratic (channel, band)
-cells; averaging across 123 subjects \emph{at fixed channels} produces
-the cohort signal. The all-band oracle ($|r|=0.616$) exceeds the
-cohort-fixed top-8 by $+0.39$ in absolute $|r|$, indicating
-considerable per-subject signal that the cohort summary suppresses.
-
-We frame this honestly in our claims: the V-axis is universal at the
-\emph{population} level on FACED video stimuli, with substantial
-inter-subject variability in topographic encoding. This is the
-Simpson's-paradox dynamic that Sani et~al.\ \citep{sani2024crosssubject}
-flag for cross-subject EEG-emotion modelling more broadly.
-Figure~\ref{fig:nine-stim-simpson} dissects the 9-stim contrast and
-the per-subject distribution side by side.
-
-\begin{figure}[ht]
-\centering
-\IfFileExists{figures/neuro/NF3_9stim_simpson.pdf}
-  {\includegraphics[width=\linewidth]{neuro/NF3_9stim_simpson.pdf}}
-  {}
-\caption{The cohort V-axis is a 9-stimulus contrast and a between-subject
-phenomenon. Top row: drop-class subset bars, per-emotion drop-$\Delta$,
-PO3/$\gamma$ stim-level scatter colour-coded by emotion. Bottom row:
-per-subject $r$ distribution at fixed top-8 channels (centred near 0,
-cohort line at $+0.02$); per-subject best-channel oracle distribution
-(centred at $|r|\approx 0.55$); summary callout.}
-\label{fig:nine-stim-simpson}
-\end{figure}
-
-\subsection{Functional connectivity of the V-axis network}
-
-The eight V-axis-aligned channels (PO3, F7, O1, P3, Oz, O2, P4, PO4)
-do not act as eight independent sources: they form a tight functional
-network in the gamma band. Pairwise $\gamma$-DE correlation at
-second resolution has mean off-diagonal $r = 0.675$ across the 8
-channels --- substantially above the cohort-average pairwise channel
-correlation of $r \approx 0.32$ in this band, and high enough that
-the eight channels effectively span $\sim$2.5 independent components
-(by participation-ratio analysis on the $8\!\times\!8$ correlation
-matrix). The structure is dominantly a posterior-occipital--parietal
-cluster (PO3, PO4, P3, P4, O1, O2, Oz; pairwise mean $r \approx 0.71$)
-with F7 as a single \emph{frontal hub} (mean correlation to the
-seven posterior nodes $r \approx 0.47$, lower but non-trivial).
-F7's auto-isolation in hierarchical clustering (Figure
-\ref{fig:vnet-connectivity}b) suggests it indexes a distinct
-fronto-temporal contribution to the V-axis signal that nonetheless
-co-varies tightly with the posterior network second-by-second within
-the 30-second clips. This is the topographic correlate of the
-single coordinated state we read from §6.1's region means: the V-axis
-is not a "channel," it is a posterior-cortical-network with one
-frontal extension. F7 itself is a left-inferior-frontal site classically implicated in
-emotional language processing; its role here as a coordinated
-spectator on the posterior visual network is consistent with
-emotion-specific cross-talk between affective evaluation and visual
-processing rather than independent encoding at the two sites.
-
-\begin{figure}[ht]
-\centering
-\IfFileExists{figures/neuro/NF5_connectivity.pdf}
-  {\includegraphics[width=0.95\linewidth]{neuro/NF5_connectivity.pdf}}
-  {}
-\caption{V-axis-aligned channels form a coordinated network with F7 as
-frontal hub. Left: scalp graph with the 8 V-axis channels as red nodes
-and edges weighted by pairwise $\gamma$-DE correlation. Right:
-hierarchically clustered $8\!\times\!8$ correlation matrix; F7
-auto-isolates as the frontal hub.}
-\label{fig:vnet-connectivity}
-\end{figure}
-
-\subsection{Mutual-information vs.\ linear correlation}
-
-A natural concern with linear correlation as a similarity metric is
-that it misses nonlinear structure. We tested for residual
-non-linearity directly. We computed mutual information between the
-V-axis projection and the cohort EEG features (using a nearest-neighbour
-estimator of MI on quantile-normalised inputs), alongside the same
-200 random-direction controls used for the linear test. The MI test
-gives $p_{\mathrm{MI}}=0.115$ (not significant), in contrast to the
-linear $p_r = 0.020$ (significant). Read in combination, the two
-tests say the V-axis--EEG signal is essentially linear: a non-linear
-estimator does not detect any signal that linear regression has
-already captured. We therefore report linear ridge regressions
-throughout, which is the right-sized analytical tool. We document
-the non-significant MI as a calibration caveat in
-Section~\ref{sec:discussion}: any future claim relying on
-non-linear V-axis structure (e.g.\ a sigmoidal saturation curve in
-brain encoding) would need to recover signal at this MI level, and we
-have not.
-
-\subsection{Time-resolved peaks: the Late Positive Potential analogue}
-
-The V-axis is not a static snapshot of the 30-second clip but
-a time-locked dynamical signature. Within-clip per-second cohort
-correlation reveals band-specific peak times that align cleanly with
-classical EEG affective-processing literature:
-
-\begin{itemize}
-\item \textbf{Alpha} ($8$--$13$\,Hz): peak at $t=21$\,s, cohort
-$r=0.40$; best individual stimulus $r=0.68$.
-\item \textbf{Beta} ($13$--$30$\,Hz): peak at $t=18$\,s, cohort
-$r=0.41$; best stim $r=0.62$.
-\item \textbf{Gamma} ($30$--$47$\,Hz): peak at $t=3$--$6$\,s, cohort
-$r=0.21$; best stim $r=0.61$.
-\item \textbf{Delta/Theta} ($0.5$--$8$\,Hz): peak at $t=12$\,s,
-cohort $r=0.18$.
-\end{itemize}
-
-\paragraph{Two distinct affective windows.}
-The structure is bimodal in time. The mid-late alpha/beta peak at
-$t=18$--$21$\,s falls cleanly within the Late Positive Potential
-(LPP) / sustained-attention window characterised by Hajcak \&
-Foti \citep{hajcak2010ofthelpp} and Codispoti et al.\
-\citep{codispoti2023arousal}: a slow, post-stimulus
-attention-allocation response that scales with affective intensity
-and is most reliably observed in centroparietal alpha/beta
-desynchronisation. The early gamma peak at $t=3$--$6$\,s aligns with
-M\"uller's right-hemisphere $\gamma$ bias for affective pictures
-\citep{muller1999gamma}, an early sensory-affective signal
-$\sim$200--500 ms after stimulus onset that has been linked to
-gamma-band binding during emotional encoding. The fact that the same
-LLM-derived V-axis recovers \emph{both} of these classically
-distinct windows from independent literature ---
-without any time-domain alignment in the extraction protocol --- is
-a non-trivial cross-validation of the V-axis as a dynamics-aware
-affective signal, not just a static cohort statistic.
-
-\paragraph{Per-subject peak timing is heterogeneous.}
-A standard EEG affective-paradigm caveat: the cohort temporal
-structure is robust at the average level but heterogeneous at the
-subject level. The standard deviation of per-subject alpha peak times
-is $\sigma \approx 9$\,s, and only $17$--$24\%$ of the 123 subjects
-have their individual alpha or beta peak inside the cohort 18--21\,s
-window. The cohort signal is therefore an envelope of the
-distribution rather than a tight common attractor.
-Figure~\ref{fig:time-resolved} dissects both: the full per-second
-cohort trace and the per-subject peak-time histogram. We read the
-combination as further evidence for the Simpson's-paradox dynamic
-of \S\ref{sec:topography}: the cohort-level time-resolved structure
-is real and statistically significant ($p < 10^{-4}$ at both alpha
-and beta peaks), but does not transfer to within-subject
-modelling. Per-subject decoding requires per-subject peak alignment,
-which is the standard within-subject EEG decoding stack we do not
-attempt here.
-
-\begin{figure}[ht]
-\centering
-\IfFileExists{figures/neuro/NF4_time_resolved.pdf}
-  {\includegraphics[width=0.95\linewidth]{neuro/NF4_time_resolved.pdf}}
-  {}
-\caption{Per-second cohort V-axis $|r|$ over the 30-second clip,
-across all five frequency bands. The mid-late $\alpha$/$\beta$ peak
-coincides with the LPP / sustained-attention window; the early
-$\gamma$ peak with M\"uller's affective-picture window.}
-\label{fig:time-resolved}
-\end{figure}
-
-\subsection{Theta-gamma coupling does \emph{not} mediate the V-axis}
-
-Theta-gamma cross-frequency coupling (CFC) has been proposed as a
-neural mechanism for emotional cognitive control, where slow theta
-phases gate gamma-band processing of emotionally significant content
-\citep{canolty2010cfc}. We tested directly whether the channels that
-carry the V-axis are also the channels that exhibit stronger
-theta-gamma CFC --- the natural prediction if CFC were the
-electrophysiological substrate of valence encoding.
-
-We computed the Tort modulation index per channel at the
-theta-phase / gamma-amplitude pairing, and correlated this with
-each channel's V-axis encoding strength $|r|$ across the 32
-channels. The result is unambiguously null: $\rho(\mathrm{PAC},
-\mathrm{V\text{-}axis\ }r) = +0.082$, $p=0.667$. (A naive
-proxy, computed without the strict Tort normalisation, gives
-$r=+0.20$, $p=0.30$ --- still not significant; the strict number
-is the conservative one.) Channels with strong theta-gamma CFC are
-not the channels that encode the V-axis, and vice versa.
-
-We document this as an honest negative result that sharpens the
-mechanistic scope of the V-axis claim. The V-axis is encoded as a
-direct linear projection of late-LM-style residual stream geometry
-onto channel-band DE features; it is \emph{not} mediated by the
-phase-amplitude coupling literature's preferred mechanism. Two
-non-mutually-exclusive readings: (i) theta-gamma CFC may index a
-distinct \emph{cognitive-control} aspect of emotional processing
-that is orthogonal to the dimensional valence dimension we measure
-here; or (ii) the cohort-averaged DE-band representation is too
-coarse to detect a CFC-V-axis relationship that exists at the
-single-trial or single-subject level. We do not try to distinguish
-these in this paper.
-
-\subsection{Summary}
-
-The LLM-derived V-axis lives predominantly in posterior visual cortex
-on FACED ($|r|_{\mathrm{occ}}=0.21$ vs.\ $|r|_{\mathrm{frontal}}=0.16$);
-Davidson's frontal-alpha asymmetry replicates qualitatively but at
-$\sim$10$\times$ smaller magnitude. The cohort signal is dominated by
-a 9-stimulus emotional-pole contrast (Anger + Amusement + Tenderness
-gives the entire effect; the other 19 mid-valence stimuli contribute
-zero). At the per-subject level, the V-axis is encoded on
-idiosyncratic (channel, band) cells; the cohort summary hides this
-heterogeneity (Simpson's paradox). Theta-gamma coupling is decoupled
-from V-axis encoding. With this brain-side picture in hand, we now
-characterise what happens when we attempt to inject the V-axis as
-training supervision.
+\paragraph{Caveats (Appendix~\ref{app:topography-deep-dive}).}
+\emph{Simpson's paradox}: cohort $r{=}0.48$ is between-subject;
+per-subject $r$ at those same channels is $-0.062$, oracle $|r|=0.616$
+\citep{sani2024crosssubject}. \emph{Time-resolved peaks} align with
+classical EEG markers --- $\alpha/\beta$ peak at $t{=}18$--$21$\,s in
+the LPP window
+\citep{hajcak2010ofthelpp,codispoti2023arousal}; early $\gamma$ at
+$t{=}3$--$6$\,s \citep{muller1999gamma}. \emph{Theta-gamma coupling
+does not mediate the V-axis}: $\rho(\mathrm{PAC}, \mathrm{V}r) =
++0.082$, $p=0.667$ \citep{canolty2010cfc}.

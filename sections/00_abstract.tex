@@ -1,55 +1,55 @@
 \begin{abstract}
 \textbf{Late-layer concept directions are not free real estate for
-supervision.} We show that once a network has absorbed a concept from
-task supervision alone, adding the same concept as an auxiliary loss
-is at best a no-op and at worst harmful --- a regularity we call
-\emph{saturation}. We discover and quantify saturation by studying
-the principal axis of human emotion (the \textbf{V-axis}, valence)
-across language models, human brains, and EEG emotion classifiers.
+supervision.} Once a network has absorbed a concept from task supervision
+alone, adding the same concept as an auxiliary loss is at best a no-op
+and at worst harmful --- a regularity we call \emph{saturation}. We
+discover and quantify saturation by studying the principal axis of human
+emotion (the \textbf{V-axis}, valence) across language models, human
+brains, and EEG emotion classifiers.
 
 The V-axis itself is universal: extracted from nine short emotion
-stories via PCA on language-model centroids, it is shared across 18
-LLMs (1.7B--72B parameters across the Qwen3.5 family plus Llama-3,
-Llama-4, Mistral, OLMo, Phi, Pythia, BLOOM, TinyLlama, and Gemma),
-recovers sentiment lexicons (NRC,
-Warriner) at $|r|\!\ge\!0.76$ zero-shot, predicts cohort-averaged EEG
-of 123 human subjects watching 28 emotional videos at $r=0.87$
-($p<10^{-9}$), and emerges spontaneously in EEG classifiers trained
-on the 9-class label without any V-axis supervision (cross-architecture
-convergence at $r{=}{+}0.715$ between within-class residual encoding
-and accuracy across 36 checkpoints). Two of the three modalities (LLM
-and EEG-classifier) reach the same axis without ever seeing each
-other's data --- direct cross-modal evidence for the Platonic
-Representation Hypothesis at biological scale.
+stories via PCA on language-model centroids, it is shared across 14 LLMs
+(560M--32B parameters across the Qwen3 family plus Llama-4, Mistral,
+Phi, Pythia, BLOOM, TinyLlama, and Gemma); a single Qwen3-4B run
+recovers sentiment benchmarks (SST-2 AUC $0.832$, IMDB $0.857$, Yelp
+$0.938$, TweetEval $0.927$) and word-valence lexicons (Hu \& Liu,
+Warriner) at $|r|\!\ge\!0.70$ zero-shot,
+predicts cohort-averaged EEG of 123 human subjects watching 28 emotional
+videos at $r=0.87$ ($p<10^{-9}$), and emerges spontaneously in EEG
+classifiers trained on the 9-class label without any V-axis supervision
+(class-PC1 $r{=}{+}0.885$, within-class residual $r{=}{+}0.738$ across
+36 checkpoints). LLMs and EEG classifiers reach the same axis without
+ever seeing each other's data --- direct cross-modal evidence for the
+Platonic Representation Hypothesis at biological scale.
 
 \textbf{Saturation.} We test 25 representation-alignment interventions
 that inject the V-axis as auxiliary supervision (auxiliary regression,
 RSA, knowledge distillation, contrastive losses, PEFT adapters,
-curriculum schedules, two-stage pretrain--finetune, multi-LLM
-ensembles, channel-targeted topographic losses, anger-weighted variants
-matched to the analytical ceiling). Above an empirically located
-saturation threshold, \emph{none help}: 13 produce statistically
-significant accuracy decrements ($\Delta\text{BACC} \le -0.013$,
-$p<0.05$) and five families exhibit \emph{monotonic} destruction with
-intervention strength. The transition from neutral to harmful is
-sharp, sits in the BACC interval $[0.62, 0.66]$ on FACED-9, and
-disappears at weak baselines (5-seed CBraMod $\Delta\!\in\![-0.005,
-+0.005]$, all $p>0.2$).
+curriculum schedules, pretrain--finetune, multi-LLM ensembles,
+channel-targeted topographic losses, anger-weighted variants matched to
+the analytical ceiling). Above an empirically located saturation
+threshold, \emph{none help}: 16 produce statistically significant
+accuracy decrements ($\Delta\text{BACC}\le-0.013$, $p<0.05$) and five
+families exhibit \emph{monotonic} destruction with intervention
+strength. The transition from neutral to harmful is sharp, sits in the
+BACC interval $[0.62, 0.66]$ on FACED-9, and disappears at weak
+baselines (CBraMod $\Delta\!\in\![-0.005, +0.005]$, all $p>0.2$).
 
-\textbf{Mechanism.} The within-class residual $|r|$ of an EEG
+\textbf{Mechanism and SOTA.} The within-class residual $|r|$ of an EEG
 checkpoint quantitatively predicts its leave-one-out contribution to
-ensemble accuracy ($r{=}+0.74$, $p{=}0.014$, $n{=}10$) --- a result
-we term the \emph{Residual Contribution Law}. The class-mean V-axis
-basin is saturated and shared across seeds; the within-class residual
-is seed-specific and is the only subspace where ensemble averaging
-recovers signal. We operationalise this into a new FACED 9-class SOTA:
-\textbf{0.6948 BACC ensemble} ($+21.5\%$ relative over CBraMod) and
-\textbf{0.6755 single-checkpoint} (val-selected).
-
-\emph{What this result is not.} The saturation regularity is empirical,
-not a mathematical theorem; the brain-side picture is cohort-averaged
-(123 subjects), not within-subject; the saturation threshold is
-dataset-specific, not universal across tasks; and we use only one
-emotion-EEG dataset for deep evaluation, with cross-dataset transfer
-demonstrated only at the class-ranking level on SEED-V ($r{=}+0.96$).
+ensemble accuracy ($r{=}{+}0.74$, $p{=}0.014$, $n{=}10$) --- the
+\emph{Residual Contribution Law}. A causal Arditi-style ablation of
+$v_{\mathrm{resid}}$ drops BACC well above a matched random-direction
+null on every checkpoint (mean $z\approx 7.7$, all $p<0.001$). The class-mean basin is
+saturated and shared; the within-class residual is seed-specific and is
+the only subspace where ensemble averaging recovers signal. This yields
+a new FACED 9-class SOTA: \textbf{0.6948 BACC ensemble} ($+21.5\%$
+relative over CBraMod) and \textbf{0.6755 single-checkpoint}
+(val-selected). \emph{What this is not}: an analytical theorem; a
+within-subject claim (cohort-averaged across 123 subjects); a universal
+threshold (FACED-specific). Cross-dataset replication on SEED-V is at
+the class-ranking level ($r{=}{+}0.96$) plus a parallel five-claim
+re-derivation (cohort $r{=}{+}0.62$, posterior dominance, cross-arch
+$r{=}{+}0.601$, saturation, and causal-ablation closure with mean
+$z{=}{+}23.6$).
 \end{abstract}

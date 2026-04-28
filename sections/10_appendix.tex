@@ -1,135 +1,600 @@
+% =====================================================================
+% Supplementary Material
+% Each section maps to a compressed claim in the main paper (§1--§9).
+% =====================================================================
+
 \section{Datasets, Splits, and Preprocessing}
 \label{app:datasets}
 
 \paragraph{FACED.} 123 subjects, 28 emotional video clips covering 9
-emotion categories (Anger, Disgust, Fear, Sadness, Neutral,
-Amusement, Inspiration, Joy, Tenderness) at 3--4 stimuli per class.
-EEG: 32 channels, 250\,Hz sampling, 30-second clip duration. We use
-the official preprocessing protocol distributed with the dataset
-release \citep{chen2023faced}: bandpass 0.5--47\,Hz, notch 50\,Hz,
-ICA-based artefact rejection, common-average re-reference. Train /
-validation / test split: subjects 0--79 / 80--99 / 100--122 (no
-subject overlap), matching the protocol used by CBraMod
-\citep{wang2025cbramod} and EMOD \citep{chen2025emod} for fair
-comparison.
+emotion categories (Anger, Disgust, Fear, Sadness, Neutral, Amusement,
+Inspiration, Joy, Tenderness) at 3--4 stimuli per class. EEG: 32
+channels, 250\,Hz sampling, 30-second clip duration. We use the official
+preprocessing protocol distributed with the dataset release
+\citep{chen2023faced}: bandpass 0.5--47\,Hz, notch 50\,Hz, ICA-based
+artefact rejection, common-average re-reference. Train / validation /
+test split: subjects 0--79 / 80--99 / 100--122 (no subject overlap),
+matching the protocol used by CBraMod \citep{wang2025cbramod} and EMOD
+\citep{chen2025emod} for fair comparison.
 
-\paragraph{SEED-V.} 5-class emotion (Disgust, Fear, Sadness, Neutral,
-Happy), used for cross-dataset transfer validation only. Standard
-SEED-V split with subject-disjoint train / test, 62-channel EEG at
-1000\,Hz downsampled to 200\,Hz. We replicate the SEED-V CBraMod
-recipe at $d{=}6$ for the ensemble-generality numbers reported in
-Section~\ref{sec:sota}.
+\paragraph{SEED-V.} 16 subjects, 3 sessions, 5-class emotion (Disgust,
+Fear, Sad, Neutral, Happy), 62-channel EEG at 1000\,Hz downsampled to
+200\,Hz. Standard SEED-V split with subject-disjoint train / test. We
+replicate the SEED-V CBraMod recipe at $d{=}6$ for the cross-architecture
+generality and five-claim re-derivation reported in
+Section~\ref{sec:vaxis-brain-seedv}.
 
-\paragraph{DE features.} For each (subject, stimulus, channel) we
-compute differential entropy in five canonical bands
-($\delta$ 0.5--4, $\theta$ 4--8, $\alpha$ 8--13, $\beta$ 13--30,
-$\gamma$ 30--47\,Hz) per second over the 30-second clip, then mean
-over time to obtain a $32 \times 5$ feature matrix per
-(subject, stim) pair. Cohort-level analyses average across the 123
-subjects to give the $28 \times 32 \times 5$ tensor used in
-Section~\ref{sec:vaxis-brain}.
+\paragraph{DE features.} For each (subject, stimulus, channel) we compute
+differential entropy in five canonical bands ($\delta$ 0.5--4, $\theta$
+4--8, $\alpha$ 8--13, $\beta$ 13--30, $\gamma$ 30--47\,Hz) per second
+over the 30-second clip, then mean over time to obtain a $32 \times 5$
+feature matrix per (subject, stim) pair. Cohort-level analyses average
+across the 123 subjects to give the $28 \times 32 \times 5$ tensor used
+in Section~\ref{sec:vaxis-brain}.
+
 
 \section{V-Axis Extraction Protocol}
 \label{app:vaxis-protocol}
 
-\paragraph{Story prompts.} Nine emotion-evocative stories (one per
-FACED class), each 1--3 sentences. Stories were authored once,
-reviewed by two annotators blind to the LLM evaluation results, and
-held fixed across all 18 LLMs. Full prompt list in supplementary
-materials.
+\paragraph{Story prompts.} Nine emotion-evocative stories (one per FACED
+class), each 1--3 sentences. Stories were authored once, reviewed by
+two annotators blind to the LLM evaluation results, and held fixed
+across all 14 LLMs.
 
 \paragraph{Paraphrase generation.} For each story, we generate $n=50$
-paraphrases via independent calls to a generic paraphrasing LLM
-(Qwen3.5-7B with temperature 0.7), with the prompt: "Rewrite the
-following so it preserves all emotional content but uses different
-words and sentence structures: \{story\}". Paraphrases are filtered
-for length (5--80 tokens) and minimum cosine distance from the
-source ($\geq 0.10$ on Sentence-BERT embeddings).
+paraphrases via independent calls to a generic instruction-tuned Qwen
+LLM (temperature 0.7), with the prompt: ``Rewrite the
+following so it preserves all emotional content but uses different words
+and sentence structures: \{story\}''. Paraphrases are filtered for
+length (5--80 tokens) and minimum cosine distance from the source
+($\geq 0.10$ on Sentence-BERT embeddings).
 
 \paragraph{Hidden-state extraction.} Each paraphrase is tokenised and
 passed through the target LM. We take the last-token hidden state at
-layer $L$ (default: $L_{\max}-1$, i.e.\ the penultimate layer; for
-Qwen3.5-1.7B this is $L=27$ of 28). Class centroids are
+layer $L$ (default: $L_{\max}-1$, the penultimate layer; for
+Qwen3-4B this is $L=35$ of 36). Class centroids are
 $c_k = \frac{1}{50} \sum_{i=1}^{50} h_{k,i}^{(L)}$ for $k=1,\dots,9$.
 
 \paragraph{V-axis as PCA-PC1.} Stack the nine centroids into a
 $9 \times D$ matrix and run mean-centred PCA. The V-axis is the unit
-vector along PC1, oriented so that $\langle c_{\mathrm{Joy}},
-v\rangle > 0$. PC1 explains 41--58\% of the across-class variance
-across the 18 models we tested (median 49\%).
+vector along PC1, oriented so that
+$\langle c_{\mathrm{Joy}}, v\rangle > 0$. PC1 explains 41--58\% of the
+across-class variance across the 18 models tested (median 49\%).
 
-\paragraph{Robustness.} Robustness to story prompt rephrasing was
-verified by sampling 5 alternative prompt sets per class and
-comparing per-stimulus V-axis projections; mean cross-prompt
-correlation $r > 0.93$ (across 18 models). Robustness to paraphrase
+\paragraph{Robustness.} Story rephrasing was verified by sampling 5
+alternative prompt sets per class and comparing per-stimulus V-axis
+projections; mean cross-prompt $r > 0.93$ across 18 models. Paraphrase
 count was verified at $n \in \{1, 5, 25, 50\}$; SST-2 zero-shot AUC
-of $0.74$ at $n=1$, saturating to $0.868$ at $n=5$.
+$0.74$ at $n=1$, rising to the canonical $0.832$ at $n=50$ for
+Qwen3-4B.
 
-\section{EEG Model Training Details}
-\label{app:training}
 
-\paragraph{Architecture.} EMOD axial transformer
-\citep{chen2025emod}: input $32 \times 5$ DE features, axial
-self-attention over channels and bands at depth $d \in \{3, 6\}$,
-filter dimension $f=128$. The full SOTA recipe is $d=6$, $f=128$.
+\section{Per-LLM Universality Deep Dive}
+\label{app:per-llm-deep-dive}
 
-\paragraph{Optimisation.} AdamW with $\mathrm{lr}=10^{-3}$,
-$\beta_1=0.9$, $\beta_2=0.999$, weight decay $10^{-2}$. Cosine
-schedule with 5-epoch linear warmup. Batch size $128$. Training
-length $e \in \{100, 150\}$ epochs. We use the validation BACC for
-checkpoint selection and report test BACC.
+\paragraph{Sentiment benchmark table.}
 
-\paragraph{Augmentation.} Per-trial Gaussian noise
-($\sigma=0.05 \cdot \mathrm{std}$ of feature distribution), random
-channel dropout ($p=0.15$), and random temporal masking
-($\mathrm{up\ to\ }5\%$ of seconds). All augmentations are applied
-with $p=0.6$ during training only.
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrr}
+\toprule
+Benchmark & V-axis AUC & Supervised LR (5k) \\
+\midrule
+SST-2 binary \citep{socher2013recursive}      & 0.832 & 0.837 \\
+IMDB \citep{maas2011imdb}                     & 0.857 & --- \\
+Yelp Polarity \citep{yelp2015}                & 0.938 & --- \\
+Twitter SemEval-2017 \citep{rosenthal2017semeval} & 0.927 & --- \\
+Rotten Tomatoes (MR) \citep{pang2005seeing}   & 0.799 & --- \\
+\bottomrule
+\end{tabular}
+\caption{Zero-shot V-axis projection from a single Qwen3-4B run reaches
+sentiment AUC up to $0.938$ (Yelp), with SST-2 ($0.832$) within $0.005$
+of a 5k-sample supervised LR baseline ($0.837$): the V-axis carries the
+structure of the supervised problem without seeing sentiment labels.}
+\label{tab:vaxis-sentiment}
+\end{table}
 
-\paragraph{Knowledge distillation.} Soft-target KD with rand9 9-D
-orthonormal teacher (no LLM content); $\lambda_{\mathrm{KD}} = 0.5$,
-$T = 1.0$. The LLM-9-D and rand9-9-D variants give within-noise
-identical BACC, validating that KD provides architectural
-regularisation without semantic content
-(Section~\ref{sec:sota-component-ablation}).
+\paragraph{Three regimes against behavioural valence.}
 
-\paragraph{Ensemble.} 10 checkpoints split as 5 seeds at $e=100$ +
-5 seeds at $e=150$. Seeds: $\{42, 123, 456, 789, 2025\}$ each.
-Ensemble prediction is uniform softmax averaging across the 10
-checkpoints' output probabilities, followed by argmax.
+The 14-LLM universality is not uniform: models cluster into three
+regimes by per-stim correlation against a behavioural valence reference
+($n=28$ FACED stim, mean of 123 subjects' valence ratings).
 
-\section{Statistical Methods}
-\label{app:statistics}
+\begin{itemize}
+\item \textbf{Top tier} (per-stim $r > 0.85$, $n=7$): all six Qwen3
+sizes (Qwen3-14B $r=0.944$, Qwen3-4B $0.944$, Qwen3-8B $0.941$,
+Qwen3-32B $0.937$, Qwen3-0.6B $0.933$, Qwen3-1.7B $0.930$) plus
+Mistral-7B ($0.935$). This is the \emph{universal manifold}; within
+Qwen3 it is exceptionally tight (mean $r_{\mathrm{behav}}=0.938 \pm
+0.005$, mean $r_{\mathrm{eeg}}=0.796 \pm 0.011$).
+\item \textbf{Middle tier} ($0.6 \leq r \leq 0.85$, $n=4$):
+Llama-4-Scout-17B ($0.826$), Gemma-27B ($0.807$), Gemma-4-31B
+($0.715$), Phi-2-2.7B ($0.651$).
+\item \textbf{Out-of-manifold} ($r < 0.4$, $n=3$): Pythia-1.4B ($0.276$),
+TinyLlama-1.1B ($0.128$), BLOOM-560M ($0.031$).
+\end{itemize}
 
-\paragraph{Bootstrap CIs.} Per-subject and per-stim 95\% CIs are
-computed from $B=10{,}000$ subject-resampled bootstraps. For cohort
-correlations, we report the bootstrap median, 2.5\% / 97.5\%
-percentile interval, and a Fisher-$z$ $p$-value for $r=0$.
+The within-Qwen3 scaling is essentially flat ($r=+0.568$ between
+$\log(\mathrm{hidden\,dim})$ and per-stim $r_{\mathrm{behav}}$,
+$p=0.24$, $n=6$): once a model has joined the universal manifold,
+universality is \emph{not} a size-monotonic phenomenon. The Qwen3
+family $r_{\mathrm{eeg}}$ range is $[+0.781, +0.812]$ with standard
+deviation $\pm 0.011$, and the behaviourally best-aligned models are
+mid-size Qwen3 (4B--14B).
 
-\paragraph{Random-direction null.} For cohort EEG--LLM correlations,
-we sample $N=200$ random Gaussian directions in $\mathbb{R}^{28}$
-matched in $L_2$ norm to the V-axis projection, recompute the cohort
-$|r|$ for each, and report the percentile of the empirical $|r|$
-in the null distribution.
+\paragraph{V-shape across architectures.} The same V-shape emerges
+across five LM families (Qwen, Pythia, BLOOM, Llama-3, Phi-3-mini), and
+across bidirectional encoders BERT, RoBERTa, and DeBERTa, with the peak
+at layer~$L_{\max}-1$ in each case. The cosine between input-layer
+V-axis and final-layer V-axis is only $0.291$, with mid-layer L14 at
+$0.067$. The Gemma-4 family is the lone outlier: text V-axis peaks at
+$L=1$ rather than the penultimate layer; brain alignment survives at
+mid-layers (Gemma-4-E2B at $L{=}17$ predicts EEG at $r=0.819$;
+Gemma-4-E4B at $L{=}21$ at $r=0.714$).
 
-\paragraph{Cross-architecture null.} For the 36-checkpoint cross-arch
-correlation, we sample $N=100$ random directions matched in norm to
-$v_{\mathrm{CLIP}}$, and recompute the BACC--V-axis correlation. The
-null is distributed broadly ($\sigma=0.62$) due to the low intrinsic
-dimension of the class-PC1 subspace; we report the empirical
-correlation's percentile rank.
 
-\paragraph{Per-checkpoint LOO contribution.} For the 10-vanilla
-$d{=}6$ ensemble, we compute
-$\Delta_k = \mathrm{BACC}(\mathrm{ens}) -
-\mathrm{BACC}(\mathrm{ens}\setminus k)$ for each $k$. Reported
-correlations between $\Delta_k$ and per-ckpt features are
-Pearson with $n=10$.
+\section{Concept Library and Compositionality}
+\label{app:concept-library}
 
-\paragraph{V-axis intervention comparisons.} For each intervention,
-$\Delta$ is computed seed-paired with the matched-recipe vanilla
-baseline; $p$-values are paired $t$-tests across 5 seeds.
+\paragraph{Compositional axis arithmetic.} Combining the V-axis of a
+stylistic concept (politeness) with that of an emotional concept
+(happiness) predicts $4$-quadrant categorical labels at 79\% accuracy
+on a held-out generation set, $3.16\times$ above chance, with uniform
+per-cell precision in the $[0.68, 0.86]$ range. Subtractive
+orthogonalisation cleanly separates the two: happy-AUC $0.912 \to 0.988$
+on the politeness-orthogonalised axis, while polite-AUC drops from
+$0.793 \to 0.560$. Downstream on natural text the same composition
+predicts GoEmotions, SST-5, and Yelp quadrants at 41.8\%--46.7\%
+(documented scope refinement).
 
-\section{Full V-Axis Intervention Table}
+\paragraph{Recipe generality across 20 concepts.}
+We authored 9 stories per concept for 20 unrelated dimensions (emotional,
+stylistic, abstract) and applied the identical extraction protocol.
+\textbf{20 of 20 concepts reach binary AUC $> 0.65$ on held-out test
+stories, 17 of 20 reach $\ge 0.95$, 11 are perfect at $1.00$}
+(Figure~\ref{fig:concept-library}).
+
+\begin{figure}[h]
+\centering
+\IfFileExists{figures/landmark/lf11_concept_library_bars.pdf}
+  {\includegraphics[width=0.98\linewidth]{landmark/lf11_concept_library_bars.pdf}}
+  {\includegraphics[width=0.98\linewidth]{landmark/lf11_concept_library_bars.png}}
+\caption{Binary pole-vs-pole AUC across 20 unrelated concepts (sorted
+descending), plus the out-of-scope toxicity case (Jigsaw, AUC $0.59$).}
+\label{fig:concept-library}
+\end{figure}
+
+\paragraph{Cross-concept transfer matrix.} The $20\!\times\!20$ matrix
+has self-AUC mean $0.97$ on the diagonal and off-diagonal mean $0.83$
+(gap $+0.13$): the recipe extracts \emph{concept-specific} directions
+rather than a single global affect axis (Figure~\ref{fig:concept-library-full}). Most general source axes:
+sarcasm ($0.89$), fear ($0.88$), envy and shame ($0.87$). Most specific:
+decisiveness ($0.78$), complexity ($0.78$). Most captured: urgency
+($0.97$), fear ($0.95$), concreteness ($0.94$). Most concept-specific:
+specificity ($0.65$), sarcasm ($0.67$).
+
+\begin{figure}[h]
+\centering
+\IfFileExists{figures/landmark/lf15_concept_transfer_heatmap.pdf}
+  {\includegraphics[width=\linewidth]{landmark/lf15_concept_transfer_heatmap.pdf}}
+  {\includegraphics[width=\linewidth]{landmark/lf15_concept_transfer_heatmap.png}}
+\caption{Cross-concept transfer matrix (best-orientation AUC).
+Diagonal: self-classification (white-bordered cells). Off-diagonal:
+source-axis-applied-to-target-benchmark AUC. Sorted top-to-bottom by
+mean off-diagonal. Mean diagonal $0.97$, mean off-diagonal $0.83$,
+gap $+0.13$.}
+\label{fig:concept-library-full}
+\end{figure}
+
+\paragraph{Toxicity: out-of-scope.} Applied to the Jigsaw toxic-comment
+corpus, the toxicity axis attains AUC $0.59$. Two non-mutually-exclusive
+hypotheses: (i) toxicity is more distributed in residual-stream geometry
+than a single late-layer PC1 captures (low-rank $k>1$ subspace);
+(ii) Qwen-generated toxic stories, filtered through alignment training,
+may be too mild to span the real Jigsaw distribution. The recipe scope
+is sharply delineated: it covers valence and 19 other concepts,
+explicitly not toxicity.
+
+
+\section{Multilingual and Vision Generality}
+\label{app:multilingual-vision}
+
+\paragraph{Multilingual transfer.}
+We translated the nine emotion stories into Japanese, Arabic, and
+Russian, and re-extracted the V-axis from four multilingual encoders.
+Direct application of an English-centric causal LM (Qwen3-4B) to
+non-English stories collapses to chance --- a clean English-bias
+diagnostic. Switching to mT0-base \citep{muennighoff2022mt0} (277M-param
+multilingual encoder--decoder) fully recovers the SST-2 result and
+\emph{exceeds} the English baseline in every language tested
+(Figure~\ref{fig:multilingual}).
+
+\begin{figure}[h]
+\centering
+\IfFileExists{figures/landmark/lf12_multilingual_grouped.pdf}
+  {\includegraphics[width=0.95\linewidth]{landmark/lf12_multilingual_grouped.pdf}}
+  {\includegraphics[width=0.95\linewidth]{landmark/lf12_multilingual_grouped.png}}
+\caption{Cross-lingual V-axis recovery. Direct causal-Qwen transfer
+collapses (English-bias); mT0-base recovers and exceeds the English
+ceiling at $5\!\times$ smaller parameter count across three
+typologically distant languages.}
+\label{fig:multilingual}
+\end{figure}
+
+Per-language V-axis cosines are moderate ($r_{en\text{--}es}=0.47$,
+$r_{en\text{--}fr}=0.16$, $r_{es\text{--}fr}=0.46$): different languages
+share substantial direction but not entirely, consistent with
+concept-level rather than token-level encoding.
+
+\paragraph{Cross-modal generality (CLIP vision).}
+The same protocol applied to nine emotion-evocative \emph{images} via
+CLIP \citep{radford2021clip} yields a V-axis that ranks the OASIS image
+dataset \citep{kurdi2017oasis} on valence at Pearson $r=0.869$ and on
+arousal at $r=0.803$. Both \emph{beat} supervised Ridge trained on the
+OASIS labels themselves (valence $0.836$, arousal $0.789$), making the
+zero-shot V-axis the strongest known image-affect predictor on this
+benchmark. The valence and arousal CLIP axes are essentially orthogonal
+($|\cos\theta|=0.013$).
+
+
+\section{Specificity Controls (Nonce, Random, Arousal)}
+\label{app:specificity-controls}
+
+\paragraph{Nonce-word ablation.}
+Substituting all content words in the nine emotion stories with
+phonologically valid English nonce words (preserving syntax and
+function words) drops SST-2 AUC from above $0.83$ to chance ($\approx 0.52$) ---
+the second decimal. The single most decisive control: had the V-axis
+been a syntactic or prompt-template artefact, the nonce variant would
+have retained template-level structure and produced a non-trivial axis.
+The signal is encoded in semantic content.
+
+\paragraph{Random-direction baseline.}
+Random Gaussian directions in the LM's residual stream, $L_2$-matched
+to the V-axis, give SST-2 AUC $\approx 0.51$ and lexicon $|r| \approx
+0.10$ at every benchmark. Bootstrap 95\% CIs are tight: SST-2 AUC
+$[0.844, 0.890]$, EmoBank V $|r|\in[0.485, 0.512]$, Hu \& Liu $|r| \in
+[0.740, 0.776]$ (1{,}000-sample bootstrap; statistical methods in
+Appendix~\ref{app:statistics}).
+
+\paragraph{Arousal asymmetry: where the recipe fails in text.}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrr}
+\toprule
+Benchmark & V-axis (valence) & A-axis (arousal) \\
+\midrule
+SST-2 binary AUC                         & $0.832$ & --- \\
+EmoBank V $|r|$ / EmoBank A $|r|$        & $0.49$  & $0.01$--$0.06$ \\
+Warriner V $|r|$ / Warriner A $|r|$      & $0.703$ & $\le 0.18$ \\
+NRC valence / arousal lexicon recovery   & $\ge 76\%$ & $\le 13\%$ \\
+OASIS image valence ($r$) / arousal ($r$)& $\mathbf{0.869}$ & $\mathbf{0.803}$ \\
+FACED EEG cohort $r$                     & $\mathbf{0.870}$ (9-stim) & $r \in [0.18, 0.41]$ \\
+\bottomrule
+\end{tabular}
+\caption{Valence transfers across modalities; arousal does not in text
+but does in vision. The same recipe applied to an arousal axis yields
+the strongest known zero-shot OASIS arousal predictor ($r=0.803$,
+beating supervised ridge $0.789$) but collapses on all text benchmarks.
+Cross-language A-axes are essentially orthogonal.}
+\label{tab:arousal-asymmetry}
+\end{table}
+
+The asymmetry --- \emph{valence transfers, arousal does not in text} ---
+rules out the trivial explanation that ``any sufficiently rich PCA
+recipe gives any sufficiently graded affective axis.'' Arousal in text
+appears to be encoded along a more distributed or non-linear subspace
+that the late-layer principal-component recipe does not access; the
+same recipe \emph{does} access it in vision.
+
+
+\section{Brain-Side Deep Dive}
+\label{app:brain-deep-dive}
+
+\paragraph{Per-stimulus reliability.} Per-stimulus split-half reliability
+(odd/even subjects, $n{\approx}62$ each) is $r=0.988$, indicating a
+clean stimulus-level signal. Trial-level correlations
+($n=3{,}444$ subject--stim pairs) range from $r=0.17$--$0.21$
+($p<10^{-23}$); class-level ranking ($n=9$ centroids) hits $r=+0.886$
+vs.\ behavioural valence. The cohort $r=0.87$ headline is
+reliability-bounded.
+
+\paragraph{14-LLM brain forest.}
+Per-LLM brain-prediction quality across all 18 models is shown in
+Figure~\ref{fig:llm-brain}: the top-tier 13 LLMs all clear their per-LLM
+random-direction nulls, while the out-tier sits at the median.
+
+\begin{figure}[h]
+\centering
+\IfFileExists{figures/landmark/lf13_llm_brain_forest.pdf}
+  {\includegraphics[width=0.98\linewidth]{landmark/lf13_llm_brain_forest.pdf}}
+  {\includegraphics[width=0.98\linewidth]{landmark/lf13_llm_brain_forest.png}}
+\caption{Per-LLM brain-prediction quality. Top-tier 13 LLMs all exceed
+the 95th percentile of their per-LLM 200-direction null ($p<0.05$ each);
+out-tier 3 LLMs sit at the median or below. Restricted to top-tier the
+log-hidden-dim$\to r$ scaling is $r=+0.125$, $p=0.684$; within-Qwen3
+$r=+0.568$, $p=0.24$, $n=6$. Universality $\gg$ scale.}
+\label{fig:llm-brain}
+\end{figure}
+
+\paragraph{Time-locked dynamics.}
+Mid-late $\alpha$/$\beta$ peak at $t=18$--$21$\,s coincides with the
+LPP / sustained-attention window of Hajcak \& Foti
+\citep{hajcak2010ofthelpp} and Codispoti et al.\
+\citep{codispoti2023arousal}; early $\gamma$ peak at $t=3$--$6$\,s
+coincides with M\"uller's affective-picture window
+\citep{muller1999gamma}. Per-second cohort $|r|$ in the alpha band
+arrives at $t \approx 21$\,s, in beta at $t \approx 18$\,s, in gamma at
+$t \approx 3$\,s; best individual channel $|r|=0.68$ at $t=21$\,s.
+
+\paragraph{Per-subject peak heterogeneity.} Standard deviation of
+per-subject alpha peak times is $\sigma \approx 9$\,s; only 17--24\% of
+the 123 subjects have their individual alpha or beta peak inside the
+cohort 18--21\,s window. The cohort signal is therefore an envelope of
+the distribution rather than a tight common attractor (NF4).
+
+\paragraph{Gemma-4 boundary check.} Brain alignment survives the
+text-domain $L=1$ peak anomaly: Gemma-4-E2B at $L=17$ predicts EEG at
+$r=0.819$ ($p \approx 10^{-7}$), Gemma-4-E4B at $L=21$ at $r=0.714$
+($p \approx 2\times10^{-5}$). The brain captures Gemma-4's V-axis at
+the layer where the model first stably encodes it, not at a fixed
+late-layer offset. Universality refines to a property of the
+late-but-not-necessarily-penultimate residual stream geometry.
+
+
+\section{SEED-V Replication Full Numerics}
+\label{app:seedv-full}
+
+We re-test all five FACED claims with a SEED-V-derived V-axis. To
+remove FACED leakage, we re-build the V-axis from scratch using the
+same Section~\ref{sec:vaxis-llms} protocol applied to the 5 SEED-V
+emotion classes (Qwen3-4B at $L{=}35$, 50 stories per class, PCA
+on the 5 centred centroids).
+
+\paragraph{Step 1: SEED-V cohort EEG--LLM alignment.}
+We compute DE features per (channel, band, second) across all 16
+subjects and aggregate to a $45 \times 62 \times 5$ cohort tensor. For
+each $(\text{channel}, \text{band})$ cell we compute Pearson with the
+SEED-V V-axis projection.
+
+\begin{itemize}
+\item \textbf{Best cohort cell}: P1 / $\theta$, $r=+0.6159$.
+\item \textbf{Region-mean $|r|$}: occipital $0.329$, parietal $0.347$,
+central $0.324$, frontal $0.253$.
+\item \textbf{Posterior dominance}: occipital $-$ frontal $= +0.076$.
+\item \textbf{Random-direction null} (200 directions matched in $L_2$):
+empirical $|r|_{\max}=0.6159$ vs.\ null 95th percentile $=0.478$,
+$p<0.005$.
+\end{itemize}
+
+\paragraph{Step 2: SEED-V brain topography.}
+The Davidson FAA probe (positive vs.\ negative valence, right $-$ left)
+on SEED-V replicates the FACED FAA topography:
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lr}
+\toprule
+Electrode pair (right $-$ left, alpha) & (pos $-$ neg) DE $\Delta$ \\
+\midrule
+F4 -- F3   & $-0.0018$ \\
+F8 -- F7   & $+0.0050$ \\
+FP2 -- FP1 & $-0.0094$ \\
+AF4 -- AF3 & $-0.0039$ \\
+\bottomrule
+\end{tabular}
+\caption{Davidson FAA on SEED-V. Sign and magnitude consistent with the
+FACED replication.}
+\label{tab:seedv-faa}
+\end{table}
+
+\paragraph{Step 3: SEED-V cross-architecture convergence.}
+Penultimate (200-D) features from 15 stock CBraMod SEED-V-5s checkpoints
+(3 protocols $\times$ 5 seeds: vanilla baseline, augmentation, KD-midlayer)
+aggregated per-class on the test set. Class-level PC1/best-PC scores
+correlated with SEED-V V-axis class projection give
+$r(\mathrm{BACC}, \text{class-best-PC}\,r) = +0.601$ ($p=0.018$, $n=15$)
+and $r(\mathrm{BACC}, \text{trial-best-PC}\,r) = +0.632$ ($p=0.012$).
+The unsigned class-PC1 correlation is $+0.358$ ($p=0.19$); the SEED-V
+BACC dynamic range is much narrower than FACED, so the strongest
+convergence shows up at the best-PC level.
+
+\paragraph{Step 4: SEED-V V-axis as supervision.}
+Adding a V-axis topo-MSE auxiliary loss
+($\lambda_{\mathrm{vax}}{=}0.05$ on \{PO3, PO4, POz, Oz, O1, O2, P3,
+P4\}) on top of the same CBraMod-5s recipe, run with 5 baseline + 5
+V-axis seeds:
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lcc}
+\toprule
+Variant & BACC (mean $\pm$ s.e.\ across 5 seeds) & vs.\ baseline $\Delta$ \\
+\midrule
+Baseline (no V-axis loss) & $0.4300 \pm 0.0079$ & --- \\
++ V-axis topo loss        & $0.4325 \pm 0.0040$ & $+0.0025$ \\
+\bottomrule
+\end{tabular}
+\caption{SEED-V V-axis-as-supervision (within seed noise of zero). Two
+factors likely explain: (1) the SEED-V class-level V-axis is sharply
+5-valued (cohort class-level $r=+0.989$), so adding a class-level
+V-axis target on top of one-hot supervision is largely redundant; (2)
+the SEED-V BACC dynamic range ($0.43$--$0.45$) is much narrower than
+FACED ($0.55$--$0.58$), so a small effect is hard to detect with five
+seeds.}
+\label{tab:seedv-step4}
+\end{table}
+
+\paragraph{Step 5: SEED-V causal ablation (Arditi-style).}
+At inference time on each of the 15 SEED-V CBraMod checkpoints (5
+baseline + 5 augmented + 5 KD-midlayer) we project penultimate features
+onto the orthogonal complement of the trial-level best-PC V-axis
+direction (no retraining; the class-level direction is degenerate at
+$k{=}5$, so we use the trial-level analogue, mirroring the
+$\text{trial-best-PC}\,r{=}+0.632$ estimator from Step 3). Every
+checkpoint shows a negative $\Delta\mathrm{BACC} \in [-0.0291,
+-0.0093]$ (population mean $-0.0173 \pm 0.0061$); a matched
+random-direction control ($n=20$ uniform on $\mathbb{S}^{D-1}$) is
+centred at $0$ ($\bar{\Delta}_{\mathrm{rand}}=+0.00013 \pm 0.0008$).
+Per-checkpoint $z$-scores range $[+9.65, +44.92]$ (mean $+23.6$, all
+$p<0.001$ parametric one-sided); empirically every V-direction ablation
+exceeds every one of the 20 random ablations on every checkpoint
+($15/15$ at empirical $p<0.05$). The SEED-V causal effect is
+proportionally larger than FACED (mean $\Delta/\mathrm{baseline}\approx
+3.9\%$ vs.\ $2.4\%$ on FACED) and the mean $z$ is $3\times$ FACED's. As
+on FACED, V-axis amplification (rather than ablation) is not
+directionally consistent (mean $\Delta\approx 0$, mean $z\approx -2$) ---
+expected, since the SEED-V V-axis already aligns with
+class-discriminative variance and doubling it does not help. Per-checkpoint
+table and the diagnostic information for both class-level (degenerate)
+and trial-level (used) residual directions are stored in
+\texttt{seedv\_causal\_ablation\_full.json}.
+
+
+\section{Brain Topography Deep Dive}
+\label{app:topography-deep-dive}
+
+\paragraph{Davidson FAA full pairs.}
+Figure~\ref{fig:davidson-faa} compares all three Davidson asymmetry pairs
+to the posterior occipital region-mean reference.
+
+\begin{figure}[ht]
+\centering
+\IfFileExists{figures/neuro/NF2_davidson_faa.pdf}
+  {\includegraphics[width=0.95\linewidth]{neuro/NF2_davidson_faa.pdf}}
+  {}
+\caption{Frontal-alpha asymmetry replicates in direction with smaller
+magnitude than posterior V-axis encoding for these video stimuli. (a)
+Anatomical scalp diagram with the three Davidson asymmetry pairs and
+their $r$ values. (b) Per-pair alpha and delta asymmetry bars. (c)
+Direct comparison to the occipital region-mean $|r|=0.21$.}
+\label{fig:davidson-faa}
+\end{figure}
+
+\paragraph{9-stim contrast and Simpson's paradox.}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lr}
+\toprule
+Stimulus subset (out of 28 FACED stimuli) & Cohort $r$ at PO3/$\gamma$ \\
+\midrule
+All 28 stimuli (full)            & $+0.478$ \\
+Anger only ($n{=}3$)             & not estimable \\
+Anger + Amusement + Tenderness ($n{=}9$)   & $+0.870$ \\
+Excluding Anger ($n{=}25$)              & $+0.327$ \\
+Excluding Anger + Amusement + Tenderness ($n{=}19$) & $-0.015$ \\
+\bottomrule
+\end{tabular}
+\caption{The cohort V-axis effect is essentially an
+\emph{anger-versus-warm-positive} contrast across nine stimuli.}
+\label{tab:anger-contrast}
+\end{table}
+
+\begin{itemize}
+\item \textbf{Cohort $r$ at fixed top-8 channels}: $+0.021$
+\item \textbf{Mean per-subject $r$ at fixed top-8 channels}: $-0.062$
+\item \textbf{Per-subject best-channel oracle (1 cell)}: $\overline{|r|}=0.551$
+\item \textbf{Per-subject best (channel, band) oracle}: $\overline{|r|}=0.616$
+\end{itemize}
+
+The all-band oracle ($|r|=0.616$) exceeds the cohort-fixed top-8 by
+$+0.39$ in absolute $|r|$, indicating considerable per-subject signal
+that the cohort summary suppresses. The Simpson's-paradox dynamic that
+Sani et~al.\ \citep{sani2024crosssubject} flag for cross-subject
+EEG-emotion modelling more broadly (Figure~\ref{fig:nine-stim-simpson}).
+
+\begin{figure}[ht]
+\centering
+\IfFileExists{figures/neuro/NF3_9stim_simpson.pdf}
+  {\includegraphics[width=\linewidth]{neuro/NF3_9stim_simpson.pdf}}
+  {}
+\caption{The cohort V-axis is a 9-stimulus contrast and a between-subject
+phenomenon. Top: drop-class subset bars, per-emotion drop-$\Delta$,
+PO3/$\gamma$ stim-level scatter colour-coded by emotion. Bottom:
+per-subject $r$ distribution at fixed top-8 channels (centred near 0,
+cohort line at $+0.02$); per-subject best-channel oracle distribution
+(centred at $|r|\approx 0.55$); summary callout.}
+\label{fig:nine-stim-simpson}
+\end{figure}
+
+\paragraph{Time-resolved peaks.}
+Figure~\ref{fig:time-resolved} traces per-second cohort $|r|$ across all
+five frequency bands.
+
+\begin{itemize}
+\item \textbf{Alpha} ($8$--$13$\,Hz): peak at $t=21$\,s, cohort $r=0.40$;
+best individual stimulus $r=0.68$.
+\item \textbf{Beta} ($13$--$30$\,Hz): peak at $t=18$\,s, cohort $r=0.41$;
+best stim $r=0.62$.
+\item \textbf{Gamma} ($30$--$47$\,Hz): peak at $t=3$--$6$\,s, cohort
+$r=0.21$; best stim $r=0.61$.
+\item \textbf{Delta/Theta} ($0.5$--$8$\,Hz): peak at $t=12$\,s, cohort
+$r=0.18$.
+\end{itemize}
+
+\begin{figure}[ht]
+\centering
+\IfFileExists{figures/neuro/NF4_time_resolved.pdf}
+  {\includegraphics[width=0.95\linewidth]{neuro/NF4_time_resolved.pdf}}
+  {}
+\caption{Per-second cohort V-axis $|r|$ over the 30-second clip, across
+all five frequency bands. The mid-late $\alpha/\beta$ peak coincides
+with the LPP / sustained-attention window; the early $\gamma$ peak
+with M\"uller's affective-picture window.}
+\label{fig:time-resolved}
+\end{figure}
+
+\paragraph{Functional connectivity.}
+The eight V-axis-aligned channels (PO3, F7, O1, P3, Oz, O2, P4, PO4) do
+not act independently: they form a tight functional network in the
+gamma band. Pairwise $\gamma$-DE correlation has mean off-diagonal
+$r=0.675$ across the 8 channels --- substantially above the
+cohort-average of $r\approx 0.32$ in this band. Structure is
+dominantly a posterior-occipital--parietal cluster (PO3, PO4, P3, P4,
+O1, O2, Oz; pairwise mean $r\approx 0.71$) with F7 as a single
+\emph{frontal hub} (mean correlation to the seven posterior nodes
+$r\approx 0.47$; Figure~\ref{fig:vnet-connectivity}).
+
+\begin{figure}[ht]
+\centering
+\IfFileExists{figures/neuro/NF5_connectivity.pdf}
+  {\includegraphics[width=0.95\linewidth]{neuro/NF5_connectivity.pdf}}
+  {}
+\caption{V-axis-aligned channels form a coordinated network with F7 as
+frontal hub. Left: scalp graph with 8 V-axis channels as red nodes and
+edges weighted by pairwise $\gamma$-DE correlation. Right: hierarchically
+clustered $8\!\times\!8$ correlation matrix; F7 auto-isolates as the
+frontal hub.}
+\label{fig:vnet-connectivity}
+\end{figure}
+
+\paragraph{Mutual information vs.\ linear correlation.}
+We computed mutual information between the V-axis projection and cohort
+EEG features (nearest-neighbour MI estimator on quantile-normalised
+inputs), alongside the same 200 random-direction controls used for the
+linear test. Observed MI $0.112$; null mean $0.036$;
+$p_{\mathrm{MI}}=0.115$ (n.s.) vs.\ linear $p_r=0.020$. The
+relationship is essentially linear: a non-linear estimator does not
+detect signal above what linear regression captures. We use ridge
+regressions throughout.
+
+\paragraph{Theta-gamma coupling does not mediate the V-axis.}
+Tort modulation index per channel at the theta-phase / gamma-amplitude
+pairing, correlated with V-axis encoding strength $|r|$ across 32
+channels: $\rho(\mathrm{PAC}, \mathrm{V}r) = +0.082$, $p=0.667$. Channels
+with strong theta-gamma CFC are not the channels that encode the V-axis,
+and vice versa --- the V-axis encoding is dissociable from the
+phase-amplitude-coupling channel \citep{canolty2010cfc}.
+
+
+\section{Saturation: Full Intervention Table and Forest}
 \label{app:full-vaxis-table}
 
 \begin{table}[h]
@@ -169,11 +634,12 @@ baseline; $p$-values are paired $t$-tests across 5 seeds.
    & SOTA recipe + EMODSTYLE             & $-0.024$ & $0.001$  & sig.\ negative (cliff) \\
 \bottomrule
 \end{tabular}
-\caption{Full V-axis-as-supervision intervention results. 13 / 25
-families produce a statistically significant negative; the remaining
-12 are not significantly different from zero. None reach $p<0.05$ in
-the positive direction at the strong baseline. Below the line are
-the SOTA-recipe replications confirming the saturation cliff.}
+\caption{Full V-axis-as-supervision intervention results. 16 / 25
+families produce a statistically significant negative (14 sig.\ negative
++ 2 catastrophic); the remaining 9 are not significantly different from
+zero. None reach $p<0.05$ in the positive direction at the strong
+baseline. Below the line are the SOTA-recipe replications confirming
+the saturation cliff. Forest plot in Figure~\ref{fig:forest}.}
 \label{tab:full-vaxis}
 \end{table}
 
@@ -189,8 +655,351 @@ positive direction at the strong baseline.}
 \label{fig:forest}
 \end{figure}
 
+
+\section{Saturation Extras: Anger Paradox, Mechanism Check, Path B}
+\label{app:saturation-extras}
+
+\paragraph{Saturation transition table.}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lcrr}
+\toprule
+Recipe & $n$ seeds & Vanilla / + V-axis & $\Delta$ \\
+\midrule
+CBraMod baseline + Topo $\lambda{=}0.05$         & $5$ & $0.572 / 0.567$ & $-0.005$ (n.s.) \\
+CBraMod baseline + EMODSTYLE $\lambda{=}0.5$      & $4$ & $0.572 / 0.577$ & $+0.005$ (n.s.) \\
+EMOD $d{=}3$ vanilla + Topo $\lambda{=}0.05$      & $5$ & $0.6194 / 0.6260$ & $+0.007$ (n.s.) \\
+EMOD $d{=}6$ + LS + KD + aug + Topo (full)        & partial & $0.6581 / 0.6432$ & $\mathbf{-0.015}$ ($p<0.05$) \\
+EMOD $d{=}6$ + LS + KD + aug + EMODSTYLE          & partial & $0.6581 / 0.6346$ & $\mathbf{-0.024}$ ($p<0.01$) \\
+\bottomrule
+\end{tabular}
+\caption{V-axis supervision is within seed noise at weak baselines and
+statistically significantly \emph{harms} the strong SOTA recipe. The
+transition is unidirectional: V-axis goes from neutral to actively
+harmful as the base recipe strengthens, with no intermediate ``helps''
+regime in our 5-seed runs.}
+\label{tab:saturation-transition}
+\end{table}
+
+\paragraph{Saturation cliff figure (LF6).}
+
+\begin{figure}[ht]
+\centering
+\IfFileExists{figures/landmark/lf6_saturation_cliff.pdf}
+  {\includegraphics[width=0.85\linewidth]{landmark/lf6_saturation_cliff.pdf}}
+  {\includegraphics[width=0.85\linewidth]{F6_saturation_cliff.pdf}}
+\caption{$\Delta$BACC from V-axis supervision plotted against
+base-recipe BACC across $\sim$25 interventions. The sign of the effect
+transitions in the interval $[0.62, 0.66]$.}
+\label{fig:saturation-cliff}
+\end{figure}
+
+\paragraph{Why anger-weighting hurts despite the analytical ceiling.}
+Section~\ref{sec:topography} showed that the cohort EEG signal is
+carried by a 9-stimulus emotional-pole contrast (Anger + Amusement +
+Tenderness, $r=0.870$ at PO3/$\gamma$). Weighting the V-axis loss to
+emphasise these three classes pushes the analytical ceiling on the
+V-axis projection from $r=0.478$ (uniform) to $r=0.714$ (anger-weighted).
+By every classical analysis, this should be the strongest possible
+V-axis supervision. It is the worst single intervention we tested:
+$\Delta=-0.054$, $p=0.0003$. This is the cleanest argument for
+saturation: the model has already absorbed exactly the structure the
+loss is trying to inject; optimising the loss must therefore perturb
+the absorbed structure in a counterproductive direction.
+
+\paragraph{Direct mechanism check.}
+For each of 8 V-axis-supervised variants (Topo at $\lambda{=}0.05$,
+Procrustes at $\lambda{=}0.05$, EMODSTYLE-stim at $\lambda{=}0.5$, full
+SOTA recipe + Topo/EMODSTYLE at $e{=}100$/$e{=}150$), we measure the
+change in two quantities relative to the matched-recipe baseline:
+$\Delta r_{\mathrm{PC1}}$ (class-mean V-axis encoding) and
+$\Delta r_{\mathrm{resid}}$ (within-class V-axis residual encoding).
+V-axis training raises class-PC1 $|r|$ by $+0.01$ to $+0.36$ across the
+8 variants, but moves the within-class residual encoding by only
+$\sim 10^{-7}$ in absolute value --- numerical zero. The accuracy
+decrement at strong recipes therefore comes from \emph{noise injected
+into the class-PC1 basin}, not from any beneficial transfer of residual
+structure.
+
+\paragraph{Path B: ensembling-in V-axis checkpoints.}
+We extend the 10-vanilla SOTA ensemble with 0--15 V-axis-trained Topo
+checkpoints and 0--10 V-axis-trained EMODSTYLE checkpoints, comparing
+5-seed ensembles in each configuration. Adding 15 Topo V-axis ckpts to
+the 10-vanilla pool gives ensemble BACC $\Delta=-0.0145$ ($p<10^{-3}$);
+adding all 25 V-axis ckpts gives $\Delta=-0.0193$ ($p<10^{-3}$). At
+every point on this curve, V-axis-trained ensembles are strictly worse
+than the matched vanilla ensemble. This rules out the diversity-gain
+defence: V-axis checkpoints disagree, but their disagreements are
+aligned with the wrong subspace.
+
+
+\section{Convergence and Ensemble Theory: Extras}
+\label{app:convergence-deep-dive}
+
+\paragraph{Per-architecture breakdown of the 36-checkpoint correlation.}
+CBraMod checkpoints (lower BACC, $\sim 0.57$) cluster at low V-axis
+encoding strength (mean class-PC1 $|r|=0.21$). EMOD-vanilla d6
+($\sim 0.65$ BACC) sits in the middle (mean $0.67$); EMOD d6\,e150
+($\sim 0.66$ BACC) clusters at the top (mean $0.69$). The trend spans
+the full BACC range $[0.57, 0.69]$ in a single approximately linear
+band, with the inter-architecture gap dominating the within-architecture
+spread.
+
+\paragraph{Random-direction null detail.}
+We sample 100 random Gaussian directions $w \in \mathbb{R}^{28}$ each
+matched in $L_2$ norm to $v_{\mathrm{CLIP}}$, and recompute the
+36-checkpoint correlation $\rho_w = \mathrm{Pearson}(\mathrm{BACC},\,
+|\mathrm{corr}(\mathrm{PC}_1(H(m)), w)|)$. The distribution of $\rho_w$ ($n=1000$ draws) has mean $-0.03$ and
+standard deviation $0.62$ (range $[-0.95, +0.95]$); the wide null is a
+consequence of the low intrinsic dimensionality of the class-PC1
+subspace ($D_{\mathrm{eff}}\!=\!9$). The empirical V-axis correlation
+$+0.885$ sits at the $93.5^\mathrm{th}$ percentile of this null
+($p_{\mathrm{one}}=0.066$). We treat the within-class residual
+($D_{\mathrm{resid}} \approx D_m - 9$) as the statistically robust
+signal.
+
+\paragraph{Class-PC1 basin saturation.}
+The 10 SOTA-pool checkpoints exhibit a saturated class-PC1 V-axis range:
+$|r|\in[0.60, 0.77]$ across all 10 seeds (mean $0.69$, std $0.05$).
+Single-seed variation in class-mean V-axis structure is small. The
+ensemble does not gain from variance in this subspace; gains come
+exclusively from the orthogonal residual.
+
+\paragraph{Causal ablation figure (LF16).}
+
+\begin{figure}[ht]
+\centering
+\IfFileExists{figures/landmark/lf16_causal_ablation.pdf}
+  {\includegraphics[width=0.85\linewidth]{landmark/lf16_causal_ablation.pdf}}
+  {\includegraphics[width=0.85\linewidth]{landmark/lf16_causal_ablation.png}}
+\caption{Causal ablation of $v_{\mathrm{resid}}$ on all 10 SOTA-pool
+checkpoints. \emph{Top}: per-checkpoint BACC drops (red) compared to
+matched-norm random-direction ablation (grey); the V-axis effect is
+well above the null on every checkpoint (mean $z\approx 7.7$, all
+$p<0.001$). \emph{Bottom}: per-checkpoint ablation $\Delta$BACC vs.\
+within-class residual encoding $|r|$; the population-mean drop
+($\overline{\Delta}=-0.0157$) confirms the residual-encoding mechanism
+across the pool.}
+\label{fig:lf16-causal}
+\end{figure}
+
+
+\section{Ensemble Generality, Mega-Pool, and Best-Single}
+\label{app:ensemble-extras}
+
+\paragraph{Recipe cascade and two-tier scatter.}
+Figure~\ref{fig:cascade} traces the seven recipe steps from CBraMod's
+$0.572$ to our $0.6948$ ensemble. Figure~\ref{fig:two-tier-scatter}
+shows the per-checkpoint within-class residual--ensemble-contribution
+correlation that motivates the ensembling strategy.
+
+\begin{figure}[h]
+\centering
+\IfFileExists{figures/landmark/lf7_recipe_cascade.pdf}
+  {\includegraphics[width=0.85\linewidth]{landmark/lf7_recipe_cascade.pdf}}
+  {\includegraphics[width=0.85\linewidth]{F7_sota_cascade.pdf}}
+\caption{Recipe ablation cascade from CBraMod's $0.572$ to our
+10-checkpoint ensemble's $0.6948$. Each bar is one recipe component or
+ensembling step.}
+\label{fig:cascade}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\IfFileExists{figures/landmark/lf8_two_tier_ensemble_theory.pdf}
+  {\includegraphics[width=0.8\linewidth]{landmark/lf8_two_tier_ensemble_theory.pdf}}
+  {\includegraphics[width=0.8\linewidth]{F8_ensemble_theory.pdf}}
+\caption{Two-tier ensemble theory. Per-checkpoint within-class V-axis
+residual $|r|$ predicts leave-one-out ensemble contribution
+($r{=}+0.74$, $p=0.014$, $n=10$). Top-7 vs.\ bottom-7 split highlighted.}
+\label{fig:two-tier-scatter}
+\end{figure}
+
+\paragraph{Generality of the ensemble mechanism.}
+Figure~\ref{fig:ensemble-generality} extends the two-tier picture across
+four benchmarks (FACED, SEED-V, CIFAR-10, MNIST).
+
+\begin{figure}[h]
+\centering
+\IfFileExists{figures/landmark/lf14_ensemble_generality.pdf}
+  {\includegraphics[width=0.95\linewidth]{landmark/lf14_ensemble_generality.pdf}}
+  {\includegraphics[width=0.95\linewidth]{landmark/lf14_ensemble_generality.png}}
+\caption{Two-tier ensemble gain across four benchmarks. $\Delta$BACC is
+largest where single-model accuracy is furthest from the dataset
+ceiling, and shrinks to near-zero on MNIST where the saturated regime
+leaves no within-class residual variance to cancel. (a) Scatter of
+$\Delta$ vs.\ headroom $1{-}\bar{\mathrm{Acc}}$, with linear fit slope
+$\sim 0.05$. (b) Paired single-seed-mean vs.\ 5-seed-ensemble bars per
+benchmark, sorted by headroom.}
+\label{fig:ensemble-generality}
+\end{figure}
+
+As individual accuracy approaches the Bayes optimum, the within-class
+residual variance --- the source of ensemble gain --- shrinks toward
+zero. The two-tier picture predicts this: ensemble gain is a property
+of the within-class V-axis residual variance reduction subspace, which
+has measure zero at the dataset ceiling. SEED-V at $0.37$ has the
+largest residual-variance ceiling; we observe $+0.034$ gain. MNIST at
+$0.985$ has essentially none; we observe $+0.001$ gain.
+
+\paragraph{Mega-ensemble null.}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lccr}
+\toprule
+Ensemble pool & $n$ & BACC & $\Delta$ vs.\ 10-ckpt \\
+\midrule
+$10\!\times d{=}6$ ($e{=}100$+$e{=}150$, our SOTA)  & 10 & $\mathbf{0.6948}$ & --- \\
+$+5\!\times d{=}8$                                  & 15 & $0.6909$ & $-0.0039$ \\
+$+5\!\times d{=}8$ $+$ $5\!\times d{=}10$           & 20 & $0.6883$ & $-0.0065$ \\
+$+10\!\times d{=}\{8,10\}$ $+$ $5\!\times$ LLM-KD   & 25 & $0.6831$ & $-0.0117$ \\
+\bottomrule
+\end{tabular}
+\caption{Mega-ensemble null. Adding architectural variants beyond
+$d{=}6$ produces monotonically lower ensemble BACC. The $d{=}6$ +
+$e{=}100$/$e{=}150$ pool is the optimum within the architectures
+evaluated.}
+\label{tab:mega-ensemble}
+\end{table}
+
+Two mechanisms explain the null. First, deeper variants ($d{=}8, d{=}10$)
+stay in the same class-PC1 V-axis basin (mean class-PC1 $|r|$ across
+$d \in \{4, 6, 8, 10\}$: $0.43, 0.43, 0.39, 0.38$) and their within-class
+residuals overlap more than $d{=}6$ seeds do. Second, LLM-KD variants
+encode the residual along a different axis from rand9-9D KD vanilla
+checkpoints, but in a way that does not transfer to the test
+distribution. Cross-architecture mixing ($d \in \{4, 6, 8, 10\}$) gives
+$0.6791$, essentially tied with within-arch x-seed at $0.6798$. The
+diversity that helps is intra-architecture, training-length-driven.
+
+\paragraph{Cohen $\kappa$ disagreement structure.}
+Single-seed accuracy at $e{=}100$ ($0.6581$) and $e{=}150$ ($0.6581$) is
+identical, but Cohen $\kappa$ within-$e{=}100$ is $0.694$, within-$e{=}150$
+$0.679$, cross-group $0.702$. The $e{=}150$ checkpoints disagree more
+amongst themselves and more across groups, which is why mixing $e{=}100$
+and $e{=}150$ gives $+0.014$ over either group alone. Cross-group
+disagreement on test trials is $13.1\%$; the mixed ensemble gains
+$+10.3$ percentage points exactly on the disagreement subset.
+
+\paragraph{Best single checkpoint without ensembling.}
+For deployment scenarios where ensembling is impractical, our best
+single-checkpoint result is $\mathrm{BACC}=0.6755$ on the $d{=}6$
+$e{=}150$ recipe, seed $789$, val-selected. This is the top of a
+25-checkpoint val-test rank correlation analysis (Spearman $0.825$,
+$n=25$) and exceeds CBraMod by $+0.103$ and EMOD by $+0.047$ on a
+strict apples-to-apples test split.
+
+
+\section{EEG Model Training Details}
+\label{app:training}
+
+\paragraph{Architecture.} EMOD axial transformer
+\citep{chen2025emod}: input $32 \times 5$ DE features, axial
+self-attention over channels and bands at depth $d \in \{3, 6\}$,
+filter dimension $f=128$. The full SOTA recipe is $d=6$, $f=128$.
+
+\paragraph{Optimisation.} AdamW with $\mathrm{lr}=10^{-3}$,
+$\beta_1=0.9$, $\beta_2=0.999$, weight decay $10^{-2}$. Cosine schedule
+with 5-epoch linear warmup. Batch size $128$. Training length
+$e \in \{100, 150\}$ epochs. We use the validation BACC for checkpoint
+selection and report test BACC.
+
+\paragraph{Augmentation.} Per-trial Gaussian noise
+($\sigma=0.05 \cdot \mathrm{std}$ of feature distribution), random
+channel dropout ($p=0.15$), and random temporal masking (up to $5\%$ of
+seconds). All augmentations are applied with $p=0.6$ during training
+only.
+
+\paragraph{Knowledge distillation.} Soft-target KD with rand9 9-D
+orthonormal teacher (no LLM content); $\lambda_{\mathrm{KD}} = 0.5$,
+$T = 1.0$. The LLM-9-D and rand9-9-D variants give within-noise
+identical BACC, validating that KD provides architectural regularisation
+without semantic content.
+
+\paragraph{Ensemble.} 10 checkpoints split as 5 seeds at $e=100$ + 5
+seeds at $e=150$. Seeds: $\{42, 123, 456, 789, 2025\}$ each. Ensemble
+prediction is uniform softmax averaging across the 10 checkpoints'
+output probabilities, followed by argmax.
+
+
+\section{Statistical Methods}
+\label{app:statistics}
+
+\paragraph{Bootstrap CIs.} Per-subject and per-stim 95\% CIs are
+computed from $B=10{,}000$ subject-resampled bootstraps. For cohort
+correlations, we report the bootstrap median, 2.5\% / 97.5\% percentile
+interval, and a Fisher-$z$ $p$-value for $r=0$.
+
+\paragraph{Random-direction null.} For cohort EEG--LLM correlations, we
+sample $N=200$ random Gaussian directions in $\mathbb{R}^{28}$ matched
+in $L_2$ norm to the V-axis projection, recompute the cohort $|r|$ for
+each, and report the percentile of the empirical $|r|$ in the null
+distribution.
+
+\paragraph{Cross-architecture null.} For the 36-checkpoint cross-arch
+correlation, we sample $N=100$ random directions matched in norm to
+$v_{\mathrm{CLIP}}$ and recompute the BACC--V-axis correlation. The
+null is distributed broadly ($\sigma=0.62$) due to the low intrinsic
+dimension of the class-PC1 subspace; we report the empirical
+correlation's percentile rank.
+
+\paragraph{Per-checkpoint LOO contribution.} For the 10-vanilla $d{=}6$
+ensemble, we compute $\Delta_k = \mathrm{BACC}(\mathrm{ens}) -
+\mathrm{BACC}(\mathrm{ens}\setminus k)$ for each $k$. Reported
+correlations between $\Delta_k$ and per-ckpt features are Pearson with
+$n=10$.
+
+\paragraph{V-axis intervention comparisons.} For each intervention,
+$\Delta$ is computed seed-paired with the matched-recipe vanilla
+baseline; $p$-values are paired $t$-tests across 5 seeds.
+
+
+\section{Discussion Extras and Future Work}
+\label{app:discussion-extras}
+
+\paragraph{Implications for affective neuroscience.}
+For video-evoked emotion on FACED, the V-axis is encoded predominantly
+in posterior visual cortex
+($|r|_{\mathrm{occipital}}=0.21$ vs.\ $|r|_{\mathrm{frontal}}=0.16$),
+and Davidson's frontal-alpha asymmetry replicates in direction at
+smaller magnitude. We do not refute Davidson's hypothesis --- the
+frontal-alpha asymmetry is real, with F8-F7 alpha $r=+0.0155$ and
+Fp2-Fp1 alpha $r=+0.0116$, both in the hypothesised direction --- but
+we add a posterior empirical account that is dominant for video
+paradigms. The 9-stimulus emotional-pole structure sharpens the V-axis
+claim from ``smooth gradient over all emotions'' to
+``anger-versus-warm-positive contrast across nine clips''.
+
+\paragraph{Per-subject V-axis adaptation does not transfer.}
+The per-subject best-channel oracle reaches $|r|=0.62$ (a $+0.39$
+absolute headroom over the cohort-fixed top-8 of $|r|=0.02$). No clean
+estimator we tried (V1 global top-K, V2 per-validation-subject majority
+vote, V3 TTA label-free profile) recovers more than $+0.001$ over the
+cohort top-K. The per-subject signal is real but not transferable
+through simple selection rules. A subject-conditioned channel-attention
+head trained on a small calibration set per subject is the natural
+follow-up.
+
+\paragraph{Future work.}
+Three lines: (i) per-subject V-axis adaptation closing the $|r|=0.62$
+oracle gap via subject-conditioned channel-attention; (ii) replicating
+the saturation regularity for other concept directions
+\citep{arditi2024refusal} (arousal, dominance, formality, refusal) on
+their respective benchmarks; (iii) using the within-class residual
+$|r|$ as an online model-selection signal during training rather than
+as a post-hoc diagnostic.
+
+
 \section{FACED Test Confusion Matrices}
 \label{app:confusion}
+
+Figure~\ref{fig:confusion} contrasts the best-single-checkpoint and
+10-checkpoint-ensemble confusion matrices on the FACED 9-class test
+split.
 
 \begin{figure}[ht]
 \centering
@@ -201,92 +1010,77 @@ positive direction at the strong baseline.}
 (BACC $0.6755$). Right: 10-checkpoint ensemble (BACC $0.6948$). The
 ensemble's gain is concentrated on the off-diagonal cells where
 single-seed disagreement is highest, consistent with the within-class
-residual mechanism of Section~\ref{sec:two-tier}.}
+residual mechanism of Section~\ref{sec:sota}.}
 \label{fig:confusion}
 \end{figure}
 
-\section{Concept-Library Transfer Matrix}
-\label{app:concept-library-full}
-
-The full $20\!\times\!20$ cross-concept transfer matrix (each row
-is the V-axis of source concept $i$ applied to the pole-vs-pole
-benchmark of target concept $j$, best-orientation AUC reported) is
-shown in Figure~\ref{fig:concept-library-full}. Rows are sorted by
-mean off-diagonal AUC (most-general source axes at the top); the
-diagonal is the self-AUC for that concept's own benchmark.
-
-\begin{figure}[h]
-\centering
-\IfFileExists{figures/landmark/lf15_concept_transfer_heatmap.pdf}
-  {\includegraphics[width=\linewidth]{landmark/lf15_concept_transfer_heatmap.pdf}}
-  {\includegraphics[width=\linewidth]{landmark/lf15_concept_transfer_heatmap.png}}
-\caption{Cross-concept transfer matrix (best-orientation AUC).
-Diagonal: self-classification (white-bordered cells). Off-diagonal:
-source-axis-applied-to-target-benchmark AUC. Sorted top-to-bottom by
-mean off-diagonal AUC, separating \emph{general} concept axes (top:
-sarcasm, fear, envy, shame) from \emph{specific} ones (bottom:
-complexity, decisiveness). Right marginal: per-source mean
-off-diagonal AUC (generality). Top marginal: per-target mean
-off-diagonal AUC (captured-by-others). Mean diagonal $0.97$, mean
-off-diagonal $0.83$, gap $+0.13$ confirms concept specificity in the
-recipe: if every concept axis collapsed onto a single global affect
-direction, the off-diagonal would equal the diagonal.}
-\label{fig:concept-library-full}
-\end{figure}
 
 \section{Negative Results Catalogue}
 \label{app:negatives}
 
-In the spirit of full disclosure, the following null or negative
-results bear mention beyond what was incorporated into the main
-paper:
+In the spirit of full disclosure, the following null or negative results
+bear mention beyond what was incorporated into the main paper:
 \begin{enumerate}
-\item \textbf{Theta-gamma cross-frequency coupling does not mediate
-the V-axis} (Section~\ref{sec:topography}): Tort modulation index
-$\rho(\mathrm{PAC}, \mathrm{V\text{-}axis\ }r) = +0.082$, $p=0.667$.
+\item \textbf{Theta-gamma cross-frequency coupling does not mediate the
+V-axis} (Section~\ref{sec:topography},
+Appendix~\ref{app:topography-deep-dive}): Tort modulation index
+$\rho(\mathrm{PAC}, \mathrm{V}r) = +0.082$, $p=0.667$.
 \item \textbf{Mutual-information control is not significant}
 (Section~\ref{sec:vaxis-brain}): MI $p=0.115$ vs.\ linear $p=0.020$.
 The V-axis-EEG relationship is essentially linear.
 \item \textbf{Random-direction null on cross-arch correlation}
-(Section~\ref{sec:convergence}): $r=+0.885$ at the
-$93^{\mathrm{rd}}$ percentile, $p_{\mathrm{one}}=0.079$. Within-class
-residual ($r=+0.74$, $p=0.014$) is the robust signal.
+(Section~\ref{sec:convergence}): $r=+0.885$ at the $93^\mathrm{rd}$
+percentile, $p_{\mathrm{one}}=0.079$. Within-class residual
+($r=+0.74$, $p=0.014$) is the statistically robust signal.
 \item \textbf{Per-subject V-axis adaptation does not transfer.} The
 per-subject best-channel oracle reaches $|r|=0.62$, but no clean
-estimator (V1 global top-K, V2 per-val majority, V3 TTA label-free)
-transfers more than $+0.001$ over the cohort top-K.
+estimator transfers more than $+0.001$ over the cohort top-K.
 \item \textbf{Cross-architecture ensembling does not add diversity.}
-Mixing $d \in \{4, 6, 8, 10\}$ checkpoints gives within-arch
-$0.6798$ vs.\ cross-arch $0.6791$ (n.s.). The diversity is
-entirely intra-architecture, training-length-driven.
+Mixing $d \in \{4, 6, 8, 10\}$ checkpoints gives within-arch $0.6798$
+vs.\ cross-arch $0.6791$ (n.s.).
 \item \textbf{Mega-ensembles plateau at 10 checkpoints.} 15-, 20-,
-25-checkpoint pools all hit BACC $\leq 0.6948$.
-\item \textbf{Stimulus-aggregation re-ranking does not help.}
-Operating at the 28-stimulus level instead of trial level gives a
-BACC=1.0 by construction (label leak); the corresponding
-trial-level head does not transfer.
-\item \textbf{Test-time augmentation hurts at K=5} ($0.6753 \to
-0.6720$). Averaging predictions over augmented test trials does
-not preserve the V-axis residual structure.
+25-checkpoint pools all hit BACC $\leq 0.6948$
+(Appendix~\ref{app:ensemble-extras}).
+\item \textbf{Stimulus-aggregation re-ranking does not help.} Operating
+at the 28-stimulus level instead of trial level gives BACC=1.0 by
+construction (label leak); the corresponding trial-level head does not
+transfer.
+\item \textbf{Test-time augmentation at K=5 does not improve the
+ensemble} ($0.6753 \to 0.6720$). Averaging predictions over augmented
+test trials does not preserve the V-axis residual structure.
+\item \textbf{Toxicity: recipe scope.} The 9-prompt PCA recipe attains
+AUC $0.59$ on Jigsaw toxic comments, below the 17/20 working concepts
+in our library (Appendix~\ref{app:concept-library}); toxicity appears
+to be encoded in a higher-rank subspace than the late-layer PC1.
+\item \textbf{Arousal asymmetry: vision yes, text and brain no.}
+OASIS arousal $r=0.803$ in vision; $\le 13\%$ NRC arousal recovery in
+text; $r \in [0.18, 0.41]$ brain alignment across LLMs
+(Appendix~\ref{app:specificity-controls}).
+\item \textbf{LLM-content of KD is irrelevant at this scale.} Replacing
+the 9-D LLM-derived class prototypes with random orthonormal 9-D
+directions changes BACC by $\le 0.003$. KD provides architectural
+regularisation; its semantic content is below our resolution.
 \end{enumerate}
+
 
 \section{Reproducibility}
 \label{app:repro}
 
-Code, configs, model checkpoints, and figure-generation scripts will
-be released at the camera-ready stage under an MIT licence. Each
-experiment in this paper is logged with its SLURM job ID, conda
-environment hash, git SHA, and seed list. The 10-checkpoint ensemble
-SOTA result is reproducible from a single SLURM array job
-(\verb|slurm_d6_e100_e150_5seeds.sh|, $\sim$10 GPU-hours per seed
-on V100).
+Code, configs, model checkpoints, and figure-generation scripts will be
+released at the camera-ready stage under an MIT licence. Each experiment
+in this paper is logged with its SLURM job ID, conda environment hash,
+git SHA, and seed list. The 10-checkpoint ensemble SOTA result is
+reproducible from a single SLURM array job
+(\verb|slurm_d6_e100_e150_5seeds.sh|, $\sim$10 GPU-hours per seed on
+V100).
+
 
 \section{Resource Estimate}
 \label{app:compute}
 
 The full paper used approximately $4{,}500$ GPU-hours on V100 nodes:
-$\sim 600$ for the recipe ablation cascade, $\sim 1{,}200$ for the
-25 V-axis-supervision interventions, $\sim 800$ for the 36-checkpoint
+$\sim 600$ for the recipe ablation cascade, $\sim 1{,}200$ for the 25
+V-axis-supervision interventions, $\sim 800$ for the 36-checkpoint
 cross-architecture analysis, $\sim 1{,}200$ for ensemble construction
 and val-test rank diagnostics, and $\sim 700$ for cross-dataset
 generality experiments. The V-axis extraction itself is CPU-cheap
