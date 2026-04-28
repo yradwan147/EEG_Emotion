@@ -15,7 +15,7 @@ CBraMod \citep{wang2025cbramod}    & $0.572$  \\
 EmotionKD \citep{liu2023emotionkd} & $0.628$  \\
 EMOD \citep{chen2025emod}          & $0.6287$ \\
 \midrule
-EMOD + aug + KD + d6 (1 seed)      & $0.6581$ \\
+EMOD$+$aug$+$KD$+d{=}6$ (5-seed)   & $.658\!\pm\!.010$ \\
 \textbf{Best single (val-sel)}     & $\mathbf{0.6755}$ \\
 \textbf{10-ckpt ensemble (SOTA)}   & $\mathbf{0.6948}$ \\
 \bottomrule
@@ -28,14 +28,14 @@ EMOD + aug + KD + d6 (1 seed)      & $0.6581$ \\
 \toprule
 Recipe step & BACC & $\Delta$ \\
 \midrule
-EMOD ($d{=}3$, $f{=}128$) replication & $0.6194$ & --- \\
-$+$ augmentation                      & $0.6343$ & $+0.015$ \\
-$+$ aug $+$ KD                        & $0.6439$ & $+0.025^{*}$ \\
-$+$ depth doubling ($d{=}6$)          & $0.6581$ & $+0.014$ \\
-$+$ longer training ($e{=}150$)       & $0.6581$ & $0.000$ \\
+EMOD ($d{=}3$) replication            & $.619\!\pm\!.004$ & --- \\
+$+$ augmentation                      & $.634\!\pm\!.004$ & $+.015$ \\
+$+$ aug $+$ KD                        & $.644\!\pm\!.007$ & $+.025^{*}$ \\
+$+$ depth doubling ($d{=}6$)          & $.658\!\pm\!.007$ & $+.014$ \\
+$+$ longer training ($e{=}150$)       & $.658\!\pm\!.010$ & $.000$ \\
 \midrule
-5-seed e100 ensemble                  & $0.6798$ & $+0.022$ \\
-\textbf{10-ckpt e100$+$e150 (SOTA)}   & $\mathbf{0.6948}$ & $\mathbf{+0.037}$ \\
+5-seed e100 ensemble                  & $.6798$ & $+.022$ \\
+\textbf{10-ckpt e100$+$e150 (SOTA)}   & $\mathbf{.6948}$ & $\mathbf{+.037}$ \\
 \bottomrule
 \end{tabular}
 \subcaption*{(b) Recipe cascade ($^{*}$super-add., $p{=}3\!\times\!10^{-4}$).}
@@ -48,8 +48,9 @@ Appendix~\ref{app:ensemble-extras}.}
 \label{tab:sota}
 \end{table}
 
-The cascade starts from a faithful EMOD replication at $0.6194$ and
-walks up in six steps. Augmentation---temporal jitter, channel
+The cascade starts from an EMOD replication at $0.6194 \pm 0.004$ over
+five seeds---within seed noise of the published $0.6287$
+\citep{chen2025emod} ($\Delta=-0.009$, n.s.)---and walks up in six steps. Augmentation---temporal jitter, channel
 dropout, amplitude scaling, and Gaussian noise applied with
 $p{=}0.6$---contributes the largest single jump ($+0.0149$),
 reflecting the limited stimulus count per subject. Knowledge
@@ -68,10 +69,12 @@ The $10$ $d{=}6$ checkpoints share an \emph{identical} class-PC1 basin
 within-class residual ($r{=}{+}0.743$, $p{=}0.014$). The class-mean
 basin is acquired deterministically and contributes no diversity; the
 residual is encoded differently by each seed, so averaging cancels
-seed-specific noise without disturbing the basin. Mixing $e{=}100$
-and $e{=}150$ ties at $0.6581$ single-seed but provides the most
-ensemble-relevant diversity axis: the mixed $10$-checkpoint pool
-reaches $0.6948$ versus $0.6798$ for $e{=}100$ alone. The mechanism
+seed-specific noise without disturbing the basin. Mixing $e{=}100$ and $e{=}150$ ties at $0.6581 \pm 0.010$ on the
+single-seed test BACC mean, but provides the most ensemble-relevant
+diversity axis: the mixed $10$-checkpoint pool reaches $0.6948$
+versus $0.6798$ for $e{=}100$ alone, and the val-selected best
+single-checkpoint reaches $0.6755$ ($+0.017$ over the seed mean,
+within the $\pm 0.010$ seed-std). The mechanism
 generalises (Appendix~\ref{app:ensemble-extras}): $\Delta$BACC is
 monotonic in headroom (near zero on MNIST), mega-ensembles plateau at
 ten checkpoints ($\le 0.6948$), and cross-architecture mixing adds no

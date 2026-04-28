@@ -17,10 +17,12 @@ models converge on the same latent without sharing data. Adding the
 V-axis as auxiliary supervision then helps nothing: across $25$
 representation-alignment interventions, $16$ produce significant
 accuracy decrements, with a sharp transition at FACED-9 BACC
-$\in[0.62, 0.66]$. A causal ablation of the within-class V-axis
-residual drops accuracy on every checkpoint at mean $z{\approx}7.7$
-above a matched random-direction null, and per-checkpoint residual
-strength linearly predicts ensemble contribution. Combining the
+$\in[0.62, 0.66]$. An inference-time directional ablation of the
+within-class V-axis residual---the LLM-derived direction projected
+out of the classifier's penultimate features---drops accuracy on
+every checkpoint at mean $z{\approx}7.7$ above a matched
+random-direction null, and per-checkpoint residual strength predicts
+ensemble contribution at $r{=}{+}0.74$. Combining the
 saturated class-mean basin with seed-specific residual diversity
 yields a new FACED 9-class state of the art ($\mathbf{0.6948}$
 ensemble, $\mathbf{0.6755}$ single, $+21.5\%$ over CBraMod), and every

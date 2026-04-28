@@ -17,11 +17,12 @@ clearly stress-tests the FACED result. Across $15$ stock CBraMod
 SEED-V checkpoints, accuracy correlates with V-axis encoding strength
 at $r{=}{+}0.601$ ($p{=}0.018$)---a correlation built on a different
 EEG dataset, a different label space, and a different best cell, yet
-with the same sign and magnitude as FACED. The causal closure
-replicates harder still: ablating the V-axis residual direction at
-inference drops accuracy on every one of the $15$ checkpoints
-($\Delta\mathrm{BACC} \in [-0.029, -0.009]$, mean $-0.0173$) at mean
-$z{=}{+}23.6$ above a matched random-direction null---roughly three
-times the FACED effect, with no checkpoint surviving the null at
-$p<0.001$. Full Step 1--5 numerics, FAA bars, and per-checkpoint
+with the same sign and magnitude as FACED. The directional ablation
+replicates harder still: projecting the V-axis residual out of the
+penultimate features at inference time drops accuracy on every one
+of the $15$ checkpoints ($\Delta\mathrm{BACC} \in [-0.029, -0.009]$,
+mean $-0.0173$, equivalent to a $3.9\%$ relative drop on the
+$\sim 0.44$ baseline against $2.4\%$ on FACED), at mean $z{=}{+}23.6$
+above a matched random-direction null. No checkpoint survives the
+null at $p<0.001$, parametric one-sided. Full Step 1--5 numerics, FAA bars, and per-checkpoint
 details are in Appendix~\ref{app:seedv-full}.

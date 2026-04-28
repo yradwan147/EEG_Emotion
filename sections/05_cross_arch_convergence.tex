@@ -37,9 +37,12 @@ $f{=}128$ checkpoints used to build our SOTA ensemble, leave-one-out
 contributions
 $\Delta_k = \mathrm{BACC}(\mathrm{ens}) - \mathrm{BACC}(\mathrm{ens}\setminus k)$
 correlate with within-residual $|r|$ at $\mathbf{+0.743}$ ($p{=}0.014$,
-$n{=}10$); a top-$7$ ensemble reaches $\mathbf{0.6962}$ BACC versus a
-bottom-$7$ ensemble at $\mathbf{0.6829}$, a $+0.0133$ gap above a
-random-$7$ baseline ($z{=}{+}2.0$).
+$n{=}10$); leave-one-out drops give $r \in [+0.626, +0.795]$ across
+$10$ deletions and a $5000$-resample bootstrap places the slope at
+$\hat\beta = +0.74$ with a $95\%$ CI of $[+0.50, +0.92]$. A top-$7$
+ensemble reaches $\mathbf{0.6962}$ BACC versus a bottom-$7$ ensemble
+at $\mathbf{0.6829}$, a $+0.0133$ gap above a random-$7$ baseline
+($z{=}{+}2.0$).
 
 \begin{quote}
 \textbf{Residual Contribution Law.} \emph{For a saturated EEG
@@ -49,17 +52,19 @@ softmax-averaged ensemble scales linearly with $\rho_k$, with slope
 $\hat\beta = +0.74$ ($p{=}0.014$, $n{=}10$, FACED 9-class).}
 \end{quote}
 
-The Law is correlational; an Arditi-style causal
-intervention~\citep{arditi2024refusal} closes the loop. At inference
-time on each of the $10$ SOTA-pool checkpoints we project penultimate
-features onto the orthogonal complement of $v_{\mathrm{resid}}$
-without retraining. Residual ablation produces
+The Law is correlational. An Arditi-style directional
+ablation~\citep{arditi2024refusal} on the EEG classifier---projecting
+the LLM-derived $v_{\mathrm{resid}}$ out of the penultimate features
+at inference time, without retraining---tightens the link from
+correlation to representational dependence. On each of the $10$
+SOTA-pool checkpoints, the ablation produces
 $\Delta\mathrm{BACC}\in[-0.024, -0.006]$ (mean $-0.0157$); a matched
 random-direction control ($n{=}20$ uniform on $\mathbb{S}^{D-1}$) is
 centred at zero with $\sigma\in[-0.0006, +0.0032]$. Every checkpoint
 clears the null parametrically at $p<0.001$ (one-sided, mean
-$z\approx 7.7$), confirming that V-axis residual encoding is
-load-bearing across the pool. External V-axis loss therefore
-optimises the \emph{saturated} class-mean component while perturbing
-the \emph{useful} within-class residual---the prediction we test
-directly via $25$ interventions in \S\ref{sec:saturation}.
+$z\approx 7.7$), so the population-mean drop confirms that V-axis
+residual encoding is load-bearing across the pool. The mechanism
+prediction we test directly with the $25$ interventions in
+\S\ref{sec:saturation} is that external V-axis supervision will
+optimise the \emph{saturated} class-mean component while perturbing
+the \emph{useful} within-class residual.

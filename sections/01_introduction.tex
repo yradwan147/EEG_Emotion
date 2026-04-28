@@ -54,16 +54,17 @@ correlates with V-axis encoding strength at $r{=}{+}0.885$ in the
 class-PC1 subspace and $r{=}{+}0.738$ in the within-class residual.
 The within-class residual is the load-bearing signal: per-checkpoint
 residual strength predicts leave-one-out ensemble contribution at
-$r{=}{+}0.74$ ($p{=}0.014$, $n{=}10$), and an Arditi-style causal
-ablation~\citep{arditi2024refusal} of the residual direction drops
-balanced accuracy on every checkpoint at mean $z{\approx}7.7\sigma$
-above a matched random-direction null. LLMs and EEG classifiers
-arrive at the same axis without sharing data, completing a three-way
-LLM--brain--classifier triangle and giving direct cross-modal
-evidence for the Platonic Representation Hypothesis at biological
-scale.
+$r{=}{+}0.74$ ($p{=}0.014$, $n{=}10$), and an Arditi-style directional
+ablation~\citep{arditi2024refusal}---projecting the V-axis residual
+out of the classifier's penultimate features at inference
+time---drops balanced accuracy on every checkpoint at mean
+$z{\approx}7.7$ above a matched random-direction null. LLMs and EEG
+classifiers arrive at the same one-dimensional axis without sharing
+data---a three-way LLM--brain--classifier convergence consistent with
+the Platonic Representation Hypothesis extended to the
+LLM$\leftrightarrow$brain pair.
 
-What happens when we add this universal axis as auxiliary supervision?
+What happens when we add this shared axis as auxiliary supervision?
 We test $25$ representation-alignment interventions drawn from seven
 years of literature---auxiliary regression, knowledge distillation,
 RSA, contrastive losses, PEFT adapters, curriculum schedules,
@@ -89,8 +90,8 @@ checkpoint at $\mathbf{0.6755}$. All five claims replicate on
 SEED-V~\citep{liu2022seedv}, where the V-axis re-built from scratch
 on five classes recovers cohort EEG at $r{=}{+}0.6159$, posterior
 dominance, cross-architecture convergence at $r{=}{+}0.601$,
-saturation, and causal closure at mean $z{=}{+}23.6$ across $15$
-checkpoints.
+saturation, and a directional-ablation effect with mean
+$z{=}{+}23.6$ across $15$ SEED-V checkpoints.
 
 \paragraph{Contributions.} We make five contributions. \textbf{(1)} A
 one-dimensional V-axis extracted from nine LLM emotion stories that
@@ -100,8 +101,9 @@ across two datasets, generalising across $14$ LLMs
 \textbf{(2)} Spontaneous cross-architecture convergence: $36$ EEG
 checkpoints encode the same axis without supervision, with a
 \emph{Residual Contribution Law} linking per-checkpoint residual
-strength to ensemble contribution and a causal Arditi ablation
-closing the loop (\S\ref{sec:convergence}).
+strength to ensemble contribution and an Arditi-style directional
+ablation tying the population-mean accuracy drop to the
+LLM-derived V-axis residual (\S\ref{sec:convergence}).
 \textbf{(3)} A posterior-dominant brain topography distinguishing
 video-evoked emotion from the static-stimulus regime in which
 frontal-alpha asymmetry was developed (\S\ref{sec:topography}).

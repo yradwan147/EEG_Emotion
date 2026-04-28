@@ -20,16 +20,26 @@ controls are in Appendix~\ref{app:vaxis-protocol}.
 We extract this axis from $14$ language models spanning three orders
 of magnitude---all six dense Qwen3 sizes from 0.6B to 32B,
 Llama-4-Scout-17B, Mistral-7B, Phi-2-2.7B, Pythia-1.4B, BLOOM-560M,
-TinyLlama-1.1B, Gemma-27B, and Gemma-4-31B. The mean off-diagonal
-Pearson correlation between per-stim V-axis projections is $0.65$,
-and three regimes emerge against a behavioural valence reference: a
-top tier of seven models with per-stim $r > 0.85$ (all six Qwen3
-sizes plus Mistral-7B, mean $r_{\mathrm{behav}}{=}0.939$), a middle
-tier of four ($0.6 \le r \le 0.85$; Llama-4-Scout, Gemma-27B,
-Gemma-4-31B, Phi-2), and an out-tier of three with $r{<}0.4$
-(Pythia-1.4B, TinyLlama-1.1B, BLOOM-560M). Within the Qwen3 family
-the dependence on scale is essentially flat ($r{=}{+}0.568$,
-$p{=}0.24$, $n{=}6$): universality is not a size-monotonic phenomenon.
+TinyLlama-1.1B, Gemma-27B, and Gemma-4-31B. Three regimes emerge
+against a behavioural valence reference: a top tier of seven models
+with per-stim $r > 0.85$ (all six Qwen3 sizes plus Mistral-7B, mean
+$r_{\mathrm{behav}}{=}0.939$), a middle tier of four ($0.6 \le r \le
+0.85$; Llama-4-Scout, Gemma-27B, Gemma-4-31B, Phi-2), and an out-tier
+of three with $r{<}0.4$ (Pythia-1.4B, TinyLlama-1.1B, BLOOM-560M).
+Within the Qwen3 family the dependence on scale is essentially flat
+($r{=}{+}0.568$, $p{=}0.24$, $n{=}6$): once a modern LLM family has
+joined the manifold, the axis it finds is not size-monotonic.
+
+The pairwise off-diagonal correlation between per-stim V-axis
+projections decomposes cleanly. \emph{Within} Qwen3 the off-diagonal
+is essentially saturated ($r{=}{+}0.995 \pm 0.003$ across $15$ pairs):
+all six sizes find the same direction. \emph{Across} families
+Qwen3$\leftrightarrow$non-Qwen drops to $r{=}{+}0.585 \pm 0.289$ over
+$48$ pairs, with Mistral-7B as the closest non-Qwen neighbour
+(Qwen3$\leftrightarrow$Mistral mean $r{=}{+}0.939$). Convergence is
+therefore tight within a modern LLM family and looser across
+families---consistent with a ``modern-LLM manifold'' interpretation
+rather than a strict universality claim.
 The full per-LLM table is in Appendix~\ref{app:per-llm-deep-dive}.
 
 A single Qwen3-4B run gives this axis surprising external validity.

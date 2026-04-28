@@ -32,11 +32,18 @@ positive setpoint to find. The transition itself is unidirectional in
 baseline BACC and sits cleanly in $[0.62, 0.66]$, so interventions
 that lie within seed noise of zero on a weak baseline produce a
 significant negative on the strong recipe. The mechanism check
-explains why: V-axis supervision moves class-PC1 encoding by $+0.01$
-to $+0.36$ while leaving the within-class residual untouched at
-$\sim 10^{-7}$---a numerical zero---so the auxiliary loss perturbs
-exactly the saturated component and never touches the load-bearing
-one. The full $25$-row table, monotonic curves, transition table,
+explains why: V-axis supervision pushes class-PC1 even further along
+$v_{\mathrm{CLIP}}$ ($\Delta|r|{=}{+}0.01$ to $+0.36$) while leaving
+the within-class residual encoding at $\sim 10^{-7}$---a numerical
+zero. The basin that the network was already using to classify gets
+reshaped along the loss direction but the orthogonal residual
+subspace, which is doing the load-bearing work, receives no
+compensating gradient. We therefore read $\rho(\theta)$ in the boxed
+statement as a proxy for the network's task-derived V-axis
+encoding---high $\rho$ flags a network that has converged on the
+target geometry from task supervision alone---and the saturation
+mechanism as parameter drift along the loss direction within an
+already-converged subspace. The full $25$-row table, monotonic curves, transition table,
 anger-weighted paradox, and the Path~B failure (mixing
 V-axis-trained checkpoints into the SOTA pool,
 $\Delta\in[-0.0193, -0.0145]$) are in
