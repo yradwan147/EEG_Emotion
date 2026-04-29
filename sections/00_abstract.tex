@@ -1,36 +1,32 @@
 \begin{abstract}
-Late-layer concept directions are not free real estate for supervision:
-once a network has absorbed a concept from task alone, adding the same
-concept as an auxiliary loss is at best a no-op and typically harmful.
-We discover and quantify this regularity---which we call
-\emph{saturation}---by tracking the principal axis of human emotion,
-the \emph{V-axis} of valence, across language models, human brains,
-and EEG emotion classifiers. Recovered by PCA on the class-centroids
-of nine LLM emotion stories, the V-axis generalises across $14$
-language models from 560M to 32B parameters and recovers zero-shot
-sentiment from a single Qwen3-4B run---above an off-the-shelf
-sentence-encoder zero-shot baseline and within $0.08$ AUC of an
-NLI-supervised RoBERTa-large. The same axis predicts a ridge-regression read-out of the
-cohort-averaged EEG of $123$ subjects watching $28$ emotional videos
-at $r{=}0.87$ ($p<10^{-9}$, single test on stim-level features), with
-the signal carried by an anger--warm-positive contrast on $9$ of the
-$28$ stimuli and localised to posterior visual cortex rather than
-frontal regions; and it emerges spontaneously in EEG
-classifiers trained only on the 9-class label, so LLMs and brain
-models converge on the same latent without sharing data. Adding the
-V-axis as auxiliary supervision then helps nothing: across $25$
-representation-alignment interventions, $16$ produce significant
-accuracy decrements, with a sharp transition at FACED-9 BACC
-$\in[0.62, 0.66]$. An inference-time directional ablation of the
-within-class V-axis residual---the LLM-derived direction projected
-out of the classifier's penultimate features---drops accuracy on
-every checkpoint at mean $z{\approx}7.7$ above a matched
-random-direction null, and per-checkpoint residual strength predicts
-ensemble contribution at $r{=}{+}0.74$. Combining the
-saturated class-mean basin with seed-specific residual diversity
-yields a new FACED 9-class state of the art ($\mathbf{0.6948}$
-ensemble, $\mathbf{0.6755}$ single, $+21.5\%$ over CBraMod, with
-LLM-derived KD prototypes shown to be interchangeable with random
-orthonormal directions---the gain is structural rather than semantic),
-and every claim replicates on SEED-V.
+We study what happens when an explicit concept direction is added as
+auxiliary supervision to a network that has already learned the same
+concept from task labels alone. Across $25$ representation-alignment
+interventions on FACED 9-class EEG emotion classification---knowledge
+distillation, RSA, contrastive losses, PEFT adapters, and
+channel-targeted topographic losses---none help: $16$ produce
+statistically significant accuracy decrements, and $0$ produce gains.
+We call this regularity \emph{saturation}: above an empirical
+threshold (FACED-9 balanced accuracy in $[0.62, 0.66]$), the concept
+direction is already the geometry the network finds from task labels,
+and the auxiliary loss perturbs that saturated component while leaving
+the orthogonal within-class residual---the load-bearing
+subspace---untouched. Saturation is distinct from overfitting: it is
+not memorisation, but a property of how task supervision and auxiliary
+supervision interact once they target the same direction. The same
+mechanism gives a positive prescription: ensemble across the residual
+rather than supervise the basin. Following this prescription on
+FACED-9 yields a new state of the art at $\mathbf{0.6948}$ balanced
+accuracy ($+21.5\%$ over CBraMod's $0.572$), with the surprising
+property that the LLM-derived class prototypes used in our recipe are
+interchangeable with random orthonormal directions ($\Delta\le 0.003$):
+the gain is structural, not semantic. As a probe of the concept the
+network saturates on, we extract a one-dimensional \emph{valence
+direction} by PCA from the late-layer activations of nine short
+LLM-generated emotion stories; the same direction recovers SST-2
+sentiment zero-shot at AUC $0.832$ from a single Qwen3-4B run,
+predicts cohort-averaged EEG of $123$ subjects watching emotional
+videos at $r{=}0.87$, and emerges spontaneously in $36$ EEG
+classifiers trained only on the 9-class label. All claims replicate on
+SEED-V.
 \end{abstract}

@@ -1,91 +1,73 @@
-\section{A Shared Valence Axis Across Modern Language Models}
+\section{Probing the Saturated Concept: A Valence Direction in LLMs}
 \label{sec:vaxis-llms}
 
-We define the V-axis by a recipe that uses only nine sentences. Given
-a language model with hidden dimension $D$ and the FACED 9-emotion
-taxonomy, we author one short emotion-evocative story per class,
-generate $n{=}50$ paraphrases per story by independent LLM calls, and
-take the mean last-token hidden state at the penultimate layer
-$L_{\max}{-}1$ to obtain nine class centroids
-$c_1,\dots,c_9 \in \mathbb{R}^D$. Mean-centred PCA on the
-$9 \times D$ matrix gives the V-axis as the unit vector along
-$\mathrm{PC}_1$, oriented so that
-$\langle c_{\mathrm{Joy}}, v\rangle > 0$. Qwen3-4B at the penultimate
-layer ($L{=}35$ of $36$) is our lead model. We chose it for compute
-parsimony among the seven Qwen3 sizes whose behavioural-valence
-correlations sit within $0.01$ of one another in our forest
-($0.94$--$0.95$, see Appendix~\ref{app:per-llm-deep-dive}); $4$B is
-the smallest size with this top-tier alignment. The recipe is robust
-to paraphrase budget (zero-shot SST-2 AUC $0.74$ at $n{=}1$, rising
-to $0.832$ at $n{=}50$) and to prompt rephrasing (mean cross-prompt
-$r{>}0.93$ across the LLMs we test). Full protocol and quality
-controls are in Appendix~\ref{app:vaxis-protocol}.
+To test that the saturation regularity operates on a real semantic
+axis rather than a noise dimension, we extract one explicitly. The
+construction uses nine sentences: given a language model with hidden
+dimension $D$ and the FACED 9-emotion taxonomy, we author one short
+emotion-evocative story per class, generate $n{=}50$ paraphrases per
+story by independent LLM calls, and take the mean last-token hidden
+state at $L_{\max}{-}1$ to obtain nine class centroids
+$c_1,\dots,c_9 \in \mathbb{R}^D$. Mean-centred PCA gives the V-axis
+as the unit vector along $\mathrm{PC}_1$, oriented so
+$\langle c_{\mathrm{Joy}}, v\rangle > 0$. Qwen3-4B at $L{=}35/36$ is
+our lead model (chosen for compute parsimony among the seven Qwen3
+sizes whose behavioural-valence correlations sit within $0.01$ of
+one another, $0.94$--$0.95$, Appendix~\ref{app:per-llm-deep-dive}).
+The recipe is robust to paraphrase budget (zero-shot SST-2 AUC $0.74$
+at $n{=}1$, rising to $0.832$ at $n{=}50$) and to prompt rephrasing
+(mean cross-prompt $r{>}0.93$). Full protocol and quality controls
+are in Appendix~\ref{app:vaxis-protocol}.
 
-We extract this axis from $14$ language models spanning three orders
+\paragraph{The same direction across $14$ LLMs.}
+We extract the V-axis from $14$ language models spanning three orders
 of magnitude---all six dense Qwen3 sizes from 0.6B to 32B,
 Llama-4-Scout-17B, Mistral-7B, Phi-2-2.7B, Pythia-1.4B, BLOOM-560M,
 TinyLlama-1.1B, Gemma-27B, and Gemma-4-31B. Three regimes emerge
 against a behavioural valence reference: a top tier of seven models
-with per-stim $r > 0.85$ (all six Qwen3 sizes plus Mistral-7B, mean
-$r_{\mathrm{behav}}{=}0.939$), a middle tier of four ($0.6 \le r \le
-0.85$; Llama-4-Scout, Gemma-27B, Gemma-4-31B, Phi-2), and an out-tier
-of three with $r{<}0.4$ (Pythia-1.4B, TinyLlama-1.1B, BLOOM-560M).
-Within the Qwen3 family the dependence on scale is essentially flat
-($r{=}{+}0.568$, $p{=}0.24$, $n{=}6$): once a modern LLM family has
-joined the manifold, the axis it finds is not size-monotonic.
+with per-stim $r > 0.85$ (all six Qwen3 sizes plus Mistral-7B), a
+middle tier of four ($0.6 \le r \le 0.85$), and an out-tier of three
+with $r{<}0.4$ (Pythia-1.4B, TinyLlama-1.1B, BLOOM-560M). The
+pairwise off-diagonal decomposes cleanly: \emph{within} Qwen3 the
+V-axes are essentially identical ($r{=}{+}0.995 \pm 0.003$ across
+$15$ pairs), \emph{across} families the correlation drops to
+$+0.585 \pm 0.289$ over $48$ pairs. Convergence is tight within a
+modern LLM family and looser across families.
 
-The pairwise off-diagonal correlation between per-stim V-axis
-projections decomposes cleanly. \emph{Within} Qwen3 the off-diagonal
-is essentially saturated ($r{=}{+}0.995 \pm 0.003$ across $15$ pairs):
-all six sizes find the same direction. \emph{Across} families
-Qwen3$\leftrightarrow$non-Qwen drops to $r{=}{+}0.585 \pm 0.289$ over
-$48$ pairs, with Mistral-7B as the closest non-Qwen neighbour
-(Qwen3$\leftrightarrow$Mistral mean $r{=}{+}0.939$). Convergence is
-therefore tight within a modern LLM family and looser across
-families---consistent with a ``modern-LLM manifold'' interpretation
-rather than a strict universality claim.
-The full per-LLM table is in Appendix~\ref{app:per-llm-deep-dive}.
-
-A single Qwen3-4B run gives this axis surprising external validity.
-Projecting onto it recovers SST-2 sentiment at zero-shot AUC
-$0.832$~\citep{socher2013recursive}---matching a supervised
+\paragraph{External validity.}
+A single Qwen3-4B run recovers SST-2 sentiment at zero-shot AUC
+$\mathbf{0.832}$~\citep{socher2013recursive}, matching a supervised
 logistic-regression baseline trained on $5$k in-domain examples
-($0.837$), beating an off-the-shelf SBERT prototype-cosine zero-shot
-baseline ($0.793$;~\citealp{reimers2019sbert}) and within $0.08$ of a
-$355$M-param RoBERTa-large-MNLI zero-shot entailment classifier
-($0.912$;~\citealp{liu2019roberta})---and pushes Yelp Polarity to
-$0.938$~\citep{yelp2015}; the full sentiment table (IMDB, TweetEval,
-Rotten Tomatoes) and the two word-level lexicon recoveries (Hu \& Liu,
-Warriner) are in Appendix~\ref{app:per-llm-deep-dive}. An Arditi-style same-model
+($0.837$), beating a SBERT prototype-cosine zero-shot baseline
+($0.793$;~\citealp{reimers2019sbert}), and within $0.08$ of a $355$M-param
+RoBERTa-large-MNLI zero-shot entailment classifier
+($0.912$;~\citealp{liu2019roberta}). The same direction reaches
+$0.938$ on Yelp Polarity~\citep{yelp2015}; the full sentiment
+table (IMDB, TweetEval, Rotten Tomatoes) and word-level lexicon
+recoveries (Hu \& Liu, Warriner) are in
+Appendix~\ref{app:per-llm-deep-dive}. An Arditi-style same-model
 ablation~\citep{arditi2024refusal}---projecting the V-axis out of
 Qwen3-4B's own penultimate features---collapses the V-axis zero-shot
 decoder on SST-2 from $0.832$ to chance ($0.505$). A linear-probe
-classifier retrained on the now-ablated features only loses
-$0.0019$ AUC (still $z{=}{+}9.8$ above a $20$-direction matched-norm
-null), so the V-axis is the direction Qwen3-4B uses for zero-shot
-sentiment, even though some discriminative content remains in the
-orthogonal complement.
+classifier retrained on the now-ablated features only loses $0.0019$
+AUC (still $z{=}{+}9.8$ above a $20$-direction matched-norm null), so
+the V-axis is the direction Qwen3-4B uses for zero-shot sentiment,
+even though some discriminative content remains in the orthogonal
+complement.
 
-The V-axis is a late-layer phenomenon: the cosine between the
-input-layer and the penultimate-layer V-axis stays below $0.30$
-across Qwen3 sizes. The same V-shape---axes that converge only in
-the last few layers---appears across five LM families and across
-BERT, RoBERTa, and DeBERTa, peaking at $L_{\max}{-}1$ and ruling out
-tokeniser or training-objective artefacts. Within this V-shape pattern,
-Gemma-4 is the lone outlier, with a text-side V-axis that peaks at $L{=}1$ but brain
-alignment that survives at mid-layers (\S\ref{sec:vaxis-brain}).
-
-The recipe is also concept-generic, cross-lingual, and cross-modal.
-Beyond valence, $20$ of $20$ further concepts we tried in the same
-form produce a working axis and $17$ exceed AUC $0.95$
-(Appendix~\ref{app:concept-library}). On mT0-base
-\citep{muennighoff2022mt0} the recipe exceeds the English ceiling on
-Japanese, Arabic, and Russian at $5\times$ smaller
-scale~(Appendix~\ref{app:multilingual-vision}). A CLIP-text V-axis
-ranks OASIS~\citep{kurdi2017oasis,radford2021clip} valence at
-$r{=}0.869$ and arousal at $r{=}0.803$, both beating supervised ridge.
-Specificity controls bound the recipe: a nonce-word ablation drops
-SST-2 to chance, random-Gaussian directions give chance lexicon
-recovery, and arousal transfers in vision but stays below detection
-in text---a clean modality split documented in
-Appendix~\ref{app:specificity-controls}.
+\paragraph{A late-layer phenomenon.}
+The cosine between the input-layer and penultimate-layer V-axis stays
+below $0.30$ across Qwen3 sizes; the same V-shape---axes that
+converge only in the last few layers---appears across five LM
+families and across BERT, RoBERTa, and DeBERTa, peaking at
+$L_{\max}{-}1$ and ruling out tokeniser or training-objective
+artefacts. Within this V-shape pattern, Gemma-4 is the lone outlier,
+with a text-side V-axis that peaks at $L{=}1$ but brain alignment
+that survives at mid-layers (\S\ref{sec:vaxis-brain}). The recipe is
+also concept-generic, cross-lingual, and cross-modal: $20/20$ further
+concepts produce a working axis ($17$ exceed AUC $0.95$,
+Appendix~\ref{app:concept-library}); on
+mT0-base~\citep{muennighoff2022mt0} the recipe exceeds the English
+ceiling on Japanese, Arabic, and Russian; a CLIP-text V-axis ranks
+OASIS~\citep{kurdi2017oasis,radford2021clip} valence at $r{=}0.869$
+and arousal at $r{=}0.803$.

@@ -1,49 +1,72 @@
 \section{Related Work}
 \label{sec:related}
 
+\paragraph{Concept-direction supervision.}
+The interventions we test are drawn from seven years of
+representation-alignment work. Knowledge
+distillation~\citep{hinton2015distilling,tian2020crd,park2019rkd}
+trains a student's penultimate features against a fixed teacher
+target. Representational similarity
+analysis~\citep{kriegeskorte2008rsa,sundaram2024perceptual} aligns
+representational geometries through pairwise similarity matrices.
+Supervised contrastive
+losses~\citep{khosla2020supcon,vandenoord2018cpc,radford2021clip}
+pull same-class features together and push different-class apart.
+Parameter-efficient adaptation~\citep{hu2022lora,liu2022ia3}
+inserts low-rank or scaling modules whose updates are localised to a
+chosen geometry. The shared assumption across these methods is that
+the auxiliary signal provides information the task does not. This
+paper studies a regime where it does not.
+
+\paragraph{Concept directions in language models.}
+Arditi et~al.~\citep{arditi2024refusal} showed that refusal in
+instruction-tuned LMs is mediated by a single direction in
+residual-stream activations: ablating it eliminates refusal, adding
+it induces it. Earlier work in this family includes
+\citep{li2023inferencetime,zou2023repe,kim2018tcav}. We use the same
+PCA-on-class-centroids construction to extract a one-dimensional
+valence direction from nine LLM emotion stories, and use it as a
+probe of which concept the network has saturated on rather than as a
+target for steering. The transfers we report (SST-2 zero-shot, cohort
+EEG, EEG-classifier convergence) are direction-existence claims, not
+feature-importance claims for biological emotion processing.
+
 \paragraph{Brain--LM alignment.}
 Toneva and Wehbe~\citep{toneva2019interpreting} first showed that
 mid-layer transformer activations predict fMRI responses to narrative
-text; Schrimpf et~al.~\citep{schrimpf2021neural} ($43$ LMs against
-fMRI/ECoG), Goldstein et~al.~\citep{goldstein2022shared}
-(intracranial), Caucheteux and King~\citep{caucheteux2022brains}
-(MEG), and Padakanti and Oota~\citep{padakanti2025meg} (per-sensor
-topographic maps) extended the picture across modalities. We differ
-by working at full $123$-subject EEG scale, by studying \emph{emotion}
-rather than language, and by showing alignment in both directions:
-LLM-derived directions predict brain responses, and EEG classifiers
-trained on those brain signals converge to the same direction.
+text; Schrimpf et~al.~\citep{schrimpf2021neural}, Goldstein
+et~al.~\citep{goldstein2022shared}, and Caucheteux and
+King~\citep{caucheteux2022brains} extended the picture across MEG,
+ECoG, and large model
+families. Huh et~al.\ formalised the emerging picture as the
+\emph{Platonic Representation
+Hypothesis}~\citep{huh2024platonic}. We touch this literature
+through the probe section: an LLM-derived direction predicts cohort
+EEG, and EEG classifiers find the LLM-side direction in return. Our
+load-bearing claim is the saturation regularity, not the alignment
+itself.
 
-\paragraph{Concept directions in LLMs.}
-Arditi et~al.~\citep{arditi2024refusal} showed that refusal in
-instruction-tuned LMs is mediated by a single direction in
-residual-stream activations; ablating it eliminates refusal, adding it
-induces it. Earlier work in this family includes
-\citep{li2023inferencetime,zou2023repe,kim2018tcav}. The V-axis is
-extracted analogously---principal component of class-mean activations
-across nine emotion-story prompts---and exhibits the same
-cross-architecture convergence within the modern-LLM family. We extend this line by linking
-the LLM-side direction to a $123$-subject biological neural system at
-the cohort level and by showing that an artificial classifier trained
-on those biological signals \emph{finds} the same direction,
-completing a three-way LLM--brain--classifier triangle.
+\paragraph{Frontal-alpha asymmetry.}
+Davidson's frontal-alpha asymmetry~\citep{davidson1992anterior,coan2004frontal,davidson2004wellbeing}
+remains the dominant electrophysiological account of approach/withdrawal
+emotion, developed primarily on static stimuli. Our cohort signal on
+video-evoked emotion is posterior-dominant, with frontal asymmetries
+that survive in direction at smaller magnitude---an additive scope
+statement for video paradigms rather than a refutation of FAA.
 
-\paragraph{Platonic hypothesis, ensemble theory, and FAA.}
-Huh et~al.~\citep{huh2024platonic} operationalised the Platonic
-hypothesis through vision--language kernel alignment; the V-axis
-convergence we observe is consistent with the same hypothesis at the
-LLM$\leftrightarrow$brain and LLM$\leftrightarrow$EEG-classifier pairs.
+\paragraph{Ensemble theory.}
 The two-tier mechanism we identify---a saturated class-mean basin
-plus a seed-specific within-class residual---gives a representation-level
+plus a seed-specific within-class residual---is a representation-level
 form of bias--variance~\citep{geman1992neural,krogh1995neural} and
 linear-mode connectivity~\citep{frankle2020linearmode,wortsman2022model}.
-Davidson's frontal-alpha asymmetry hypothesis~\citep{davidson1992anterior,coan2004frontal,davidson2004wellbeing}
-remains the dominant electrophysiological account of emotion; we
-replicate it qualitatively at smaller magnitude and add a posterior
-account for video paradigms. The $25$ alignment mechanisms we test are
-drawn from~\citep{hinton2015distilling,tian2020crd,kriegeskorte2008rsa,park2019rkd,sundaram2024perceptual,radford2021clip,khosla2020supcon,hu2022lora,liu2022ia3}.
+Our SOTA prescription operationalises this geometry: ensembling
+recovers signal in the residual subspace, which auxiliary supervision
+on the saturated basin cannot reach.
+
+\paragraph{Baselines.}
 The FACED-9 baselines we compare against are
-CBraMod $0.572$~\citep{wang2025cbramod}, EmotionKD $0.628$~\citep{liu2023emotionkd},
-and EMOD $0.6287$~\citep{chen2025emod}, with REVE~\citep{elouahidi2025reve},
-LaBraM~\citep{jiang2024labram}, and EEGPT~\citep{yue2024eegpt} as
-foundation-model references.
+CBraMod~\citep{wang2025cbramod} ($0.572$),
+EmotionKD~\citep{liu2023emotionkd} ($0.628$), and
+EMOD~\citep{chen2025emod} ($0.6287$), with
+REVE~\citep{elouahidi2025reve}, LaBraM~\citep{jiang2024labram}, and
+EEGPT~\citep{yue2024eegpt} as foundation-model references.

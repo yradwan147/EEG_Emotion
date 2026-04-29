@@ -1,28 +1,33 @@
-\section{Replication on a Second EEG Dataset (SEED-V)}
+\section{Cross-Dataset Replication: SEED-V}
 \label{sec:vaxis-brain-seedv}
 
-A second EEG dataset, SEED-V~\citep{liu2022seedv}, lets us see whether
-the same picture emerges when nothing is shared with FACED. We
-re-build the V-axis from scratch on its five emotion classes on $16$
-subjects and $62$ channels, and we re-test every FACED claim with no
-parameter shared between datasets. The cohort EEG--LLM signal returns
-at $r{=}{+}0.6159$ ($p<10^{-5}$) at the P1/$\theta$ cell, the same
-posterior-dominant gradient appears (occipital $-$ frontal $+0.076$),
-and adding the V-axis as supervision again moves accuracy by a margin
-within seed noise ($\Delta{=}{+}0.0025$ across $5$ baseline and $5$
-V-axis seeds).
+A second EEG dataset, SEED-V~\citep{liu2022seedv}, lets us re-test
+every claim with no parameter shared with FACED. We re-build the
+V-axis from scratch on its five emotion classes ($16$ subjects,
+$62$ channels), and re-run the four claims in turn.
 
-Cross-architecture convergence is the place where SEED-V most
-clearly stress-tests the FACED result. Across $15$ stock CBraMod
-SEED-V checkpoints, accuracy correlates with V-axis encoding strength
-at $r{=}{+}0.601$ ($p{=}0.018$)---a correlation built on a different
-EEG dataset, a different label space, and a different best cell, yet
-with the same sign and magnitude as FACED. The directional ablation
-replicates harder still: projecting the V-axis residual out of the
-penultimate features at inference time drops accuracy on every one
-of the $15$ checkpoints ($\Delta\mathrm{BACC} \in [-0.029, -0.009]$,
-mean $-0.0173$, equivalent to a $3.9\%$ relative drop on the
-$\sim 0.44$ baseline against $2.4\%$ on FACED), at mean $z{=}{+}23.6$
-above a matched random-direction null. No checkpoint survives the
-null at $p<0.001$, parametric one-sided. Full Step 1--5 numerics, FAA bars, and per-checkpoint
+\paragraph{Probe predicts cohort EEG (replicates).}
+The cohort EEG--LLM signal returns at $r{=}{+}0.6159$ ($p<10^{-5}$)
+at the P1/$\theta$ cell, with the same posterior-dominant gradient
+(occipital $-$ frontal $+0.076$).
+
+\paragraph{Saturation (replicates).}
+Adding the V-axis as supervision moves accuracy by a margin within
+seed noise ($\Delta{=}{+}0.0025$ across $5$ baseline and $5$ V-axis
+seeds), at a baseline strength below the FACED transition---the same
+neutrality on weak baselines we report on FACED.
+
+\paragraph{Mechanism (replicates harder).}
+Across $15$ stock CBraMod SEED-V checkpoints, accuracy correlates
+with V-axis encoding strength at $r{=}{+}0.601$ ($p{=}0.018$)---a
+correlation built on a different EEG dataset, a different label
+space, and a different best cell, with the same sign and magnitude
+as FACED. The directional ablation replicates harder still:
+projecting the V-axis residual out of the penultimate features at
+inference time drops accuracy on every one of the $15$ checkpoints
+($\Delta\mathrm{BACC} \in [-0.029, -0.009]$, mean $-0.0173$, a
+$3.9\%$ relative drop on the $\sim 0.44$ baseline against $2.4\%$
+on FACED), at mean $z{=}{+}23.6$ above a matched random-direction
+null. No checkpoint survives the null at $p<0.001$, parametric
+one-sided. Full Step 1--5 numerics, FAA bars, and per-checkpoint
 details are in Appendix~\ref{app:seedv-full}.

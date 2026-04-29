@@ -1,24 +1,25 @@
-\section{The Same Axis in Human EEG}
+\section{The Probe Predicts Cohort EEG}
 \label{sec:vaxis-brain}
 
 We use FACED~\citep{chen2023faced}: $123$ subjects watching $28$
-emotional video clips, $32$ EEG channels at $250$\,Hz. From the cohort
-$28 \times 32 \times 5$ DE tensor (channel, band, stimulus, averaged
-over subjects and time), we fit a single ridge regression that
-predicts the V-axis projection from all $160$ channel--band features.
-The cohort-level prediction matches the V-axis at $r{=}{+}0.87$
-($n{=}28$ stimuli, $p<10^{-9}$ parametric; Figure~\ref{fig:eeg-llm-circle})
----one ridge model on all features, not a multi-cell argmax.
-Per-cell raw correlations (no ridge) peak at PO3/$\gamma$ at
-$r{=}{+}0.478$ (uncorrected $p{=}0.010$); under Bonferroni or
-Benjamini--Hochberg FDR (q$=$0.05) over the $32{\times}5$ grid no
-single cell clears significance, so we treat per-cell results as
-descriptive and rely on the ridge prediction and on the region-mean
-contrast in \S\ref{sec:topography} for the load-bearing topographic
-claim. The headline correlation holds against a battery of
-controls---matched-norm random-direction null, split-half subject
-reliability, mutual-information non-linearity, and class-level
-ranking---catalogued in Appendix~\ref{app:brain-deep-dive}.
+emotional video clips, $32$ EEG channels at $250$\,Hz. From the
+cohort $28 \times 32 \times 5$ DE tensor (channel, band, stimulus,
+averaged over subjects and time), we fit a single ridge regression
+that predicts the V-axis projection from all $160$ channel--band
+features. The cohort-level prediction matches the V-axis at
+$\mathbf{r{=}{+}0.87}$ ($n{=}28$ stimuli, $p<10^{-9}$ parametric;
+Figure~\ref{fig:eeg-llm-circle})---one ridge model on all features,
+not a multi-cell argmax. Per-cell raw correlations (no ridge) peak
+at PO3/$\gamma$ at $r{=}{+}0.478$ (uncorrected $p{=}0.010$); under
+Bonferroni or Benjamini--Hochberg FDR (q$=$0.05) over the
+$32{\times}5$ grid no single cell clears significance, so we treat
+per-cell results as descriptive and rely on the ridge prediction
+and on the region-mean contrast in \S\ref{sec:topography} for the
+load-bearing topographic claim. The headline correlation holds
+against a battery of controls---matched-norm random-direction null,
+split-half subject reliability, mutual-information non-linearity,
+and class-level ranking---catalogued in
+Appendix~\ref{app:brain-deep-dive}.
 
 \begin{figure}[ht]
 \centering
@@ -29,26 +30,19 @@ ranking---catalogued in Appendix~\ref{app:brain-deep-dive}.
 \label{fig:eeg-llm-circle}
 \end{figure}
 
-The V-axis lives predominantly in posterior visual cortex (occipital
-$\overline{|r|}{=}0.212$, parietal $0.181$, frontal $0.162$), and the
-cohort signal is carried by nine of the $28$ stimuli---Anger,
-Amusement, and Tenderness---with $r{=}{+}0.870$ on that subset against
-$r{=}{-}0.015$ on the remaining $19$ mid-valence clips. The full
-topography treatment is in \S\ref{sec:topography}.
-
 The same picture survives across all $14$ LLMs. Computing the V-axis
 from each model and projecting onto the cohort response at
 PO3/$\gamma$ recapitulates the text-domain three-tier structure, with
 the Qwen3 family alone reaching mean $r{=}{+}0.796 \pm 0.011$
-irrespective of size: brain-side alignment, like the text-side off-diagonal,
-is a property of the family rather than the parameter count. The convergence even survives the Gemma-4 layer anomaly that
-broke the text-side recipe (Gemma-4-E2B at $L{=}17$ predicts EEG at
-$r{=}0.819$, $p \approx 10^{-7}$). The forest plot, mid-layer
-robustness, and time-locked dynamics are in
-Appendix~\ref{app:brain-deep-dive}.
-
-The FACED V-axis also generalises to a held-out EEG dataset without
-retraining: it ranks the five SEED-V emotion
-classes~\citep{liu2022seedv} at semantic-space $r{=}{+}0.96$
-($p{=}0.008$). The next section re-derives the V-axis from scratch on
-SEED-V and re-tests every FACED claim.
+irrespective of size: brain-side alignment, like the text-side
+off-diagonal, is a property of the LLM family rather than the
+parameter count. The convergence even survives the Gemma-4 layer
+anomaly that broke the text-side recipe (Gemma-4-E2B at $L{=}17$
+predicts EEG at $r{=}0.819$, $p \approx 10^{-7}$). Forest plot,
+mid-layer robustness, and time-locked dynamics are in
+Appendix~\ref{app:brain-deep-dive}. The FACED V-axis also
+generalises to a held-out EEG dataset without retraining: it ranks
+the five SEED-V emotion classes~\citep{liu2022seedv} at
+semantic-space $r{=}{+}0.96$ ($p{=}0.008$); \S\ref{sec:vaxis-brain-seedv}
+re-derives the V-axis from scratch on SEED-V and re-tests every
+claim.

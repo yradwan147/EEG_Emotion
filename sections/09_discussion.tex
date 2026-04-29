@@ -1,23 +1,23 @@
-\section{Discussion}
+\section{Discussion: Limitations and Future Work}
 \label{sec:discussion}
 
-A single direction extracted from nine LLM stories, the cohort
-response of $123$ subjects watching emotional videos, and the
-penultimate features of a classifier trained on those videos converge
-on the same one-dimensional axis, without any of them seeing the
-others' data---consistent with the Platonic Representation
-Hypothesis~\citep{huh2024platonic} extended to the
-LLM$\leftrightarrow$brain pair. The cohort signal is carried by an
-\emph{anger-versus-warm-positive} contrast on $9$ of the $28$ stimuli,
-and every brain finding replicates on SEED-V; the convergence is not
-a peculiarity of one recording.
+\paragraph{Limitations.} Saturation is empirical, not analytical: we
+locate the FACED-9 transition at BACC $[0.62, 0.66]$, but the
+threshold magnitude is dataset-specific, the boxed statement
+describes rather than proves, and SEED-V is not large enough to
+localise its own cliff. The probe transfers (SST-2, cohort EEG,
+classifier convergence) are direction-existence claims, not
+neuroscience claims; the cohort topography is a paradigm statement
+for video-evoked emotion, not a refutation of frontal-alpha
+asymmetry~\citep{davidson1992anterior}. The KD prototypes that
+contribute $+0.0096$ to the SOTA recipe are interchangeable with
+random orthonormal directions: the gain is structural, not semantic,
+and the probe and the SOTA gain are reconciled only via saturation.
 
-The negative half is the part with consequences. Adding the V-axis
-back as an auxiliary loss perturbs the saturated component while
-leaving the load-bearing residual untouched; twenty-five interventions
-reduce to one principle, with the transition at FACED-9 BACC
-$[0.62, 0.66]$ (dataset-specific magnitude; principle generalises
-to KD/RSA/contrastive). The corresponding positive prescription,
-ensemble gain as variance reduction in the orthogonal complement,
-is exactly what our $0.6948$/$0.6755$ SOTA
-measures~(Appendix~\ref{app:discussion-extras}).
+\paragraph{Future work.} Per-subject residual adaptation
+(Appendix~\ref{app:discussion-extras}) is the most direct positive
+test; locating the transition cliff on a non-emotion task would
+test whether
+bias--variance~\citep{geman1992neural,frankle2020linearmode}
+quantitatively predicts where concept supervision stops helping.
+The regularity is falsifiable in the obvious direction.
