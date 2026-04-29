@@ -74,9 +74,8 @@ single-seed test BACC mean, but provides the most ensemble-relevant
 diversity axis: the mixed $10$-checkpoint pool reaches $0.6948$
 versus $0.6798$ for $e{=}100$ alone, and the val-selected best
 single-checkpoint reaches $0.6755$ ($+0.017$ over the seed mean,
-within the $\pm 0.010$ seed-std). The mechanism
-generalises (Appendix~\ref{app:ensemble-extras}): $\Delta$BACC is
-monotonic in headroom (near zero on MNIST), mega-ensembles plateau at
-ten checkpoints ($\le 0.6948$), and cross-architecture mixing adds no
-diversity---intra-architecture, training-length-driven diversity is
-what the within-class residual mechanism predicts.
+within the $\pm 0.010$ seed-std). Headroom-monotonicity (near-zero
+on MNIST), the $10$-checkpoint plateau, and the failure of
+cross-architecture mixing all confirm intra-architecture
+training-length diversity as the operative mechanism
+(Appendix~\ref{app:ensemble-extras}).

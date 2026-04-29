@@ -5,38 +5,19 @@ A single direction extracted from nine LLM stories, the cohort
 response of $123$ subjects watching emotional videos, and the
 penultimate features of a classifier trained on those videos converge
 on the same one-dimensional axis, without any of them seeing the
-others' data. This is consistent with the Platonic Representation
+others' data---consistent with the Platonic Representation
 Hypothesis~\citep{huh2024platonic} extended to the
-LLM$\leftrightarrow$brain pair, in both directions: LLM-derived
-directions predict brain responses, and brain-trained classifiers
-find the LLM-side direction in return. The cohort EEG correlation
-($r{=}0.87$ at PO3/$\gamma$) is carried by an
-\emph{anger-versus-warm-positive} contrast on $9$ of the $28$
-stimuli---a scope we report transparently in \S\ref{sec:topography}.
-Every brain finding replicates on SEED-V, most sharply through a
-directional ablation whose normalised effect is $\sim$1.6$\times$
-larger than on FACED in $\Delta/\text{baseline}$ terms ($3.9\%$ vs.\
-$2.4\%$); the convergence is not a peculiarity of one recording.
+LLM$\leftrightarrow$brain pair. The cohort signal is carried by an
+\emph{anger-versus-warm-positive} contrast on $9$ of the $28$ stimuli,
+and every brain finding replicates on SEED-V; the convergence is not
+a peculiarity of one recording.
 
-The negative half of the story is the part with consequences. Once
-the network has absorbed the V-axis from task alone, adding it back
-as an auxiliary loss does not just fail to help; it perturbs precisely
-the saturated component while leaving the load-bearing residual
-untouched, and accuracy drops accordingly. Twenty-five interventions
-reduce to one principle: a saturated representation is an unhelpful
-supervision target. We locate the empirical transition at FACED-9
-BACC $[0.62, 0.66]$; the principle should hold elsewhere but the
-threshold magnitude is dataset- and architecture-specific. The same observation gives a positive
-prescription: ensemble gain on a saturated network is variance
-reduction in the orthogonal complement of the converged
-subspace---generalising bias--variance \citep{geman1992neural} and
-linear-mode connectivity \citep{frankle2020linearmode}---and that is
-exactly what our $0.6948$/$0.6755$ FACED state of the art measures.
-
-The regularity should generalise: modern recipes for concept
-supervision (KD, RSA, contrastive auxiliary losses, soft-prompt
-projections) all align penultimate features with a chosen geometry,
-and that gain has a horizon---it shrinks as task supervision finds
-the same geometry on its own. Per-subject residual adaptation, which
-lifts the within-class signal without disturbing the basin, is the
-immediate next step (Appendix~\ref{app:discussion-extras},~\ref{app:negatives}).
+The negative half is the part with consequences. Adding the V-axis
+back as an auxiliary loss perturbs the saturated component while
+leaving the load-bearing residual untouched; twenty-five interventions
+reduce to one principle, with the transition at FACED-9 BACC
+$[0.62, 0.66]$ (dataset-specific magnitude; principle generalises
+to KD/RSA/contrastive). The corresponding positive prescription,
+ensemble gain as variance reduction in the orthogonal complement,
+is exactly what our $0.6948$/$0.6755$ SOTA
+measures~(Appendix~\ref{app:discussion-extras}).
