@@ -1,7 +1,14 @@
-\textbf{EEG models converge to the LLM V-axis without ever being trained on it.}
-(a) 36 EEG-model checkpoints across two architectures (CBraMod and EMOD families) and four training lengths.
-$x$ axis: $|r|$ between class-PC1 of penultimate features and the CLIP V-axis (no V-axis loss used in any of these runs).
-$y$ axis: FACED 9-class balanced accuracy.
-Linear fit: $r{=}{+}0.885$, $p{=}7.8\!\times\!10^{-13}$, $n{=}36$.
-(b) Random-direction control: 1000 random unit directions in CLIP space, each producing its own across-checkpoint correlation.
-The V-axis sits at the 93.5th percentile of the random-direction null distribution ($p_{\text{one-sided}}{=}0.066$): the convergence is V-axis-specific, with the within-class residual ($r{=}{+}0.738$, $p{=}3\!\times\!10^{-7}$) carrying the statistically robust signal.
+\textbf{EEG classifiers converge to the LLM-derived V-axis without
+being trained on it.}
+\textbf{(a)} $36$ EEG-classifier checkpoints across two architectures
+(CBraMod and EMOD families) and six recipe variants. $x$-axis:
+absolute correlation between class-PC1 of the penultimate features
+and the LLM V-axis (no V-axis loss used in training). $y$-axis:
+FACED 9-class balanced accuracy. Linear fit $r{=}{+}0.885$
+($p{=}7.8\!\times\!10^{-13}$, $n{=}36$). \textbf{(b)} Matched-norm
+random-direction null: $1000$ random unit directions in feature space,
+each producing its own across-checkpoint correlation. The V-axis sits
+at the $93.5$th percentile (one-sided $p{=}0.066$): the convergence is
+V-axis-specific. The within-class residual alignment carries the
+statistically robust signal ($r{=}{+}0.738$, $p{=}3\!\times\!10^{-7}$;
+\S\ref{sec:convergence}).

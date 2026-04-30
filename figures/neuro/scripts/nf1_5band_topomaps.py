@@ -72,13 +72,16 @@ def main():
     print('region |r| (canonical):', region_vals)
 
     # ---------- figure layout ----------
+    # Increased wspace and added a small "spacer" between colorbar (col 5)
+    # and the 32-channel montage inset (col 6) — previously the colorbar
+    # right-side label was being overdrawn by the montage axes.
     fig = plt.figure(figsize=(12.6, 5.6))
     gs = fig.add_gridspec(
         2, 7,
-        width_ratios=[1.0, 1.0, 1.0, 1.0, 1.0, 0.05, 0.70],
+        width_ratios=[1.0, 1.0, 1.0, 1.0, 1.0, 0.05, 0.85],
         height_ratios=[3.4, 1.05],
-        left=0.025, right=0.975, top=0.86, bottom=0.10,
-        wspace=0.32, hspace=1.05,
+        left=0.025, right=0.965, top=0.86, bottom=0.10,
+        wspace=0.55, hspace=1.05,
     )
 
     cmap = plt.colormaps["RdBu_r"]
@@ -135,11 +138,16 @@ def main():
                 color=COLORS["darkblue"] if r1 > 0 else COLORS["red"],
                 ha='center', va='top')
 
-    # Colorbar axis (column 5 — small)
+    # Colorbar axis (column 5 — small). Label placed on the LEFT side and
+    # ticks on the LEFT so the right side is clear for the montage inset
+    # in column 6 (previously the right-side label clipped under the
+    # montage's title).
     cax = fig.add_subplot(gs[0, 5])
     cbar = fig.colorbar(ims[-1], cax=cax)
     cbar.set_label("Pearson  r  (V-axis encoding)",
                    fontsize=9, labelpad=4)
+    cbar.ax.yaxis.set_label_position('left')
+    cbar.ax.yaxis.set_ticks_position('left')
     cbar.ax.tick_params(labelsize=8, length=2.5)
     # neat tick set
     cbar.set_ticks([-0.4, -0.2, 0.0, 0.2, 0.4])

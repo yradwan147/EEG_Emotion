@@ -554,12 +554,19 @@ $r=0.18$.
 \begin{figure}[ht]
 \centering
 \IfFileExists{figures/neuro/NF4_time_resolved.pdf}
-  {\includegraphics[width=0.95\linewidth]{neuro/NF4_time_resolved.pdf}}
+  {\includegraphics[width=\linewidth]{neuro/NF4_time_resolved.pdf}}
   {}
-\caption{Per-second cohort V-axis $|r|$ over the 30-second clip, across
-all five frequency bands. The mid-late $\alpha/\beta$ peak coincides
-with the LPP / sustained-attention window; the early $\gamma$ peak
-with M\"uller's affective-picture window.}
+\caption{Time-resolved V-axis encoding across the 30-second clip.
+\textbf{(a)} Per-second cohort $|r|$ across all $28$ stimuli, one trace
+per frequency band; the early $\gamma$ peak ($t{\approx}2$\,s)
+coincides with M\"uller's affective-picture window and the sustained
+$\alpha/\beta$ peak ($t{\approx}17$--$20$\,s) coincides with the LPP
+sustained-attention window. \textbf{(b)} Same trace restricted to the
+$9$-stimulus emotional-pole subset where the cohort effect lives;
+$\alpha$ reaches $|r|{\approx}0.78$. \textbf{(c)} Per-subject
+distribution of $\alpha$-peak times: only $\sim$24\% of subjects peak
+inside the cohort 18--21\,s window, evidence that the cohort signal
+is a between-subject phenomenon rather than a tight common attractor.}
 \label{fig:time-resolved}
 \end{figure}
 
@@ -810,11 +817,13 @@ correlation that motivates the ensembling strategy.
 \begin{figure}[h]
 \centering
 \IfFileExists{figures/landmark/lf7_recipe_cascade.pdf}
-  {\includegraphics[width=0.85\linewidth]{landmark/lf7_recipe_cascade.pdf}}
-  {\includegraphics[width=0.85\linewidth]{F7_sota_cascade.pdf}}
-\caption{Recipe ablation cascade from CBraMod's $0.572$ to our
-10-checkpoint ensemble's $0.6948$. Each bar is one recipe component or
-ensembling step.}
+  {\includegraphics[width=\linewidth]{landmark/lf7_recipe_cascade.pdf}}
+  {\includegraphics[width=\linewidth]{F7_sota_cascade.pdf}}
+\caption{Recipe ablation cascade from the EMOD baseline at $0.6287$
+(previous FACED-9 SOTA~\citep{chen2025emod}) to our $10$-checkpoint
+ensemble at $0.6948$ ($+10.5\%$ relative). Each bar is one recipe
+component or ensembling step. Older baselines (CBraMod $0.572$,
+EmotionKD $0.628$) shown for reference.}
 \label{fig:cascade}
 \end{figure}
 

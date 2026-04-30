@@ -1,5 +1,13 @@
-\textbf{Stimulus-level alignment between the LLM valence axis and human EEG.}
-Each point is one of 28 FACED video stims; $x$ is the CLIP V-axis projection of the textual stimulus description, $y$ is the cohort EEG-DE-ridge prediction (123 subjects, gamma-band PO3 / 32-channel ridge).
-Pearson $r{=}0.874$, $p<10^{-9}$.
-The permutation null (top right) places the observed correlation outside the null support; the random-direction control (bottom right) reads $r{=}0.07$.
-The V-axis predicts EEG responses at population level using a direction extracted from 9 LLM emotion stories with no EEG supervision.
+\textbf{Stimulus-level alignment between the LLM-derived valence
+direction and human EEG.}
+Each point is one of the $28$ FACED video stimuli; $x$ is the LLM
+V-axis projection of the textual stimulus description, $y$ is the
+single ridge-regression prediction of that projection from all $160$
+cohort channel--band features ($32$ channels $\times$ $5$ frequency
+bands, averaged over $123$ subjects and over each clip).
+Cohort Pearson $r{=}{+}0.87$ ($n{=}28$, $p<10^{-9}$). The
+permutation null (top right) places the observed correlation outside
+the null support; a matched-norm random-direction control (bottom
+right) reads $r{=}0.07$. The V-axis predicts EEG responses at
+population level using a direction extracted from nine LLM emotion
+stories with no EEG supervision.

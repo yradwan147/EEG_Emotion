@@ -30,9 +30,14 @@ def main():
     bs    = data['time_resolved_best_stim']   # (5, 30)
     psp   = data['time_resolved_per_subj_peak']  # (5, Nsub)
 
-    fig = plt.figure(figsize=(12.6, 5.6))
-    gs = fig.add_gridspec(1, 2, left=0.06, right=0.985, top=0.84, bottom=0.12,
-                          wspace=0.24)
+    # 1x3 layout: (a) all-stim time-trace | (b) best-stim time-trace |
+    # (c) per-subject α-peak histogram. The histogram was previously an
+    # inset on (b) and was overlapping the trace data; it now has its
+    # own panel.
+    fig = plt.figure(figsize=(14.4, 5.0))
+    gs = fig.add_gridspec(1, 3, left=0.05, right=0.985, top=0.82, bottom=0.14,
+                          width_ratios=[1.0, 1.0, 0.55],
+                          wspace=0.30)
 
     # --- helper: shade LPP windows ---
     def shade_lpp(ax):
@@ -177,22 +182,31 @@ def main():
     ax_b.set_title(r"(b)  9-stim emotional-pole subset:  alpha reaches |r| ≈ 0.78",
                    fontsize=10, fontweight='bold', loc='left', pad=4)
 
-    # Inset: per-subject peak-time histogram for alpha — placed in
-    # bottom-center where traces are lowest, avoiding all peaks.
-    ax_inset = ax_b.inset_axes([0.34, 0.06, 0.32, 0.33])
+    # ===================================================================
+    # (c) per-subject α-peak histogram — own panel (was an overlapping
+    # inset on panel b)
+    # ===================================================================
+    ax_c = fig.add_subplot(gs[0, 2])
     bi_alpha = bands.index('alpha')
     bins = np.arange(0, 31, 2)
-    ax_inset.hist(psp[bi_alpha], bins=bins, color=BAND_COLORS['alpha'],
-                  edgecolor='black', linewidth=0.4, alpha=0.85)
-    # shade cohort 18-21s window
-    ax_inset.axvspan(18, 21, color=COLORS['red'], alpha=0.22, zorder=0)
-    ax_inset.set_xlabel(r"per-subject α-peak  t  (s)", fontsize=7.0)
-    ax_inset.set_ylabel("# subj", fontsize=7.0)
-    ax_inset.tick_params(axis='both', labelsize=6.5)
+    ax_c.hist(psp[bi_alpha], bins=bins, color=BAND_COLORS['alpha'],
+              edgecolor='black', linewidth=0.5, alpha=0.85)
+    # shade cohort 18–21 s window
+    ax_c.axvspan(18, 21, color=COLORS['red'], alpha=0.22, zorder=0,
+                 label='cohort α-peak (18–21 s)')
     pct_in = float(((psp[bi_alpha] >= 18) & (psp[bi_alpha] <= 21)).mean() * 100)
-    ax_inset.set_title(f"only {pct_in:.0f}% peak in 18–21 s\n"
-                       fr"($\sigma \approx {psp[bi_alpha].std():.0f}$ s)",
-                       fontsize=7.0, pad=2)
+    ax_c.set_xlabel(r"per-subject α-peak time  $t$  (s)", fontsize=9)
+    ax_c.set_ylabel("# subjects", fontsize=9)
+    ax_c.tick_params(axis='both', labelsize=8)
+    ax_c.set_xlim(0, 30)
+    ax_c.legend(loc='upper right', fontsize=7.5, frameon=True,
+                framealpha=0.95)
+    ax_c.grid(axis='y', alpha=0.20, linewidth=0.4)
+    ax_c.set_axisbelow(True)
+    ax_c.set_title(
+        fr"(c)  Only {pct_in:.0f}% of subjects peak in 18–21 s "
+        fr"($\sigma \approx {psp[bi_alpha].std():.0f}$ s)",
+        fontsize=10, fontweight='bold', loc='left', pad=4)
 
     # global title
     fig.suptitle(
