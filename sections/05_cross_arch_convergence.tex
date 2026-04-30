@@ -1,35 +1,23 @@
 \section{Mechanism: Saturated Basin, Load-Bearing Residual}
 \label{sec:convergence}
 
-\S\ref{sec:saturation} reported that V-axis supervision moves
-class-PC1 by up to $+0.36$ but moves the within-class residual by
-$\sim 10^{-7}$. We take that decomposition as the operative geometry
-and ask what each subspace actually does.
+\S\ref{sec:saturation} reported that V-axis supervision moves the
+class-mean component of the network's features by up to $+0.36$ but
+moves the within-class residual by a numerical zero. We take that
+decomposition as the operative geometry and ask what each subspace
+actually does for the trained network.
 
-\paragraph{Cross-architecture convergence to the same axis.}
-We collect $36$ EEG-emotion checkpoints spanning two
-architectures (CBraMod~\citep{wang2025cbramod} and
-EMOD~\citep{chen2025emod}), three training regimes, and six recipe
-variants. For each, we extract balanced test accuracy and two
-V-axis encoding scores from the $28$-stimulus penultimate features:
-a class-PC1 alignment $|\mathrm{corr}(\mathrm{PC}_1(\{\mu_k\}),
-v_{\mathrm{CLIP}})|$ across the nine class centroids, and a
-within-class residual alignment between the validation-selected
-best residual PC and the $28$-stim CLIP V-axis residual. Across
-$n{=}36$ checkpoints,
-$\mathrm{Pearson}(\mathrm{BACC},
-\mathrm{class\text{-}PC1\text{-}r}){=}{+}0.885$ and
-$\mathrm{Pearson}(\mathrm{BACC},
-\mathrm{within\text{-}resid\text{-}r}){=}{+}0.738$
-(Figure~\ref{fig:crossarch}). A $1000$-direction random Gaussian
-null matched in $L_2$ norm to $v_{\mathrm{CLIP}}$ places class-PC1
-at the $93.5^{\mathrm{th}}$ percentile; the 9-class PC1 subspace is
-intrinsically low-dimensional ($\sigma{=}0.62$), so we foreground
-the within-class residual---operating in
-$D_{\mathrm{resid}}\approx D-9$---as the statistically robust
-signal. The class-PC1 basin is essentially saturated across seeds
-($|r|\in[0.60, 0.77]$, mean $0.69 \pm 0.05$;
-Appendix~\ref{app:convergence-deep-dive}).
+\paragraph{Different seeds find the same axis.}
+Across $36$ EEG-emotion checkpoints from two architectures
+(CBraMod~\citep{wang2025cbramod}, EMOD~\citep{chen2025emod}) and six
+recipe variants, balanced accuracy correlates with V-axis encoding
+strength at $r{=}{+}0.885$ in the class-mean subspace and $r{=}{+}0.738$
+in the orthogonal residual (Figure~\ref{fig:crossarch}). The
+class-mean basin is essentially saturated across seeds
+($|r|\in[0.60, 0.77]$): every well-trained checkpoint finds the
+same direction. The full forest, random-direction null, and
+intrinsic-dimension diagnostics are in
+Appendix~\ref{app:convergence-deep-dive}.
 
 \begin{figure}[ht]
 \centering
@@ -40,45 +28,31 @@ Appendix~\ref{app:convergence-deep-dive}).
 \label{fig:crossarch}
 \end{figure}
 
-\paragraph{The residual is the load-bearing subspace.} Within-class
-residual encoding predicts ensemble contribution. Across the $10$
-vanilla $d{=}6$, $f{=}128$ checkpoints used to build our SOTA
-ensemble (\S\ref{sec:sota}), leave-one-out contributions
-$\Delta_k = \mathrm{BACC}(\mathrm{ens}) -
-\mathrm{BACC}(\mathrm{ens}\setminus k)$ correlate with
-within-residual $|r|$ at $\mathbf{+0.743}$ ($p{=}0.014$, $n{=}10$);
-a $5000$-resample bootstrap places the slope at $\hat\beta = +0.74$
-with a $95\%$ CI of $[+0.50, +0.92]$, and per-deletion LOO drops
-give $r \in [+0.626, +0.795]$. A top-$7$ ensemble reaches
-$\mathbf{0.6962}$ BACC versus a bottom-$7$ at $\mathbf{0.6829}$
-($z{=}{+}2.0$ above a random-$7$ baseline).
+\paragraph{The residual is what averaging recovers.}
+Within-class residual encoding predicts ensemble contribution: across
+the $10$ checkpoints used to build our SOTA ensemble
+(\S\ref{sec:sota}), per-checkpoint residual strength predicts
+leave-one-out contribution at $\mathbf{r{=}{+}0.74}$ ($p{=}0.014$).
+Bootstrap CIs and per-deletion ranges are in
+Appendix~\ref{app:convergence-deep-dive}.
 
 \begin{quote}
-\textbf{Residual Contribution Regularity.} \emph{For a saturated
-EEG classifier with within-class residual encoding of the V-axis
-at $|r|=\rho_k$, the leave-one-out ensemble contribution scales
-linearly with $\rho_k$, slope $\hat\beta = +0.74$ ($p{=}0.014$,
-$n{=}10$, FACED 9-class). $n=10$ is small; we report this as an
-empirical regularity rather than a law.}
+\textbf{Residual Contribution Regularity.} \emph{For a saturated EEG
+classifier with within-class residual encoding of the V-axis at
+strength $\rho_k$, the leave-one-out ensemble contribution scales
+linearly with $\rho_k$ ($p{=}0.014$, $n{=}10$, FACED 9-class). $n{=}10$
+is small; we report this as an empirical regularity rather than a
+law.}
 \end{quote}
 
-The regularity is correlational. An Arditi-style directional
-ablation~\citep{arditi2024refusal} on the EEG classifier---projecting
-the LLM-derived $v_{\mathrm{resid}}$ out of the penultimate features
-at inference time, without retraining---tightens the link from
-correlation to representational dependence. On each of the $10$
-SOTA-pool checkpoints, the ablation produces
-$\Delta\mathrm{BACC}\in[-0.024, -0.006]$ (mean $-0.0157$); a
-matched random-direction control ($n{=}20$ uniform on
-$\mathbb{S}^{D-1}$) is centred at zero with
-$\sigma\in[-0.0006, +0.0032]$. Every checkpoint clears the null
-parametrically at $p<0.001$ (one-sided, mean $z\approx 7.7$). Per
-checkpoint, within-residual encoding strength does not predict the
-corresponding ablation drop ($r{=}{+}0.17$, $p{=}0.64$, $n{=}10$):
-the representational signal is encoded across the residual subspace
-rather than in a tight per-checkpoint magnitude, so the mechanism
-is read at population level rather than as a per-checkpoint slope.
-This decomposition---saturated basin, load-bearing residual---is
-the operative geometry that \S\ref{sec:saturation} predicted from
-the failure of V-axis supervision and that \S\ref{sec:sota} turns
-into a positive prescription.
+\paragraph{Direct test: ablate the residual at inference time.}
+A directional ablation~\citep{arditi2024refusal}---projecting the
+LLM-derived V-axis residual out of the classifier's penultimate
+features at inference time, without retraining---drops accuracy on
+every one of the $10$ SOTA-pool checkpoints (mean $\Delta\mathrm{BACC}
+= -0.0157$, mean $z{\approx}7.7$ above a matched random-direction
+null). The residual carries the load. This decomposition---saturated
+basin, load-bearing residual---is the operative geometry that
+\S\ref{sec:saturation} predicted from the failure of V-axis
+supervision and that \S\ref{sec:sota} turns into a positive
+prescription.

@@ -50,12 +50,11 @@ what carries information past the saturated basin, ensembling across
 the residual should recover the gain that supervising it cannot.
 Following this prescription on FACED-9 yields a new state of the art
 at $\mathbf{0.6948}$ balanced accuracy on a 10-checkpoint softmax
-ensemble (best val-selected single $\mathbf{0.6755}$), $+21.5\%$ over
-CBraMod's $0.572$~\citep{wang2025cbramod} and $+10.6\%$ over
-EmotionKD's $0.628$~\citep{liu2023emotionkd}. The class prototypes
-used by knowledge distillation in our recipe are interchangeable with
-random orthonormal directions ($\Delta\mathrm{BACC} \le 0.003$): the
-gain is structural, not semantic.
+ensemble (best val-selected single $\mathbf{0.6755}$), $+10.5\%$ over
+the previous SOTA EMOD's $0.6287$~\citep{chen2025emod}. The class
+prototypes used by knowledge distillation in our recipe are
+interchangeable with random orthonormal directions ($\Delta\mathrm{BACC}
+\le 0.003$): the gain is structural, not semantic.
 
 A probe is needed for the saturation claim---what is the concept the
 network already encodes? We use a one-dimensional \emph{valence
@@ -89,8 +88,8 @@ from $9$ LLM stories that simultaneously recovers SST-2 sentiment,
 predicts cohort EEG, and emerges in EEG classifiers
 (\S\ref{sec:vaxis-llms}--\S\ref{sec:topography}). \textbf{(5)}
 Cross-dataset replication on SEED-V, including saturation, residual
-ablation, and the SOTA prescription
-(\S\ref{sec:vaxis-brain-seedv}).
+ablation, and cross-architecture convergence
+(Appendix~\ref{app:seedv-full}).
 
 Limitations and scope statements are catalogued in
 \S\ref{sec:discussion}.
