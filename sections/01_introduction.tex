@@ -1,10 +1,10 @@
 \section{Introduction}
 \label{sec:intro}
 
-Concept-direction supervision is the standard recipe for adding
-semantic structure to a neural classifier. A target direction $v$ is
+\kilich{did you invent this term "Concept-direction supervision"} is the standard recipe for adding
+semantic structure to a neural classifier\kilich{if standard citations needed}. A target direction $v$ is
 specified in feature space---a class prototype, an LLM-derived
-embedding, a known affective axis---and a loss is added that pulls
+embedding, a known affective axis \kilich{what is affective axis, revier who is not familiar with psychological term finds it hard to understand} ---and a loss is added that pulls
 the network's penultimate features toward $v$. The variants span
 seven years of representation-alignment literature: auxiliary
 regression toward fixed targets, knowledge
@@ -12,7 +12,7 @@ distillation~\citep{hinton2015distilling}, representational similarity
 analysis~\citep{kriegeskorte2008rsa}, contrastive
 losses~\citep{khosla2020supcon,vandenoord2018cpc}, parameter-efficient
 adapters~\citep{hu2022lora,liu2022ia3}, and channel-targeted
-topographic supervision. The shared assumption is that the loss
+topographic  \kilich{citation needed}. The shared assumption is that the loss
 provides information the task does not.
 
 \begin{figure}[ht]
@@ -24,18 +24,18 @@ provides information the task does not.
 \label{fig:universal-vaxis}
 \end{figure}
 
-We test $25$ such interventions on FACED 9-class EEG emotion
+We test $25$ such  \kilich{"interventions" is it right word/term? technique maybe?} on FACED 9-class EEG emotion
 classification~\citep{chen2023faced}. None help. Sixteen produce
 statistically significant accuracy decrements
 ($\Delta\mathrm{BACC} \le -0.013$, $p<0.05$, paired across five seeds);
-zero produce gains. Five intervention families exhibit
+\kilich{feels reduntant: "zero produce gains"}. \kilich{did not understand at all "Five intervention families exhibit
 \emph{monotonic destruction} as the loss weight is raised, with no
 positive setpoint to find. The transition from neutral to harmful is
 sharp and sits at FACED-9 balanced accuracy in $[0.62, 0.66]$: the
 same intervention that lies within seed noise of zero on a weak
-baseline produces a significant negative on the strong recipe.
+baseline produces a significant negative on the strong recipe." - you are abusing jargon or some metaphor use and completely hiding the essence of your claim, why not just write in simple language?}
 
-We call this regularity \emph{saturation}. It is not overfitting:
+\kilich{this paragraph is really trying to do good job by explaining saturation vs overfitting and mechanism. But again metaphors making it impossible to understand better: }We call this regularity \emph{saturation}. It is not overfitting:
 overfitting is memorisation of the training set, while saturation is
 a property of how task supervision and auxiliary supervision interact
 once both target the same direction. Once the class-mean features
@@ -43,33 +43,33 @@ have absorbed the concept from task labels alone, $v$ is no longer
 free real estate for supervision. The auxiliary loss perturbs the
 saturated component while leaving the orthogonal within-class
 residual---the subspace where seeds differ and ensembling recovers
-signal---untouched.
+signal---untouched. \kilich{start with like "We call this pattern saturation. It is not overfitting which is memorising the training set". Saturation happens when network has already learned a direction v from labels alone, so aux loss that pushes features toward v has nothing left to teach. Specifically, .... explain the process ... how class-mean obtained, within-class discrimination ?}
 
-The same mechanism gives a positive prescription: if the residual is
+The same mechanism gives \kilich{where is this prescription defined "a positive prescription:} a positive prescription: if the residual is
 what carries information past the saturated basin, ensembling across
 the residual should recover the gain that supervising it cannot.
 Following this prescription on FACED-9 yields a new state of the art
 at $\mathbf{0.6948}$ balanced accuracy on a 10-checkpoint softmax
 ensemble (best val-selected single $\mathbf{0.6755}$), $+10.5\%$ over
-the previous SOTA EMOD's $0.6287$~\citep{chen2025emod}. The class
-prototypes used by knowledge distillation in our recipe are
+the previous SOTA EMOD's $0.6287$~\citep{chen2025emod}.  The class
+prototypes \kilich{<- out of nowhere without setup} used by knowledge distillation in our recipe are
 interchangeable with random orthonormal directions ($\Delta\mathrm{BACC}
-\le 0.003$): the gain is structural, not semantic.
+\le 0.003$): the gain is structural, not semantic. \kilich{wait ... if random vectors work, what is the V-axis doing at all in the paper?}
 
 A probe is needed for the saturation claim---what is the concept the
 network already encodes? We use a one-dimensional \emph{valence
 direction} ($v$), extracted by mean-centred PCA from the late-layer
 activations of nine short LLM-generated emotion stories, one per
-FACED class~\citep{russell1980circumplex,warriner2013norms}. The
+FACED class~\citep{russell1980circumplex,warriner2013norms} \kilich{citation seems misplaced}. The
 same direction recovers SST-2 sentiment zero-shot at AUC $0.832$ from
 a single Qwen3-4B run~\citep{socher2013recursive}, predicts
-cohort-averaged EEG of $123$ subjects watching emotional videos at
+cohort-averaged \kilich{<- cohort averaged?} EEG of $123$ subjects watching emotional videos at
 $r{=}0.87$ ($p<10^{-9}$), and emerges spontaneously in $36$ EEG
-classifiers trained only on the 9-class label, with class-PC1
+classifiers trained only on the 9-class label, \kilich {ambigious phrasing: "with class-PC1
 alignment $r{=}{+}0.885$ and within-class residual alignment
-$r{=}{+}0.738$ across checkpoints. All five claims (probe existence,
+$r{=}{+}0.738$ across checkpoints" - what does it mean?} . \kilich{"All five claims (probe existence,
 brain alignment, classifier convergence, saturation, residual
-ensembling) replicate on SEED-V~\citep{liu2022seedv}.
+ensembling) replicate on SEED-V~\citep{liu2022seedv}." <-- overstated} \kilich{also, SST-2, cohort EEG, and classifier convergence are three different studies with three different methodologies and three different threats to validity. compressing them into a single comma-separated list reads as a brag-list. each deserves its own sentence (or at minimum its own clause with explicit setup).}
 
 \paragraph{Contributions.} \textbf{(1)} The saturation regularity:
 $25$ interventions, $16/25$ statistically significant negatives,
@@ -84,12 +84,12 @@ residual encoding and leave-one-out contribution, and a new FACED-9
 state of the art at $\mathbf{0.6948}$
 (\S\ref{sec:convergence},~\S\ref{sec:sota}). \textbf{(4)} A probe for
 the saturated concept: a one-dimensional valence direction extracted
-from $9$ LLM stories that simultaneously recovers SST-2 sentiment,
-predicts cohort EEG, and emerges in EEG classifiers
+from $9$ LLM stories that simultaneously recovers \kilich{"recovers" is a vague verb would be better predict, classify} SST-2 sentiment,
+predicts cohort EEG , and emerges in EEG classifiers
 (\S\ref{sec:vaxis-llms}--\S\ref{sec:topography}). \textbf{(5)}
 Cross-dataset replication on SEED-V, including saturation, residual
 ablation, and cross-architecture convergence
 (Appendix~\ref{app:seedv-full}).
-
+\kilich{1 and 2 is basically the same contribution, 5 is robustness statement not a contribution}
 Limitations and scope statements are catalogued in
 \S\ref{sec:discussion}.
