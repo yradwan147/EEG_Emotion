@@ -96,8 +96,11 @@ movie-review sentiment zero-shot on SST-2~\citep{socher2013recursive},
 a standard benchmark of $\sim$$10$k labelled film reviews, at AUC
 $0.832$ from a single Qwen3-4B run. \textbf{(b)} It predicts the EEG
 response averaged across $123$ FACED subjects: a single ridge
-regression on all $160$ channel-band features matches the V-axis
-projection at $r=0.87$ over the $28$ video clips ($p<10^{-9}$).
+regression on all $160$ channel-band features matches the Qwen3-4B
+V-axis projection at $r=0.80$ over the $28$ video clips
+($p<10^{-5}$); a CLIP-text variant of the V-axis built from the same
+$28$ stimulus descriptions reaches $r=0.87$ on the same ridge
+($p<10^{-9}$).
 \textbf{(c)} It emerges spontaneously in EEG classifiers: across $36$
 checkpoints trained only on the $9$ emotion labels, the alignment
 between the network's class-mean component and the V-axis predicts

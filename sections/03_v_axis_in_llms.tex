@@ -77,7 +77,9 @@ Appendix~\ref{app:concept-library}). Nonce-word ablation drops SST-2
 to chance and random-Gaussian directions give chance lexicon recovery,
 so the V-axis is a real semantic direction, not a noise artefact
 (Appendix~\ref{app:specificity-controls}). An Arditi-style same-model
-ablation~\citep{arditi2024refusal} on Qwen3-4B's own features
-collapses zero-shot SST-2 from $0.832$ to chance ($0.505$): the
-V-axis is the direction Qwen3-4B uses for sentiment, not a post-hoc
-projection.
+ablation~\citep{arditi2024refusal} on Qwen3-4B quantifies how much
+sentiment lives along the V-axis: a logistic-regression probe on the
+full features reaches SST-2 AUC $0.909$, drops to $0.907$ after
+projecting the V-axis out and retraining ($z{=}{+}9.8$ above a
+$20$-direction random-direction null). The V-axis carries detectable
+sentiment signal but is not the sole sentiment-bearing direction.

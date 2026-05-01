@@ -5,20 +5,20 @@ We use FACED~\citep{chen2023faced}: $123$ subjects watching $28$
 emotional video clips, $32$ EEG channels at $250$\,Hz. From the
 cohort EEG averaged over subjects and time, we fit a single
 \emph{ridge regression} (a linear model with $L_2$ regularisation)
-predicting the V-axis projection from the $160$ channel--band
-features. The ridge prediction matches the LLM-derived V-axis at
-$\mathbf{r{=}{+}0.87}$ ($n{=}28$ stimuli, $p<10^{-9}$;
-Figure~\ref{fig:eeg-llm-circle}). Three explicit controls support the
-brain--LM correlation. \textbf{(i)} Replacing the V-axis with a
-matched-norm random direction drops the same ridge to $r{=}{+}0.07$
-($p{=}0.73$): the alignment is V-axis-specific, not a generic property
-of the ridge. \textbf{(ii)} Split-half subject reliability on
-per-stimulus valence ratings is $r{=}{+}0.99$: the cohort signal we
-predict is highly reliable. \textbf{(iii)} The same EEG ridge
-predicts the human-rated valence of each clip at $r{=}{+}0.86$,
-matching the V-axis prediction to within $0.01$---the brain signal we
-extract is at the same strength a panel of human raters would
-produce. Multi-comparison correction and other controls are in
+predicting the V-axis projection of each stimulus's textual
+description from the $160$ channel--band features. The ridge
+prediction matches the Qwen3-4B V-axis at $\mathbf{r{=}{+}0.80}$
+($n{=}28$ stimuli, $p<10^{-5}$). Substituting the CLIP-text V-axis
+on the same $28$ stimulus descriptions reaches
+$\mathbf{r{=}{+}0.87}$ ($p<10^{-9}$; Figure~\ref{fig:eeg-llm-circle})
+---the brain signal aligns with the LLM-derived direction across two
+distinct LLM substrates. Three controls support the brain--LM correlation: a matched-norm
+random direction drops the same ridge to $r{=}{+}0.07$ ($p{=}0.73$);
+split-half subject reliability on per-stimulus valence is $r{=}{+}0.99$;
+the same EEG ridge predicts human-rated valence at $r{=}{+}0.86$,
+matching the V-axis prediction to within $0.01$---the brain signal is
+at the same strength a panel of human raters would produce.
+Multi-comparison correction and other controls are in
 Appendix~\ref{app:brain-deep-dive}.
 
 \begin{figure}[ht]

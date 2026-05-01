@@ -1,19 +1,17 @@
 \begin{abstract}
 A common machine-learning technique adds an \emph{auxiliary loss}
-that pushes a network's internal features toward a known target
-direction in feature space---for example, the difference between
-positive and negative sentiment, or between calming and disturbing
-emotion. We test $25$ such recipes (knowledge distillation,
+that pushes a network's features toward a known target direction
+(e.g., positive vs. negative sentiment, or calming vs. disturbing
+emotion). We test $25$ such recipes (knowledge distillation,
 representational-similarity analysis, contrastive losses, low-rank
 adapters, channel-targeted brain-region losses) on
-FACED~\citep{chen2023faced}, a public dataset of EEG recordings from
-$123$ subjects watching $28$ emotional video clips, with $9$ emotion
-classes. None help: $16$ of the $25$ produce statistically significant
-accuracy decrements, and $0$ produce gains. We trace this to a
-regularity we call \emph{saturation}: once a network has converged on
-the emotion classification task from labels alone, its features
-already encode the target concept; the auxiliary loss then adds
-gradient noise rather than information. Saturation is distinct from
+FACED~\citep{chen2023faced}, a public EEG-emotion dataset ($123$
+subjects, $28$ video clips, $9$ classes). None help: $16$ produce
+statistically significant accuracy decrements; $0$ produce gains. We
+trace this to a regularity we call \emph{saturation}: once a network
+has converged from task labels alone, its features already encode the
+target concept; the auxiliary loss then adds gradient noise rather
+than information. Saturation is distinct from
 overfitting (memorising the training set); it is a property of how
 task and auxiliary supervision interact once both target the same
 direction in feature space. The same picture suggests a positive
@@ -36,8 +34,10 @@ component of the language model's late-layer features across the nine
 stories. We call this direction the \emph{valence axis}. The same
 direction predicts movie-review sentiment zero-shot on
 SST-2~\citep{socher2013recursive} at AUC $0.832$, predicts the EEG
-response averaged across $123$ FACED subjects at $r=0.87$, and emerges
-spontaneously in $36$ EEG classifiers trained only on the $9$ emotion
+response averaged across $123$ FACED subjects at $r=0.80$ ($r=0.87$
+when the V-axis is built from CLIP-text embeddings of the same
+stimulus descriptions), and emerges spontaneously in $36$ EEG
+classifiers trained only on the $9$ emotion
 labels. All claims replicate on a second public EEG dataset,
 SEED-V~\citep{liu2022seedv} (Appendix~\ref{app:seedv-full}).
 \end{abstract}
