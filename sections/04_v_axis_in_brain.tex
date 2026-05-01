@@ -3,15 +3,22 @@
 
 We use FACED~\citep{chen2023faced}: $123$ subjects watching $28$
 emotional video clips, $32$ EEG channels at $250$\,Hz. From the
-cohort EEG averaged over subjects and time, we fit a single ridge
-regression predicting the V-axis projection from the standard
-$160$ channel--band features. The ridge prediction matches the
-LLM-derived V-axis at $\mathbf{r{=}{+}0.87}$ ($n{=}28$ stimuli,
-$p<10^{-9}$; Figure~\ref{fig:eeg-llm-circle})---one ridge model on
-all features, not a multi-cell argmax. The headline correlation
-holds against a battery of controls (matched-norm random-direction
-null, split-half subject reliability, multi-comparison correction
-over the channel--band grid, and class-level ranking) catalogued in
+cohort EEG averaged over subjects and time, we fit a single
+\emph{ridge regression} (a linear model with $L_2$ regularisation)
+predicting the V-axis projection from the $160$ channel--band
+features. The ridge prediction matches the LLM-derived V-axis at
+$\mathbf{r{=}{+}0.87}$ ($n{=}28$ stimuli, $p<10^{-9}$;
+Figure~\ref{fig:eeg-llm-circle}). Three explicit controls support the
+brain--LM correlation. \textbf{(i)} Replacing the V-axis with a
+matched-norm random direction drops the same ridge to $r{=}{+}0.07$
+($p{=}0.73$): the alignment is V-axis-specific, not a generic property
+of the ridge. \textbf{(ii)} Split-half subject reliability on
+per-stimulus valence ratings is $r{=}{+}0.99$: the cohort signal we
+predict is highly reliable. \textbf{(iii)} The same EEG ridge
+predicts the human-rated valence of each clip at $r{=}{+}0.86$,
+matching the V-axis prediction to within $0.01$---the brain signal we
+extract is at the same strength a panel of human raters would
+produce. Multi-comparison correction and other controls are in
 Appendix~\ref{app:brain-deep-dive}.
 
 \begin{figure}[ht]
@@ -23,11 +30,9 @@ Appendix~\ref{app:brain-deep-dive}.
 \label{fig:eeg-llm-circle}
 \end{figure}
 
-The same picture survives across all $14$ LLMs: the family-tier
-structure recapitulates on the brain side, with the Qwen3 family
-alone reaching mean $r{=}{+}0.796 \pm 0.011$ irrespective of size.
-The FACED-derived V-axis also generalises to a held-out EEG dataset
-without retraining, ranking the five SEED-V emotion
-classes~\citep{liu2022seedv} at semantic-space $r{=}{+}0.96$;
+The same picture survives across all $14$ LLMs (Qwen3 family mean
+$r{=}{+}0.796 \pm 0.011$ irrespective of size) and on the held-out
+SEED-V dataset~\citep{liu2022seedv}, where the FACED-derived V-axis
+ranks the five SEED-V emotions at $r{=}{+}0.96$ without retraining.
 Appendix~\ref{app:seedv-full} re-derives the V-axis from scratch on
-SEED-V and re-tests every claim in the paper.
+SEED-V and re-tests every claim.

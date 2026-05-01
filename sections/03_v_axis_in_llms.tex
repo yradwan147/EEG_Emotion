@@ -4,11 +4,14 @@
 To test that the saturation regularity operates on a real semantic
 axis rather than a noise dimension, we extract one explicitly. The
 construction uses nine sentences. Given a language model, we author
-one short emotion-evocative story per FACED class, generate $50$
-paraphrases per story by independent LLM calls, and take the mean
-last-token hidden state at the penultimate layer to obtain nine class
-centroids. PCA on these centroids gives the V-axis as the first
-principal component, oriented so that the Joy centroid projects
+one short emotion-evocative story per FACED class and generate $50$
+paraphrases per story by independent LLM calls. For each class we
+average the language model's last-token activation (at the
+penultimate layer) over all $50$ paraphrases; the resulting vector is
+the class \emph{centroid}---a single point in feature space that
+summarises the model's representation of that emotion. Principal
+component analysis (PCA) on the nine centroids gives the V-axis as
+the first principal component, oriented so the Joy centroid projects
 positive. We use Qwen3-4B as the lead model and verify the recipe is
 robust to paraphrase budget, prompt rephrasing, and model choice
 (Appendix~\ref{app:vaxis-protocol}).
@@ -34,7 +37,7 @@ Modality & Benchmark / signal & Score & Reference \\
 \midrule
 Text   & SST-2 sentiment AUC (zero-shot) & $\mathbf{0.832}$ & matches sup.\ LR on $5$k examples \\
 Brain  & Cohort EEG ridge $r$ ($n{=}123$ subj.) & $\mathbf{0.87}$ & $p<10^{-9}$, see \S\ref{sec:vaxis-brain} \\
-Vision & OASIS valence rank $r$ (CLIP-text axis) & $\mathbf{0.869}$ & beats supervised ridge \\
+Vision & OASIS~\citep{kurdi2017oasis} valence $r$ (CLIP-text) & $\mathbf{0.869}$ & beats sup.\ ridge \\
 \bottomrule
 \end{tabular}
 \caption{Cross-modal external validity of a single Qwen3-4B V-axis.
@@ -46,17 +49,13 @@ multilingual results are in Appendix~\ref{app:per-llm-deep-dive}.}
 \label{tab:cross-modal}
 \end{table}
 
-The LLM-side direction has the practical property of a strong
-sentiment classifier: $0.832$ AUC on SST-2 matches a supervised
-logistic regression trained on $5$k in-domain examples ($0.837$),
-beats an off-the-shelf SBERT prototype-cosine baseline
-($0.793$;~\citealp{reimers2019sbert}), and trails a $355$M-param
+The LLM-side direction is a strong sentiment classifier: $0.832$
+AUC on SST-2 matches a supervised logistic regression on $5$k
+in-domain examples ($0.837$), beats an SBERT prototype-cosine
+baseline ($0.793$;~\citealp{reimers2019sbert}), and trails a $355$M
 RoBERTa-large-MNLI zero-shot entailment classifier
-($0.912$;~\citealp{liu2019roberta}) by $0.08$. With nine sentences of
-supervision, no fine-tuning, and no labelled target-modality data, it
-matches what supervised tuning on thousands of examples produces for
-sentiment, and produces a brain prediction that no prior LLM-derived
-direction has reached.
+($0.912$;~\citealp{liu2019roberta}) by $0.08$---all from nine
+sentences of supervision and no labelled target-modality data.
 
 \paragraph{The same direction across families.}
 We extract the V-axis from $14$ language models from 560M to 32B
@@ -72,14 +71,13 @@ direction is a property of \emph{modern} LM training rather than of
 parameter count.
 
 \paragraph{Specificity.}
-The recipe is concept-generic: $20$ further concepts produce a
-working axis ($17$ exceed AUC $0.95$, Appendix~\ref{app:concept-library}).
-A nonce-word ablation drops SST-2 to chance, random-Gaussian
-directions give chance lexicon recovery, and arousal transfers in
-vision but stays below detection in text---the V-axis is a real
-semantic direction, not a noise artefact
-(Appendix~\ref{app:specificity-controls}). An Arditi-style
-same-model ablation~\citep{arditi2024refusal} on Qwen3-4B's own
-features collapses zero-shot SST-2 from $0.832$ to chance ($0.505$):
-the V-axis is the direction Qwen3-4B uses for sentiment, not a
-post-hoc projection.
+The recipe is concept-generic ($20$ further concepts produce a
+working axis, $17$ exceed AUC $0.95$;
+Appendix~\ref{app:concept-library}). Nonce-word ablation drops SST-2
+to chance and random-Gaussian directions give chance lexicon recovery,
+so the V-axis is a real semantic direction, not a noise artefact
+(Appendix~\ref{app:specificity-controls}). An Arditi-style same-model
+ablation~\citep{arditi2024refusal} on Qwen3-4B's own features
+collapses zero-shot SST-2 from $0.832$ to chance ($0.505$): the
+V-axis is the direction Qwen3-4B uses for sentiment, not a post-hoc
+projection.

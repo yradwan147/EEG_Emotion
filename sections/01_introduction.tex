@@ -6,16 +6,16 @@ target direction in feature space---a known semantic concept such as
 sentiment polarity, the truthfulness of a statement, or the valence
 of an emotion---and add an \emph{auxiliary loss} that pulls the
 network's penultimate features toward this direction. The recipes
-vary widely. Knowledge distillation~\citep{hinton2015distilling}
+vary widely. Knowledge distillation (KD)~\citep{hinton2015distilling}
 aligns a student network's features with those of a teacher network.
-Representational-similarity analysis~\citep{kriegeskorte2008rsa}
+Representational similarity analysis (RSA)~\citep{kriegeskorte2008rsa}
 aligns the geometry of pairwise distances between two networks.
 Contrastive losses~\citep{khosla2020supcon,vandenoord2018cpc} pull
 same-class features together and push different-class features apart.
-Parameter-efficient adapters such as LoRA~\citep{hu2022lora} restrict
-the network's update to a low-rank direction in weight space.
-Channel-targeted topographic losses~\citep{padakanti2025meg} bias
-which input channels matter most. The shared assumption across all
+Parameter-efficient fine-tuning (PEFT) adapters such as
+LoRA~\citep{hu2022lora} restrict the network's update to a low-rank
+direction in weight space. Channel-targeted topographic
+losses~\citep{padakanti2025meg} bias which input channels matter most. The shared assumption across all
 of these methods is that the auxiliary loss provides information the
 task labels alone cannot.
 
@@ -32,8 +32,9 @@ We test 25 such techniques on FACED~\citep{chen2023faced}, a public
 dataset of EEG recordings from $123$ subjects watching $28$ emotional
 video clips ($32$ EEG channels at $250$\,Hz, $9$ emotion classes).
 None help. Sixteen produce statistically significant accuracy
-decrements ($\Delta$BACC $\le -0.013$, $p<0.05$, paired across five
-seeds); zero produce gains. Five of the $25$ recipes show
+decrements (change in balanced accuracy $\Delta$BACC $\le -0.013$, the
+fraction-correct averaged uniformly across the $9$ classes;
+$p<0.05$, paired across five seeds); zero produce gains. Five of the $25$ recipes show
 \emph{monotonic destruction}: the harder we push the auxiliary loss,
 the worse accuracy gets, with no positive setpoint to find. The
 transition from neutral-to-harmful is sharp: an auxiliary loss that

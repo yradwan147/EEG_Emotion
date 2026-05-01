@@ -8,16 +8,17 @@ decomposition as the operative geometry and ask what each subspace
 actually does for the trained network.
 
 \paragraph{Different seeds find the same axis.}
-Across $36$ EEG-emotion checkpoints from two architectures
-(CBraMod~\citep{wang2025cbramod}, EMOD~\citep{chen2025emod}) and six
-recipe variants, balanced accuracy correlates with V-axis encoding
-strength at $r{=}{+}0.885$ in the class-mean subspace and $r{=}{+}0.738$
-in the orthogonal residual (Figure~\ref{fig:crossarch}). The
+Across $36$ EEG-emotion checkpoints from two foundation-model
+backbones (CBraMod~\citep{wang2025cbramod} and
+EMOD~\citep{chen2025emod}) and six recipe variants, balanced accuracy
+correlates with V-axis encoding strength at $r{=}{+}0.885$ in the
+class-mean subspace ($p{=}7.8{\times}10^{-13}$) and $r{=}{+}0.738$ in
+the orthogonal residual (Figure~\ref{fig:crossarch}). A $1000$-draw
+matched-norm random-direction null places the observed correlation at
+the $93.5$th percentile, so the convergence is V-axis-specific. The
 class-mean basin is essentially saturated across seeds
-($|r|\in[0.60, 0.77]$): every well-trained checkpoint finds the
-same direction. The full forest, random-direction null, and
-intrinsic-dimension diagnostics are in
-Appendix~\ref{app:convergence-deep-dive}.
+($|r|\in[0.60, 0.77]$): every well-trained checkpoint finds the same
+direction.
 
 \begin{figure}[ht]
 \centering

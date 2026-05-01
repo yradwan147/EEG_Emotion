@@ -55,34 +55,30 @@ Appendix~\ref{app:ensemble-extras}.}
 \label{tab:sota}
 \end{table}
 
-The cascade starts from an EMOD replication at $0.6194 \pm 0.004$ over
-five seeds---within seed noise of the published $0.6287$
-\citep{chen2025emod} ($\Delta=-0.009$, n.s.)---and walks up in six steps. Augmentation---temporal jitter, channel
-dropout, amplitude scaling, and Gaussian noise applied with
-$p{=}0.6$---contributes the largest single jump ($+0.0149$),
-reflecting the limited stimulus count per subject. Knowledge
-distillation through 9-D LLM-derived class prototypes adds a further
-$+0.0096$; a \texttt{rand9} ablation that swaps the prototypes for
-random orthonormal directions costs at most $0.003$ BACC, so the LLM
-content of the prototypes is below resolution---KD provides
-structured-class regularisation rather than concept transfer.
-Depth-doubling to $d{=}6$ adds another $+0.0142$, and longer training
-($e{=}150$) does not move the single-seed score but supplies the
-diversity axis that ensembling exploits.
+The cascade starts at the EMOD replication ($0.6194 \pm 0.004$,
+within seed noise of the published $0.6287$~\citep{chen2025emod}) and
+walks up in six steps. Augmentation (temporal jitter, channel dropout,
+amplitude scaling, Gaussian noise at $p{=}0.6$) contributes the
+largest single jump ($+0.0149$). Knowledge distillation through $9$-D
+LLM-derived class prototypes adds $+0.0096$; a \texttt{rand9} ablation
+(identical recipe with the $9$ LLM prototypes replaced by random
+orthonormal directions) costs at most $0.003$ BACC, paired $p>0.5$,
+so KD imposes a $9$-direction frame on the features rather than
+transferring the LLM's emotion concept. Depth-doubling to $d{=}6$
+adds $+0.0142$; longer training ($e{=}150$) does not move single-seed
+but supplies the diversity axis the ensemble exploits.
 
 \paragraph{Two-tier ensemble theory.}
-The $10$ $d{=}6$ checkpoints share an \emph{identical} class-PC1 basin
-($|r|\in[0.60, 0.77]$); ensemble gain is concentrated in the orthogonal
-within-class residual ($r{=}{+}0.743$, $p{=}0.014$). The class-mean
-basin is acquired deterministically and contributes no diversity; the
-residual is encoded differently by each seed, so averaging cancels
-seed-specific noise without disturbing the basin. Mixing $e{=}100$ and $e{=}150$ ties at $0.6581 \pm 0.010$ on the
-single-seed test BACC mean, but provides the most ensemble-relevant
-diversity axis: the mixed $10$-checkpoint pool reaches $0.6948$
-versus $0.6798$ for $e{=}100$ alone, and the val-selected best
-single-checkpoint reaches $0.6755$ ($+0.017$ over the seed mean,
-within the $\pm 0.010$ seed-std). Headroom-monotonicity (near-zero
-on MNIST), the $10$-checkpoint plateau, and the failure of
-cross-architecture mixing all confirm intra-architecture
-training-length diversity as the operative mechanism
-(Appendix~\ref{app:ensemble-extras}).
+The $10$ $d{=}6$ checkpoints share an identical class-PC1 basin
+($|r|\in[0.60, 0.77]$ across all $10$ seeds): the first principal
+component of the per-class mean features points in the same
+direction. Ensemble gain is concentrated in the orthogonal
+within-class residual ($r{=}{+}0.743$, $p{=}0.014$): each seed encodes
+the residual differently, so averaging cancels seed-specific noise
+without disturbing the basin. Mixing $e{=}100$ and $e{=}150$ ties at
+$0.6581$ on single-seed BACC but provides the diversity axis the
+ensemble exploits: the mixed pool reaches $0.6948$ versus $0.6798$
+for $e{=}100$ alone. Headroom-monotonicity (near-zero on MNIST), the
+$10$-checkpoint plateau, and the failure of cross-architecture mixing
+confirm intra-architecture training-length diversity as the operative
+mechanism (Appendix~\ref{app:ensemble-extras}).
