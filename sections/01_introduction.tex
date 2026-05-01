@@ -90,16 +90,18 @@ lead model), and take the first principal component of the model's
 late-layer features across the nine resulting story representations.
 We call this one-dimensional direction the \emph{valence axis} (or
 V-axis for short), oriented so that the centroid of the Joy story
-projects to a positive value. The same direction predicts movie-review
-sentiment zero-shot on SST-2~\citep{socher2013recursive}, a standard
-benchmark of $\sim$$10$k labelled film reviews, at AUC $0.832$ from a
-single Qwen3-4B run. It predicts the EEG response averaged across
-$123$ FACED subjects: a single ridge regression on all $160$
-channel-band features matches the V-axis projection at $r=0.87$ over
-the $28$ video clips ($p<10^{-9}$). And it emerges spontaneously in
-EEG classifiers: across $36$ checkpoints trained only on the $9$
-emotion labels, the alignment between the network's class-mean
-component and the V-axis predicts balanced accuracy at $r=+0.885$.
+projects to a positive value. Figure~\ref{fig:universal-vaxis} summarises the three external-validity
+results in one panel each. \textbf{(a)} The same direction predicts
+movie-review sentiment zero-shot on SST-2~\citep{socher2013recursive},
+a standard benchmark of $\sim$$10$k labelled film reviews, at AUC
+$0.832$ from a single Qwen3-4B run. \textbf{(b)} It predicts the EEG
+response averaged across $123$ FACED subjects: a single ridge
+regression on all $160$ channel-band features matches the V-axis
+projection at $r=0.87$ over the $28$ video clips ($p<10^{-9}$).
+\textbf{(c)} It emerges spontaneously in EEG classifiers: across $36$
+checkpoints trained only on the $9$ emotion labels, the alignment
+between the network's class-mean component and the V-axis predicts
+balanced accuracy at $r=+0.885$.
 The probe demonstrates the concept is real (the saturation operates
 on a genuine semantic axis); the SOTA prescription shows that, once
 the network has saturated, only the loss's structure matters, not the
