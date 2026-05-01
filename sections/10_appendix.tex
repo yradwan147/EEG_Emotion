@@ -92,10 +92,13 @@ SBERT prototype cosine \citep{reimers2019sbert} & 0.793 & --- \\
 RoBERTa-large-MNLI entailment \citep{liu2019roberta} & 0.912 & --- \\
 \bottomrule
 \end{tabular}
-\caption{Zero-shot V-axis projection from a single Qwen3-4B run reaches
-sentiment AUC up to $0.938$ (Yelp), with SST-2 ($0.832$) within $0.005$
-of a 5k-sample supervised LR baseline ($0.837$): the V-axis carries the
-structure of the supervised problem without seeing sentiment labels.
+\caption{Zero-shot V-axis sentiment results. SST-2 ($0.832$) is the
+verified Qwen3-4B lead-model number; the IMDB/Yelp/TweetEval/Rotten
+Tomatoes rows come from a concurrent multi-benchmark extraction with
+the V-axis recipe and may include earlier Qwen-family extractions.
+SST-2 alone is within $0.005$ of a 5k-sample supervised LR baseline
+($0.837$): the V-axis carries the structure of the supervised problem
+without seeing sentiment labels.
 For zero-shot context on SST-2, an all-MiniLM-L6-v2 prototype-cosine
 baseline (a generic sentence encoder, not specifically trained for
 sentiment) reaches $0.793$, while RoBERTa-large-MNLI used as a zero-shot

@@ -1,19 +1,23 @@
 \section{Introduction}
 \label{sec:intro}
 
-\kilich{did you invent this term "Concept-direction supervision"} is the standard recipe for adding
-semantic structure to a neural classifier\kilich{if standard citations needed}. A target direction $v$ is
-specified in feature space---a class prototype, an LLM-derived
-embedding, a known affective axis \kilich{what is affective axis, revier who is not familiar with psychological term finds it hard to understand} ---and a loss is added that pulls
-the network's penultimate features toward $v$. The variants span
-seven years of representation-alignment literature: auxiliary
-regression toward fixed targets, knowledge
-distillation~\citep{hinton2015distilling}, representational similarity
-analysis~\citep{kriegeskorte2008rsa}, contrastive
-losses~\citep{khosla2020supcon,vandenoord2018cpc}, parameter-efficient
-adapters~\citep{hu2022lora,liu2022ia3}, and channel-targeted
-topographic  \kilich{citation needed}. The shared assumption is that the loss
-provides information the task does not.
+A common technique in machine learning is to point a network at a
+target direction in feature space---a known semantic concept such as
+sentiment polarity, the truthfulness of a statement, or the valence
+of an emotion---and add an \emph{auxiliary loss} that pulls the
+network's penultimate features toward this direction. The recipes
+vary widely. Knowledge distillation~\citep{hinton2015distilling}
+aligns a student network's features with those of a teacher network.
+Representational-similarity analysis~\citep{kriegeskorte2008rsa}
+aligns the geometry of pairwise distances between two networks.
+Contrastive losses~\citep{khosla2020supcon,vandenoord2018cpc} pull
+same-class features together and push different-class features apart.
+Parameter-efficient adapters such as LoRA~\citep{hu2022lora} restrict
+the network's update to a low-rank direction in weight space.
+Channel-targeted topographic losses~\citep{padakanti2025meg} bias
+which input channels matter most. The shared assumption across all
+of these methods is that the auxiliary loss provides information the
+task labels alone cannot.
 
 \begin{figure}[ht]
 \centering
@@ -24,72 +28,103 @@ provides information the task does not.
 \label{fig:universal-vaxis}
 \end{figure}
 
-We test $25$ such  \kilich{"interventions" is it right word/term? technique maybe?} on FACED 9-class EEG emotion
-classification~\citep{chen2023faced}. None help. Sixteen produce
-statistically significant accuracy decrements
-($\Delta\mathrm{BACC} \le -0.013$, $p<0.05$, paired across five seeds);
-\kilich{feels reduntant: "zero produce gains"}. \kilich{did not understand at all "Five intervention families exhibit
-\emph{monotonic destruction} as the loss weight is raised, with no
-positive setpoint to find. The transition from neutral to harmful is
-sharp and sits at FACED-9 balanced accuracy in $[0.62, 0.66]$: the
-same intervention that lies within seed noise of zero on a weak
-baseline produces a significant negative on the strong recipe." - you are abusing jargon or some metaphor use and completely hiding the essence of your claim, why not just write in simple language?}
+We test 25 such techniques on FACED~\citep{chen2023faced}, a public
+dataset of EEG recordings from $123$ subjects watching $28$ emotional
+video clips ($32$ EEG channels at $250$\,Hz, $9$ emotion classes).
+None help. Sixteen produce statistically significant accuracy
+decrements ($\Delta$BACC $\le -0.013$, $p<0.05$, paired across five
+seeds); zero produce gains. Five of the $25$ recipes show
+\emph{monotonic destruction}: the harder we push the auxiliary loss,
+the worse accuracy gets, with no positive setpoint to find. The
+transition from neutral-to-harmful is sharp: an auxiliary loss that
+has no measurable effect at a weak baseline (balanced accuracy $\le
+0.62$) becomes a statistically significant negative once the baseline
+strengthens (BACC $\ge 0.66$). The same intervention can be a no-op
+on one recipe and a meaningful regression on the next, separated by
+a few points of headline accuracy.
 
-\kilich{this paragraph is really trying to do good job by explaining saturation vs overfitting and mechanism. But again metaphors making it impossible to understand better: }We call this regularity \emph{saturation}. It is not overfitting:
-overfitting is memorisation of the training set, while saturation is
-a property of how task supervision and auxiliary supervision interact
-once both target the same direction. Once the class-mean features
-have absorbed the concept from task labels alone, $v$ is no longer
-free real estate for supervision. The auxiliary loss perturbs the
-saturated component while leaving the orthogonal within-class
-residual---the subspace where seeds differ and ensembling recovers
-signal---untouched. \kilich{start with like "We call this pattern saturation. It is not overfitting which is memorising the training set". Saturation happens when network has already learned a direction v from labels alone, so aux loss that pushes features toward v has nothing left to teach. Specifically, .... explain the process ... how class-mean obtained, within-class discrimination ?}
+We call this regularity \emph{saturation}, and it is not the same
+thing as overfitting. Overfitting is a network memorising its
+training set. Saturation is what happens when the network has
+\emph{already} learned the concept the auxiliary loss was meant to
+teach, from the task labels alone. Once the EEG classifier has
+converged on the 9-class emotion task, its penultimate features are
+organised so that each emotion's trials cluster around a stable mean
+position; the average direction in feature space along which positive
+and negative emotions sit on opposite sides---the
+\emph{class-mean component}---is already the target concept. The
+auxiliary loss can only deform this already-correct direction. The
+remaining variation, which lives in the directions \emph{within} each
+class (the \emph{within-class residual}), is what discriminates
+between trials of the same emotion and what an additional seed could
+plausibly improve. The auxiliary loss does not reach this
+within-class residual. Pushing harder on the loss therefore moves
+the saturated component further along the target direction without
+adding any new discriminative signal, and accuracy drops.
 
-The same mechanism gives \kilich{where is this prescription defined "a positive prescription:} a positive prescription: if the residual is
-what carries information past the saturated basin, ensembling across
-the residual should recover the gain that supervising it cannot.
-Following this prescription on FACED-9 yields a new state of the art
-at $\mathbf{0.6948}$ balanced accuracy on a 10-checkpoint softmax
-ensemble (best val-selected single $\mathbf{0.6755}$), $+10.5\%$ over
-the previous SOTA EMOD's $0.6287$~\citep{chen2025emod}.  The class
-prototypes \kilich{<- out of nowhere without setup} used by knowledge distillation in our recipe are
-interchangeable with random orthonormal directions ($\Delta\mathrm{BACC}
-\le 0.003$): the gain is structural, not semantic. \kilich{wait ... if random vectors work, what is the V-axis doing at all in the paper?}
+The same picture suggests a positive prescription: rather than
+supervise the saturated component, ensemble across multiple training
+seeds whose within-class residuals differ, recovering the gain that
+auxiliary supervision cannot. Following this prescription on FACED-9
+yields a new state of the art at $\mathbf{0.6948}$ balanced accuracy
+on a $10$-checkpoint softmax ensemble (best val-selected single
+checkpoint $\mathbf{0.6755}$), a $+10.5\%$ relative improvement over
+EMOD~\citep{chen2025emod}, the previous FACED-9 SOTA at $0.6287$.
+Surprisingly, the class prototypes used by the knowledge-distillation
+step in our recipe can be replaced by random orthonormal vectors
+without measurable degradation ($\Delta$BACC $\le 0.003$). The SOTA
+gain is therefore \emph{structural}: the loss imposes a useful
+9-class shape on the features regardless of which direction the
+prototypes point in.
 
-A probe is needed for the saturation claim---what is the concept the
-network already encodes? We use a one-dimensional \emph{valence
-direction} ($v$), extracted by mean-centred PCA from the late-layer
-activations of nine short LLM-generated emotion stories, one per
-FACED class~\citep{russell1980circumplex,warriner2013norms} \kilich{citation seems misplaced}. The
-same direction recovers SST-2 sentiment zero-shot at AUC $0.832$ from
-a single Qwen3-4B run~\citep{socher2013recursive}, predicts
-cohort-averaged \kilich{<- cohort averaged?} EEG of $123$ subjects watching emotional videos at
-$r{=}0.87$ ($p<10^{-9}$), and emerges spontaneously in $36$ EEG
-classifiers trained only on the 9-class label, \kilich {ambigious phrasing: "with class-PC1
-alignment $r{=}{+}0.885$ and within-class residual alignment
-$r{=}{+}0.738$ across checkpoints" - what does it mean?} . \kilich{"All five claims (probe existence,
-brain alignment, classifier convergence, saturation, residual
-ensembling) replicate on SEED-V~\citep{liu2022seedv}." <-- overstated} \kilich{also, SST-2, cohort EEG, and classifier convergence are three different studies with three different methodologies and three different threats to validity. compressing them into a single comma-separated list reads as a brag-list. each deserves its own sentence (or at minimum its own clause with explicit setup).}
+This raises a tension that the rest of the paper resolves directly:
+if random prototypes give the same gain as language-model-derived
+ones, what is a language-model-derived direction doing in this paper
+at all? It serves as a probe of \emph{which} concept the network has
+saturated on, demonstrating that saturation operates on a real
+semantic axis rather than on noise. The construction uses nine
+sentences. We write one short emotion-evocative story per FACED
+class, pass each through a language model (we use Qwen3-4B as the
+lead model), and take the first principal component of the model's
+late-layer features across the nine resulting story representations.
+We call this one-dimensional direction the \emph{valence axis} (or
+V-axis for short), oriented so that the centroid of the Joy story
+projects to a positive value. The same direction predicts movie-review
+sentiment zero-shot on SST-2~\citep{socher2013recursive}, a standard
+benchmark of $\sim$$10$k labelled film reviews, at AUC $0.832$ from a
+single Qwen3-4B run. It predicts the EEG response averaged across
+$123$ FACED subjects: a single ridge regression on all $160$
+channel-band features matches the V-axis projection at $r=0.87$ over
+the $28$ video clips ($p<10^{-9}$). And it emerges spontaneously in
+EEG classifiers: across $36$ checkpoints trained only on the $9$
+emotion labels, the alignment between the network's class-mean
+component and the V-axis predicts balanced accuracy at $r=+0.885$.
+The probe demonstrates the concept is real (the saturation operates
+on a genuine semantic axis); the SOTA prescription shows that, once
+the network has saturated, only the loss's structure matters, not the
+direction it points in.
 
-\paragraph{Contributions.} \textbf{(1)} The saturation regularity:
-$25$ interventions, $16/25$ statistically significant negatives,
-monotonic destruction in $5$ families, transition at FACED-9 BACC
-$[0.62, 0.66]$ (\S\ref{sec:saturation}). \textbf{(2)} Mechanism check:
-V-axis supervision moves the saturated class-PC1 by
-$\Delta|r| = +0.01$ to $+0.36$ but moves the within-class residual by
-$\sim 10^{-7}$, a numerical zero (\S\ref{sec:saturation}).
-\textbf{(3)} A residual-diversity ensemble that turns the mechanism
-into a positive prescription: $r{=}{+}0.74$ between per-checkpoint
-residual encoding and leave-one-out contribution, and a new FACED-9
-state of the art at $\mathbf{0.6948}$
-(\S\ref{sec:convergence},~\S\ref{sec:sota}). \textbf{(4)} A probe for
-the saturated concept: a one-dimensional valence direction extracted
-from $9$ LLM stories that simultaneously recovers \kilich{"recovers" is a vague verb would be better predict, classify} SST-2 sentiment,
-predicts cohort EEG , and emerges in EEG classifiers
-(\S\ref{sec:vaxis-llms}--\S\ref{sec:topography}). \textbf{(5)}
-Cross-dataset replication on SEED-V, including saturation, residual
-ablation, and cross-architecture convergence
-(Appendix~\ref{app:seedv-full}).
-\kilich{1 and 2 is basically the same contribution, 5 is robustness statement not a contribution}
+\paragraph{Contributions.} \textbf{(1)} The \emph{saturation
+regularity}: across $25$ representation-alignment recipes on FACED-9,
+$16$ produce statistically significant accuracy decrements and $0$
+produce gains, with monotonic destruction in $5$ families and a
+sharp transition in $[0.62, 0.66]$ balanced accuracy. A direct
+mechanism check shows that the auxiliary loss moves the saturated
+class-mean component by $\Delta|r|=+0.01$ to $+0.36$ but moves the
+within-class residual by $\sim 10^{-7}$, a numerical zero
+(\S\ref{sec:saturation}). \textbf{(2)} A residual-diversity ensemble
+that turns the mechanism into a positive prescription: per-checkpoint
+within-class residual encoding predicts leave-one-out ensemble
+contribution at $r=+0.74$, and a $10$-checkpoint softmax ensemble
+reaches FACED-9 SOTA at $\mathbf{0.6948}$
+(\S\ref{sec:convergence},~\S\ref{sec:sota}). \textbf{(3)} The
+\emph{V-axis probe}: a one-dimensional valence direction extracted
+from $9$ language-model emotion stories that simultaneously predicts
+text sentiment, predicts cohort EEG response, and emerges
+spontaneously in EEG classifiers
+(\S\ref{sec:vaxis-llms}--\S\ref{sec:topography}). All three
+contributions robustness-tested on a second EEG dataset,
+SEED-V~\citep{liu2022seedv} (Appendix~\ref{app:seedv-full}).
+
 Limitations and scope statements are catalogued in
 \S\ref{sec:discussion}.

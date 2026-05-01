@@ -1,32 +1,43 @@
 \begin{abstract}
-We study what happens when an explicit concept direction \kilich{<-what is concept direction?} is added as
-auxiliary supervision to a network that has already learned the same
-concept \kilich{<-what are you refering by "same concept"?} from task labels alone. Across $25$ representation-alignment 
-interventions \kilich{<-what is the meaning?} on FACED \kilich{<-what is the meaning? + also EMOD, SEED-V, and SST-2 is not familiar to reviewers outside neuro} 9-class EEG emotion classification---knowledge
-distillation, RSA \kilich{<-what is the meaning?}, contrastive losses, PEFT adapters \kilich{<-what is the meaning of PEFT?}, and
-channel-targeted topographic losses \kilich{<-what is the meaning channel--targeted topo loss?}---none help: $16$ produce
-statistically significant accuracy decrements, and $0$ produce gains.
-We call this regularity \emph{saturation}: above an empirical
-threshold (FACED-9 balanced accuracy in $[0.62, 0.66]$), the concept
-direction is already the geometry the network finds from task labels,
-and the auxiliary loss perturbs that saturated component while leaving
-the orthogonal within-class residual \kilich{<-what is the meaning of orthogonal residual?}---the load-bearing
-subspace \kilich{<-what is the meaning load bearing subspace?}---untouched. Saturation is distinct from overfitting: it is
-not memorisation, but a property of how task supervision and auxiliary
-supervision interact once they target the same direction. The same
-mechanism gives a positive prescription: ensemble across the residual
-rather than supervise the basin \kilich{<-what is the meaning of basin?}. Following this prescription on
-FACED-9 yields a new state of the art at $\mathbf{0.6948}$ balanced
-accuracy ($+10.5\%$ over EMOD's $0.6287$), with the surprising
-property that the LLM-derived class prototypes used in our recipe \kilich{<-what recipe?} are
-interchangeable with random orthonormal directions ($\Delta\le 0.003$):
-the gain is structural, not semantic. As a probe of the concept the
-network saturates on, we extract a one-dimensional \emph{valence
-direction} \kilich{<-what is the meaning?} by PCA \kilich{<-what is the meaning?} from the late-layer activations of nine short
-LLM-generated emotion stories; the same direction recovers SST-2
-sentiment zero-shot at AUC $0.832$ from a single Qwen3-4B run,
-predicts cohort-averaged \kilich{<-what is the meaning cohort averaged?} EEG of $123$ subjects watching emotional
-videos at $r{=}0.87$, and emerges spontaneously in $36$ EEG
-classifiers trained only on the 9-class label. All claims replicate on
-SEED-V.
+A common machine-learning technique adds an \emph{auxiliary loss}
+that pushes a network's internal features toward a known target
+direction in feature space---for example, the difference between
+positive and negative sentiment, or between calming and disturbing
+emotion. We test $25$ such recipes (knowledge distillation,
+representational-similarity analysis, contrastive losses, low-rank
+adapters, channel-targeted brain-region losses) on
+FACED~\citep{chen2023faced}, a public dataset of EEG recordings from
+$123$ subjects watching $28$ emotional video clips, with $9$ emotion
+classes. None help: $16$ of the $25$ produce statistically significant
+accuracy decrements, and $0$ produce gains. We trace this to a
+regularity we call \emph{saturation}: once a network has converged on
+the emotion classification task from labels alone, its features
+already encode the target concept; the auxiliary loss then adds
+gradient noise rather than information. Saturation is distinct from
+overfitting (memorising the training set); it is a property of how
+task and auxiliary supervision interact once both target the same
+direction in feature space. The same picture suggests a positive
+prescription: ensemble across the seed-specific differences in the
+features, rather than supervise the part of the features that has
+already saturated. Following this prescription on FACED yields a new
+state of the art at $\mathbf{0.6948}$ balanced accuracy---a $+10.5\%$
+relative improvement over EMOD~\citep{chen2025emod}, the previous SOTA
+on FACED, at $0.6287$. Surprisingly, the language-model-derived class
+prototypes used by the knowledge-distillation step in our recipe are
+interchangeable with random orthonormal vectors ($\Delta\le 0.003$
+balanced accuracy): the SOTA gain comes from the \emph{shape} of the
+loss (a 9-class structure imposed on the features), not from the
+\emph{content} of the prototypes. To probe what the network has
+saturated on---and to demonstrate it is a real semantic axis, not a
+noise dimension---we extract one direction explicitly. We write nine
+short emotion-evocative stories (one per FACED class), pass them
+through a language model (Qwen3-4B), and take the first principal
+component of the language model's late-layer features across the nine
+stories. We call this direction the \emph{valence axis}. The same
+direction predicts movie-review sentiment zero-shot on
+SST-2~\citep{socher2013recursive} at AUC $0.832$, predicts the EEG
+response averaged across $123$ FACED subjects at $r=0.87$, and emerges
+spontaneously in $36$ EEG classifiers trained only on the $9$ emotion
+labels. All claims replicate on a second public EEG dataset,
+SEED-V~\citep{liu2022seedv} (Appendix~\ref{app:seedv-full}).
 \end{abstract}

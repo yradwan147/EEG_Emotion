@@ -1,77 +1,63 @@
 \section{The Saturation Regularity}
 \label{sec:saturation}
 
-We test $25$ representation-alignment interventions on FACED 9-class
-EEG emotion classification at our strongest baseline (an
-EMOD~\citep{chen2025emod} backbone augmented to BACC $\approx
-0.66$; recipe in \S\ref{sec:sota}). Each adds an auxiliary loss
-$\mathcal{L}_v$ supplying a target concept direction $v$ to the
-penultimate features, with $\lambda > 0$ on a conservative grid.
-The $25$ families span knowledge distillation, RSA, contrastive,
+We test whether auxiliary supervision toward a known concept direction
+helps a strong EEG-emotion classifier. The setup uses an
+EMOD~\citep{chen2025emod} backbone (the previous FACED-9 SOTA),
+augmented to balanced accuracy $\approx 0.66$ via the recipe described
+in \S\ref{sec:sota}. Each of the $25$ interventions adds an auxiliary
+loss that pulls the network's penultimate features toward a target
+direction. The directions span LLM-derived class prototypes (the
+V-axis of \S\ref{sec:vaxis-llms}), CLIP-text embeddings, and
+frontal-channel masks matched to the analytical valence ceiling. The
+loss families span knowledge distillation, RSA, contrastive losses,
 PEFT adapters, curriculum schedules, multi-LLM ensembles,
-channel-targeted topographic losses, and anger-weighted
-variants---direction sources include LLM-derived class-mean
-prototypes (the V-axis of \S\ref{sec:vaxis-llms}), CLIP-text
-embeddings, and frontal-channel masks matched to the analytical
-valence ceiling (Appendix~\ref{app:full-vaxis-table}).
+channel-targeted topographic losses, and anger-weighted variants
+(full $25$-row table in Appendix~\ref{app:full-vaxis-table}).
 
 \paragraph{Result.} None help. Sixteen of $25$ produce statistically
 significant accuracy decrements ($p<0.05$, paired across five seeds);
-zero produce gains. Five intervention families exhibit
-\emph{monotonic destruction} as the loss weight is raised, with no
-positive setpoint to find. Among the negatives is the
-anger-weighted target that analytically maximises the V-axis
-ceiling on FACED ($\Delta\mathrm{BACC} = -0.054$,
-Appendix~\ref{app:full-vaxis-table})---supplying the strongest
-possible target makes things strictly worse.
+zero produce gains. Five families show \emph{monotonic destruction}:
+the harder we push the auxiliary loss, the worse accuracy gets, with
+no positive setpoint. Even the anger-weighted target that
+analytically maximises the V-axis ceiling on FACED is among the worst
+($\Delta\mathrm{BACC} = -0.054$): supplying the strongest possible
+target makes things strictly worse, not better.
 
-\paragraph{The transition.} The transition from neutral to harmful is
-sharp and unidirectional in baseline strength. Interventions whose
-effect is within seed noise of zero on a weak baseline (BACC $\le
-0.62$) produce a significant negative on the strong recipe (BACC
-$\ge 0.66$). The transition sits cleanly in the band
-$[0.62, 0.66]$ on FACED-9; we do not claim universal cut-offs.
+\paragraph{The transition is sharp and unidirectional in baseline
+strength.} An intervention whose effect lies within seed noise on a
+weak baseline (BACC $\le 0.62$) becomes a statistically significant
+negative on the strong recipe (BACC $\ge 0.66$). The transition sits
+cleanly in the band $[0.62, 0.66]$ on FACED-9 (we make no claim about
+universal cut-offs).
 
 \begin{quote}
-\textbf{Saturation: an empirical regularity.} \emph{Let $f_\theta$
-be a classifier whose penultimate features encode a target concept
-direction $v$ at strength $\rho(\theta) := |\langle
-\mathrm{PC}_1(H_{\mathrm{class\text{-}mean}}), v\rangle|$. We
-observe an empirical threshold $\rho^*$ above which supplementing
-the task loss with any auxiliary loss $\mathcal{L}_v(H, v)$ at
-$\lambda > 0$ produces $\mathbb{E}[\Delta\mathrm{BACC}] \leq 0$
-across the $25$ families tested ($16/25$ at $p<0.05$, $0/25$ in
-the positive direction).}
+\textbf{Saturation: an empirical regularity.} \emph{Let $f_\theta$ be
+a classifier whose penultimate features encode a target concept
+direction $v$ at strength $\rho(\theta)$. We observe an empirical
+threshold $\rho^*$ above which adding any auxiliary loss
+$\mathcal{L}_v$ at $\lambda > 0$ produces
+$\mathbb{E}[\Delta\mathrm{BACC}] \leq 0$ across the $25$ families
+tested ($16/25$ at $p<0.05$, $0/25$ positive).}
 \end{quote}
 
-The statement is empirical, not analytical, but the evidence is
-hard to read as hyperparameter mis-specification: increasing
-$\lambda$ only makes things worse in five families, and the
-analytically optimal target is among the worst negatives.
+\paragraph{Saturation is not overfitting.} Overfitting is memorisation
+of the training set. Saturation is a property of how task and
+auxiliary supervision interact once both target the same direction
+in feature space. The mechanism check below makes the distinction
+concrete.
 
-\paragraph{Saturation is not overfitting.} Overfitting is
-memorisation of the training set. Saturation is a property of
-how task supervision and auxiliary supervision interact when the
-network's class-mean features have already converged on the
-target geometry from task labels alone. The auxiliary loss is
-not adding signal the task did not provide; it is perturbing the
-component the task already produced. The mechanism check in
-\S\ref{sec:convergence} makes the distinction concrete.
-
-\paragraph{Mechanism check.} V-axis supervision pushes class-PC1
-even further along $v$ ($\Delta|r| = +0.01$ to $+0.36$ across
-intervention families) while leaving the within-class residual
-encoding at $\sim 10^{-7}$---a numerical zero. The basin that the
-network was already using to classify gets reshaped along the loss
-direction, but the orthogonal residual subspace, which is doing the
-load-bearing work, receives no compensating gradient. We therefore
-read $\rho(\theta)$ in the boxed statement as a flag for a network
-that has already converged on the target geometry from task
-supervision alone, and the saturation mechanism as parameter drift
-along the loss direction within an already-converged subspace. The
-full $25$-row table, monotonic destruction curves, transition
-table, and the Path~B failure (mixing V-axis-trained checkpoints
-into the SOTA pool, $\Delta\in[-0.0193, -0.0145]$) are in
+\paragraph{Mechanism check.} The auxiliary loss does push the network's
+class-mean features further along the target direction (alignment
+increases by $\Delta|r|=+0.01$ to $+0.36$ across the $25$ families),
+but it leaves the within-class residual---the part of the features
+that actually distinguishes one trial of an emotion from another---at
+a numerical zero ($\sim 10^{-7}$). The basin the network was using
+to classify gets reshaped along the loss direction; the load-bearing
+orthogonal residual subspace receives no compensating gradient.
+Twenty-five interventions reduce to one principle: \emph{a saturated
+representation is an unhelpful supervision target.} Full table,
+monotonic-destruction curves, transition table, and the Path-B
+failure (mixing V-axis-trained checkpoints into the SOTA pool,
+$\Delta\in[-0.0193, -0.0145]$) are in
 Appendix~\ref{app:full-vaxis-table}--\ref{app:saturation-extras}.
-Twenty-five interventions reduce to one principle: \emph{a
-saturated representation is an unhelpful supervision target}.
