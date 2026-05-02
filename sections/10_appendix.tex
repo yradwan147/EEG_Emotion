@@ -705,7 +705,9 @@ regime in our 5-seed runs.}
 \label{tab:saturation-transition}
 \end{table}
 
-\paragraph{Saturation cliff figure (LF6).}
+\paragraph{Saturation cliff figure (LF6).} Figure~\ref{fig:saturation-cliff}
+plots $\Delta$BACC against base-recipe BACC across all $25$ interventions,
+showing the unidirectional sign-flip in the $[0.62, 0.66]$ band.
 
 \begin{figure}[ht]
 \centering
@@ -790,6 +792,10 @@ ensemble does not gain from variance in this subspace; gains come
 exclusively from the orthogonal residual.
 
 \paragraph{Directional ablation figure (LF16).}
+Figure~\ref{fig:lf16-causal} shows the per-checkpoint causal effect:
+ablating $v_{\mathrm{resid}}$ drops BACC by $\overline{\Delta}=-0.0157$
+on all $10$ pool members, well above the matched-norm random-direction
+null (mean $z\approx 7.7$, all $p<0.001$).
 
 \begin{figure}[ht]
 \centering
