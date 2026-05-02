@@ -60,20 +60,9 @@ orthogonal residual subspace receives no compensating gradient.
 The $25$ recipes reduce to one principle: \emph{a saturated
 representation is an unhelpful supervision target.}
 
-\paragraph{Relation to prior art.} The few-class regime in which
-distillation underperforms is documented in subclass
-distillation~\citep{muller2020subclass} on the information-theoretic
-argument that hard-label entropy grows as $\log K$ while soft-label
-entropy grows linearly in $K$, and in linear-projection
-distillation~\citep{loo2024lelp} which uses neural-collapse geometry
-to lift the rank of the teacher target. Tf-KD~\citep{yuan2020revisitkd}
-established that random or poorly-trained teachers can match real ones
-at $K\!\geq\!100$. Our finding extends that picture to the few-class
-regime ($K\!=\!9$, FACED) where the destruction is sharpest, and
-supplies the residual-variance mechanism that explains why a
-saturated classifier responds to additional supervision the same way
-regardless of teacher content. Full table, monotonic-destruction
-curves, transition table, and the Path-B failure (mixing
-V-axis-trained checkpoints into the SOTA pool,
-$\Delta\in[-0.0193, -0.0145]$) are in
-Appendix~\ref{app:full-vaxis-table}--\ref{app:saturation-extras}.
+The few-class distillation regime is documented qualitatively in
+\citep{muller2020subclass,loo2024lelp,yuan2020revisitkd}; we add the
+residual-variance mechanism that explains the content-independence.
+Full table, transition table, and the Path-B failure
+(V-axis-trained checkpoints in the SOTA pool, $\Delta\in[-0.0193,
+-0.0145]$) are in Appendix~\ref{app:full-vaxis-table}--\ref{app:saturation-extras}.
