@@ -28,15 +28,15 @@ task labels alone cannot.
 \label{fig:universal-vaxis}
 \end{figure}
 
-We test 25 such techniques on FACED~\citep{chen2023faced}, a public
+We test $25$ such techniques on FACED~\citep{chen2023faced}, a public
 dataset of EEG recordings from $123$ subjects watching $28$ emotional
 video clips ($32$ EEG channels at $250$\,Hz, $9$ emotion classes).
 None help. Sixteen produce statistically significant accuracy
 decrements (change in balanced accuracy $\Delta$BACC $\le -0.013$, the
 fraction-correct averaged uniformly across the $9$ classes;
-$p<0.05$, paired across five seeds); zero produce gains. Five of the $25$ recipes show
-\emph{monotonic destruction}: the harder we push the auxiliary loss,
-the worse accuracy gets, with no positive setpoint to find. The
+$p<0.05$, paired across five seeds); zero produce gains. Five recipes
+show \emph{monotonic destruction}: the harder we push the auxiliary
+loss, the worse accuracy gets, with no positive setpoint to find. The
 transition from neutral-to-harmful is sharp: an auxiliary loss that
 has no measurable effect at a weak baseline (balanced accuracy $\le
 0.62$) becomes a statistically significant negative once the baseline
