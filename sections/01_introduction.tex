@@ -112,25 +112,20 @@ direction it points in.
 
 \paragraph{Contributions.} \textbf{(1)} The \emph{saturation
 regularity}: across $25$ representation-alignment recipes on FACED-9,
-$16$ produce statistically significant accuracy decrements and $0$
-produce gains, with monotonic destruction in $5$ families and a
-sharp transition in $[0.62, 0.66]$ balanced accuracy. A direct
-mechanism check shows that the auxiliary loss moves the saturated
-class-mean component by $\Delta|r|=+0.01$ to $+0.36$ but moves the
+$16$ produce significant decrements and $0$ produce gains, with
+monotonic destruction in $5$ families and a sharp transition in
+$[0.62, 0.66]$ BACC; the auxiliary loss moves the saturated
+class-mean component by $\Delta|r|{=}{+}0.01$ to ${+}0.36$ but the
 within-class residual by $\sim 10^{-7}$, a numerical zero
 (\S\ref{sec:saturation}). \textbf{(2)} A residual-diversity ensemble
-that turns the mechanism into a positive prescription: per-checkpoint
-within-class residual encoding predicts leave-one-out ensemble
-contribution at $r=+0.74$, and a $10$-checkpoint softmax ensemble
-reaches FACED-9 SOTA at $\mathbf{0.6948}$
-(\S\ref{sec:convergence},~\S\ref{sec:sota}). \textbf{(3)} The
-\emph{V-axis probe}: a one-dimensional valence direction extracted
-from $9$ language-model emotion stories that simultaneously predicts
-text sentiment, predicts cohort EEG response, and emerges
-spontaneously in EEG classifiers
-(\S\ref{sec:vaxis-llms}--\S\ref{sec:topography}). All three
-contributions robustness-tested on a second EEG dataset,
-SEED-V~\citep{liu2022seedv} (Appendix~\ref{app:seedv-full}).
-
-Limitations and scope statements are catalogued in
-\S\ref{sec:discussion}.
+turning the mechanism into a positive prescription: per-checkpoint
+residual encoding predicts leave-one-out contribution at $r{=}{+}0.74$,
+and a $10$-checkpoint ensemble reaches FACED-9 SOTA at
+$\mathbf{0.6948}$ (\S\ref{sec:convergence},~\S\ref{sec:sota}).
+\textbf{(3)} The \emph{V-axis probe}: a one-dimensional valence
+direction from $9$ language-model emotion stories that simultaneously
+predicts text sentiment, predicts cohort EEG response, and emerges
+in EEG classifiers
+(\S\ref{sec:vaxis-llms}--\S\ref{sec:topography}). All three replicate
+on SEED-V~\citep{liu2022seedv} (Appendix~\ref{app:seedv-full}).
+Limitations in \S\ref{sec:discussion}.
