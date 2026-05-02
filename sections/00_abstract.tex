@@ -8,10 +8,11 @@ adapters, channel-targeted brain-region losses) on
 FACED~\citep{chen2023faced}, a public EEG-emotion dataset ($123$
 subjects, $28$ video clips, $9$ classes). None help: $16$ produce
 statistically significant accuracy decrements; $0$ produce gains. We
-trace this to a regularity we call \emph{saturation}: once a network
-has converged from task labels alone, its features already encode the
-target concept; the auxiliary loss then adds gradient noise rather
-than information. Saturation is distinct from
+trace this to a regularity we call \emph{saturation} (in our setting,
+a converged FACED-9 classifier whose penultimate features already
+encode a measurable valence direction): once the network has reached
+this regime from task labels alone, the auxiliary loss adds gradient
+noise rather than information. Saturation is distinct from
 overfitting (memorising the training set); it is a property of how
 task and auxiliary supervision interact once both target the same
 direction in feature space. The same picture suggests a positive

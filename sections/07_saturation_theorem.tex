@@ -34,13 +34,14 @@ cleanly in the band $[0.62, 0.66]$ on FACED-9 (we make no claim about
 universal cut-offs).
 
 \begin{quote}
-\textbf{Saturation: an empirical regularity.} \emph{Let $f_\theta$ be
-a classifier whose penultimate features encode a target concept
-direction $v$ at strength $\rho(\theta)$. We observe an empirical
-threshold $\rho^*$ above which adding any auxiliary loss
+\textbf{Saturation (FACED-9, EMOD backbone, V-axis target).}
+\emph{Let $f_\theta$ be a FACED-9 emotion classifier whose
+penultimate features encode the V-axis at strength $\rho(\theta)$.
+We observe an empirical threshold $\rho^*$ in the band
+$\mathrm{BACC}\in[0.62, 0.66]$ above which adding any auxiliary loss
 $\mathcal{L}_v$ at $\lambda > 0$ produces
-$\mathbb{E}[\Delta\mathrm{BACC}] \leq 0$ across all families
-tested ($16/25$ significant at $p<0.05$, $0/25$ positive).}
+$\mathbb{E}[\Delta\mathrm{BACC}] \leq 0$ across all families tested
+($16/25$ significant at $p<0.05$, $0/25$ positive).}
 \end{quote}
 
 \paragraph{Saturation is not overfitting.} Overfitting is memorisation
@@ -58,9 +59,10 @@ a numerical zero ($\sim 10^{-7}$). The basin the network was using
 to classify gets reshaped along the loss direction; the load-bearing
 orthogonal residual subspace receives no compensating gradient.
 The $25$ recipes reduce to one principle: \emph{a saturated
-representation is an unhelpful supervision
-target}---qualitatively similar to the few-class distillation regime
-\citep{muller2020subclass,loo2024lelp,yuan2020revisitkd}, with the
-residual-variance mechanism made explicit. Full table, transition
-table, and Path-B failure ($\Delta\in[-0.0193,-0.0145]$) in
+representation is an unhelpful supervision target}, qualitatively
+similar to the few-class distillation
+regime~\citep{muller2020subclass,loo2024lelp,yuan2020revisitkd},
+here with the residual-variance mechanism made explicit. Full table,
+transition table, and Path-B failure
+($\Delta\in[-0.0193,-0.0145]$) in
 Appendix~\ref{app:full-vaxis-table}--\ref{app:saturation-extras}.
