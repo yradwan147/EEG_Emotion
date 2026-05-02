@@ -70,15 +70,13 @@ but supplies the diversity axis the ensemble exploits.
 
 \paragraph{Two-tier ensemble theory.}
 The $10$ $d{=}6$ checkpoints share an identical class-PC1 basin
-($|r|\in[0.60, 0.77]$ across all $10$ seeds): the first principal
-component of the per-class mean features points in the same
-direction. Ensemble gain is concentrated in the orthogonal
-within-class residual ($r{=}{+}0.743$, $p{=}0.014$): each seed encodes
-the residual differently, so averaging cancels seed-specific noise
-without disturbing the basin. Mixing $e{=}100$ and $e{=}150$ ties at
-$0.6581$ on single-seed BACC but provides the diversity axis the
-ensemble exploits: the mixed pool reaches $0.6948$ versus $0.6798$
-for $e{=}100$ alone. Headroom-monotonicity (near-zero on MNIST), the
-$10$-checkpoint plateau, and the failure of cross-architecture mixing
+($|r|\in[0.60, 0.77]$ across all $10$ seeds); ensemble gain
+concentrates in the orthogonal within-class residual ($r{=}{+}0.743$,
+$p{=}0.014$). Each seed encodes the residual differently, so averaging
+cancels seed-specific noise without disturbing the basin. Mixing
+$e{=}100$ and $e{=}150$ ties at $0.6581$ single-seed but provides the
+diversity axis: the mixed pool reaches $0.6948$ versus $0.6798$ for
+$e{=}100$ alone. Headroom-monotonicity (near-zero on MNIST), the
+$10$-checkpoint plateau, and failure of cross-architecture mixing
 confirm intra-architecture training-length diversity as the operative
 mechanism (Appendix~\ref{app:ensemble-extras}).

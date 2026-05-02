@@ -58,11 +58,9 @@ a numerical zero ($\sim 10^{-7}$). The basin the network was using
 to classify gets reshaped along the loss direction; the load-bearing
 orthogonal residual subspace receives no compensating gradient.
 The $25$ recipes reduce to one principle: \emph{a saturated
-representation is an unhelpful supervision target.}
-
-The few-class distillation regime is documented qualitatively in
-\citep{muller2020subclass,loo2024lelp,yuan2020revisitkd}; we add the
-residual-variance mechanism that explains the content-independence.
-Full table, transition table, and the Path-B failure
-(V-axis-trained checkpoints in the SOTA pool, $\Delta\in[-0.0193,
--0.0145]$) are in Appendix~\ref{app:full-vaxis-table}--\ref{app:saturation-extras}.
+representation is an unhelpful supervision
+target}---qualitatively similar to the few-class distillation regime
+\citep{muller2020subclass,loo2024lelp,yuan2020revisitkd}, with the
+residual-variance mechanism made explicit. Full table, transition
+table, and Path-B failure ($\Delta\in[-0.0193,-0.0145]$) in
+Appendix~\ref{app:full-vaxis-table}--\ref{app:saturation-extras}.
