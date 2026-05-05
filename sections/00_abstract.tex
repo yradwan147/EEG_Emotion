@@ -1,44 +1,47 @@
 \begin{abstract}
-A common machine-learning technique adds an \emph{auxiliary loss}
-that pushes a network's features toward a known target direction
-(e.g., positive vs. negative sentiment, or calming vs. disturbing
-emotion). We test $25$ such recipes (knowledge distillation,
-representational-similarity analysis, contrastive losses, low-rank
-adapters, channel-targeted brain-region losses) on
-FACED~\citep{chen2023faced}, a public EEG-emotion dataset ($123$
-subjects, $28$ video clips, $9$ classes). None help: $16$ produce
-statistically significant accuracy decrements; $0$ produce gains. We
-trace this to a regularity we call \emph{saturation} (in our setting,
-a converged FACED-9 classifier whose penultimate features already
-encode a measurable valence direction): once the network has reached
-this regime from task labels alone, the auxiliary loss adds gradient
-noise rather than information. Saturation is distinct from
-overfitting (memorising the training set); it is a property of how
-task and auxiliary supervision interact once both target the same
-direction in feature space. The same picture suggests a positive
-prescription: ensemble across the seed-specific differences in the
-features, rather than supervise the part of the features that has
-already saturated. Following this prescription on FACED yields a new
-state of the art at $\mathbf{0.6948}$ balanced accuracy---a $+10.5\%$
-relative improvement over EMOD~\citep{chen2025emod}, the previous SOTA
-on FACED, at $0.6287$. The SOTA recipe itself uses a structural KD step on the weaker
-pre-saturation baseline, distinct from the $25$ semantic-V-axis
-failures on the already-saturated baseline; confirming this, replacing
-the SOTA-recipe LLM prototypes with random orthonormal vectors costs
-$\le 0.003$ BACC---the gain is the $9$-direction \emph{shape}, not
-the prototype \emph{content}. To probe what the network has
-saturated on---and to demonstrate it is a real semantic axis, not a
-noise dimension---we extract one direction explicitly. We write nine
-short emotion-evocative stories (one per FACED class), pass them
-through a language model (Qwen3-4B), and take the first principal
-component of the language model's late-layer features across the nine
-stories. We call this direction the \emph{valence axis}. The same
-direction predicts movie-review sentiment zero-shot on
-SST-2~\citep{socher2013recursive} at AUC $0.832$, predicts the EEG
-response averaged across $123$ FACED subjects at $r=0.80$ ($r=0.87$
-when the V-axis is built from CLIP-text embeddings of the same
-stimulus descriptions), and emerges spontaneously in $36$ EEG
-classifiers trained only on the $9$ emotion
-labels. All claims replicate on a second public EEG dataset,
-SEED-V~\citep{liu2022seedv} (Appendix~\ref{app:seedv-full}).
+% A common machine-learning technique adds an \emph{auxiliary loss}
+% that pushes a network's features toward a known target direction
+% (e.g., positive vs. negative sentiment, or calming vs. disturbing
+% emotion). We test $25$ such recipes (knowledge distillation,
+% representational-similarity analysis, contrastive losses, low-rank
+% adapters, channel-targeted brain-region losses) on
+% FACED~\citep{chen2023faced}, a public EEG-emotion dataset ($123$
+% subjects, $28$ video clips, $9$ classes). None help: $16$ produce
+% statistically significant accuracy decrements; $0$ produce gains. We
+% trace this to a regularity we call \emph{saturation} (in our setting,
+% a converged FACED-9 classifier whose penultimate features already
+% encode a measurable valence direction): once the network has reached
+% this regime from task labels alone, the auxiliary loss adds gradient
+% noise rather than information. Saturation is distinct from
+% overfitting (memorising the training set); it is a property of how
+% task and auxiliary supervision interact once both target the same
+% direction in feature space. The same picture suggests a positive
+% prescription: ensemble across the seed-specific differences in the
+% features, rather than supervise the part of the features that has
+% already saturated. Following this prescription on FACED yields a new
+% state of the art at $\mathbf{0.6948}$ balanced accuracy---a $+10.5\%$
+% relative improvement over EMOD~\citep{chen2025emod}, the previous SOTA
+% on FACED, at $0.6287$. Surprisingly, the language-model-derived class
+% prototypes used by the knowledge-distillation step in our recipe are
+% interchangeable with random orthonormal vectors ($\Delta\le 0.003$
+% balanced accuracy): the SOTA gain comes from the \emph{shape} of the
+% loss (a 9-class structure imposed on the features), not from the
+% \emph{content} of the prototypes. To probe what the network has
+% saturated on---and to demonstrate it is a real semantic axis, not a
+% noise dimension---we extract one direction explicitly. We write nine
+% short emotion-evocative stories (one per FACED class), pass them
+% through a language model (Qwen3-4B), and take the first principal
+% component of the language model's late-layer features across the nine
+% stories. We call this direction the \emph{valence axis}. The same
+% direction predicts movie-review sentiment zero-shot on
+% SST-2~\citep{socher2013recursive} at AUC $0.832$, predicts the EEG
+% response averaged across $123$ FACED subjects at $r=0.80$ ($r=0.87$
+% when the V-axis is built from CLIP-text embeddings of the same
+% stimulus descriptions), and emerges spontaneously in $36$ EEG
+% classifiers trained only on the $9$ emotion
+% labels. All claims replicate on a second public EEG dataset,
+% SEED-V~\citep{liu2022seedv} (Appendix~\ref{app:seedv-full}).
+\xuhui{Large language models (LLMs) have become powerful general-purpose representation learners, with growing evidence that their internal features align with human cognition across high-level concepts. In this paper, we investigate this alignment for emotional valence. Using just nine emotion-evocative sentences, we construct a one-dimensional valence direction, named the V-axis, from modern LLMs and verify that it transfers zero-shot to standard sentiment benchmarks and converges across fourteen LLMs of widely varying scale.
+We then consider whether the V-axis is shared with the human brain signals. It predicts the cohort EEG response to affective videos, and more strikingly, is independently rediscovered by EEG emotion classifiers that never see it during training. Different modalities and different supervision converge on the same valence direction.
+A shared direction across LLMs and brains suggests an obvious next step: align EEG classifiers to the V-axis via auxiliary losses. We test twenty-five standard recipes spanning knowledge distillation, RSA, contrastive, and topographic losses, and find that none help; sixteen significantly hurt accuracy. We explain this with the saturation regularity: once task labels alone have driven the network onto the target direction, supervision can only deform an already-saturated basin while the load-bearing within-class residual receives no gradient. The same mechanism prescribes its remedy. Ensembling across residual diversity, rather than supervising the basin, improves balanced accuracy by 10.5\% over the prior best on FACED, a public EEG emotion recognition benchmark. The same effect replicates on the SEED-V dataset.}
 \end{abstract}
