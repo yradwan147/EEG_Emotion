@@ -34,14 +34,16 @@
 
 % === Cross-referencing ===
 \usepackage[capitalize,noabbrev]{cleveref}
-\newcommand{\xuhui}[1]{\textcolor{blue}{#1}}
-
 % === Coauthor / reviewer comment macros =============================
 % Toggle: \showcommentstrue shows comments, \showcommentsfalse hides.
-% Set to false for camera-ready.
+% Set to false for camera-ready / submission PDF (also neutralises \xuhui).
 \usepackage[normalem]{ulem}     % for \sout in tracked changes
 \newif\ifshowcomments
-\showcommentstrue
+\showcommentsfalse
+
+% Xuhui authorship marker — respects \ifshowcomments.
+% \showcommentstrue → blue (review mode); \showcommentsfalse → plain.
+\newcommand{\xuhui}[1]{\ifshowcomments{\color{blue}#1}\else#1\fi}
 
 % Kilich's color — vivid orange, HTML spec for maximum reliability
 \definecolor{kilichcolor}{HTML}{D2691E}
