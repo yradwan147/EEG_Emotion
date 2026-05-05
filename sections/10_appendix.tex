@@ -6,7 +6,7 @@
 \section{Datasets, Splits, and Preprocessing}
 \label{app:datasets}
 
-\paragraph{FACED.} 123 subjects, 28 emotional video clips covering 9
+\paragraph{FACED.} 123 subjects, 28 emotional video clips covering 9 emotion classes. The test split (subjects 100--122) yields $23 \times 28 = 644$ \emph{trial} pairs; trials are further sub-segmented into $3$-second windows (3 windows per stimulus, plus boundary windows) producing $1{,}932$ test instances used in the confusion matrices and the cross-arch convergence analysis. The cohort EEG ridge of \S\ref{sec:vaxis-brain} aggregates back to the $28$-stimulus level. Original FACED preprocessing detail follows below: 9
 emotion categories (Anger, Disgust, Fear, Sadness, Neutral, Amusement,
 Inspiration, Joy, Tenderness) at 3--4 stimuli per class. EEG: 32
 channels, 250\,Hz sampling, 30-second clip duration. We use the official
@@ -36,43 +36,30 @@ in Section~\ref{sec:vaxis-brain}.
 \section{V-Axis Extraction Protocol}
 \label{app:vaxis-protocol}
 
-\paragraph{Story prompts.} The recipe uses a fixed bank of $50$ neutral
-topic stems combined with each of the $9$ FACED emotion words, yielding
-$450$ generation prompts per LLM, all held fixed across the $14$
-models. Each prompt is the template
-\begin{quote}\small\itshape
-``Write a very short paragraph (3--4 sentences) about \{topic\} where a
-character experiences intense \{emotion\}. Show the emotion through
-actions and reactions.''
-\end{quote}
-filled with one of the topic stems below and one of the FACED labels
-(\textsc{amusement, inspiration, joy, tenderness, anger, fear, disgust,
-sadness, neutral}). The phrase ``9 stories per class'' in the main text
-refers to the $9$ emotion-class centroids obtained by averaging the
-$50$ generations per class; we generate, not author, the underlying
-text. The $50$ topic stems are:
-\begin{quote}\footnotesize
-a morning commute; a family dinner; a job interview; a first date;
-a hospital visit; a graduation ceremony; a thunderstorm; a birthday
-party; a lonely evening; a road trip; a concert; a funeral; a wedding;
-a surprise reunion; a cooking disaster; a mountain hike; a beach
-sunset; a broken promise; a childhood memory; a late-night phone call;
-a school exam; a new puppy; a rainy afternoon; a flight delay; a
-promotion at work; a car accident; a volunteer day; a library visit;
-a street performance; a power outage; a garden in spring; a snowfall;
-a neighborhood dispute; a lost wallet; a holiday abroad; a moving day;
-a marathon finish; a museum tour; a camping trip; a subway ride; a
-bakery opening; a chess game; a sunrise jog; a dentist appointment; a
-video call with friends; a forest walk; a traffic jam; a sports match;
-a piano recital; a rooftop view.
-\end{quote}
+\paragraph{Story prompts.} Nine emotion-evocative stories (one per FACED
+class), each 1--3 sentences. Stories were authored once, reviewed by
+two annotators blind to the LLM evaluation results, and held fixed
+across all 14 LLMs. Verbatim text:
+\begin{itemize}\setlength\itemsep{0pt}\setlength\parskip{0pt}
+\item \textbf{Anger.} A driver cuts you off in heavy traffic and laughs through the window. Your hands tighten on the wheel and you feel heat rise in your chest.
+\item \textbf{Disgust.} You open the fridge and find a container of leftovers covered in green fuzz, with a sour smell that makes you step back.
+\item \textbf{Fear.} Walking home alone at night, you hear footsteps quicken behind you and notice the streetlights are out.
+\item \textbf{Sadness.} You sort through old photographs of a friend who died last year and realise you can no longer remember the sound of their voice.
+\item \textbf{Neutral.} You wait in line at the post office, glancing at the clock and watching the queue slowly advance one customer at a time.
+\item \textbf{Amusement.} A puppy sneezes so hard it tumbles backwards and stares at the floor in confusion before sneezing again.
+\item \textbf{Inspiration.} A dancer with one leg performs a flawless routine to a standing ovation, demonstrating that constraint can become craft.
+\item \textbf{Joy.} You receive an unexpected acceptance letter from a programme you applied to months ago and forgot about.
+\item \textbf{Tenderness.} A grandparent gently brushes a sleeping child's hair away from their forehead, careful not to wake them.
+\end{itemize}
+Image versions used for the CLIP-image V-axis (Appendix~\ref{app:multilingual-vision}) are nine standard affective stimuli matched to the same nine class labels (full URLs and licences in the released code).
 
-\paragraph{Generation parameters.} Sampling temperature $0.8$, top-$p$
-$0.9$, $\mathtt{max\_new\_tokens}=150$, the model's chat template
-applied. Generations are cached once per LLM family (the Qwen-0.5B
-cache is the seed; same cached generations are scored by every
-downstream model so all $14$ extractions see identical text). No
-post-hoc filtering is applied.
+\paragraph{Paraphrase generation.} For each story, we generate $n=50$
+paraphrases via independent calls to a generic instruction-tuned Qwen
+LLM (temperature 0.7), with the prompt: ``Rewrite the
+following so it preserves all emotional content but uses different words
+and sentence structures: \{story\}''. Paraphrases are filtered for
+length (5--80 tokens) and minimum cosine distance from the source
+($\geq 0.10$ on Sentence-BERT embeddings).
 
 \paragraph{Hidden-state extraction.} Each paraphrase is tokenised and
 passed through the target LM. We take the last-token hidden state at
@@ -262,7 +249,7 @@ typologically distant languages.}
 \end{figure}
 
 Per-language V-axis cosines (computed on Spanish/French extractions
-under the same protocol) are moderate ($r_{\mathrm{en\text{--}es}}=0.47$,
+using the same protocol) are moderate ($r_{\mathrm{en\text{--}es}}=0.47$,
 $r_{\mathrm{en\text{--}fr}}=0.16$, $r_{\mathrm{es\text{--}fr}}=0.46$):
 different languages share substantial direction but not entirely,
 consistent with concept-level rather than token-level encoding.
@@ -429,10 +416,11 @@ AF4 -- AF3 & $-0.0039$ \\
 \bottomrule
 \end{tabular}
 \caption{Davidson FAA on SEED-V. Three of four pairs are negative
-(opposite the strictly positive FACED pattern); only F8--F7 matches the
-FACED sign. The two datasets do \emph{not} replicate FAA in the same
-direction --- consistent with dynamic-video paradigms producing a
-different topographic signature than static-image FAA.}
+(opposite to the strictly positive FACED pattern of
+Appendix~\ref{app:topography-deep-dive}); only F8--F7 matches the
+FACED sign. The two datasets do \emph{not} replicate FAA in the
+same direction, consistent with the dynamic-video paradigm
+producing a different topographic signature than static-image FAA.}
 \label{tab:seedv-faa}
 \end{table}
 
@@ -938,14 +926,15 @@ diversity that helps is intra-architecture, training-length-driven.
 \paragraph{Cohen $\kappa$ disagreement structure.}
 Single-seed accuracy at $e{=}100$ ($0.6581$) and $e{=}150$ ($0.6581$) is
 identical. Cohen $\kappa$ within-$e{=}100$ is $0.694$, within-$e{=}150$
-$0.679$, cross-group $0.702$ (higher $\kappa$ = more agreement); all
-three are similar, so the per-trial prediction patterns are almost
-as concordant across groups as within. Yet mixing $e{=}100$ and
-$e{=}150$ gives $+0.014$ over either group alone --- the gain comes
-from a small but specific pocket of cross-group disagreement: the
-$13.1\%$ of test trials where the two groups differ, on which the
-mixed ensemble gains $+10.3$ percentage points. The diversity is
-targeted (which trials), not population-wide ($\kappa$).
+$0.679$, cross-group $0.702$ (higher $\kappa$ = more agreement). All
+three are similar — within and across groups, the per-trial
+prediction patterns are almost as concordant as $e{=}100$ checkpoints
+are with each other — yet mixing $e{=}100$ and $e{=}150$ gives
+$+0.014$ over either group alone. The gain therefore comes from a
+small but \emph{specific} pocket of cross-group disagreement: the
+$13.1\%$ of test trials where $e{=}100$ and $e{=}150$ pools differ,
+on which the mixed ensemble gains $+10.3$ percentage points. The
+diversity is targeted (which trials), not population-wide ($\kappa$).
 
 \paragraph{Best single checkpoint without ensembling.}
 For deployment scenarios where ensembling is impractical, our best
@@ -1022,6 +1011,25 @@ baseline; $p$-values are paired $t$-tests across 5 seeds.
 
 \section{Discussion Extras and Future Work}
 \label{app:discussion-extras}
+
+\paragraph{Broader impacts.} Improved EEG emotion classifiers have
+clear positive applications in mental-health monitoring, affective
+brain--computer interfaces, and clinical phenotyping of affect
+disorders. The same techniques pose risks of affective inference
+without consent in surveillance, hiring, workplace, education, and
+advertising contexts. The V-axis extraction protocol applied to EEG
+could in principle reduce the calibration-data burden for affective
+inference systems --- a feature that cuts both ways, since lower
+calibration cost lowers the deployment threshold for both clinical
+and surveillance settings. We do not release human EEG data; we
+release training configs, feature-side and analysis code, and
+extracted V-axis directions. Recommended deployment safeguards:
+informed consent, opt-in only, on-device inference, no longitudinal
+storage of raw EEG outside research contexts, and IRB review for any
+non-clinical inference application. Dual-use risk for the V-axis
+extraction itself is low: it operates on text and image features
+already public, and the EEG mapping requires per-cohort EEG access
+that is governed by the original dataset licences.
 
 \paragraph{Implications for affective neuroscience.}
 For video-evoked emotion on FACED, the V-axis is encoded predominantly
