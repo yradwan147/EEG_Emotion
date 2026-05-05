@@ -85,6 +85,14 @@ Qwen3-4B.
 \label{app:per-llm-deep-dive}
 
 \paragraph{Sentiment benchmark table.}
+Table~\ref{tab:vaxis-sentiment} consolidates the zero-shot V-axis
+projection scores across five sentiment corpora and contrasts them
+against (i) a same-corpus 5k-example supervised logistic-regression
+upper bound on SST-2 and (ii) two zero-shot reference baselines
+(SBERT prototype-cosine and a $355$M RoBERTa-large-MNLI entailment
+classifier). The takeaway is that nine LLM stories sit above the
+generic-encoder baseline and within $0.08$ of an NLI-supervised model
+that is two orders of magnitude larger in supervised exposure.
 
 \begin{table}[h]
 \centering
@@ -286,6 +294,19 @@ $[0.844, 0.890]$, EmoBank V $|r|\in[0.485, 0.512]$, Hu \& Liu $|r| \in
 Appendix~\ref{app:statistics}).
 
 \paragraph{Arousal asymmetry: where the recipe fails in text.}
+Table~\ref{tab:arousal-asymmetry} side-by-sides the same nine-story
+PCA recipe instantiated on a valence axis (V-axis, this paper) versus
+an arousal axis (A-axis, identical extraction protocol with the
+nine-story prompts re-anchored on arousal poles). If the recipe were
+content-blind --- merely a high-capacity dimensionality-reduction trick
+that produces a graded affective scale from any pole-vs-pole prompt
+set --- the V and A columns should agree across the five textual rows.
+They do not: V transfers cleanly across SST-2, EmoBank, Warriner,
+NRC, and OASIS, while A collapses to near-chance on every textual
+benchmark. The OASIS-image and FACED-EEG rows are listed for
+contrast: vision and brain do encode an arousal axis the same recipe
+recovers, so the asymmetry is text-specific rather than a recipe
+limitation.
 
 \begin{table}[h]
 \centering
@@ -509,6 +530,16 @@ Direct comparison to the occipital region-mean $|r|=0.21$.}
 \end{figure}
 
 \paragraph{9-stim contrast and Simpson's paradox.}
+Table~\ref{tab:anger-contrast} decomposes the cohort-level brain--LM
+correlation by stimulus subset, isolating which of the $28$ FACED
+stimuli carry the V-axis signal. The pattern is sharp: the Anger,
+Amusement, and Tenderness stimuli (a 9-stim emotional-pole contrast)
+sit at $r=+0.870$, while removing them collapses the residual $19$
+stimuli to $r=-0.015$. The full-cohort $r=+0.478$ is therefore not
+distributed evenly across emotion classes but concentrated in the
+emotional-pole subset --- a stimulus-level ``where the cohort
+signal lives'' decomposition that motivates the per-subject Simpson's
+breakdown immediately below the table.
 
 \begin{table}[h]
 \centering
@@ -636,6 +667,20 @@ phase-amplitude-coupling channel \citep{canolty2010cfc}.
 \section{Saturation: Full Intervention Table and Forest}
 \label{app:full-vaxis-table}
 
+This appendix lists every V-axis-as-supervision intervention reported in
+the saturation regularity (\S\ref{sec:saturation}). Table~\ref{tab:full-vaxis}
+gives per-recipe $\Delta$BACC against the strong EMOD\,$d{=}6$\,+\,KD\,+\,aug
+baseline, the paired-seed $p$-value, and a verdict tier; the
+two SOTA-recipe replications below the line confirm the cliff persists
+at the BACC$\,\approx\,0.66$ regime where saturation is operative.
+Figure~\ref{fig:forest} renders the same $25$ entries as a forest plot
+ranked by effect size, so the asymmetry is visible at a glance: every
+significant entry sits to the left of zero, and even the largest n.s.\
+positive (EMODSTYLE-stim, $+0.0066$, $p{=}0.22$) is within seed noise.
+The block structure across loss families (KD, RSA, contrastive, PEFT,
+topographic, scaling, multi-task) is what makes the regularity a
+\emph{family-wide} statement rather than a single-loss anecdote.
+
 \begin{table}[h]
 \centering
 \small
@@ -699,6 +744,18 @@ positive direction at the strong baseline.}
 \label{app:saturation-extras}
 
 \paragraph{Saturation transition table.}
+Table~\ref{tab:saturation-transition} pairs the same V-axis intervention
+(Topo or EMODSTYLE auxiliary loss) against five base recipes spanning
+the BACC range from $0.572$ (CBraMod baseline) to $0.6581$ (EMOD\,$d{=}6$
+SOTA pre-ensemble). Reading top-to-bottom traces the saturation
+transition: at low BACC the auxiliary loss is within seed noise
+(rows 1--3, $|\Delta|\le 0.007$, all n.s.), but as the base recipe
+strengthens, the same loss becomes a statistically significant
+\emph{negative} (rows 4--5, $\Delta\in\{-0.015,-0.024\}$, $p<0.05$ and
+$p<0.01$). No row crosses the boundary in the helpful direction. This
+is the data behind the ``no positive setpoint'' wording in §7 and the
+basis for treating $\mathrm{BACC}\approx 0.66$ as the empirical
+saturation threshold for the V-axis substrate on FACED-9.
 
 \begin{table}[h]
 \centering
@@ -892,6 +949,13 @@ largest residual-variance ceiling; we observe $+0.034$ gain. MNIST at
 $0.985$ has essentially none; we observe $+0.001$ gain.
 
 \paragraph{Mega-ensemble null.}
+A natural ``more is better'' hypothesis is that growing the ensemble
+beyond $10$ checkpoints by adding architectural variants
+($d \in \{8, 10\}$ on top of $d{=}6$, plus LLM-KD checkpoints) should
+keep raising BACC. Table~\ref{tab:mega-ensemble} tests that hypothesis
+directly. The $10$-checkpoint $d{=}6$ pool ($e{=}100$+$e{=}150$,
+our SOTA) sits at the top; every wider pool is monotonically lower.
+The mechanism check follows the table.
 
 \begin{table}[h]
 \centering
