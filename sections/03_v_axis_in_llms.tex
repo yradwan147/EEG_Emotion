@@ -3,7 +3,7 @@
 
 To test that the saturation regularity operates on a real semantic
 axis rather than a noise dimension, we extract one explicitly. The
-construction uses nine sentences. Given a language model, we author
+construction uses nine stories. Given a language model, we author
 one short emotion-evocative story per FACED class and generate $50$
 paraphrases per story by independent LLM calls. For each class we
 average the language model's last-token activation (at the
@@ -17,45 +17,40 @@ robust to paraphrase budget, prompt rephrasing, and model choice
 (Appendix~\ref{app:vaxis-protocol}).
 
 \paragraph{The same direction across modalities.}
-A single Qwen3-4B run produces a direction that simultaneously
-recovers human affect across three settings that share no training
-data: language sentiment, brain responses, and visual scenes
-(Table~\ref{tab:cross-modal}). All three numbers come from
-\emph{projecting} onto the LLM-derived axis without any
-target-modality fine-tuning---a zero-shot transfer from nine LLM
-sentences to (i) a 9k-sentence sentiment benchmark, (ii) the
-cohort-averaged EEG of $123$ subjects, and (iii) a $900$-image
-affective-norm dataset.
+The V-axis recipe recovers human affect across three settings that
+share no training data (Table~\ref{tab:cross-modal}): the text result
+is true zero-shot projection; the EEG and vision results use the
+same nine-story recipe re-extracted in their native modality plus a
+small linear probe.
 
 \begin{table}[h]
 \centering
 \small
 \setlength{\tabcolsep}{6pt}
-\begin{tabular}{@{}llrl@{}}
+\begin{tabular}{@{}lllrl@{}}
 \toprule
-Modality & Benchmark / signal & Score & Reference \\
+Modality & Axis source & Probe & Score & Reference \\
 \midrule
-Text   & SST-2 sentiment AUC (zero-shot) & $\mathbf{0.832}$ & matches sup.\ LR on $5$k examples \\
-Brain  & Cohort EEG ridge $r$ ($n{=}123$ subj.) & $\mathbf{0.87}$ & $p<10^{-9}$, see \S\ref{sec:vaxis-brain} \\
-Vision & OASIS~\citep{kurdi2017oasis} valence $r$ (CLIP-text) & $\mathbf{0.869}$ & beats sup.\ ridge \\
+Text   & Qwen3-4B (9 stories) & none (proj.) & $\mathbf{0.832}$ AUC & matches sup.\ LR on $5$k examples \\
+Brain  & CLIP-text (9 stories) & ridge LOOCV & $\mathbf{r{=}0.87}$ & $p<10^{-9}$, see \S\ref{sec:vaxis-brain} \\
+Vision & CLIP-image (9 images) & none (proj.) & $\mathbf{r{=}0.869}$ & beats sup.\ ridge \\
 \bottomrule
 \end{tabular}
-\caption{Cross-modal external validity of a single Qwen3-4B V-axis.
-Nine LLM sentences produce a direction that recovers human affect on
-text sentiment, video-evoked EEG, and natural-image valence---without
-any target-modality training. Full sentiment table (IMDB, TweetEval,
-Rotten Tomatoes), lexicon recoveries (Hu \& Liu, Warriner), and
-multilingual results are in Appendix~\ref{app:per-llm-deep-dive}.}
+\caption{Cross-modal external validity of the V-axis recipe (PCA on
+nine emotion-class centroids). Axis source differs per row
+(Qwen3-4B for SST-2, CLIP-text for cohort EEG, CLIP-image for OASIS);
+the Qwen3-4B V-axis projected onto cohort EEG via the same ridge
+gives $r{=}0.80$ (\S\ref{sec:vaxis-brain}). Full sentiment, lexicon
+and multilingual results in Appendix~\ref{app:per-llm-deep-dive}.}
 \label{tab:cross-modal}
 \end{table}
 
 The LLM-side direction is a strong sentiment classifier: $0.832$
-AUC on SST-2 matches a supervised logistic regression on $5$k
-in-domain examples ($0.837$), beats an SBERT prototype-cosine
-baseline ($0.793$;~\citealp{reimers2019sbert}), and trails a $355$M
-RoBERTa-large-MNLI zero-shot entailment classifier
+SST-2 AUC matches supervised LR on $5$k examples ($0.837$), beats
+SBERT prototype-cosine ($0.793$;~\citealp{reimers2019sbert}), and
+trails $355$M RoBERTa-MNLI zero-shot
 ($0.912$;~\citealp{liu2019roberta}) by $0.08$---all from nine
-sentences of supervision and no labelled target-modality data.
+stories of supervision.
 
 \paragraph{The same direction across families.}
 We extract the V-axis from $14$ language models from 560M to 32B

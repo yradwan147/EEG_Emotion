@@ -17,7 +17,7 @@
 \item {\bf Limitations}
     \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
     \item[] Answer: \answerYes{}
-    \item[] Justification: A ``What this result is not'' boxed paragraph in Section~\ref{sec:intro} names the empirical-not-mathematical scope of the saturation regularity, the cohort-not-within-subject scope of the brain analyses, and the FACED-specific saturation threshold. Section~\ref{sec:discussion} expands these into a numbered limitations subsection: (a) two EEG datasets (FACED deep, SEED-V replicates 5/5 claims; V-axis-as-supervision threshold is FACED-specific); (b) cohort-side analysis with explicit Simpson's-paradox dynamic; (c) saturation threshold dataset-specific; (d) negative results require strong-baseline interpretation; (e) cross-architecture class-PC1 correlation softened by 93.5th-percentile null-direction control ($n=1000$). Theta-gamma PAC null and arousal-axis brain-side failure are documented.
+    \item[] Justification: Section~\ref{sec:saturation} contains a boxed scope statement (``Saturation (FACED-9, EMOD backbone, V-axis target)'') naming the empirical-not-mathematical scope and the FACED-specific BACC threshold $[0.62, 0.66]$. Section~\ref{sec:discussion} explicitly states the regularity is scoped to FACED-9 with a measurable V-axis substrate, with no claim beyond, and that probe transfers (SST-2, cohort EEG, classifier convergence) are direction-existence rather than neuroscience claims. Posterior-topography is framed as a video-paradigm statement rather than an FAA refutation. The cross-architecture class-PC1 correlation is softened by a 93.5th-percentile null-direction control ($n=1000$, one-sided $p\!\approx\!0.065$) in Section~\ref{sec:convergence}. Negative results catalogue (theta-gamma PAC, arousal-axis brain-side failure, Path-B mixing) in Appendix~\ref{app:saturation-extras}.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper has no limitation while the answer \answerNo{} means that the paper has limitations, but those are not discussed in the paper.
@@ -133,7 +133,7 @@
 \item {\bf Broader impacts}
     \item[] Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
     \item[] Answer: \answerYes{}
-    \item[] Justification: Improved EEG emotion classifiers have applications in mental-health monitoring and brain--computer interfaces (positive); they also pose risks of affective inference without consent in surveillance, workplace, or advertising contexts (negative). Section~\ref{sec:discussion} flags this dual-use surface and notes that the V-axis extraction protocol applied to EEG could in principle reduce the calibration-data burden for affective inference systems --- a feature that cuts both ways. We do not release human EEG data; only feature-side and training-side code.
+    \item[] Justification: Improved EEG emotion classifiers have applications in mental-health monitoring and brain--computer interfaces (positive); they also pose risks of affective inference without consent in surveillance, workplace, or advertising contexts (negative). The V-axis extraction protocol applied to EEG could in principle reduce the calibration-data burden for affective inference systems --- a feature that cuts both ways. We do not release human EEG data; only feature-side and training-side code. Full broader-impacts statement in Appendix~\ref{app:discussion-extras}.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that there is no societal impact of the work performed.
@@ -147,7 +147,7 @@
 \item {\bf Safeguards}
     \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models that have a high risk for misuse (e.g., pre-trained language models, image generators, or scraped datasets)?
     \item[] Answer: \answerNA{}
-    \item[] Justification: Our trained EEG-emotion checkpoints and V-axis extraction code do not introduce abuse vectors beyond what is already public via FACED, SEED-V, and the listed pre-trained LLMs. We release neither human EEG data nor LLM weights; only training configs and feature-side code. We assess the dual-use risk in the broader-impacts statement.
+    \item[] Justification: Our trained EEG-emotion checkpoints and V-axis extraction code do not introduce abuse vectors beyond what is already public via FACED, SEED-V, and the listed pre-trained LLMs. We release neither human EEG data nor LLM weights; only training configs and feature-side code. We assess the dual-use risk in Appendix~\ref{app:discussion-extras}.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper poses no such risks.

@@ -21,12 +21,12 @@ features, rather than supervise the part of the features that has
 already saturated. Following this prescription on FACED yields a new
 state of the art at $\mathbf{0.6948}$ balanced accuracy---a $+10.5\%$
 relative improvement over EMOD~\citep{chen2025emod}, the previous SOTA
-on FACED, at $0.6287$. Surprisingly, the language-model-derived class
-prototypes used by the knowledge-distillation step in our recipe are
-interchangeable with random orthonormal vectors ($\Delta\le 0.003$
-balanced accuracy): the SOTA gain comes from the \emph{shape} of the
-loss (a 9-class structure imposed on the features), not from the
-\emph{content} of the prototypes. To probe what the network has
+on FACED, at $0.6287$. The SOTA recipe itself uses a structural KD step on the weaker
+pre-saturation baseline, distinct from the $25$ semantic-V-axis
+failures on the already-saturated baseline; confirming this, replacing
+the SOTA-recipe LLM prototypes with random orthonormal vectors costs
+$\le 0.003$ BACC---the gain is the $9$-direction \emph{shape}, not
+the prototype \emph{content}. To probe what the network has
 saturated on---and to demonstrate it is a real semantic axis, not a
 noise dimension---we extract one direction explicitly. We write nine
 short emotion-evocative stories (one per FACED class), pass them
