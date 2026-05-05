@@ -1201,13 +1201,21 @@ regularisation; its semantic content is below our resolution.
 \section{Reproducibility}
 \label{app:repro}
 
-Code, configs, model checkpoints, and figure-generation scripts will be
-released at the camera-ready stage under an MIT licence. Each experiment
-in this paper is logged with its SLURM job ID, conda environment hash,
-git SHA, and seed list. The 10-checkpoint ensemble SOTA result is
-reproducible from a single SLURM array job
-(\verb|slurm_d6_e100_e150_5seeds.sh|, $\sim$10 GPU-hours per seed on
-V100).
+\paragraph{Release commitment.} Code, configs, model checkpoints, and
+figure-generation scripts will be released publicly under an MIT licence
+upon acceptance, simultaneously with the arXiv posting of the paper
+(no submission-time anonymous URL is provided). The release will
+include: V-axis extraction scripts for the 14 LLMs in the per-LLM
+table; the EMOD\,$d{=}6$ training pipeline with the exact augmentation,
+KD, and ensemble-construction code; the 10-checkpoint $0.6948$-BACC
+ensemble checkpoints; and the figure-generation scripts for every
+landmark and neuro figure in the paper.
+
+\paragraph{Run-level provenance.} Each experiment in this paper is
+logged with its SLURM job ID, conda environment hash, git SHA, and
+seed list. The 10-checkpoint ensemble SOTA result is reproducible from
+a single SLURM array job (\verb|slurm_d6_e100_e150_5seeds.sh|,
+$\sim$10 GPU-hours per seed on V100).
 
 
 \section{Resource Estimate}
