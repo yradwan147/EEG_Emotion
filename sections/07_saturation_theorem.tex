@@ -2,14 +2,12 @@
 \label{sec:saturation}
 
 We test whether auxiliary supervision toward a known concept direction
-helps an EEG-emotion classifier. The setup uses an
-EMOD~\citep{chen2025emod} backbone (the previous FACED-9 SOTA) at
-two strengths: a vanilla $0.62$ BACC baseline and the SOTA recipe of
-\S\ref{sec:sota} at $0.66$ BACC. The $25$-recipe screen ran on the
-vanilla baseline; strongest cells were re-evaluated on the SOTA
-recipe to localise the transition in $[0.62, 0.66]$. Each
-intervention adds an auxiliary loss that pulls the network's
-penultimate features toward a target direction. Targets span LLM-derived class prototypes (the V-axis of
+helps a strong EEG-emotion classifier. The setup uses an
+EMOD~\citep{chen2025emod} backbone (the previous FACED-9 SOTA),
+augmented to balanced accuracy $\approx 0.66$ via the recipe described
+in \S\ref{sec:sota}. Each of $25$ interventions adds an auxiliary
+loss that pulls the network's penultimate features toward a target
+direction. Targets span LLM-derived class prototypes (the V-axis of
 \S\ref{sec:vaxis-llms}), CLIP-text embeddings, and frontal-channel
 masks matched to the analytical valence ceiling. Loss families span
 knowledge distillation~\citep{hinton2015distilling}, representational
@@ -37,13 +35,13 @@ universal cut-offs).
 
 \begin{quote}
 \textbf{Saturation (FACED-9, EMOD backbone, V-axis target).}
-\emph{For a FACED-9 classifier $f_\theta$ with task-only
-$\mathrm{BACC}(\theta)$ in the band $[0.62, 0.66]$ or higher, adding
-any V-axis auxiliary loss $\mathcal{L}_v$ at $\lambda > 0$ produces
+\emph{Let $f_\theta$ be a FACED-9 emotion classifier whose
+penultimate features encode the V-axis at strength $\rho(\theta)$.
+We observe an empirical threshold $\rho^*$ in the band
+$\mathrm{BACC}\in[0.62, 0.66]$ above which adding any auxiliary loss
+$\mathcal{L}_v$ at $\lambda > 0$ produces
 $\mathbb{E}[\Delta\mathrm{BACC}] \leq 0$ across all families tested
-($16/25$ significant at $p<0.05$, $0/25$ positive). The threshold
-coincides with the regime where the V-axis encoding strength
-$\rho(\theta)$ saturates across seeds (\S\ref{sec:convergence}).}
+($16/25$ significant at $p<0.05$, $0/25$ positive).}
 \end{quote}
 
 \paragraph{Saturation is not overfitting.} Overfitting is memorisation

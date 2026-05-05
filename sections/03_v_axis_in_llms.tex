@@ -3,7 +3,7 @@
 
 To test that the saturation regularity operates on a real semantic
 axis rather than a noise dimension, we extract one explicitly. The
-construction uses nine stories. Given a language model, we author
+construction uses nine sentences. Given a language model, we author
 one short emotion-evocative story per FACED class and generate $50$
 paraphrases per story by independent LLM calls. For each class we
 average the language model's last-token activation (at the
@@ -17,11 +17,13 @@ robust to paraphrase budget, prompt rephrasing, and model choice
 (Appendix~\ref{app:vaxis-protocol}).
 
 \paragraph{The same direction across modalities.}
-The V-axis recipe recovers human affect across three settings that
-share no training data (Table~\ref{tab:cross-modal}): the text result
-is true zero-shot projection; the EEG and vision results use the
-same nine-story recipe re-extracted in their native modality plus a
-small linear probe.
+The same nine-story V-axis recipe, applied in each modality's native
+encoder, recovers human affect across three settings that share no
+training data: language sentiment, brain responses, and visual scenes
+(Table~\ref{tab:cross-modal}). The text result is a true zero-shot
+projection; the EEG result uses the same recipe re-extracted from
+CLIP-text plus a ridge linear probe (LOOCV) on $160$ EEG features;
+the vision result uses CLIP-image of nine matched images.
 
 \begin{table}[h]
 \centering
@@ -36,21 +38,23 @@ Brain  & CLIP-text (9 stories) & ridge LOOCV & $\mathbf{r{=}0.87}$ & $p<10^{-9}$
 Vision & CLIP-image (9 images) & none (proj.) & $\mathbf{r{=}0.869}$ & beats sup.\ ridge \\
 \bottomrule
 \end{tabular}
-\caption{Cross-modal external validity of the V-axis recipe (PCA on
-nine emotion-class centroids). Axis source differs per row
-(Qwen3-4B for SST-2, CLIP-text for cohort EEG, CLIP-image for OASIS);
-the Qwen3-4B V-axis projected onto cohort EEG via the same ridge
-gives $r{=}0.80$ (\S\ref{sec:vaxis-brain}). Full sentiment, lexicon
+\caption{Cross-modal external validity of the V-axis \emph{recipe}
+(PCA on nine emotion-class centroids). The axis source differs per
+row (Qwen3-4B for SST-2, CLIP-text for cohort EEG, CLIP-image for
+OASIS); the Qwen3-4B V-axis projected onto cohort EEG via the same
+ridge gives $r{=}0.80$ (\S\ref{sec:vaxis-brain}). Full sentiment
+(IMDB, TweetEval, Rotten Tomatoes), lexicon (Hu \& Liu, Warriner),
 and multilingual results in Appendix~\ref{app:per-llm-deep-dive}.}
 \label{tab:cross-modal}
 \end{table}
 
 The LLM-side direction is a strong sentiment classifier: $0.832$
-SST-2 AUC matches supervised LR on $5$k examples ($0.837$), beats
-SBERT prototype-cosine ($0.793$;~\citealp{reimers2019sbert}), and
-trails $355$M RoBERTa-MNLI zero-shot
+AUC on SST-2 matches a supervised logistic regression on $5$k
+in-domain examples ($0.837$), beats an SBERT prototype-cosine
+baseline ($0.793$;~\citealp{reimers2019sbert}), and trails a $355$M
+RoBERTa-large-MNLI zero-shot entailment classifier
 ($0.912$;~\citealp{liu2019roberta}) by $0.08$---all from nine
-stories of supervision.
+sentences of supervision and no labelled target-modality data.
 
 \paragraph{The same direction across families.}
 We extract the V-axis from $14$ language models from 560M to 32B
