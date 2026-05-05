@@ -65,8 +65,8 @@
 
 \item {\bf Open access to data and code}
     \item[] Question: Does the paper provide open access to the data and code, with sufficient instructions to faithfully reproduce the main experimental results, as described in supplemental material?
-    \item[] Answer: \answerYes{}
-    \item[] Justification: Code, configs, model checkpoints, and figure-generation scripts will be released at the camera-ready stage under an MIT licence (Appendix~\ref{app:repro}). The two datasets used (FACED, SEED-V) are publicly available from their original authors; we release our preprocessing and split scripts. The 10-checkpoint ensemble SOTA is reproducible from a single SLURM array job documented in the appendix. Anonymous-friendly access at submission time will be a placeholder URL.
+    \item[] Answer: \answerNo{}
+    \item[] Justification: We do not release code or model checkpoints with this submission. The two datasets used (FACED \citep{chen2023faced} and SEED-V \citep{liu2022seedv}) are publicly available from their original authors under their published licences; we have not modified or re-released them. The full methodology, hyperparameters, optimisation details, augmentation schedule, exact seed list, and SLURM-array recipe required to reproduce every result in the paper are documented in the appendix (Appendix~\ref{app:training}, \ref{app:statistics}, \ref{app:datasets}, \ref{app:full-vaxis-table}, \ref{app:repro}). Code, configs, and the 10-checkpoint ensemble checkpoints will be released at the camera-ready stage under an MIT licence; this commitment is recorded in Appendix~\ref{app:repro}.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that paper does not include experiments requiring code.
@@ -93,7 +93,7 @@
 \item {\bf Experiment statistical significance}
     \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
     \item[] Answer: \answerYes{}
-    \item[] Justification: We report standard deviation across 5 seeds in every recipe-cascade row (Section~\ref{sec:sota}); Pearson $r$ with $p$-values for every cross-architecture and brain correlation (Sections~\ref{sec:vaxis-brain}, \ref{sec:convergence}); paired $t$-tests for V-axis interventions vs.\ matched-recipe baselines (Section~\ref{sec:saturation}); $B=10{,}000$ subject-resampled bootstrap CIs and Fisher-$z$ $p$-values for cohort EEG correlations (Appendix~\ref{app:statistics}); 200-direction matched-norm random-direction null distributions for the cohort EEG--LLM correlation; 1000-direction null for the cross-architecture V-axis correlation; permutation $p$-values for the directional ablation (Section~\ref{sec:convergence}, $z = +10.87$, $p < 10^{-26}$ on the smoke checkpoint).
+    \item[] Justification: We report standard deviation across 5 seeds in every recipe-cascade row (Section~\ref{sec:sota}); Pearson $r$ with $p$-values for every cross-architecture and brain correlation (Sections~\ref{sec:vaxis-brain}, \ref{sec:convergence}); paired $t$-tests for V-axis interventions vs.\ matched-recipe baselines (Section~\ref{sec:saturation}); $B=10{,}000$ subject-resampled bootstrap CIs and Fisher-$z$ $p$-values for cohort EEG correlations (Appendix~\ref{app:statistics}); 200-direction matched-norm random-direction null distributions for the cohort EEG--LLM correlation; 1000-direction null for the cross-architecture V-axis correlation; matched-direction null for the inference-time directional ablation (Section~\ref{sec:convergence}, mean $z \approx 7.7$ across the 10 SOTA-pool checkpoints).
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper does not include experiments.
@@ -133,7 +133,7 @@
 \item {\bf Broader impacts}
     \item[] Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
     \item[] Answer: \answerYes{}
-    \item[] Justification: Improved EEG emotion classifiers have applications in mental-health monitoring and brain--computer interfaces (positive); they also pose risks of affective inference without consent in surveillance, workplace, or advertising contexts (negative). The V-axis extraction protocol applied to EEG could in principle reduce the calibration-data burden for affective inference systems --- a feature that cuts both ways. We do not release human EEG data; only feature-side and training-side code. Full broader-impacts statement in Appendix~\ref{app:discussion-extras}.
+    \item[] Justification: Improved EEG emotion classifiers have applications in mental-health monitoring and brain--computer interfaces (positive); they also pose risks of affective inference without consent in surveillance, workplace, or advertising contexts (negative). The V-axis extraction protocol applied to EEG could in principle reduce the calibration-data burden for affective inference systems --- a feature that cuts both ways. We do not release human EEG data at any stage; the planned camera-ready code release covers training configs, feature extraction, and analysis only. Full broader-impacts statement in Appendix~\ref{app:discussion-extras}.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that there is no societal impact of the work performed.
@@ -147,7 +147,7 @@
 \item {\bf Safeguards}
     \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models that have a high risk for misuse (e.g., pre-trained language models, image generators, or scraped datasets)?
     \item[] Answer: \answerNA{}
-    \item[] Justification: Our trained EEG-emotion checkpoints and V-axis extraction code do not introduce abuse vectors beyond what is already public via FACED, SEED-V, and the listed pre-trained LLMs. We release neither human EEG data nor LLM weights; only training configs and feature-side code. We assess the dual-use risk in Appendix~\ref{app:discussion-extras}.
+    \item[] Justification: We release no high-risk artefacts with this submission. The planned camera-ready release (Appendix~\ref{app:repro}) covers training configs, feature-side and analysis code, and the trained EEG-emotion checkpoints; it does not introduce abuse vectors beyond what is already public via FACED, SEED-V, and the listed pre-trained LLMs. We release neither human EEG data nor LLM weights at any stage. Dual-use risk assessment and recommended deployment safeguards are in Appendix~\ref{app:discussion-extras}.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper poses no such risks.
@@ -174,8 +174,8 @@
 
 \item {\bf New assets}
     \item[] Question: Are new assets introduced in the paper well documented and is the documentation provided alongside the assets?
-    \item[] Answer: \answerYes{}
-    \item[] Justification: The V-axis extraction scripts, V-axis-aligned EEG checkpoints, and figure-generation pipelines will be released with documentation (README, environment.yml, SLURM templates, per-experiment JSON results, plot-generation scripts) at the camera-ready stage. Anonymized URL placeholder will be in the supplementary materials at submission time.
+    \item[] Answer: \answerNo{}
+    \item[] Justification: We do not release new assets with this submission. The V-axis extraction scripts, V-axis-aligned EEG checkpoints, and figure-generation pipelines will be released at the camera-ready stage with documentation (README, environment.yml, SLURM templates, per-experiment JSON results, plot-generation scripts), as recorded in Appendix~\ref{app:repro}. Within the paper, the V-axis itself --- nine FACED-class centroids and the PCA-PC1 direction at the LM's penultimate layer --- is fully specified by the protocol in Appendix~\ref{app:vaxis-protocol} (model identities, layer indices, story prompts, paraphrase parameters), so any reader can re-derive the V-axis without our checkpoint files.
     \item[] Guidelines:
     \begin{itemize}
         \item The answer \answerNA{} means that the paper does not release new assets.
