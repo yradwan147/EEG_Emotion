@@ -567,9 +567,10 @@ Excluding Anger + Amusement + Tenderness ($n{=}19$) & $-0.015$ \\
 \item \textbf{Per-subject best (channel, band) oracle}: $\overline{|r|}=0.616$
 \end{itemize}
 
-The all-band oracle ($|r|=0.616$) exceeds the cohort-fixed top-8 by
-$+0.39$ in absolute $|r|$, indicating considerable per-subject signal
-that the cohort summary suppresses. The Simpson's-paradox dynamic that
+The all-band oracle ($\overline{|r|}=0.616$) exceeds the
+cohort-fixed top-8 ($+0.021$) by $+0.60$ in absolute $|r|$,
+indicating considerable per-subject signal that the cohort summary
+suppresses. The Simpson's-paradox dynamic that
 Sani et~al.\ \citep{sani2024crosssubject} flag for cross-subject
 EEG-emotion modelling more broadly (Figure~\ref{fig:nine-stim-simpson}).
 
@@ -1109,8 +1110,9 @@ claim from ``smooth gradient over all emotions'' to
 ``anger-versus-warm-positive contrast across nine clips''.
 
 \paragraph{Per-subject V-axis adaptation does not transfer.}
-The per-subject best-channel oracle reaches $|r|=0.62$ (a $+0.39$
-absolute headroom over the cohort-fixed top-8 of $|r|=0.02$). No clean
+The per-subject best-channel oracle reaches $\overline{|r|}=0.62$
+(a $+0.60$ absolute headroom over the cohort-fixed top-8 of
+$|r|=0.02$). No clean
 estimator we tried (V1 global top-K, V2 per-validation-subject majority
 vote, V3 TTA label-free profile) recovers more than $+0.001$ over the
 cohort top-K. The per-subject signal is real but not transferable

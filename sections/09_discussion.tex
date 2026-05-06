@@ -10,37 +10,22 @@ real semantic axis shared with language. The regularity is scoped
 to FACED-9 with a V-axis substrate; probe transfers are
 direction-existence rather than neuroscience claims; the posterior
 topography is a video-paradigm statement, not a refutation of
-FAA~\citep{davidson1992anterior}. The cross-modal asymmetry (valence
-transfers across text, vision, and EEG; arousal transfers in vision
-but collapses in text) suggests the saturating concept is itself
-content-specific rather than recipe-universal: the same PCA-on-LM
-construction that works for valence is not a generic affective-axis
-recipe (Appendix~\ref{app:specificity-controls}). The same diagnosis
-predicts where on the population-vs-individual spectrum further gains
-should appear: the cohort signal lives in a 9-stimulus
-emotional-pole contrast (Appendix~\ref{app:topography-deep-dive}),
-while a per-subject channel-selection oracle reaches
-$\overline{|r|}=0.616$ versus $0.021$ at the cohort-fixed channels.
-A practical corollary
-follows for the EEG-emotion community: aux-loss design papers should
-report the saturation state of the receiving baseline, since the same
-loss that is within seed noise on a $0.62$ recipe can be a significant
-negative on a $0.66$ recipe by the same absolute margin
-(\S\ref{sec:saturation}, Appendix~\ref{app:full-vaxis-table}) --- a
-comparison currently obscured when only the headline number is
-disclosed. When is a task-only optimum already encoding the concept an
+FAA~\citep{davidson1992anterior}. The cross-modal asymmetry --- valence
+transfers across text, vision, and EEG; arousal transfers only in
+vision --- suggests the saturating concept is content-specific, not
+recipe-universal (Appendix~\ref{app:specificity-controls}). The same
+diagnosis predicts where on the population-vs-individual spectrum
+further gain lives: the cohort signal is a 9-stimulus emotional-pole
+contrast (Appendix~\ref{app:topography-deep-dive}), but a per-subject
+channel oracle reaches $\overline{|r|}=0.616$ versus $0.021$ at
+cohort-fixed channels.
+A practical corollary follows for the EEG-emotion community:
+aux-loss design papers should report the receiving baseline's
+saturation state, since the same loss can be within seed noise on a
+$0.62$ recipe and a significant negative on a $0.66$ recipe
+(\S\ref{sec:saturation}, Appendix~\ref{app:full-vaxis-table}). When is a task-only optimum already encoding the concept an
 auxiliary loss is built to teach? Per-subject residual adaptation
 (Appendix~\ref{app:discussion-extras}) is the immediate test;
-adapting the V-axis substrate to other concepts the network has
-similarly saturated on (truthfulness, refusal, sentiment polarity in
-text classifiers) is the broader generalisation we leave open. The
-$+10.5\%$ FACED gain came from a residual we could measure but not
-supervise; whether the same residual-vs-basin decomposition is the
-right design rule beyond saturated 9-class EEG --- on saturated tasks
-in language and vision where supervision cost is comparable to
-ensembling cost --- is the question this paper opens. The
-saturation regularity itself is empirical, not theoretical: we
-characterise it on $25$ recipes spanning five loss families and
-verify the unidirectional sign-flip across two FACED-9 baselines, but
-a closed-form prediction of the threshold $\rho^*$ from architecture
-and data alone is left to future work.
+whether the same residual-vs-basin decomposition is the right design
+rule beyond saturated 9-class EEG --- on saturated tasks in language
+and vision --- is the broader question this paper opens.

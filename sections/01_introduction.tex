@@ -1,43 +1,48 @@
 \section{Introduction}
 \label{sec:intro}
 
-Large language models have become powerful general-purpose
-representation learners, and a growing body of work shows that
-their internal features align with human cognition across high-level
-concepts~\citep{kim2018tcav,arditi2024refusal}.
-We ask whether that alignment can be turned into a usable bridge to
-human electrophysiology --- specifically, whether a single direction
-extracted from a language model's hidden states can serve as a lens
-on the neural representation of emotional valence in EEG. The
-construction we adopt is deliberately minimal. We write one short
-emotion-evocative story per FACED~\citep{chen2023faced} class, pass
-each through a language model (Qwen3-4B as the lead model), take the
-first principal component of the model's late-layer features across
-the nine resulting story representations, and orient it so the Joy
-story projects positive. We call this one-dimensional direction the
-\emph{valence axis} (V-axis). On SST-2~\citep{socher2013recursive},
-a standard sentiment benchmark, the V-axis projection alone reaches
-AUC $0.832$ zero-shot --- within $0.005$ of a $5$k-example supervised
-logistic regression. Across $14$ language models from $560$M to $32$B
-parameters, the same recipe converges on essentially the same
-direction (within Qwen3, off-diagonal $r{=}{+}0.995$ over $15$
-size-pairs).
+Pass nine short emotion-evocative sentences through a language model,
+average the late-layer hidden states class by class, take the first
+principal component of the resulting nine vectors, and orient it so
+the Joy centroid projects positive. The single direction that comes
+out --- which we call the \emph{valence axis} (V-axis) --- predicts
+movie-review sentiment at AUC $0.832$ zero-shot, predicts the EEG
+response of $123$ subjects watching emotional videos at $r{=}0.87$,
+and is rediscovered without supervision by every reasonably-strong
+EEG emotion classifier we tested. Recent work shows that large
+language models' internal features align with human cognition across
+high-level concepts~\citep{kim2018tcav,arditi2024refusal}; we ask
+whether that alignment can be turned into a usable bridge to human
+electrophysiology, both as a probe of what brain-decoding networks
+encode and as a training signal that could improve them.
 
-The same V-axis maps directly onto human brain signals. On a public
-EEG cohort of $123$ FACED subjects watching affective videos, a single
-ridge regression on $160$ channel-band features matches the
-Qwen3-4B V-axis projection over the $28$ stimuli at $r=0.80$
-($p<10^{-5}$); a CLIP-text variant of the V-axis built from the same
-$28$ stimulus descriptions reaches $r=0.87$ ($p<10^{-9}$) on the
-same ridge. More strikingly, it is rediscovered without
-supervision: across $36$ EEG-emotion checkpoints trained only on the
-$9$ emotion labels and never exposed to the V-axis, the alignment
-between each network's class-mean direction and the LLM V-axis
+\textbf{A nine-sentence axis.} We write one short emotion-evocative
+story per FACED~\citep{chen2023faced} class and pass each through
+Qwen3-4B (chosen as the lead model because it sits at the centre of
+the alignment manifold in our $14$-LLM sweep, with the highest
+per-stimulus alignment to a behavioural valence reference; the recipe
+itself is model-agnostic, see Appendix~\ref{app:per-llm-deep-dive}).
+The first principal component across the nine story centroids is the
+V-axis. On SST-2~\citep{socher2013recursive}, the V-axis projection
+alone reaches AUC $0.832$ zero-shot --- within $0.005$ of a
+$5$k-example supervised logistic regression. The recipe is
+model-portable: across $14$ language models from $560$M to $32$B
+parameters, the V-axis converges on essentially the same direction
+(within Qwen3, off-diagonal $r{=}{+}0.995$ over $15$ size-pairs).
+
+\textbf{The same axis lives in the brain.} On a public EEG cohort of
+$123$ FACED subjects watching affective videos, a ridge regression on
+$160$ channel-band features matches the Qwen3-4B V-axis projection
+over the $28$ stimuli at $r{=}0.80$ ($p<10^{-5}$); a CLIP-text
+variant of the V-axis built from the same $28$ stimulus descriptions
+reaches $r{=}0.87$ ($p<10^{-9}$) on the same ridge. EEG networks
+rediscover the V-axis without ever being shown it: across $36$
+FACED-9 checkpoints trained on the $9$ emotion labels alone,
+per-checkpoint V-axis encoding strength in the class-mean subspace
 predicts balanced accuracy at $r{=}{+}0.885$
-(Figure~\ref{fig:universal-vaxis}). The same valence direction
-appears inside language models and inside human electrophysiology;
-the question this paper turns to next is whether that alignment can
-be exploited.
+($p{=}7.8{\times}10^{-13}$, Figure~\ref{fig:universal-vaxis}). The
+same valence direction appears inside language models and inside
+human electrophysiology, recovered from each side independently.
 
 \begin{figure}[ht]
 \centering
@@ -48,10 +53,12 @@ be exploited.
 \label{fig:universal-vaxis}
 \end{figure}
 
-The natural way to use such an alignment is to push it back into
-training as an auxiliary loss. We test $25$ standard recipes spanning
-knowledge distillation~\citep{hinton2015distilling}, representational
-similarity analysis~\citep{kriegeskorte2008rsa}, contrastive
+\textbf{Yet supervision fails.} The natural way to use such an
+alignment is an auxiliary loss that pulls the EEG network's
+penultimate features toward the V-axis. We test $25$ such recipes
+spanning knowledge distillation~\citep{hinton2015distilling},
+representational similarity
+analysis~\citep{kriegeskorte2008rsa}, contrastive
 losses~\citep{khosla2020supcon,vandenoord2018cpc}, parameter-efficient
 fine-tuning adapters such as LoRA~\citep{hu2022lora}, and
 channel-targeted topographic losses~\citep{padakanti2025meg}.
@@ -59,41 +66,42 @@ None help. Sixteen produce statistically significant accuracy
 decrements ($\Delta\mathrm{BACC} \le -0.013$, $p<0.05$ paired across
 five seeds); zero produce gains. Five families show \emph{monotonic
 destruction}: the harder we push the loss, the worse accuracy gets.
-The transition is sharp: an intervention with no measurable effect on
-a weak baseline (BACC $\le 0.62$) becomes a significant negative
+The transition is sharp: an intervention with no measurable effect
+on a weak baseline (BACC $\le 0.62$) becomes a significant negative
 once the baseline strengthens (BACC $\ge 0.66$). We call this
-regularity \emph{saturation}. It is not overfitting: overfitting is
-memorising the training set, while saturation is what happens once
-task labels alone have driven the network onto the target direction.
-The auxiliary loss then moves the already-saturated class-mean
-component further along the target axis (alignment increases by
-$\Delta|r|=+0.01$ to $+0.36$) but leaves the within-class
-residual --- the part of the features that distinguishes one trial of
-an emotion from another --- at a numerical zero ($\sim 10^{-7}$).
-Supervision deforms a basin the network is already using and never
-reaches the load-bearing direction.
+regularity \emph{saturation}, and it is not the same thing as
+overfitting --- overfitting is memorising the training set, while
+saturation is what happens once task labels alone have driven the
+network onto the target direction. The auxiliary loss then moves
+the already-saturated class-mean component further along the target
+axis (alignment increases by $\Delta|r|{=}{+}0.01$ to ${+}0.36$),
+but leaves the within-class residual --- the part of the features
+that distinguishes one trial of an emotion from another --- at a
+numerical zero ($\sim 10^{-7}$). Supervision deforms a basin the
+network is already using and never reaches the load-bearing
+direction.
 
-The same diagnosis identifies where the actionable gain lives: in the
-within-class residual subspace that supervision cannot reach. The
-class-mean basin is shared across seeds (every well-trained checkpoint
-recovers the V-axis at $|r|\in[0.60, 0.77]$); the residual is
-seed-specific. Ensembling across seeds therefore averages out
-seed-specific noise in the residual without disturbing the basin.
-Per-checkpoint residual encoding strength predicts leave-one-out
-ensemble contribution at $r{=}{+}0.74$ ($p=0.014$, $n=10$), and the
-$10$-checkpoint ensemble reaches FACED-9 SOTA at $\mathbf{0.6948}$
-balanced accuracy (val-selected single checkpoint $\mathbf{0.6755}$),
-a $+10.5\%$ relative improvement over
-EMOD~\citep{chen2025emod}'s prior $0.6287$. The same residual-diversity
-prescription replicates on SEED-V~\citep{liu2022seedv}
-(Appendix~\ref{app:seedv-full}). A control we did not anticipate:
-replacing the language-model-derived class prototypes used by the
-KD step with random orthonormal vectors changes BACC by
-$\le 0.003$, so the SOTA gain comes from the \emph{shape} of the loss
-(a $9$-class structure imposed on the features) rather than the
-\emph{content} of the prototypes; the V-axis serves as a probe of
-\emph{which} concept the network has saturated on, not as the source
-of the supervised signal.
+\textbf{Where the gain lives.} The same diagnosis identifies where
+the actionable gain lives: in the within-class residual subspace
+that supervision cannot reach. The class-mean basin is shared across
+seeds (every well-trained checkpoint recovers the V-axis at
+$|r|\in[0.60, 0.77]$); the residual is seed-specific. Ensembling
+across seeds therefore averages out seed-specific noise in the
+residual without disturbing the basin. Per-checkpoint residual
+encoding strength predicts leave-one-out ensemble contribution at
+$r{=}{+}0.74$ ($p{=}0.014$, $n{=}10$), and the $10$-checkpoint
+ensemble reaches FACED-9 SOTA at $\mathbf{0.6948}$ balanced accuracy
+(val-selected single checkpoint $\mathbf{0.6755}$), a $+10.5\%$
+relative improvement over EMOD~\citep{chen2025emod}'s prior
+$0.6287$. The same residual-diversity prescription replicates on
+SEED-V~\citep{liu2022seedv} (Appendix~\ref{app:seedv-full}). One
+control sharpens the picture: replacing the language-model-derived
+class prototypes used by the KD step with random orthonormal vectors
+changes BACC by $\le 0.003$, so the SOTA gain comes from the
+\emph{shape} of the loss --- a $9$-class structure imposed on the
+features --- not from the \emph{content} of the prototypes. The
+V-axis serves as a probe of \emph{what} the network has saturated
+on, not as the source of the supervised signal.
 
 \paragraph{Contributions.} \textbf{(1)} A nine-sentence \emph{V-axis
 probe}: a one-dimensional valence direction extracted from $9$
