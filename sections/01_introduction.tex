@@ -16,33 +16,36 @@ whether that alignment can be turned into a usable bridge to human
 electrophysiology, both as a probe of what brain-decoding networks
 encode and as a training signal that could improve them.
 
-\textbf{A nine-sentence axis.} We write one short emotion-evocative
-story per FACED~\citep{chen2023faced} class and pass each through
-Qwen3-4B (chosen as the lead model because it sits at the centre of
-the alignment manifold in our $14$-LLM sweep, with the highest
-per-stimulus alignment to a behavioural valence reference; the recipe
-itself is model-agnostic, see Appendix~\ref{app:per-llm-deep-dive}).
-The first principal component across the nine story centroids is the
-V-axis. On SST-2~\citep{socher2013recursive}, the V-axis projection
-alone reaches AUC $0.832$ zero-shot --- within $0.005$ of a
-$5$k-example supervised logistic regression. The recipe is
-model-portable: across $14$ language models from $560$M to $32$B
-parameters, the V-axis converges on essentially the same direction
-(within Qwen3, off-diagonal $r{=}{+}0.995$ over $15$ size-pairs).
+\textbf{A nine-sentence axis.} The nine stories are one per
+FACED~\citep{chen2023faced} class; the language model is Qwen3-4B,
+chosen as the lead because it sits at the centre of the alignment
+manifold in our $14$-LLM sweep, with the highest per-stimulus
+alignment to a behavioural valence reference (the recipe itself is
+model-agnostic, see Appendix~\ref{app:per-llm-deep-dive}). The SST-2
+benchmark grounds the AUC $0.832$ headline:
+the V-axis projection alone is within $0.005$ of a $5$k-example
+supervised logistic regression~\citep{socher2013recursive}. And the
+direction is not idiosyncratic to any one model: across the
+$14$ language models from $560$M to $32$B parameters, the V-axis
+converges on essentially the same direction (within Qwen3,
+off-diagonal $r{=}{+}0.995$ over $15$ size-pairs).
 
-\textbf{The same axis lives in the brain.} On a public EEG cohort of
-$123$ FACED subjects watching affective videos, a ridge regression on
-$160$ channel-band features matches the Qwen3-4B V-axis projection
-over the $28$ stimuli at $r{=}0.80$ ($p<10^{-5}$); a CLIP-text
-variant of the V-axis built from the same $28$ stimulus descriptions
-reaches $r{=}0.87$ ($p<10^{-9}$) on the same ridge. EEG networks
-rediscover the V-axis without ever being shown it: across $36$
-FACED-9 checkpoints trained on the $9$ emotion labels alone,
-per-checkpoint V-axis encoding strength in the class-mean subspace
-predicts balanced accuracy at $r{=}{+}0.885$
-($p{=}7.8{\times}10^{-13}$, Figure~\ref{fig:universal-vaxis}). The
-same valence direction appears inside language models and inside
-human electrophysiology, recovered from each side independently.
+\textbf{The same axis lives in the brain.} The $r{=}0.87$ above
+unpacks as follows. A ridge regression on $160$ channel-band
+features of the FACED cohort EEG predicts the V-axis position of
+each of the $28$ stimuli; the regressor uses leave-one-stimulus-out
+cross-validation, no per-subject fitting, no auxiliary supervision.
+The Qwen3-4B V-axis itself reaches $r{=}0.80$ ($p<10^{-5}$) on this
+ridge; a CLIP-text variant of the V-axis built from the same $28$
+stimulus descriptions tightens this to $r{=}0.87$ ($p<10^{-9}$).
+The third claim --- that EEG networks rediscover the V-axis without
+ever being shown it --- is quantified across $36$ FACED-9 checkpoints
+trained on the $9$ emotion labels alone: per-checkpoint V-axis
+encoding strength in the class-mean subspace predicts balanced
+accuracy at $r{=}{+}0.885$ ($p{=}7.8{\times}10^{-13}$,
+Figure~\ref{fig:universal-vaxis}). The same valence direction is
+recovered from inside language models and from inside human
+electrophysiology, by independent procedures.
 
 \begin{figure}[ht]
 \centering
