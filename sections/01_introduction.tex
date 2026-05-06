@@ -1,23 +1,43 @@
 \section{Introduction}
 \label{sec:intro}
 
-A common technique in machine learning is to point a network at a
-target direction in feature space---a known semantic concept such as
-sentiment polarity, the truthfulness of a statement, or the valence
-of an emotion---and add an \emph{auxiliary loss} that pulls the
-network's penultimate features toward this direction. The recipes
-vary widely. Knowledge distillation (KD)~\citep{hinton2015distilling}
-aligns a student network's features with those of a teacher network.
-Representational similarity analysis (RSA)~\citep{kriegeskorte2008rsa}
-aligns the geometry of pairwise distances between two networks.
-Contrastive losses~\citep{khosla2020supcon,vandenoord2018cpc} pull
-same-class features together and push different-class features apart.
-Parameter-efficient fine-tuning (PEFT) adapters such as
-LoRA~\citep{hu2022lora} restrict the network's update to a low-rank
-direction in weight space. Channel-targeted topographic
-losses~\citep{padakanti2025meg} bias which input channels matter most. The shared assumption across all
-of these methods is that the auxiliary loss provides information the
-task labels alone cannot.
+Large language models have become powerful general-purpose
+representation learners, and a growing body of work shows that
+their internal features align with human cognition across high-level
+concepts~\citep{kim2018tcav,arditi2024refusal}.
+We ask whether that alignment can be turned into a usable bridge to
+human electrophysiology --- specifically, whether a single direction
+extracted from a language model's hidden states can serve as a lens
+on the neural representation of emotional valence in EEG. The
+construction we adopt is deliberately minimal. We write one short
+emotion-evocative story per FACED~\citep{chen2023faced} class, pass
+each through a language model (Qwen3-4B as the lead model), take the
+first principal component of the model's late-layer features across
+the nine resulting story representations, and orient it so the Joy
+story projects positive. We call this one-dimensional direction the
+\emph{valence axis} (V-axis). On SST-2~\citep{socher2013recursive},
+a standard sentiment benchmark, the V-axis projection alone reaches
+AUC $0.832$ zero-shot --- within $0.005$ of a $5$k-example supervised
+logistic regression. Across $14$ language models from $560$M to $32$B
+parameters, the same recipe converges on essentially the same
+direction (within Qwen3, off-diagonal $r{=}{+}0.995$ over $15$
+size-pairs).
+
+The same V-axis maps directly onto human brain signals. On a public
+EEG cohort of $123$ FACED subjects watching affective videos, a single
+ridge regression on $160$ channel-band features matches the
+Qwen3-4B V-axis projection over the $28$ stimuli at $r=0.80$
+($p<10^{-5}$); a CLIP-text variant of the V-axis built from the same
+$28$ stimulus descriptions reaches $r=0.87$ ($p<10^{-9}$) on the
+same ridge. More strikingly, it is rediscovered without
+supervision: across $36$ EEG-emotion checkpoints trained only on the
+$9$ emotion labels and never exposed to the V-axis, the alignment
+between each network's class-mean direction and the LLM V-axis
+predicts balanced accuracy at $r{=}{+}0.885$
+(Figure~\ref{fig:universal-vaxis}). The same valence direction
+appears inside language models and inside human electrophysiology;
+the question this paper turns to next is whether that alignment can
+be exploited.
 
 \begin{figure}[ht]
 \centering
@@ -28,104 +48,70 @@ task labels alone cannot.
 \label{fig:universal-vaxis}
 \end{figure}
 
-We test $25$ such techniques on FACED~\citep{chen2023faced}, a public
-dataset of EEG recordings from $123$ subjects watching $28$ emotional
-video clips ($32$ EEG channels at $250$\,Hz, $9$ emotion classes).
+The natural way to use such an alignment is to push it back into
+training as an auxiliary loss. We test $25$ standard recipes spanning
+knowledge distillation~\citep{hinton2015distilling}, representational
+similarity analysis~\citep{kriegeskorte2008rsa}, contrastive
+losses~\citep{khosla2020supcon,vandenoord2018cpc}, parameter-efficient
+fine-tuning adapters such as LoRA~\citep{hu2022lora}, and
+channel-targeted topographic losses~\citep{padakanti2025meg}.
 None help. Sixteen produce statistically significant accuracy
-decrements (change in balanced accuracy $\Delta$BACC $\le -0.013$, the
-fraction-correct averaged uniformly across the $9$ classes;
-$p<0.05$, paired across five seeds); zero produce gains. Five recipes
-show \emph{monotonic destruction}: the harder we push the auxiliary
-loss, the worse accuracy gets, with no positive setpoint to find. The
-transition from neutral-to-harmful is sharp: an auxiliary loss that
-has no measurable effect at a weak baseline (balanced accuracy $\le
-0.62$) becomes a statistically significant negative once the baseline
-strengthens (BACC $\ge 0.66$). The same intervention can be a no-op
-on one recipe and a meaningful regression on the next, separated by
-a few points of headline accuracy.
+decrements ($\Delta\mathrm{BACC} \le -0.013$, $p<0.05$ paired across
+five seeds); zero produce gains. Five families show \emph{monotonic
+destruction}: the harder we push the loss, the worse accuracy gets.
+The transition is sharp: an intervention with no measurable effect on
+a weak baseline (BACC $\le 0.62$) becomes a significant negative
+once the baseline strengthens (BACC $\ge 0.66$). We call this
+regularity \emph{saturation}. It is not overfitting: overfitting is
+memorising the training set, while saturation is what happens once
+task labels alone have driven the network onto the target direction.
+The auxiliary loss then moves the already-saturated class-mean
+component further along the target axis (alignment increases by
+$\Delta|r|=+0.01$ to $+0.36$) but leaves the within-class
+residual --- the part of the features that distinguishes one trial of
+an emotion from another --- at a numerical zero ($\sim 10^{-7}$).
+Supervision deforms a basin the network is already using and never
+reaches the load-bearing direction.
 
-We call this regularity \emph{saturation}, and it is not the same
-thing as overfitting. Overfitting is a network memorising its
-training set. Saturation is what happens when the network has
-\emph{already} learned the concept the auxiliary loss was meant to
-teach, from the task labels alone. Once the EEG classifier has
-converged on the 9-class emotion task, its penultimate features are
-organised so that each emotion's trials cluster around a stable mean
-position; the average direction in feature space along which positive
-and negative emotions sit on opposite sides---the
-\emph{class-mean component}---is already the target concept. The
-auxiliary loss can only deform this already-correct direction. The
-remaining variation, which lives in the directions \emph{within} each
-class (the \emph{within-class residual}), is what discriminates
-between trials of the same emotion and what an additional seed could
-plausibly improve. The auxiliary loss does not reach this
-within-class residual. Pushing harder on the loss therefore moves
-the saturated component further along the target direction without
-adding any new discriminative signal, and accuracy drops.
+The same diagnosis identifies where the actionable gain lives: in the
+within-class residual subspace that supervision cannot reach. The
+class-mean basin is shared across seeds (every well-trained checkpoint
+recovers the V-axis at $|r|\in[0.60, 0.77]$); the residual is
+seed-specific. Ensembling across seeds therefore averages out
+seed-specific noise in the residual without disturbing the basin.
+Per-checkpoint residual encoding strength predicts leave-one-out
+ensemble contribution at $r{=}{+}0.74$ ($p=0.014$, $n=10$), and the
+$10$-checkpoint ensemble reaches FACED-9 SOTA at $\mathbf{0.6948}$
+balanced accuracy (val-selected single checkpoint $\mathbf{0.6755}$),
+a $+10.5\%$ relative improvement over
+EMOD~\citep{chen2025emod}'s prior $0.6287$. The same residual-diversity
+prescription replicates on SEED-V~\citep{liu2022seedv}
+(Appendix~\ref{app:seedv-full}). A control we did not anticipate:
+replacing the language-model-derived class prototypes used by the
+KD step with random orthonormal vectors changes BACC by
+$\le 0.003$, so the SOTA gain comes from the \emph{shape} of the loss
+(a $9$-class structure imposed on the features) rather than the
+\emph{content} of the prototypes; the V-axis serves as a probe of
+\emph{which} concept the network has saturated on, not as the source
+of the supervised signal.
 
-The same picture suggests a positive prescription: rather than
-supervise the saturated component, ensemble across multiple training
-seeds whose within-class residuals differ, recovering the gain that
-auxiliary supervision cannot. Following this prescription on FACED-9
-yields a new state of the art at $\mathbf{0.6948}$ balanced accuracy
-on a $10$-checkpoint softmax ensemble (best val-selected single
-checkpoint $\mathbf{0.6755}$), a $+10.5\%$ relative improvement over
-EMOD~\citep{chen2025emod}, the previous FACED-9 SOTA at $0.6287$.
-Surprisingly, the class prototypes used by the knowledge-distillation
-step in our recipe can be replaced by random orthonormal vectors
-without measurable degradation ($\Delta$BACC $\le 0.003$). The SOTA
-gain is therefore \emph{structural}: the loss imposes a useful
-9-class shape on the features regardless of which direction the
-prototypes point in.
-
-This raises a tension that the rest of the paper resolves directly:
-if random prototypes give the same gain as language-model-derived
-ones, what is a language-model-derived direction doing in this paper
-at all? It serves as a probe of \emph{which} concept the network has
-saturated on, demonstrating that saturation operates on a real
-semantic axis rather than on noise. The construction uses nine
-sentences. We write one short emotion-evocative story per FACED
-class, pass each through a language model (we use Qwen3-4B as the
-lead model), and take the first principal component of the model's
-late-layer features across the nine resulting story representations.
-We call this one-dimensional direction the \emph{valence axis} (or
-V-axis for short), oriented so that the centroid of the Joy story
-projects to a positive value. Figure~\ref{fig:universal-vaxis} summarises the three external-validity
-results in one panel each. \textbf{(a)} The same direction predicts
-movie-review sentiment zero-shot on SST-2~\citep{socher2013recursive},
-a standard benchmark of $\sim$$10$k labelled film reviews, at AUC
-$0.832$ from a single Qwen3-4B run. \textbf{(b)} It predicts the EEG
-response averaged across $123$ FACED subjects: a single ridge
-regression on all $160$ channel-band features matches the Qwen3-4B
-V-axis projection at $r=0.80$ over the $28$ video clips
-($p<10^{-5}$); a CLIP-text variant of the V-axis built from the same
-$28$ stimulus descriptions reaches $r=0.87$ on the same ridge
-($p<10^{-9}$).
-\textbf{(c)} It emerges spontaneously in EEG classifiers: across $36$
-checkpoints trained only on the $9$ emotion labels, the alignment
-between the EEG-side class-PC1 and the LLM V-axis (both reduced to
-the same $9$ scalar class-projections) predicts BACC at $r=+0.885$.
-The probe demonstrates the concept is real (the saturation operates
-on a genuine semantic axis); the SOTA prescription shows that, once
-the network has saturated, only the loss's structure matters, not the
-direction it points in.
-
-\paragraph{Contributions.} \textbf{(1)} The \emph{saturation
-regularity}: across $25$ representation-alignment recipes on FACED-9,
-$16$ produce significant decrements and $0$ produce gains, with
-monotonic destruction in $5$ families and a sharp transition in
-$[0.62, 0.66]$ BACC; the auxiliary loss moves the saturated
-class-mean component by $\Delta|r|{=}{+}0.01$ to ${+}0.36$ but the
-within-class residual by $\sim 10^{-7}$, a numerical zero
-(\S\ref{sec:saturation}). \textbf{(2)} A residual-diversity ensemble
-turning the mechanism into a positive prescription: per-checkpoint
-residual encoding predicts leave-one-out contribution at $r{=}{+}0.74$,
-and a $10$-checkpoint ensemble reaches FACED-9 SOTA at
-$\mathbf{0.6948}$ (\S\ref{sec:convergence},~\S\ref{sec:sota}).
-\textbf{(3)} The \emph{V-axis probe}: a one-dimensional valence
-direction from $9$ language-model emotion stories that simultaneously
-predicts text sentiment, predicts cohort EEG response, and emerges
-in EEG classifiers
-(\S\ref{sec:vaxis-llms}--\S\ref{sec:topography}). All three replicate
-on SEED-V~\citep{liu2022seedv} (Appendix~\ref{app:seedv-full}).
+\paragraph{Contributions.} \textbf{(1)} A nine-sentence \emph{V-axis
+probe}: a one-dimensional valence direction extracted from $9$
+language-model emotion stories that converges across $14$ LLMs,
+predicts text sentiment zero-shot, predicts cohort EEG response, and
+is rediscovered without supervision by $36$ EEG classifiers
+(\S\ref{sec:vaxis-llms}--\S\ref{sec:topography}).
+\textbf{(2)} The \emph{saturation regularity}: across $25$
+representation-alignment recipes on FACED-9, $16$ produce significant
+decrements and $0$ produce gains, with monotonic destruction in $5$
+families and a sharp transition in the $[0.62, 0.66]$ BACC band; the
+loss moves the class-mean component by $\Delta|r|{=}{+}0.01$ to
+${+}0.36$ but the within-class residual by $\sim 10^{-7}$
+(\S\ref{sec:saturation}).
+\textbf{(3)} A residual-diversity ensemble turning the mechanism into
+a positive prescription: per-checkpoint residual encoding predicts
+leave-one-out contribution at $r{=}{+}0.74$, and a $10$-checkpoint
+ensemble reaches FACED-9 SOTA at $\mathbf{0.6948}$
+(\S\ref{sec:convergence},~\S\ref{sec:sota}). All three replicate on
+SEED-V~\citep{liu2022seedv} (Appendix~\ref{app:seedv-full}).
 Limitations in \S\ref{sec:discussion}.
