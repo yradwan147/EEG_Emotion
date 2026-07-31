@@ -19,7 +19,7 @@ adapters~\citep{hu2022lora}, curriculum schedules, multi-LLM
 ensembles, channel-targeted topographic losses, and anger-weighted
 variants (full table in Appendix~\ref{app:full-vaxis-table}).
 
-\paragraph{Result.} None help. Sixteen produce statistically
+\paragraph{Result.} None help. Fifteen produce statistically
 significant accuracy decrements ($p<0.05$, paired across five seeds);
 zero produce gains. Five families show \emph{monotonic destruction}:
 the harder we push the auxiliary loss, the worse accuracy gets, with
@@ -41,7 +41,7 @@ universal cut-offs).
 $\mathrm{BACC}(\theta)$ in the band $[0.62, 0.66]$ or higher, adding
 any V-axis auxiliary loss $\mathcal{L}_v$ at $\lambda > 0$ produces
 $\mathbb{E}[\Delta\mathrm{BACC}] \leq 0$ across all families tested
-($16/25$ significant at $p<0.05$, $0/25$ positive). The threshold
+($15/25$ significant at $p<0.05$, $0/25$ positive). The threshold
 coincides with the regime where the V-axis encoding strength
 $\rho(\theta)$ saturates across seeds (\S\ref{sec:convergence}).}
 \end{quote}
@@ -54,12 +54,19 @@ concrete.
 
 \paragraph{Mechanism check.} The auxiliary loss does push the network's
 class-mean features further along the target direction (alignment
-increases by $\Delta|r|=+0.01$ to $+0.36$),
-but it leaves the within-class residual---the part of the features
-that actually distinguishes one trial of an emotion from another---at
-a numerical zero ($\sim 10^{-7}$). The basin the network was using
-to classify gets reshaped along the loss direction; the load-bearing
-orthogonal residual subspace receives no compensating gradient.
+increases by $\Delta|r|=+0.01$ to $+0.36$), yet this buys no
+generalization: with the loss active, training accuracy stays pinned
+at ceiling while test accuracy \emph{falls} ($0.622\!\to\!0.577$
+balanced accuracy, A6). The added supervision reshapes a representation
+the network has already converged onto from task labels alone, rather
+than supplying new discriminative signal. What actually carries
+generalization is the \emph{within-class residual}---the directions
+that distinguish one trial of an emotion from another---which is
+seed-specific and load-bearing: its per-checkpoint encoding strength
+predicts leave-one-out ensemble contribution at $r{=}{+}0.74$
+(\S\ref{sec:sota}). Pushing the already-saturated class-mean basin
+along a fixed target does not improve how the network uses this
+residual.
 The $25$ recipes reduce to one principle: \emph{a saturated
 representation is an unhelpful supervision target}, qualitatively
 similar to the few-class distillation

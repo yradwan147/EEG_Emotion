@@ -20,21 +20,19 @@ paper studies a regime where it does not.
 
 \paragraph{Concept directions in language models.}
 Arditi et~al.~\citep{arditi2024refusal} showed that refusal in
-instruction-tuned LMs is mediated by a single direction in
-residual-stream activations: ablating it eliminates refusal, adding
-it induces it. Earlier work in this family includes
-\citep{li2023inferencetime,zou2023repe,kim2018tcav}. Concurrent work
-from Anthropic interpretability~\citep{sofroniew2026anthropic}
-identified emotion-concept features in production-scale LMs through
-sparse autoencoders and showed that ablating these features changes
-downstream behaviour, complementing the cohort-level brain alignment
-we report here. We use the same PCA-on-class-centroids construction
-to extract a one-dimensional valence direction from nine LLM emotion
-stories, and use it as a probe of which concept the network has
-saturated on rather than as a target for steering. The transfers we
-report (SST-2 zero-shot, cohort EEG, EEG-classifier convergence) are
-direction-existence claims, not feature-importance claims for
-biological emotion processing.
+instruction-tuned LMs is mediated by a single residual-stream
+direction, and related work extracts other behavioural
+directions~\citep{li2023inferencetime,zou2023repe,kim2018tcav}.
+Concurrent Anthropic interpretability
+work~\citep{sofroniew2026anthropic} identified emotion-concept
+features in production-scale LMs via sparse autoencoders,
+complementing our cohort-level brain alignment. We use the same
+PCA-on-class-centroids construction to extract a one-dimensional
+valence direction from nine emotion stories, as a probe of the
+saturated concept rather than a steering target; our transfers (SST-2
+zero-shot, cohort EEG, classifier convergence) are direction-existence
+claims, not feature-importance claims for biological emotion
+processing.
 
 \paragraph{Brain--LM alignment.}
 Toneva and Wehbe~\citep{toneva2019interpreting} first showed that

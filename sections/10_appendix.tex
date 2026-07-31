@@ -571,9 +571,38 @@ table and the diagnostic information for both class-level (degenerate)
 and trial-level (used) residual directions are stored in
 \texttt{seedv\_causal\_ablation\_full.json}.
 
+\paragraph{Third-dataset consistency check: DEAP.}
+As a further test of the saturation regularity on an independent
+dataset (DEAP~\citep{koelstra2011deap}; $32$ subjects, $32$ channels,
+$128$\,Hz), we trained a binary-valence classifier (valence rating
+$\geq 5$, sourced from the raw DEAP labels) from the same pretrained
+EMOD backbone, splitting by \emph{(subject, trial)} unit so that all
+windows of a trial stay on one side. The converged baseline reaches
+$\overline{\mathrm{BACC}}=0.544$ --- below the $[0.62, 0.66]$
+transition band identified on FACED --- so the regularity predicts the
+V-axis auxiliary loss should have \emph{no significant effect} here,
+rather than a decrement. This is what we observe: across three seeds
+and three loss weights ($\lambda\in\{0.1, 0.5, 1.0\}$), the pooled
+change is $\Delta\mathrm{BACC}=-0.019 \pm 0.044$ ($n{=}9$,
+one-sample $t{=}{-}1.28$, $p{=}0.24$), within noise of zero (two of
+three seeds negative, one positive). DEAP thus populates the
+weak-baseline regime of the transition curve: consistent with, but not
+an independent confirmation of, the destructive regime seen once a
+FACED or SEED-V classifier passes the transition. Per-run numbers are
+in \texttt{deap\_sat/SUMMARY.json}.
+
 
 \section{Brain Topography Deep Dive}
 \label{app:topography-deep-dive}
+
+\begin{figure}[ht]
+\centering
+\IfFileExists{figures/neuro/NF1_5band_topomaps.pdf}
+  {\includegraphics[width=\linewidth]{neuro/NF1_5band_topomaps.pdf}}
+  {\includegraphics[width=\linewidth]{F4_brain_topography.pdf}}
+\caption[Brain topography]{\input{figures/F4_caption}}
+\label{fig:topomap-5band}
+\end{figure}
 
 \paragraph{Davidson FAA full pairs.}
 Figure~\ref{fig:davidson-faa} compares all three Davidson asymmetry pairs
@@ -737,7 +766,9 @@ gives per-recipe $\Delta$BACC against the strong EMOD\,$d{=}6$\,+\,KD\,+\,aug
 baseline, the paired-seed $p$-value, and a verdict tier; the
 two SOTA-recipe replications below the line confirm the cliff persists
 at the BACC$\,\approx\,0.66$ regime where saturation is operative.
-Figure~\ref{fig:forest} renders the same $25$ entries as a forest plot
+Figure~\ref{fig:forest} renders these interventions --- together with
+additional null variants we tested (weight/bias initialisation,
+soft-KD temperatures, curriculum, prior smoothing) --- as a forest plot
 ranked by effect size, so the asymmetry is visible at a glance: every
 significant entry sits to the left of zero, and even the largest n.s.\
 positive (EMODSTYLE-stim, $+0.0066$, $p{=}0.22$) is within seed noise.
@@ -771,7 +802,7 @@ topographic, scaling, multi-task) is what makes the regularity a
 17 & EMODSTYLE stim $\lambda{=}0.5$      & $+0.0066$ & $0.22$ & n.s. (sweet spot) \\
 18 & PEFT fullhead $\lambda{=}0.1$       & $-0.009$ & $0.069$ & borderline \\
 19 & PEFT LoRA $\lambda{=}0.1$           & $-0.010$ & $0.12$  & n.s. \\
-20 & PEFT IA3 $\lambda{=}0.1$            & $-0.016$ & $0.05$  & sig.\ negative \\
+20 & PEFT IA3 $\lambda{=}0.1$            & $-0.008$ & $0.14$  & n.s. \\
 21 & Pretrain-FT (frozen)                & $-0.401$ & $<10^{-4}$ & catastrophic \\
 22 & Pretrain-FT (unfrozen)              & $-0.190$ & $<10^{-4}$ & sig.\ negative \\
 23 & XEEG (FACED $\to$ SEED-V)           & $+0.0015$ & $0.97$  & n.s. (zero) \\
@@ -782,9 +813,9 @@ topographic, scaling, multi-task) is what makes the regularity a
    & SOTA recipe + EMODSTYLE             & $-0.024$ & $0.001$  & sig.\ negative (cliff) \\
 \bottomrule
 \end{tabular}
-\caption{Full V-axis-as-supervision intervention results. 16 / 25
-families produce a statistically significant negative (14 sig.\ negative
-+ 2 catastrophic); the remaining 9 are not significantly different from
+\caption{Full V-axis-as-supervision intervention results. 15 / 25
+families produce a statistically significant negative (13 sig.\ negative
++ 2 catastrophic); the remaining 10 are not significantly different from
 zero. None reach $p<0.05$ in the positive direction at the strong
 baseline. Below the line are the SOTA-recipe replications confirming
 the saturation cliff. Forest plot in Figure~\ref{fig:forest}.}
@@ -879,11 +910,15 @@ change in two quantities relative to the matched-recipe baseline:
 $\Delta r_{\mathrm{PC1}}$ (class-mean V-axis encoding) and
 $\Delta r_{\mathrm{resid}}$ (within-class V-axis residual encoding).
 V-axis training raises class-PC1 $|r|$ by $+0.01$ to $+0.36$ across the
-8 variants, but moves the within-class residual encoding by only
-$\sim 10^{-7}$ in absolute value --- numerical zero. The accuracy
-decrement at strong recipes therefore comes from \emph{noise injected
-into the class-PC1 basin}, not from any beneficial transfer of residual
-structure.
+8 variants, but leaves the within-class residual encoding essentially
+unchanged. Consistent with the accuracy behaviour (training accuracy at
+ceiling, test accuracy down; A6), the decrement at strong recipes comes
+from reshaping the already-saturated class-PC1 basin rather than from
+any beneficial transfer of residual structure. (We do \emph{not} claim
+the auxiliary gradient fails to reach the residual subspace: a direct
+gradient decomposition finds a residual-subspace component comparable to
+a random direction, so the mechanism is one of \emph{no useful
+signal added}, not of a geometrically unreachable subspace.)
 
 \paragraph{Path B: ensembling-in V-axis checkpoints.}
 We extend the 10-vanilla SOTA ensemble with 0--15 V-axis-trained Topo

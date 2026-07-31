@@ -21,6 +21,33 @@ at the same strength a panel of human raters would produce.
 Multi-comparison correction and other controls are in
 Appendix~\ref{app:brain-deep-dive}.
 
+\paragraph{The ridge correlation is not carried by a few
+high-affect stimuli.} Because a single-channel analysis of this
+dataset (PO3/$\gamma$, Appendix~\ref{app:topography-deep-dive}) is
+dominated by an anger-versus-warm-positive contrast, it is worth
+stating precisely what does and does not depend on those poles.
+Removing the three emotional-pole categories (Anger, Amusement,
+Tenderness) leaves the \emph{ridge} correlation essentially unchanged
+($r{=}0.88$ on the remaining $19$ mid-valence stimuli, versus $0.87$
+on all $28$), and a leave-one-emotion-out ablation never drops it
+below $r{=}0.92$. The same pole ablation does collapse the single raw
+PO3/$\gamma$ channel ($0.48 \to -0.02$). The pole dependence therefore
+belongs to the single-channel topography, not to the multi-feature
+ridge that carries the headline.
+
+\paragraph{The brain aligns with valence, not with the V-axis
+specifically.} Swapping the LLM-derived V-axis for a generic
+categorical valence axis (an integer valence rank assigned to each
+emotion) or for the behavioural valence ratings leaves the ridge
+correlation essentially unchanged ($r{=}0.89$ and $r{=}0.86$
+respectively, versus $0.87$ for the V-axis; all $n{=}28$), while a
+matched-norm random direction stays at chance ($r{=}0.07$;
+Appendix~\ref{app:brain-deep-dive}). What the cohort EEG encodes is a
+valence \emph{ordering} of the stimuli; the V-axis is one instance of
+that ordering, not a privileged direction. This is why we treat the
+V-axis as a probe of the saturated concept rather than as the concept
+itself.
+
 \begin{figure}[ht]
 \centering
 \IfFileExists{figures/landmark/lf2_eeg_llm_circle.pdf}
