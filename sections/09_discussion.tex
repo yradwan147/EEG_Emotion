@@ -1,33 +1,26 @@
 \section{Discussion: Limitations and Future Work}
 \label{sec:discussion}
 
-Auxiliary losses are deployed without asking whether the network has
-already saturated on the target concept. Our results---a saturation
-regularity organising $25$ recipe failures, a residual-diversity
-ensemble that turns the mechanism into FACED-9 SOTA, and a nine-story
-V-axis probe---are scoped to FACED-9 with a measurable V-axis substrate.
-The probe transfers are direction-existence results, not neuroscience
-mechanism claims; the posterior topography speaks to the video-viewing
-paradigm, not to the frontal-asymmetry
-account~\citep{davidson1992anterior}; and the cohort signal is
+Our three results---a saturation regularity organising $25$ recipe
+failures, a residual-diversity ensemble that turns it into FACED-9 SOTA,
+and the V-axis probe---are scoped to FACED-9. The probe transfers are direction-existence results,
+not neuroscience mechanism claims, and the cohort signal is
 population-level, not within-subject
 (Appendix~\ref{app:topography-deep-dive}). Three limitations bound the
-broader reading. First, we do not claim architecture-independent
-convergence: a V-axis-encoding-versus-accuracy correlation pooled
-across backbones is pseudo-replicated (it collapses within any single
-architecture and fails a matched-norm null), so convergence is scoped
-to seeds of one architecture. Second, the cross-model similarity of the
-LLM valence geometry is largely inherited from shared input structure
-rather than learned---an untrained model reproduces it---so we treat
-the V-axis as a convenient probe, not a universal learned
-representation. Third, the transfer is content-specific (valence
-carries across text, vision, and EEG; arousal only in vision), the
-weak-to-converged transition is cleanest on
-CIFAR-10~\citep{krizhevsky2009cifar} (text shows content-irrelevance
-but not a significant help-when-weak effect), and
-the EmoEEG-MC confound control is inconclusive. The practical corollary
-is that aux-loss design papers should report the receiving baseline's
-saturation state before attributing a gain to the loss. Whether
-the residual-vs-basin decomposition generalises to other saturated
-concepts---truthfulness, refusal, sentiment polarity---is the question
-this paper opens.
+broader reading. \textbf{(i)}~We do not claim architecture-independent
+convergence: the encoding-vs-accuracy correlation pooled across
+backbones is pseudo-replicated---it collapses within any single
+architecture and fails a matched-norm null---so convergence is scoped
+to seeds of one architecture. \textbf{(ii)}~The cross-model similarity
+of the LLM valence geometry is largely inherited from shared input
+structure rather than learned (an untrained model reproduces it), so we
+treat the V-axis as a probe, not a universal learned representation.
+\textbf{(iii)}~Transfer is content-specific (valence carries across
+text, vision, and EEG; arousal only in vision), the weak-to-converged
+transition is cleanest on CIFAR-10~\citep{krizhevsky2009cifar}, and
+the EmoEEG-MC confound control is inconclusive. Whether the
+residual-vs-basin decomposition generalises to other saturated concepts
+(truthfulness, refusal, sentiment) is the open question. But one
+corollary stands regardless: an auxiliary-loss gain is uninterpretable
+without the receiving baseline's saturation state---it may be headroom a
+converged model no longer has.

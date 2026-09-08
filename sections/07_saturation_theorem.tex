@@ -4,11 +4,11 @@
 We test whether auxiliary supervision toward a known concept direction
 helps an EEG-emotion classifier. The setup uses an
 EMOD~\citep{chen2025emod} backbone (the previous FACED-9 SOTA) at
-two strengths: a vanilla $0.62$ BACC baseline and the strong SOTA
-recipe of \S\ref{sec:sota} (augmentation, depth-doubling, distillation,
-and ensembling) at $0.66$ BACC. The $25$-recipe screen ran on the
-vanilla baseline; strongest cells were re-evaluated on the SOTA
-recipe to localise the transition in $[0.62, 0.66]$. Each
+two strengths we call \emph{weak} ($d{=}3$, $0.62$ BACC) and
+\emph{converged} (the $d{=}6$ SOTA recipe of \S\ref{sec:sota}, $0.658$
+BACC). The $25$-recipe screen ran on the weak baseline; strongest cells
+were re-evaluated on the converged recipe to localise the transition in
+$[0.62, 0.66]$. Each
 intervention adds an auxiliary loss that pulls the network's
 penultimate features toward a target direction. Targets span LLM-derived class prototypes (the V-axis---a one-dimensional
 valence direction extracted from nine LLM emotion stories,
@@ -51,7 +51,7 @@ target makes things strictly worse, not better.
 \paragraph{The transition is sharp and unidirectional in baseline
 strength.} An intervention whose effect lies within seed noise on a
 weak baseline (BACC $\le 0.62$) becomes a statistically significant
-negative on the strong recipe (BACC $\ge 0.66$). The transition sits
+negative on the converged recipe ($0.658$ BACC). The transition sits
 cleanly in the band $[0.62, 0.66]$ on FACED-9 (we make no claim about
 universal cut-offs).
 

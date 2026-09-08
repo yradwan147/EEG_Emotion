@@ -1,0 +1,28 @@
+% ICLR Ethics + Reproducibility statements. Unnumbered; placed at the end of the
+% main text before the references (excluded from the ICLR page limit).
+
+\section*{Ethics Statement}
+This work uses only publicly released, de-identified EEG datasets (FACED, SEED-V,
+EmoEEG-MC), collected with informed consent by their original authors under their
+respective institutional approvals; we introduce no new human-subjects data. The
+valence axis is used solely as an interpretive probe of model representations and
+of the \emph{cohort-averaged} neural response, never for individual-level
+affect inference or profiling---indeed we show the within-subject effect is near
+zero. We foresee no direct path to harmful application beyond the general dual-use
+considerations of affect-related modelling, and we release code under a permissive
+licence to support scrutiny.
+
+\section*{Reproducibility Statement}
+All datasets and models used are public: FACED, SEED-V and EmoEEG-MC (EEG),
+CIFAR-10 and SST-2 (control tasks), and the language/vision backbones fetched from
+public checkpoints. Dataset preprocessing, splits, and the V-axis extraction
+protocol are specified in Appendices~\ref{app:datasets} and
+\ref{app:vaxis-protocol}; the full statistical methodology (paired tests, Holm
+correction, TOST equivalence, nested permutation, and leave-one-emotion-out
+jackknife) is given with each result and in the appendix. Every number reported in
+the paper is linked to the exact script and result file that produced it in an
+anonymised reproducibility package released with the submission: headline
+accuracies reproduce by inference on the released checkpoint pool, and all
+analysis-level numbers and figures regenerate from shipped result files with no
+GPU. The SEED-V cross-dataset replication is documented in full in
+Appendix~\ref{app:seedv-full}.

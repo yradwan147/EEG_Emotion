@@ -5,11 +5,10 @@
 
 \documentclass{article}
 
-% --- Submission mode (uncomment exactly one) ---
-% \usepackage{neurips_2026}                       % 
-% anonymous submission (default)
-\usepackage[preprint]{neurips_2026}           % arXiv preprint
-% \usepackage[final]{neurips_2026}              % camera-ready
+% --- ICLR 2026 submission (anonymous / double-blind). ---
+% Authors are hidden automatically in submission mode; for the camera-ready,
+% uncomment \iclrfinalcopy just after \begin{document} to de-anonymize.
+\usepackage{iclr2026_conference,times}
 
 % === Core packages ===
 \usepackage[utf8]{inputenc}
@@ -130,14 +129,15 @@
 % SEED-V replication moved to Appendix~\ref{app:seedv-full}
 \input{sections/09_discussion}              % §9 Discussion
 
-\newpage
-{\small
-\bibliographystyle{plainnat}
-\bibliography{references}
-}
+% ICLR Ethics + Reproducibility statements (end of main text, before references;
+% excluded from the ICLR page limit).
+\input{sections/iclr_statements}
 
 \newpage
-\input{sections/checklist}
+{\small
+\bibliographystyle{iclr2026_conference}
+\bibliography{references}
+}
 
 \newpage
 \appendix

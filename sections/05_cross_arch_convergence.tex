@@ -27,18 +27,10 @@ Appendix~\ref{app:convergence-deep-dive}.)
 Within-class residual encoding predicts ensemble contribution: across
 the $10$ checkpoints used to build our SOTA ensemble
 (\S\ref{sec:sota}), per-checkpoint residual strength predicts
-leave-one-out contribution at $\mathbf{r{=}{+}0.74}$ ($p{=}0.014$).
+leave-one-out contribution at $\mathbf{r{=}{+}0.74}$ ($p{=}0.014$,
+$n{=}10$)---an empirical trend, not a law given the small $n$.
 Bootstrap CIs and per-deletion ranges are in
 Appendix~\ref{app:convergence-deep-dive}.
-
-\begin{quote}
-\textbf{Residual Contribution Regularity.} \emph{For a saturated EEG
-classifier with within-class residual encoding of the V-axis at
-strength $\rho_k$, the leave-one-out ensemble contribution scales
-linearly with $\rho_k$ ($p{=}0.014$, $n{=}10$, FACED 9-class). $n{=}10$
-is small; we report this as an empirical regularity rather than a
-law.}
-\end{quote}
 
 \paragraph{Direct test: ablate the residual at inference time.}
 A directional ablation~\citep{arditi2024refusal}---projecting the
