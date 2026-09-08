@@ -1,18 +1,25 @@
 \section{The Probe Predicts Cohort EEG}
 \label{sec:vaxis-brain}
 
-We use FACED~\citep{chen2023faced}: $123$ subjects watching $28$
+If the converged classifier has saturated on a genuine valence axis,
+that axis should be measurable in the brain signal itself, not only
+inside the classifier. We test this in the FACED
+cohort~\citep{chen2023faced}: $123$ subjects watching $28$
 emotional video clips, $32$ EEG channels at $250$\,Hz. From the
 cohort EEG averaged over subjects and time, we fit a single
 \emph{ridge regression} (a linear model with $L_2$ regularisation)
 predicting the V-axis projection of each stimulus's textual
-description from the $160$ channel--band features. The ridge
+description from the $160$ channel--band features (differential
+entropy over $32$ channels $\times$ $5$ frequency bands). The ridge
 prediction matches the Qwen3-4B V-axis at $\mathbf{r{=}{+}0.80}$
 ($n{=}28$ stimuli, $p<10^{-5}$). Substituting the CLIP-text V-axis
 on the same $28$ stimulus descriptions reaches
-$\mathbf{r{=}{+}0.87}$ ($p<10^{-9}$; Figure~\ref{fig:eeg-llm-circle})
+$\mathbf{r{=}{+}0.87}$ ($p<10^{-8}$; Figure~\ref{fig:eeg-llm-circle})
 ---the brain signal aligns with the LLM-derived direction across two
-distinct LLM substrates. Three controls support the brain--LM correlation: a matched-norm
+distinct LLM substrates. Four controls support the brain--LM correlation: a fully nested
+permutation test (stimulus relabelling within the subject structure,
+$N{=}5000$) places the correlation beyond every permutation draw
+($p{\le}2{\times}10^{-4}$, random-direction $r{=}0.07$); a matched-norm
 random direction drops the same ridge to $r{=}{+}0.07$ ($p{=}0.73$);
 split-half subject reliability on per-stimulus valence is $r{=}{+}0.99$;
 the same EEG ridge predicts human-rated valence at $r{=}{+}0.86$,
@@ -29,8 +36,9 @@ stating precisely what does and does not depend on those poles.
 Removing the three emotional-pole categories (Anger, Amusement,
 Tenderness) leaves the \emph{ridge} correlation essentially unchanged
 ($r{=}0.88$ on the remaining $19$ mid-valence stimuli, versus $0.87$
-on all $28$), and a leave-one-emotion-out ablation never drops it
-below $r{=}0.92$. The same pole ablation does collapse the single raw
+on all $28$, both with the CLIP-text axis), and a leave-one-emotion-out jackknife keeps it in the
+range $r\in[0.86,0.89]$ (every single-emotion drop stays significant).
+The same pole ablation does collapse the single raw
 PO3/$\gamma$ channel ($0.48 \to -0.02$). The pole dependence therefore
 belongs to the single-channel topography, not to the multi-feature
 ridge that carries the headline.
@@ -40,7 +48,7 @@ specifically.} Swapping the LLM-derived V-axis for a generic
 categorical valence axis (an integer valence rank assigned to each
 emotion) or for the behavioural valence ratings leaves the ridge
 correlation essentially unchanged ($r{=}0.89$ and $r{=}0.86$
-respectively, versus $0.87$ for the V-axis; all $n{=}28$), while a
+respectively, versus $0.87$ for the CLIP-text V-axis; all $n{=}28$), while a
 matched-norm random direction stays at chance ($r{=}0.07$;
 Appendix~\ref{app:brain-deep-dive}). What the cohort EEG encodes is a
 valence \emph{ordering} of the stimuli; the V-axis is one instance of
@@ -61,5 +69,22 @@ The same picture survives across all $14$ LLMs (Qwen3 family mean
 $r{=}{+}0.796 \pm 0.011$ irrespective of size) and on the held-out
 SEED-V dataset~\citep{liu2022seedv}, where the FACED-derived V-axis
 ranks the five SEED-V emotions at $r{=}{+}0.96$ without retraining.
-Appendix~\ref{app:seedv-full} re-derives the V-axis from scratch on
-SEED-V and re-tests every claim.
+On a third, independently collected EEG dataset
+(EmoEEG-MC~\citep{xu2025emoeegmc}), a within-subject valence decoder
+reaches $0.61$ accuracy ($p{=}3.4{\times}10^{-5}$) and its group axis
+tracks behavioural valence at $r{=}0.71$; an audio/visual confound
+control there is inconclusive (no partial survives correction), so we
+frame the EEG--valence link as a population-level predictive
+association, not a confound-free one
+(Appendix~\ref{app:brain-deep-dive}). Appendix~\ref{app:seedv-full}
+re-derives the V-axis from scratch on SEED-V and re-tests every claim.
+
+\paragraph{Probe scope.} The cohort signal is posterior-dominant and is
+carried by an anger-versus-warm-positive contrast on $9$ of the $28$
+clips, so at the single-channel level it reads more as an
+emotion-contrast than a graded valence axis (the multi-feature ridge
+above is not pole-dependent). It is a dynamic-video-paradigm statement
+that neither tests nor refutes frontal-alpha
+asymmetry~\citep{davidson1992anterior}; full topography, Simpson's-paradox,
+time-resolved, and FAA analyses are in
+Appendix~\ref{app:topography-deep-dive}.

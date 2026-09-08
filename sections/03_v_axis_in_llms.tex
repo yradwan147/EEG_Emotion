@@ -40,7 +40,7 @@ Vision & CLIP-image (9 images) & none (proj.) & $\mathbf{r{=}0.869}$ & beats sup
 nine emotion-class centroids). The Qwen3-4B V-axis is the lead model
 for both Text and Brain rows. Vision uses CLIP-image because the
 language model has no image side; a CLIP-text variant of the V-axis
-on the same EEG ridge reaches $r{=}0.87$ ($p<10^{-9}$,
+on the same EEG ridge reaches $r{=}0.87$ ($p<10^{-8}$,
 \S\ref{sec:vaxis-brain}). Full sentiment, lexicon, and multilingual
 results in Appendix~\ref{app:per-llm-deep-dive}.}
 \label{tab:cross-modal}
@@ -53,18 +53,19 @@ trails $355$M RoBERTa-MNLI zero-shot
 ($0.912$;~\citealp{liu2019roberta}) by $0.08$---all from nine
 stories of supervision.
 
-\paragraph{The same direction across families.}
-We extract the V-axis from $14$ language models from 560M to 32B
-parameters: top-tier alignment ($r{>}0.85$ against a behavioural
-valence reference) holds for all six Qwen3 sizes plus Mistral-7B;
-Llama-4-Scout, Gemma-27B, and Gemma-4 sit in a middle tier; three
-older small models (Pythia, TinyLlama, BLOOM) fall below detection
-threshold (per-LLM table in Appendix~\ref{app:per-llm-deep-dive}).
-Within the Qwen3 family, the V-axis is essentially scale-invariant
-(off-diagonal $r{=}+0.995$ across $15$ pairs); across families,
-correlations are looser ($r{=}+0.585$ over $48$ pairs). The
-direction is a property of \emph{modern} LM training rather than of
-parameter count.
+\paragraph{The direction is recovered across model families.}
+Extracting the V-axis independently from four non-Qwen families
+recovers essentially the same valence ordering of the stimuli:
+Mistral-7B ($r{=}0.95$), Llama-3 ($r{=}0.95$), and BLOOM ($r{=}0.94$)
+all align with the behavioural valence reference, with Pythia the lone
+outlier ($r{=}0.44$). Within the Qwen3 family the V-axis is essentially
+scale-invariant (off-diagonal $r{=}{+}0.995$ across $15$ size-pairs);
+across families the raw axes are looser ($r{=}{+}0.585$ over $48$
+pairs). We therefore describe the valence direction as
+\emph{recoverable} by modern LM training rather than as a single shared
+geometry---a cross-model similarity that, tested directly, is largely
+inherited from shared input structure rather than learned
+(Appendix~\ref{app:per-llm-deep-dive}).
 
 \paragraph{Specificity.}
 The recipe is concept-generic ($20$ further concepts produce a

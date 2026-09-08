@@ -26,8 +26,9 @@ EMOD$+$aug$+$KD$+d{=}6$ (5-seed)   & $.658\!\pm\!.010$ \\
 \textbf{10-ckpt ensemble (SOTA)}   & $\mathbf{0.6948}$ \\
 \bottomrule
 \end{tabular}
-\subcaption*{(a) Headline. $+0.0661$ abs.\ ($+10.5\%$) over EMOD,
-the previous FACED-9 SOTA.}
+\subcaption*{(a) Headline. All baselines are single-model: our best
+single model reaches $0.6755$ ($+7.4\%$ over EMOD) and the
+$10$-checkpoint ensemble $0.6948$ ($+10.5\%$).}
 \end{minipage}\hfill
 \begin{minipage}{0.55\linewidth}
 \centering
@@ -49,8 +50,9 @@ $+$ longer training ($e{=}150$)       & $.658\!\pm\!.010$ & $.000$ \\
 \end{minipage}
 \caption{New FACED 9-class SOTA. The \texttt{rand9} ablation replaces
 LLM-derived KD prototypes with random orthonormal 9-D directions and
-costs $\le 0.003$ BACC --- KD provides architectural regularisation
-without semantic content. Visual cascade in
+leaves BACC statistically unchanged ($\Delta{=}{-}0.004$, paired
+$p{=}0.37$) --- KD provides architectural regularisation without
+semantic content. Visual cascade in
 Appendix~\ref{app:ensemble-extras}.}
 \label{tab:sota}
 \end{table}
@@ -62,21 +64,19 @@ amplitude scaling, Gaussian noise at $p{=}0.6$) contributes the
 largest single jump ($+0.0149$). Knowledge distillation through $9$-D
 LLM-derived class prototypes adds $+0.0096$; a \texttt{rand9} ablation
 (identical recipe with the $9$ LLM prototypes replaced by random
-orthonormal directions) costs at most $0.003$ BACC, paired $p>0.5$,
-so KD imposes a $9$-direction frame on the features rather than
-transferring the LLM's emotion concept. Depth-doubling to $d{=}6$
+orthonormal directions) leaves BACC statistically unchanged
+($\Delta{=}{-}0.004$, paired $p{=}0.37$), so KD imposes a
+$9$-direction frame on the features rather than transferring the LLM's
+emotion concept. Depth-doubling to $d{=}6$
 adds $+0.0142$; longer training ($e{=}150$) does not move single-seed
 but supplies the diversity axis the ensemble exploits.
 
-\paragraph{Two-tier ensemble theory.}
-The $10$ $d{=}6$ checkpoints share an identical class-PC1 basin
-($|r|\in[0.60, 0.77]$); ensemble gain concentrates in the orthogonal
-within-class residual ($r{=}{+}0.74$, $p{=}0.014$). Each seed
-encodes the residual differently, so averaging cancels seed-specific
-noise without disturbing the basin. Mixing $e{=}100$ and $e{=}150$
-ties at $0.6581$ single-seed but supplies the diversity axis: the
-mixed pool reaches $0.6948$ versus $0.6798$ for $e{=}100$ alone.
-Headroom-monotonicity (near-zero on MNIST), the $10$-checkpoint
-plateau, and failure of cross-architecture mixing confirm
-intra-architecture training-length diversity as the operative
-mechanism (Appendix~\ref{app:ensemble-extras}).
+\paragraph{Why the ensemble works.}
+Ensemble gain concentrates in the within-class residual each seed
+encodes differently ($r{=}{+}0.74$, $p{=}0.014$;
+\S\ref{sec:convergence}); averaging cancels that seed-specific noise
+without disturbing the shared basin. Mixing $e{=}100$ and $e{=}150$
+checkpoints supplies the diversity axis---the mixed pool reaches
+$0.6948$ versus $0.6798$ for $e{=}100$ alone. Headroom-monotonicity,
+the $10$-checkpoint plateau, and the failure of cross-architecture
+mixing are in Appendix~\ref{app:ensemble-extras}.

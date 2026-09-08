@@ -4,12 +4,14 @@
 We test whether auxiliary supervision toward a known concept direction
 helps an EEG-emotion classifier. The setup uses an
 EMOD~\citep{chen2025emod} backbone (the previous FACED-9 SOTA) at
-two strengths: a vanilla $0.62$ BACC baseline and the SOTA recipe of
-\S\ref{sec:sota} at $0.66$ BACC. The $25$-recipe screen ran on the
+two strengths: a vanilla $0.62$ BACC baseline and the strong SOTA
+recipe of \S\ref{sec:sota} (augmentation, depth-doubling, distillation,
+and ensembling) at $0.66$ BACC. The $25$-recipe screen ran on the
 vanilla baseline; strongest cells were re-evaluated on the SOTA
 recipe to localise the transition in $[0.62, 0.66]$. Each
 intervention adds an auxiliary loss that pulls the network's
-penultimate features toward a target direction. Targets span LLM-derived class prototypes (the V-axis of
+penultimate features toward a target direction. Targets span LLM-derived class prototypes (the V-axis---a one-dimensional
+valence direction extracted from nine LLM emotion stories,
 \S\ref{sec:vaxis-llms}), CLIP-text embeddings, and frontal-channel
 masks matched to the analytical valence ceiling. Loss families span
 knowledge distillation~\citep{hinton2015distilling}, representational
@@ -18,6 +20,24 @@ losses, parameter-efficient fine-tuning (PEFT)
 adapters~\citep{hu2022lora}, curriculum schedules, multi-LLM
 ensembles, channel-targeted topographic losses, and anger-weighted
 variants (full table in Appendix~\ref{app:full-vaxis-table}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{NF_A_saturation.pdf}
+\caption[The saturation transition]{\textbf{Auxiliary concept
+supervision helps a weak network and hurts a converged one---regardless
+of the target's content.} \textbf{(a)} On CIFAR-10, an auxiliary head
+raises test accuracy while the backbone is undertrained (filled points,
+Holm $p{<}0.05$) but the benefit vanishes once the backbone converges
+(open points, n.s.; shaded); an aligned target is statistically
+indistinguishable from a random one throughout (dashed). \textbf{(b)}
+On FACED EEG the same sign-flip appears for two concept axes: a valence
+or arousal auxiliary loss is within seed noise of zero on a weak
+($d{=}3$) backbone but significantly negative on the converged SOTA
+recipe ($p{=}0.011$ topographic, Holm-corrected; emod-style variants
+$p{\le}0.008$). Error bars: $95\%$ CI (converged), $\pm$SEM (weak).}
+\label{fig:saturation-transition}
+\end{figure}
 
 \paragraph{Result.} None help. Fifteen produce statistically
 significant accuracy decrements ($p<0.05$, paired across five seeds);
@@ -35,15 +55,35 @@ negative on the strong recipe (BACC $\ge 0.66$). The transition sits
 cleanly in the band $[0.62, 0.66]$ on FACED-9 (we make no claim about
 universal cut-offs).
 
+\paragraph{The regularity generalises beyond valence and beyond EEG.}
+An \emph{arousal} target (the same recipe re-anchored on arousal poles)
+hurts the converged backbone just as much (topographic
+$\Delta\mathrm{BACC}={-}0.031$, $p{=}0.011$; emod-style ${-}0.035$,
+$p{=}0.007$; Holm-corrected) while remaining within seed noise on the
+weak $d{=}3$ baseline---two concept axes, one saturation
+(Figure~\ref{fig:saturation-transition}b). The weak-to-converged
+transition also reproduces outside EEG: on CIFAR-10~\citep{krizhevsky2009cifar} an auxiliary head
+significantly \emph{improves} an undertrained backbone (Holm
+$p\in[0.006,0.016]$) and the benefit vanishes at convergence
+($p{>}0.37$), with an aligned target statistically indistinguishable
+from a random one throughout (Figure~\ref{fig:saturation-transition}a).
+Across $20$ further non-EEG branches (text, vision, audio) an aligned
+target never significantly beats a random one ($0/20$): what a
+converged network rejects, and a weak one accepts, is the loss's
+\emph{structure}, not its \emph{content}
+(Appendix~\ref{app:saturation-extras}).
+
 \begin{quote}
-\textbf{Saturation (FACED-9, EMOD backbone, V-axis target).}
-\emph{For a FACED-9 classifier $f_\theta$ with task-only
-$\mathrm{BACC}(\theta)$ in the band $[0.62, 0.66]$ or higher, adding
+\textbf{Saturation (empirical regularity; FACED-9, EMOD backbone).}
+\emph{For a FACED-9 classifier $f_\theta$ whose task-only
+$\mathrm{BACC}(\theta)$ lies in the band $[0.62, 0.66]$ or higher, adding
 any V-axis auxiliary loss $\mathcal{L}_v$ at $\lambda > 0$ produces
 $\mathbb{E}[\Delta\mathrm{BACC}] \leq 0$ across all families tested
 ($15/25$ significant at $p<0.05$, $0/25$ positive). The threshold
-coincides with the regime where the V-axis encoding strength
-$\rho(\theta)$ saturates across seeds (\S\ref{sec:convergence}).}
+coincides with the regime where the V-axis encoding strength---the
+absolute correlation $|r|$ between the class-mean features and the
+V-axis---saturates across seeds (\S\ref{sec:convergence}). This is an
+empirical regularity over the recipes tested, not a proved theorem.}
 \end{quote}
 
 \paragraph{Saturation is not overfitting.} Overfitting is memorisation
@@ -56,7 +96,7 @@ concrete.
 class-mean features further along the target direction (alignment
 increases by $\Delta|r|=+0.01$ to $+0.36$), yet this buys no
 generalization: with the loss active, training accuracy stays pinned
-at ceiling while test accuracy \emph{falls} ($0.622\!\to\!0.577$
+at ceiling while test accuracy \emph{falls} ($0.62\!\to\!0.58$
 balanced accuracy, A6). The added supervision reshapes a representation
 the network has already converged onto from task labels alone, rather
 than supplying new discriminative signal. What actually carries

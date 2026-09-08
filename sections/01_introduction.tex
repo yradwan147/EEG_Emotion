@@ -6,9 +6,9 @@ direction are a standard way to inject prior knowledge. We report a
 regime in which they systematically backfire. Take an EEG emotion
 classifier that has already converged, and add a loss aligning its
 features with a valence direction: across twenty-five such recipes on
-FACED~\citep{chen2023faced}, none improve balanced accuracy and fifteen
-significantly reduce it. The same loss that helps a weak backbone hurts
-a strong one. We call this the \emph{saturation regularity}: once task
+FACED~\citep{chen2023faced}, none improve balanced accuracy (BACC) and
+fifteen significantly reduce it. The same loss that is within noise of zero on a
+weak backbone significantly hurts a strong one. We call this the \emph{saturation regularity}: once task
 labels alone have driven the network onto the target concept, further
 supervision can only deform an already-converged representation, without
 improving generalization. The finding is doubly useful. It explains a
@@ -18,13 +18,14 @@ residual that supervision cannot exploit---it yields a new state of the
 art through ensembling rather than supervising.
 
 To make ``the concept the network has saturated on'' concrete, we
-extract it explicitly. Pass nine short emotion-evocative sentences
+extract it explicitly. Pass nine short emotion-evocative stories
 through a language model, average the late-layer hidden states class by
 class, and take the first principal component; the resulting
 \emph{valence axis} (V-axis) predicts movie-review sentiment at AUC
 $0.832$ zero-shot, tracks the cohort-averaged EEG response of $123$
-subjects at the emotion-category level ($r{=}0.87$), and is rediscovered
-without supervision by every reasonably-strong EEG classifier we tested.
+subjects at the emotion-category level ($r{=}0.80$), and is encoded,
+without V-axis supervision, by all ten same-architecture EEG
+checkpoints we tested.
 Recent work shows that language models' internal features align with
 human cognition across high-level
 concepts~\citep{kim2018tcav,arditi2024refusal}; we use the V-axis as a
@@ -32,7 +33,7 @@ concepts~\citep{kim2018tcav,arditi2024refusal}; we use the V-axis as a
 signal---which, as the saturation regularity shows, a converged network
 cannot benefit from.
 
-\textbf{A nine-sentence axis.} The nine stories are one per
+\textbf{A nine-story axis.} The nine stories are one per
 FACED~\citep{chen2023faced} class; the language model is Qwen3-4B,
 chosen as the lead because it sits at the centre of the alignment
 manifold in our $14$-LLM sweep, with the highest per-stimulus
@@ -42,35 +43,26 @@ benchmark grounds the AUC $0.832$ headline:
 the V-axis projection alone is within $0.005$ of a $5$k-example
 supervised logistic regression~\citep{socher2013recursive}. And the
 direction is not idiosyncratic to any one model: across the
-$14$ language models from $560$M to $32$B parameters, the V-axis
-converges on essentially the same direction (within Qwen3,
-off-diagonal $r{=}{+}0.995$ over $15$ size-pairs).
+$14$ language models from $560$M to $32$B parameters, the V-axis is
+recovered across families, and within Qwen3 is essentially
+scale-invariant (off-diagonal $r{=}{+}0.995$ over $15$ size-pairs).
 
-\textbf{The same axis lives in the brain.} The $r{=}0.87$ above
-unpacks as follows. A ridge regression on $160$ channel-band
-features of the FACED cohort EEG predicts the V-axis position of
+\textbf{A valence ordering, consistent with the axis, in cohort EEG.}
+The brain numbers above unpack as follows. A ridge regression on $160$
+channel--band features (32 EEG channels $\times$ 5 frequency bands,
+differential-entropy) of the FACED cohort EEG predicts the V-axis position of
 each of the $28$ stimuli; the regressor uses leave-one-stimulus-out
 cross-validation, no per-subject fitting, no auxiliary supervision.
 The Qwen3-4B V-axis itself reaches $r{=}0.80$ ($p<10^{-5}$) on this
 ridge; a CLIP-text variant of the V-axis built from the same $28$
-stimulus descriptions tightens this to $r{=}0.87$ ($p<10^{-9}$).
-The third claim --- that EEG networks rediscover the V-axis without
-ever being shown it --- is quantified across $36$ FACED-9 checkpoints
-trained on the $9$ emotion labels alone: per-checkpoint V-axis
-encoding strength in the class-mean subspace predicts balanced
-accuracy at $r{=}{+}0.885$ ($p{=}7.8{\times}10^{-13}$,
-Figure~\ref{fig:universal-vaxis}). The same valence direction is
-recovered from inside language models and from inside human
-electrophysiology, by independent procedures.
-
-\begin{figure}[ht]
-\centering
-\IfFileExists{figures/landmark/lf1_universal_vaxis_hero.pdf}
-  {\includegraphics[width=\linewidth]{landmark/lf1_universal_vaxis_hero.pdf}}
-  {\includegraphics[width=\linewidth]{F1_universal_vaxis.pdf}}
-\caption[V-axis hero]{\input{figures/F1_caption}}
-\label{fig:universal-vaxis}
-\end{figure}
+stimulus descriptions tightens this to $r{=}0.87$ ($p<10^{-8}$).
+The third claim --- that converged EEG classifiers encode the V-axis
+without ever being trained on it --- is quantified on the ten
+same-architecture SOTA-pool checkpoints trained on the $9$ emotion
+labels alone: each encodes the V-axis in its class-mean subspace
+($|r|\in[0.60,0.77]$; \S\ref{sec:convergence}). The same valence
+\emph{ordering} thus appears in the LLM features and in the cohort EEG,
+recovered by independent procedures.
 
 \textbf{Yet supervision fails.} The natural way to use such an
 alignment is an auxiliary loss pulling the EEG network's penultimate
@@ -81,7 +73,8 @@ contrastive~\citep{khosla2020supcon,vandenoord2018cpc}, PEFT
 adapters~\citep{hu2022lora}, and topographic
 losses~\citep{padakanti2025meg}---none help: fifteen produce
 statistically significant decrements and zero produce gains, five
-families showing \emph{monotonic destruction}. The effect flips sign
+families showing \emph{monotonic destruction}
+(Figure~\ref{fig:saturation-transition}). The effect flips sign
 with baseline strength (no measurable effect at BACC $\le 0.62$, a
 significant negative at BACC $\ge 0.66$). We call this
 \emph{saturation}: distinct from overfitting, it is what happens once
@@ -99,47 +92,46 @@ residual encoding predicts leave-one-out contribution at $r{=}{+}0.74$,
 and a $10$-checkpoint ensemble reaches FACED-9 SOTA at
 $\mathbf{0.6948}$ (val-selected single $\mathbf{0.6755}$), a $+10.5\%$
 improvement over EMOD~\citep{chen2025emod}. Replacing the
-language-derived KD prototypes with random orthonormal vectors changes
-BACC by $\le 0.003$: the gain is the \emph{shape} of the loss, not the
+language-derived KD prototypes with random orthonormal vectors leaves
+BACC statistically unchanged ($\Delta{=}{-}0.004$, paired $p{=}0.37$): the gain is the \emph{shape} of the loss, not the
 \emph{content} of the prototypes, so the V-axis is a probe of what the
 network saturated on, not the supervised signal.
 
-\paragraph{Contributions.} \textbf{(1)} A nine-sentence \emph{V-axis
-probe}: a one-dimensional valence direction extracted from $9$
-language-model emotion stories that converges across $14$ LLMs,
-predicts text sentiment zero-shot, predicts cohort EEG response, and
-is rediscovered without supervision by $36$ EEG classifiers
-(\S\ref{sec:vaxis-llms}--\S\ref{sec:topography}).
-\textbf{(2)} The \emph{saturation regularity}: across $25$
-representation-alignment recipes on FACED-9, $15$ produce significant
-decrements and $0$ produce gains, with monotonic destruction in $5$
-families and a sharp transition in the $[0.62, 0.66]$ BACC band; the
-loss moves the class-mean component by $\Delta|r|{=}{+}0.01$ to
-${+}0.36$ while training accuracy stays at ceiling and test accuracy
-falls (\S\ref{sec:saturation}).
-\textbf{(3)} A residual-diversity ensemble turning the mechanism into
-a positive prescription: per-checkpoint residual encoding predicts
-leave-one-out contribution at $r{=}{+}0.74$, and a $10$-checkpoint
-ensemble reaches FACED-9 SOTA at $\mathbf{0.6948}$
-(\S\ref{sec:convergence},~\S\ref{sec:sota}). The saturation
-regularity and the cross-architecture V-axis convergence both
-replicate on a second EEG dataset,
-SEED-V~\citep{liu2022seedv} (Appendix~\ref{app:seedv-full}).
+\paragraph{Contributions.} \textbf{(1)} A nine-story \emph{V-axis
+probe}: a one-dimensional valence direction extracted from nine
+language-model emotion stories, validated as a genuine semantic axis
+(text sentiment zero-shot, cohort-EEG prediction, and encoding by
+converged EEG classifiers) and used to diagnose what the network has
+saturated on (\S\ref{sec:vaxis-llms}--\S\ref{sec:vaxis-brain}).
+\textbf{(2)} The \emph{saturation regularity}: concept-aligned
+auxiliary supervision cannot improve a \emph{converged} classifier and
+tends to hurt it---established across $25$ recipes on FACED-9, for both
+valence and arousal, and reproduced on a CIFAR-10 classifier, with a
+benefit present only while the backbone is still weak
+(\S\ref{sec:saturation}).
+\textbf{(3)} A residual-diversity ensemble that turns this mechanism
+into a positive prescription and a new FACED-9 state of the art
+(\S\ref{sec:convergence},~\S\ref{sec:sota}). The regularity is
+consistent on a second EEG dataset, SEED-V, where auxiliary supervision
+likewise yields no gain
+(\citealp{liu2022seedv}; Appendix~\ref{app:seedv-full}).
 
 \paragraph{What this paper does not claim.} To keep the scope
 precise, we state four non-claims up front. First, we do not claim
 the V-axis is a privileged or uniquely useful direction: a generic
 valence axis performs identically as a probe (\S\ref{sec:vaxis-llms}),
 and inside the ensemble recipe the language-derived prototypes are
-interchangeable with random orthonormal vectors ($\Delta\le0.003$
-BACC). Second, we do not claim single-trial or within-subject brain
+statistically indistinguishable from random orthonormal vectors
+($\Delta{=}{-}0.004$ BACC, $p{=}0.37$). Second, we do not claim single-trial or within-subject brain
 decoding: the brain correlation is measured on the EEG response
 averaged across $123$ subjects at the emotion-category level, and the
 within-subject effect is near zero ($r{=}0.03$). Third, we do not
-claim that auxiliary alignment is universally harmful --- the same
-valence loss \emph{helps} a weak backbone ($+0.057$ BACC on LaBraM);
-saturation is specifically a property of the \emph{converged} regime.
+claim that auxiliary alignment is universally harmful --- on a weak
+(undertrained) backbone the same valence loss is within seed noise of
+zero ($+0.006$ BACC, $p{=}0.41$), and on a still-converging CIFAR-10
+classifier an auxiliary head is significantly helpful; saturation is
+specifically a property of the \emph{converged} regime.
 Fourth, we do not present saturation as a proven theorem for all
 architectures and datasets: we establish it empirically on FACED-9
-and replicate the saturation regularity on SEED-V. Limitations are
-collected in \S\ref{sec:discussion}.
+and find it consistent on SEED-V, where auxiliary supervision yields
+no gain. Limitations are collected in \S\ref{sec:discussion}.

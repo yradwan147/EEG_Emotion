@@ -3,24 +3,25 @@
 
 A second EEG dataset, SEED-V~\citep{liu2022seedv}, lets us re-test
 every claim with no parameter shared with FACED. We re-build the
-V-axis from scratch on its five emotion classes ($16$ subjects,
-$62$ channels), and re-run the four claims in turn.
+V-axis from scratch with the lead model (Qwen3-4B, final layer)
+on its five emotion classes ($16$ subjects, $62$ channels), and re-run
+the four claims in turn.
 
 \paragraph{Probe predicts cohort EEG (replicates).}
-The cohort EEG--LLM signal returns at $r{=}{+}0.6159$ ($p<10^{-5}$)
-at the P1/$\theta$ cell, with the same posterior-dominant gradient
-(occipital $-$ frontal $+0.076$).
+The cohort EEG--LLM signal returns at $r{=}{+}0.5922$ ($p<10^{-4}$)
+at the PZ/$\theta$ cell, with the same posterior-dominant gradient
+(occipital $-$ frontal $+0.069$).
 
 \paragraph{Saturation (replicates).}
 Adding the V-axis as supervision moves accuracy by a margin within
-seed noise ($\Delta{=}{+}0.0015$ across $5$ baseline and $5$ V-axis
-seeds; full numerics in Appendix~\ref{app:seedv-full}), at a baseline
+seed noise ($\Delta{=}{+}0.0018$, paired $p{=}0.38$, across $5$ baseline
+and $5$ V-axis seeds; full numerics in Appendix~\ref{app:seedv-full}), at a baseline
 strength below the FACED transition---the same neutrality on weak
 baselines we report on FACED.
 
 \paragraph{Mechanism (replicates harder).}
 Across $15$ stock CBraMod SEED-V checkpoints, accuracy correlates
-with V-axis encoding strength at $r{=}{+}0.601$ ($p{=}0.018$)---a
+with V-axis encoding strength at $r{=}{+}0.628$ ($p{=}0.012$)---a
 correlation built on a different EEG dataset, a different label
 space, and a different best cell, with the same sign and magnitude
 as FACED. The directional ablation replicates harder still:

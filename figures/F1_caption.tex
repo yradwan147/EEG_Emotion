@@ -1,15 +1,13 @@
 \textbf{A single one-dimensional valence direction, extracted from
-nine LLM emotion stories, is recovered across language, brain, and
-EEG-classifier models.}
+nine LLM emotion stories, transfers to text sentiment and to cohort
+brain response.}
 \textbf{(a)} Zero-shot probe AUC / $|r|$ of the V-axis (PC1 of nine
 Qwen3-4B story-class centroids at the penultimate layer) on standard
 text-sentiment benchmarks; no labels are seen during axis construction.
 \textbf{(b)} Stimulus-level scatter of LLM V-axis projection vs.\
-cohort EEG response on FACED ($n{=}28$ stimuli, $123$ subjects);
-inset shows the random-direction permutation null.
-\textbf{(c)} $36$ EEG-classifier checkpoints (CBraMod and EMOD
-families) plotted as their class-PC1 V-axis $|r|$ (no V-axis loss
-used in training) against FACED 9-class balanced accuracy; linear
-fit $r{=}{+}0.885$. The same one-dimensional direction explains text
-sentiment, predicts evoked EEG, and tracks classifier accuracy
-without sharing data across the three settings.
+cohort EEG response on FACED ($n{=}28$ stimuli, $123$ subjects), a
+fully nested permutation test placing the alignment beyond every
+relabelling ($p{\le}2{\times}10^{-4}$); inset shows the
+random-direction null ($r{=}0.07$). The same one-dimensional direction
+explains text sentiment and predicts evoked EEG without sharing data
+across the two settings.

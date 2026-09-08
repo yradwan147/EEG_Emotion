@@ -14,3 +14,29 @@ main.bbl
 main.blg
 main.out
 *.synctex.gz
+
+# campaign artifacts — never in paper/Overleaf repo
+experiments_resub/
+preview/
+notes/
+*.pth
+
+# Optimus protocol scaffold — NOT paper files (ADOPTION_ASSIGNMENT.md §4).
+# The paper/Overleaf repo carries .tex/.bib/figures only (RESUB_CAMPAIGN.md
+# WRITE-TICK 50). Everything below is project-management state, tracked by
+# Optimus on disk, deliberately never committed here.
+.optimus/
+ADOPTION_ASSIGNMENT.md
+ack.yaml
+claims/
+paper/
+data/
+decisions/
+findings.md
+indexes/
+memory/
+project.yaml
+pulse.md
+reports/
+tree/
+worklog.md

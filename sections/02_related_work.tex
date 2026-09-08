@@ -3,51 +3,37 @@
 
 \paragraph{Concept-direction supervision.}
 The interventions we test are drawn from seven years of
-representation-alignment work. Knowledge
-distillation~\citep{hinton2015distilling,tian2020crd,park2019rkd}
-trains a student's penultimate features against a fixed teacher
-target. Representational similarity
-analysis~\citep{kriegeskorte2008rsa,sundaram2024perceptual} aligns
-representational geometries through pairwise similarity matrices.
-Supervised contrastive
-losses~\citep{khosla2020supcon,vandenoord2018cpc,radford2021clip}
-pull same-class features together and push different-class apart.
-Parameter-efficient adaptation~\citep{hu2022lora,liu2022ia3}
-inserts low-rank or scaling modules whose updates are localised to a
-chosen geometry. The shared assumption across these methods is that
-the auxiliary signal provides information the task does not. This
-paper studies a regime where it does not.
+representation-alignment work: knowledge
+distillation~\citep{hinton2015distilling,tian2020crd,park2019rkd},
+representational similarity
+analysis~\citep{kriegeskorte2008rsa,sundaram2024perceptual}, supervised
+contrastive losses~\citep{khosla2020supcon,vandenoord2018cpc,radford2021clip},
+and parameter-efficient adaptation~\citep{hu2022lora,liu2022ia3}. The
+shared assumption across these methods is that the auxiliary signal
+provides information the task does not; this paper studies a regime
+where it does not.
 
 \paragraph{Concept directions in language models.}
 Arditi et~al.~\citep{arditi2024refusal} showed that refusal in
 instruction-tuned LMs is mediated by a single residual-stream
 direction, and related work extracts other behavioural
-directions~\citep{li2023inferencetime,zou2023repe,kim2018tcav}.
-Concurrent Anthropic interpretability
-work~\citep{sofroniew2026anthropic} identified emotion-concept
-features in production-scale LMs via sparse autoencoders,
-complementing our cohort-level brain alignment. We use the same
-PCA-on-class-centroids construction to extract a one-dimensional
-valence direction from nine emotion stories, as a probe of the
-saturated concept rather than a steering target; our transfers (SST-2
-zero-shot, cohort EEG, classifier convergence) are direction-existence
-claims, not feature-importance claims for biological emotion
-processing.
+directions~\citep{li2023inferencetime,zou2023repe,kim2018tcav};
+concurrent Anthropic work~\citep{sofroniew2026anthropic} finds
+emotion-concept features via sparse autoencoders. We use the same
+PCA-on-class-centroids construction to extract a valence direction
+from nine stories as a \emph{probe}, not a steering target; our
+transfers are direction-existence claims, not feature-importance
+claims for biological emotion.
 
 \paragraph{Brain--LM alignment.}
-Toneva and Wehbe~\citep{toneva2019interpreting} first showed that
-mid-layer transformer activations predict fMRI responses to narrative
-text; Schrimpf et~al.~\citep{schrimpf2021neural}, Goldstein
-et~al.~\citep{goldstein2022shared}, and Caucheteux and
-King~\citep{caucheteux2022brains} extended the picture across MEG,
-ECoG, and large model
-families. Huh et~al.\ formalised the emerging picture as the
-\emph{Platonic Representation
-Hypothesis}~\citep{huh2024platonic}. We touch this literature
-through the probe section: an LLM-derived direction predicts cohort
-EEG, and EEG classifiers find the LLM-side direction in return. Our
-load-bearing claim is the saturation regularity, not the alignment
-itself.
+Toneva and Wehbe~\citep{toneva2019interpreting} showed mid-layer
+transformer activations predict fMRI responses to narrative text;
+later work extended this across MEG, ECoG, and model
+families~\citep{schrimpf2021neural,goldstein2022shared,caucheteux2022brains},
+formalised as the \emph{Platonic Representation
+Hypothesis}~\citep{huh2024platonic}. We touch this literature only
+through the probe; our load-bearing claim is the saturation
+regularity, not the alignment itself.
 
 \paragraph{Frontal-alpha asymmetry.}
 Davidson's frontal-alpha asymmetry~\citep{davidson1992anterior,coan2004frontal,davidson2004wellbeing}
