@@ -6,8 +6,8 @@ axis rather than a noise dimension, we extract one explicitly. The
 construction uses nine stories. Given a language model, we author
 one short emotion-evocative story per FACED class and generate $50$
 paraphrases per story by independent LLM calls. For each class we
-average the language model's last-token activation (at the
-penultimate layer) over all $50$ paraphrases; the resulting vector is
+mean-pool the language model's final-layer hidden state (layer $36$ for
+Qwen3-4B) over tokens and over all $50$ paraphrases; the resulting vector is
 the class \emph{centroid}---a single point in feature space that
 summarises the model's representation of that emotion. Principal
 component analysis (PCA) on the nine centroids gives the V-axis as
@@ -18,10 +18,11 @@ robust to paraphrase budget, prompt rephrasing, and model choice
 
 \paragraph{The same direction across modalities.}
 The V-axis recipe recovers human affect across three settings that
-share no training data (Table~\ref{tab:cross-modal}): the text result
-is true zero-shot projection; the EEG and vision results use the
-same nine-story recipe re-extracted in their native modality plus a
-small linear probe.
+share no training data across modalities (Table~\ref{tab:cross-modal}):
+the text result is true zero-shot projection; the EEG result re-extracts
+the nine-story recipe with a ridge probe; the vision result forms nine
+valence-binned CLIP-image centroids over $898$ images, scored on a
+held-out split.
 
 \begin{table}[h]
 \centering
@@ -33,7 +34,7 @@ Modality & Axis source & Probe & Score & Reference \\
 \midrule
 Text   & Qwen3-4B (9 stories) & none (proj.) & $\mathbf{0.832}$ AUC & matches sup.\ LR on $5$k examples \\
 Brain  & Qwen3-4B (9 stories) & ridge LOOCV & $\mathbf{r{=}0.80}$ & $p<10^{-5}$, see \S\ref{sec:vaxis-brain} \\
-Vision & CLIP-image (9 images) & none (proj.) & $\mathbf{r{=}0.869}$ & beats sup.\ ridge (image-side) \\
+Vision & CLIP-image ($9$ bins, $898$ imgs) & held-out split & $\mathbf{r{=}0.869}$ & beats sup.\ ridge (image-side) \\
 \bottomrule
 \end{tabular}
 \caption{Cross-modal external validity of the V-axis recipe (PCA on

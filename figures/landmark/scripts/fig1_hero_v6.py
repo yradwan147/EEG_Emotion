@@ -89,7 +89,7 @@ def main():
     # ---------------- TOP: three rows on one shared valence scale ----------------
     X0, X1 = 1.72, 5.30
     def sx(z): return X0 + (z + 2.0) / 4.0 * (X1 - X0)
-    rows = [(2.72, L, "language model", "reads 9 emotion stories", None),
+    rows = [(2.72, L, "language model", "CLIP-text valence axis", None),
             (2.17, B, "human brain", "raw EEG of 123 people, no model", f"r = {rBL:.2f} vs language  (28 clips → 9 means)"),
             (1.62, C, "EEG classifier", "labels only — never given valence", f"r = {rCL:.2f} vs language\n(one checkpoint; {rrange[0]:.2f}–{rrange[1]:.2f} across 10)")]
     for v, e in zip(L, EMO):   # guides anchored at the language row

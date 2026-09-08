@@ -4,16 +4,17 @@
 We test whether auxiliary supervision toward a known concept direction
 helps an EEG-emotion classifier. The setup uses an
 EMOD~\citep{chen2025emod} backbone (the previous FACED-9 SOTA) at
-two strengths we call \emph{weak} ($d{=}3$, $0.62$ BACC) and
-\emph{converged} (the $d{=}6$ SOTA recipe of \S\ref{sec:sota}, $0.658$
-BACC). The $25$-recipe screen ran on the weak baseline; strongest cells
+two strengths we call \emph{weak} (network depth $d{=}3$, $0.62$ BACC)
+and \emph{converged} ($d{=}6$, the SOTA recipe of \S\ref{sec:sota},
+$0.658$ BACC 5-seed mean; best single $0.6755$). The $25$-recipe screen
+ran on the weak baseline; strongest cells
 were re-evaluated on the converged recipe to localise the transition in
 $[0.62, 0.66]$. Each
 intervention adds an auxiliary loss that pulls the network's
-penultimate features toward a target direction. Targets span LLM-derived class prototypes (the V-axis---a one-dimensional
-valence direction extracted from nine LLM emotion stories,
-\S\ref{sec:vaxis-llms}), CLIP-text embeddings, and frontal-channel
-masks matched to the analytical valence ceiling. Loss families span
+penultimate features toward a target direction. Targets span the nine LLM-derived class prototypes and their first
+principal component, the 1-D V-axis (\S\ref{sec:vaxis-llms}); CLIP-text
+embeddings; and frontal-channel masks matched to the analytical valence
+ceiling (the maximum V-axis alignment attainable on FACED). Loss families span
 knowledge distillation~\citep{hinton2015distilling}, representational
 similarity analysis (RSA)~\citep{kriegeskorte2008rsa}, contrastive
 losses, parameter-efficient fine-tuning (PEFT)
@@ -29,8 +30,8 @@ supervision helps a weak network and hurts a converged one---regardless
 of the target's content.} \textbf{(a)} On CIFAR-10, an auxiliary head
 raises test accuracy while the backbone is undertrained (filled points,
 Holm $p{<}0.05$) but the benefit vanishes once the backbone converges
-(open points, n.s.; shaded); an aligned target is statistically
-indistinguishable from a random one throughout (dashed). \textbf{(b)}
+(open points, n.s.; shaded); an aligned target never outperforms a
+random one at any epoch (dashed). \textbf{(b)}
 On FACED EEG the same sign-flip appears for two concept axes: a valence
 or arousal auxiliary loss is within seed noise of zero on a weak
 ($d{=}3$) backbone but significantly negative on the converged SOTA
@@ -65,8 +66,8 @@ weak $d{=}3$ baseline---two concept axes, one saturation
 transition also reproduces outside EEG: on CIFAR-10~\citep{krizhevsky2009cifar} an auxiliary head
 significantly \emph{improves} an undertrained backbone (Holm
 $p\in[0.006,0.016]$) and the benefit vanishes at convergence
-($p{>}0.37$), with an aligned target statistically indistinguishable
-from a random one throughout (Figure~\ref{fig:saturation-transition}a).
+($p{>}0.37$), with an aligned target never outperforming a random one
+at any epoch (Figure~\ref{fig:saturation-transition}a).
 Across $20$ further non-EEG branches (text, vision, audio) an aligned
 target never significantly beats a random one ($0/20$): what a
 converged network rejects, and a weak one accepts, is the loss's
@@ -96,8 +97,8 @@ concrete.
 class-mean features further along the target direction (alignment
 increases by $\Delta|r|=+0.01$ to $+0.36$), yet this buys no
 generalization: with the loss active, training accuracy stays pinned
-at ceiling while test accuracy \emph{falls} ($0.62\!\to\!0.58$
-balanced accuracy, A6). The added supervision reshapes a representation
+at ceiling while test balanced accuracy \emph{falls} on the converged
+recipe ($0.658\!\to\!0.629$; Appendix~\ref{app:full-vaxis-table}). The added supervision reshapes a representation
 the network has already converged onto from task labels alone, rather
 than supplying new discriminative signal. What actually carries
 generalization is the \emph{within-class residual}---the directions
@@ -105,13 +106,13 @@ that distinguish one trial of an emotion from another---which is
 seed-specific and load-bearing: its per-checkpoint encoding strength
 predicts leave-one-out ensemble contribution at $r{=}{+}0.74$
 (\S\ref{sec:sota}). Pushing the already-saturated class-mean basin
-along a fixed target does not improve how the network uses this
-residual.
+along a fixed target does not, at the class-mean level, improve how the
+network uses this residual.
 The $25$ recipes reduce to one principle: \emph{a saturated
 representation is an unhelpful supervision target}, qualitatively
 similar to the few-class distillation
 regime~\citep{muller2020subclass,loo2024lelp,yuan2020revisitkd},
 here with the residual-variance mechanism made explicit. Full table,
-transition table, and Path-B failure
+transition table, and the alternative-target branch's failure
 ($\Delta\in[-0.0193,-0.0145]$) in
 Appendix~\ref{app:full-vaxis-table}--\ref{app:saturation-extras}.

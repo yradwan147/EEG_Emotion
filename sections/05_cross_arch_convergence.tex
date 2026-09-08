@@ -12,8 +12,8 @@ Across the ten same-architecture checkpoints that make up our SOTA
 ensemble (\S\ref{sec:sota}; EMOD $d{=}6$, five seeds $\times$ two
 training lengths), the class-mean subspace encodes the V-axis at a
 consistent strength ($|r|\in[0.60, 0.77]$, unsigned): every
-well-trained seed of this architecture converges onto the same
-class-mean direction up to sign. This is the \emph{saturated
+well-trained seed of this architecture encodes the same class-mean
+valence direction, all $|r|$ in a tight band and the same sign. This is the \emph{saturated
 basin}---the component \S\ref{sec:saturation} showed auxiliary
 supervision cannot improve. What differs across seeds, and what
 carries the recoverable gain, is the orthogonal within-class residual.
@@ -34,7 +34,7 @@ Appendix~\ref{app:convergence-deep-dive}.
 
 \paragraph{Direct test: ablate the residual at inference time.}
 A directional ablation~\citep{arditi2024refusal}---projecting the
-LLM-derived V-axis residual out of the classifier's penultimate
+CLIP-derived V-axis residual out of the classifier's penultimate
 features at inference time, without retraining---drops accuracy on
 every one of the $10$ SOTA-pool checkpoints (mean $\Delta\mathrm{BACC}
 = -0.0157$, mean $z{\approx}7.7$ above a matched random-direction
