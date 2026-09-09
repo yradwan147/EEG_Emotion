@@ -9,9 +9,11 @@ representational similarity
 analysis~\citep{kriegeskorte2008rsa,sundaram2024perceptual}, supervised
 contrastive losses~\citep{khosla2020supcon,vandenoord2018cpc,radford2021clip},
 and parameter-efficient adaptation~\citep{hu2022lora,liu2022ia3}. The
-shared assumption across these methods is that the auxiliary signal
-provides information the task does not; this paper studies a regime
-where it does not.
+shared assumption across the distillation, similarity, and contrastive
+families is that the auxiliary signal provides information the task does
+not (parameter-efficient adaptation is included as a capacity-side
+comparison); this paper studies a regime where that added information
+does not help.
 
 \paragraph{Concept directions in language models.}
 Arditi et~al.~\citep{arditi2024refusal} showed that refusal in
@@ -38,7 +40,8 @@ regularity, not the alignment itself.
 \paragraph{Frontal-alpha asymmetry.}
 Davidson's frontal-alpha asymmetry~\citep{davidson1992anterior,coan2004frontal,davidson2004wellbeing}
 remains the dominant electrophysiological account of approach/withdrawal
-emotion, developed primarily on static stimuli. Our cohort signal on
+emotion, developed primarily on resting-state, trait, and static or
+briefly-presented stimuli. Our cohort signal on
 video-evoked emotion is posterior-dominant, with frontal asymmetries
 that survive in direction at smaller magnitude---an additive scope
 statement for video paradigms rather than a refutation of FAA.
@@ -48,9 +51,10 @@ The two-tier mechanism we identify---a saturated class-mean basin
 plus a seed-specific within-class residual---is a representation-level
 form of bias--variance~\citep{geman1992neural,krogh1995neural} and
 linear-mode connectivity~\citep{frankle2020linearmode,wortsman2022model}.
-Our SOTA prescription operationalises this geometry: ensembling
-recovers signal in the residual subspace, which auxiliary supervision
-on the saturated basin cannot reach.
+Our SOTA prescription operationalises this geometry: seed-ensembling
+averages out the seed-specific residual variance, while the residual is
+load-bearing (inference-time ablation); auxiliary supervision on the
+saturated basin yields no gain.
 
 \paragraph{Baselines.}
 The FACED-9 baselines we compare against are

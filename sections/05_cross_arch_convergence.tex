@@ -10,10 +10,12 @@ ask what each subspace actually does for the trained network.
 \paragraph{The class-mean basin is saturated across seeds.}
 Across the ten same-architecture checkpoints that make up our SOTA
 ensemble (\S\ref{sec:sota}; EMOD $d{=}6$, five seeds $\times$ two
-training lengths), the class-mean subspace encodes the V-axis at a
+training lengths), the class-mean subspace encodes the CLIP-text V-axis at a
 consistent strength ($|r|\in[0.60, 0.77]$, unsigned): every
 well-trained seed of this architecture encodes the same class-mean
-valence direction, all $|r|$ in a tight band and the same sign. This is the \emph{saturated
+valence direction, all $|r|$ in a tight band and the same sign (the
+nine-story Qwen3 axis more weakly, $|r|\sim0.3$--$0.5$, per-checkpoint
+n.s.; Appendix~\ref{app:convergence-deep-dive}). This is the \emph{saturated
 basin}---the component \S\ref{sec:saturation} showed auxiliary
 supervision cannot improve. What differs across seeds, and what
 carries the recoverable gain, is the orthogonal within-class residual.

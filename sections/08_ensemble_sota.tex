@@ -2,9 +2,10 @@
 \label{sec:sota}
 
 The mechanism (\S\ref{sec:convergence}) predicts that ensembling
-should recover gain in the within-class residual subspace where
-auxiliary supervision cannot reach---the saturated basin is shared,
-the residual is seed-specific. The recipe below tests that prediction
+should recover gain by averaging the seed-specific within-class
+residual that auxiliary supervision cannot exploit---the saturated
+basin is shared across seeds of this ($d{=}6$) architecture, the
+residual is seed-specific. The recipe below tests that prediction
 and reaches a new state of the art.
 
 \begin{table}[h]
@@ -38,44 +39,52 @@ Recipe step & BACC & $\Delta$ \\
 \midrule
 EMOD ($d{=}3$) replication            & $.619\!\pm\!.004$ & --- \\
 $+$ augmentation                      & $.634\!\pm\!.004$ & $+.015$ \\
-$+$ aug $+$ KD                        & $.644\!\pm\!.007$ & $+.010^{*}$ \\
+$+$ aug $+$ KD                        & $.644\!\pm\!.007$ & $+.010$ \\
 $+$ depth doubling ($d{=}6$)          & $.658\!\pm\!.007$ & $+.014$ \\
 $+$ longer training ($e{=}150$)       & $.658\!\pm\!.010$ & $.000$ \\
 \midrule
 5-seed e100 ensemble                  & $.6798$ & $+.022$ \\
+5-seed e150 ensemble                  & $.6919$ & $+.034$ \\
 \textbf{10-ckpt e100$+$e150 (SOTA)}   & $\mathbf{.6948}$ & $\mathbf{+.037}$ \\
 \bottomrule
 \end{tabular}
-\subcaption*{(b) Recipe cascade ($^{*}$super-add., $p{=}3\!\times\!10^{-4}$).}
+\subcaption*{(b) Recipe cascade. The $10$-ckpt SOTA is not significantly
+above the $5{\times}e150$ ensemble ($+.003$, n.s.).}
 \end{minipage}
 \caption{New FACED 9-class SOTA. The \texttt{rand9} ablation replaces
 LLM-derived KD prototypes with random orthonormal 9-D directions and
-leaves BACC statistically unchanged ($\Delta{=}{-}0.004$, paired
-$p{=}0.37$) --- KD provides architectural regularisation without
-semantic content. Visual cascade in
-Appendix~\ref{app:ensemble-extras}.}
+leaves BACC statistically equivalent (TOST $\varepsilon{=}0.01$,
+$p{=}0.001$, $n{=}20$; $\Delta{=}{-}0.001$, paired $p{=}0.72$) --- KD
+provides architectural regularisation without semantic content. Visual
+cascade in Appendix~\ref{app:ensemble-extras}.}
 \label{tab:sota}
 \end{table}
 
-The cascade starts at the EMOD replication ($0.6194 \pm 0.004$,
-within seed noise of the published $0.6287$~\citep{chen2025emod}) and
-walks up in six steps. Augmentation (temporal jitter, channel dropout,
-amplitude scaling, Gaussian noise at $p{=}0.6$) contributes the
+The cascade starts at our in-house EMOD reproduction ($0.6194 \pm 0.004$,
+${\approx}0.9$ pt below the published $0.6287$~\citep{chen2025emod}; the
+SOTA gains are \emph{larger} against this same-pipeline baseline,
+$+9.1\%$/$+12.2\%$) and walks up in six steps. Augmentation (four EEG augmentations at
+$p{=}0.6$; Appendix~\ref{app:ensemble-extras}) contributes the
 largest single jump ($+0.0149$). Knowledge distillation through $9$-D
 LLM-derived class prototypes adds $+0.0096$; a \texttt{rand9} ablation
 (identical recipe with the $9$ LLM prototypes replaced by random
-orthonormal directions) leaves BACC statistically unchanged
-($\Delta{=}{-}0.004$, paired $p{=}0.37$), so KD imposes a
+orthonormal directions) is statistically equivalent to the LLM
+prototypes (TOST $\varepsilon{=}0.01$, $p{=}0.001$, $n{=}20$;
+$\Delta{=}{-}0.001$, paired $p{=}0.72$), so KD imposes a
 $9$-direction frame on the features rather than transferring the LLM's
 emotion concept. Depth-doubling to $d{=}6$
 adds $+0.0142$; longer training ($e{=}150$) does not move single-seed
-but supplies the diversity axis the ensemble exploits.
+accuracy but yields checkpoints that ensemble better ($5{\times}e150{=}0.6919$
+vs $5{\times}e100{=}0.6798$; $+0.012$, bootstrap $95\%$ CI $[0.001,0.023]$).
 
 \paragraph{Why the ensemble works.}
-Ensemble gain concentrates in the within-class residual each seed
-encodes differently (\S\ref{sec:convergence}); averaging cancels that
-seed-specific noise without disturbing the shared basin. Mixing $e{=}100$ and $e{=}150$
-checkpoints supplies the diversity axis---the mixed pool reaches
-$0.6948$ versus $0.6798$ for $e{=}100$ alone. Headroom-monotonicity,
-the $10$-checkpoint plateau, and the failure of cross-architecture
-mixing are in Appendix~\ref{app:ensemble-extras}.
+Ensembling reduces seed-specific variance without moving the shared
+class means (bias--variance); the residual it averages is load-bearing
+(ablation $z{\approx}7.7$, \S\ref{sec:convergence}) and its
+per-checkpoint encoding predicts leave-one-out contribution ($r{=}0.74$,
+$n{=}10$). The gain is variance reduction, not training-length
+diversity: the ten-checkpoint pool ($0.6948$) is not above the five
+$e{=}150$ checkpoints alone ($0.6919$; $+0.003$, $95\%$ CI
+$[-0.004,+0.010]$), and mixing lengths does not beat the $e{=}150$ set.
+Headroom-monotonicity, the $10$-checkpoint plateau, and the failure of
+cross-architecture mixing are in Appendix~\ref{app:ensemble-extras}.

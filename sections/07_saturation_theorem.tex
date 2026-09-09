@@ -24,14 +24,14 @@ variants (full table in Appendix~\ref{app:full-vaxis-table}).
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{NF_A_saturation.pdf}
+\includegraphics[width=0.84\linewidth]{NF_A_saturation.pdf}
 \caption[The saturation transition]{\textbf{Auxiliary concept
 supervision helps a weak network and hurts a converged one---regardless
 of the target's content.} \textbf{(a)} On CIFAR-10, an auxiliary head
 raises test accuracy while the backbone is undertrained (filled points,
 Holm $p{<}0.05$) but the benefit vanishes once the backbone converges
-(open points, n.s.; shaded); an aligned target never outperforms a
-random one at any epoch (dashed). \textbf{(b)}
+(open points, n.s.; shaded); an aligned target never \emph{significantly}
+outperforms a random one at any epoch (dashed). \textbf{(b)}
 On FACED EEG the same sign-flip appears for two concept axes: a valence
 or arousal auxiliary loss is within seed noise of zero on a weak
 ($d{=}3$) backbone but significantly negative on the converged SOTA
@@ -52,9 +52,10 @@ target makes things strictly worse, not better.
 \paragraph{The transition is sharp and unidirectional in baseline
 strength.} An intervention whose effect lies within seed noise on a
 weak baseline (BACC $\le 0.62$) becomes a statistically significant
-negative on the converged recipe ($0.658$ BACC). The transition sits
-cleanly in the band $[0.62, 0.66]$ on FACED-9 (we make no claim about
-universal cut-offs).
+negative on the converged recipe ($0.658$ BACC); the weak-vs-converged
+difference is a significant backbone$\times$loss interaction (Welch
+$p{=}0.001$, matched variant). The transition sits cleanly in the band
+$[0.62, 0.66]$ on FACED-9 (we make no claim about universal cut-offs).
 
 \paragraph{The regularity generalises beyond valence and beyond EEG.}
 An \emph{arousal} target (the same recipe re-anchored on arousal poles)
@@ -66,8 +67,7 @@ weak $d{=}3$ baseline---two concept axes, one saturation
 transition also reproduces outside EEG: on CIFAR-10~\citep{krizhevsky2009cifar} an auxiliary head
 significantly \emph{improves} an undertrained backbone (Holm
 $p\in[0.006,0.016]$) and the benefit vanishes at convergence
-($p{>}0.37$), with an aligned target never outperforming a random one
-at any epoch (Figure~\ref{fig:saturation-transition}a).
+($p{>}0.37$; Figure~\ref{fig:saturation-transition}a).
 Across $20$ further non-EEG branches (text, vision, audio) an aligned
 target never significantly beats a random one ($0/20$): what a
 converged network rejects, and a weak one accepts, is the loss's
