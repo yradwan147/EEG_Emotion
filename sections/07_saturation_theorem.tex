@@ -7,9 +7,9 @@ EMOD~\citep{chen2025emod} backbone (the previous FACED-9 SOTA) at
 two regimes we call \emph{weak} (network depth $d{=}3$, $0.62$ BACC)
 and \emph{converged} ($d{=}6$, the SOTA recipe of \S\ref{sec:sota},
 $0.658$ BACC 5-seed mean; best single $0.6755$). The $25$-recipe screen
-ran on the weak baseline; the strongest variants
-were re-evaluated on the converged recipe to localise the transition in
-$[0.62, 0.66]$. Each
+ran on the standard $d{=}6$ baseline; the strongest variants were also
+run on the weak $d{=}3$ backbone and the full SOTA recipe to localise the
+transition in $[0.62, 0.66]$. Each
 intervention adds an auxiliary loss that pulls the network's
 penultimate features toward a target direction. Targets span the nine LLM-derived class prototypes and their first
 principal component, the 1-D V-axis (\S\ref{sec:vaxis-llms}); CLIP-text
