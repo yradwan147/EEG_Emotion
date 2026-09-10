@@ -24,7 +24,7 @@ variants (full table in Appendix~\ref{app:full-vaxis-table}).
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.84\linewidth]{NF_A_saturation.pdf}
+\includegraphics[width=0.78\linewidth]{NF_A_saturation.pdf}
 \caption[The saturation transition]{\textbf{Auxiliary concept
 supervision helps a weak network and hurts a converged one---regardless
 of the target's content.} \textbf{(a)} On CIFAR-10, an auxiliary head
@@ -72,7 +72,11 @@ Across $20$ further non-EEG branches (text, vision, audio) an aligned
 target never significantly beats a random one ($0/20$): what a
 converged network rejects, and a weak one accepts, is the loss's
 \emph{structure}, not its \emph{content}
-(Appendix~\ref{app:saturation-extras}).
+(Appendix~\ref{app:saturation-extras}). The null is robust to the
+\emph{form} of injection too: the same direction as frozen-feature
+alignment, as LLM-aligned initialization, or as a cross-subject anchor
+all leave the converged encoder unimproved
+(Appendix~\ref{app:saturation-beyond}).
 
 \begin{quote}
 \textbf{Saturation (empirical regularity; FACED-9, EMOD backbone).}
@@ -88,10 +92,9 @@ empirical regularity over the recipes tested, not a proved theorem.}
 \end{quote}
 
 \paragraph{Saturation is not overfitting.} Overfitting is memorisation
-of the training set. Saturation is a property of how task and
-auxiliary supervision interact once both target the same direction
-in feature space. The mechanism check below makes the distinction
-concrete.
+of the training set; saturation is how task and auxiliary supervision
+interact once both target the same feature-space direction, as the
+mechanism check below makes concrete.
 
 \paragraph{Mechanism check.} The auxiliary loss does push the network's
 class-mean features further along the target direction (alignment

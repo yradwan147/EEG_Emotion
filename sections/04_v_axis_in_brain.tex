@@ -48,26 +48,25 @@ probe of the saturated concept, not the concept itself.
 \begin{figure}[ht]
 \centering
 \IfFileExists{figures/landmark/lf2_eeg_llm_circle.pdf}
-  {\includegraphics[width=0.66\linewidth]{landmark/lf2_eeg_llm_circle.pdf}}
-  {\includegraphics[width=0.66\linewidth]{F2_eeg_llm_circle.pdf}}
+  {\includegraphics[width=0.62\linewidth]{landmark/lf2_eeg_llm_circle.pdf}}
+  {\includegraphics[width=0.62\linewidth]{F2_eeg_llm_circle.pdf}}
 \caption[EEG-LLM cohort circle]{\input{figures/F2_caption}}
 \label{fig:eeg-llm-circle}
 \end{figure}
 
-The same picture survives across the $14$ LLMs from $560$M to $32$B we
-tested (enumerated in Appendix~\ref{app:per-llm-deep-dive}; Qwen3 family
-mean $r{=}{+}0.796 \pm 0.011$, with no significant size trend,
-$r{=}0.57$, $p{=}0.24$, $n{=}6$) and on the held-out
-SEED-V dataset~\citep{liu2022seedv}, where the FACED-derived V-axis
-ranks the five SEED-V emotions at $r{=}{+}0.96$ without retraining.
-On a third, independently collected dataset
-(EmoEEG-MC~\citep{xu2025emoeegmc}), a within-subject valence decoder
-reaches $0.61$ accuracy ($p{=}3.4{\times}10^{-5}$) and its group axis
+The same picture survives across the $14$ LLMs from $560$M to $32$B
+(Appendix~\ref{app:per-llm-deep-dive}; Qwen3 mean
+$r{=}{+}0.796 \pm 0.011$, no significant size trend, $r{=}0.57$,
+$p{=}0.24$, $n{=}6$) and on the held-out
+SEED-V dataset~\citep{liu2022seedv}, where the FACED V-axis
+ranks the five emotions at $r{=}{+}0.96$ without retraining.
+On EmoEEG-MC~\citep{xu2025emoeegmc} a within-subject valence decoder
+reaches $0.61$ ($p{=}3.4{\times}10^{-5}$) and its group axis
 tracks behavioural valence at $r{=}0.71$; an audio/visual confound
-control is inconclusive, so we frame the EEG--valence link as a
-population-level association, not a confound-free one
-(Appendix~\ref{app:brain-deep-dive}). Appendix~\ref{app:seedv-full}
-re-derives the V-axis on SEED-V and re-tests every claim.
+control is inconclusive, so we frame the EEG--valence link as
+population-level, not confound-free (Appendix~\ref{app:brain-deep-dive},
+which re-derives the V-axis on SEED-V (Appendix~\ref{app:seedv-full}) and
+re-tests every claim).
 
 \paragraph{Probe scope.} The cohort signal is posterior-dominant and
 carried by an anger-versus-warm-positive contrast on $9$ of $28$ clips,

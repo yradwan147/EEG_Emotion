@@ -930,6 +930,97 @@ defence: V-axis checkpoints disagree, but their disagreements are
 aligned with the wrong subspace.
 
 
+\section{Saturation Beyond Auxiliary Injection: Alignment, Initialization, and Cross-Subject Transfer}
+\label{app:saturation-beyond}
+
+The main-text screen (\S\ref{sec:saturation}) injects the concept as an
+\emph{auxiliary loss}. A natural question is whether the null is specific
+to that form of injection. We therefore tested three further channels
+through which the LLM-derived valence direction could, in principle, help
+a converged EEG encoder---frozen-feature alignment, initialization /
+pretraining, and cross-subject transfer---each against a content-matched
+control. Saturation holds in all three
+(Figure~\ref{fig:saturation-beyond}).
+
+\paragraph{(A) Frozen-feature alignment: the axis is a lossy subset of
+what the encoder already learned.} Holding the converged $d{=}6$
+encoder's penultimate features (128-d) frozen, we linearly align them to
+the real 5-d LLM/CLIP-text valence subspace and probe emotion
+cross-subject, versus a random-orthonormal subspace of the same rank, an
+unsupervised PCA-5 bottleneck, and the full features. The real subspace
+beats random ($0.391$ vs.\ $0.278$ BACC at full labels; $+0.11$ mean
+across label fractions, $p{<}0.001$)---the encoder genuinely contains a
+valence-aligned subspace---but it never beats the \emph{full} features
+($0.391$ vs.\ $0.438$). The semantic subspace is a strict lossy subset of
+the representation the network already built from labels alone; alignment
+re-identifies a slice of it and adds nothing.
+
+\paragraph{(B) LLM-aligned initialization does not help, and its harm
+grows with data.} We pretrain the encoder (Stage-1, no emotion labels) to
+regress the per-clip valence subspace, then fine-tune on FACED at label
+fractions $\{0.1, 0.5, 1.0\}$, against (i) the standard EEG-SSL
+initialization (\emph{scratch}) and (ii) an identical Stage-1 run on a
+random-orthonormal per-clip target (content-matched control).
+LLM-aligned initialization never significantly beats scratch ($+0.034$,
+$p{=}0.12$ at $10\%$ labels) and significantly hurts with more data
+($-0.125$, $p{=}0.010$ at $50\%$; $-0.167$, $p{=}0.004$ at $100\%$): a
+lossy low-rank pretext distorts the richer SSL initialization, and the
+distortion costs more the more that initialization is worth. The apparent
+``win'' over the random-target control is an artifact---that control is
+\emph{destructive} ($0.194$ vs.\ scratch $0.283$ at $10\%$, $p{=}0.0004$),
+so beating it certifies nothing.
+
+\paragraph{(C) The cohort correspondence is real but not a cross-subject
+lever.} The EEG$\leftrightarrow$V-axis correspondence is population-level:
+with hand-crafted DE features a per-subject valence decoder is near zero
+(mean $r{=}0.03$), yet averaging the converged encoder's per-clip readout
+over subjects lifts the correlation from $r{=}0.72$ at a single subject to
+$r{=}0.93$ across the cohort (Figure~\ref{fig:saturation-beyond}a)---a
+matched-filter / attenuation-by-unreliability
+signature~\citep{spearman1904proof} of a small sign-consistent shared
+component beneath large idiosyncratic geometry, the canonical structure of
+naturalistic affective neuroimaging (inter-subject
+correlation)~\citep{hasson2004intersubject}. Training already
+\emph{closes} the individual gap for this shared dimension: the converged
+encoder's features carry the cohort valence direction inside every
+held-out subject ($r{=}0.72$; $0/62$ subjects negative)---which is exactly
+why the axis is not an exploitable transfer anchor. Registering held-out
+subjects along the shared valence axis before a leave-subjects-out
+9-class probe (\emph{sem}) matches neither generic per-subject alignment
+(\emph{EA}, a Euclidean-alignment analog~\citep{he2020transfer}) nor a
+random-direction control: $\mathrm{sem}{=}0.712$ vs.\ $\mathrm{EA}{=}0.714$
+($\Delta{=}{-}0.002$, $p{=}0.54$) vs.\ $\mathrm{rand}{=}0.710$
+($\Delta{=}{+}0.003$, $p{=}0.22$) BACC
+(Figure~\ref{fig:saturation-beyond}c); a supervised few-shot sign/gain
+calibration along the axis degrades accuracy further ($-0.045$, $-0.021$,
+$-0.012$ at $5$, $10$, $20$ calibration trials). The transferable
+structure is generic subject-shift---captured by semantics-agnostic
+registration (Euclidean/Riemannian alignment, shared-response models,
+hyperalignment)---not the valence content. Saturation thus extends from
+in-distribution injection to the cross-subject setting: the converged
+encoder already contains the shared axis, so there is nothing left to
+inject.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{NF_saturation_beyond.pdf}
+\caption[Saturation beyond auxiliary injection]{\textbf{The saturation
+regularity holds beyond auxiliary-loss injection.} \textbf{(a)}~The
+EEG$\leftrightarrow$V-axis correlation is population-level: averaging the
+converged encoder's per-clip valence readout over more subjects lifts $r$
+from $0.72$ (single subject) to the cohort value $0.93$ (matched-filter
+emergence); a per-subject DE decoder is near zero (dotted). \textbf{(b)}~%
+LLM-aligned Stage-1 initialization (blue) never beats the EEG-SSL scratch
+baseline (grey) and hurts increasingly with more labels; the
+random-target control (orange) is destructive. \textbf{(c)}~Registering
+held-out subjects along the shared valence axis (\emph{sem}) does not beat
+generic subject-alignment (\emph{EA}) or a random-direction control on
+leave-subjects-out 9-class decoding. Controlled falsification runs; see
+the Negative Results Catalogue (Appendix~\ref{app:negatives}).}
+\label{fig:saturation-beyond}
+\end{figure}
+
+
 \section{Convergence and Ensemble Theory: Extras}
 \label{app:convergence-deep-dive}
 
@@ -1287,6 +1378,20 @@ directions leaves BACC statistically unchanged ($\Delta{=}{-}0.004$,
 paired $p{=}0.37$; if anything the LLM prototypes are slightly below
 random). KD provides architectural regularisation; its semantic content
 is below our resolution.
+\item \textbf{LLM-aligned initialization does not help; alignment and
+pretraining saturate too.} Beyond the auxiliary-loss screen, injecting the
+valence direction as frozen-feature alignment or as Stage-1
+initialization also fails: a real 5-d semantic subspace is a lossy subset
+of the encoder's own features (never beating the full 128-d), and
+LLM-aligned pretraining never beats the EEG-SSL baseline and hurts more
+with more labels ($-0.167$ at full labels)
+(Appendix~\ref{app:saturation-beyond}).
+\item \textbf{The valence axis is not a cross-subject lever.} Registering
+held-out subjects along the shared axis does not beat generic
+Euclidean-style subject-alignment or a random direction on
+leave-subjects-out 9-class decoding ($\mathrm{sem}{-}\mathrm{EA}={-}0.002$,
+$p{=}0.54$); saturation extends to the cross-subject setting
+(Appendix~\ref{app:saturation-beyond}).
 \end{enumerate}
 
 
