@@ -27,12 +27,12 @@ classifier that has already converged, and add a loss aligning its
 features with a valence direction: across twenty-five such recipes on
 FACED~\citep{chen2023faced}, none improve balanced accuracy (BACC) and
 fifteen significantly reduce it. The same loss that is within noise of zero on a
-weak backbone significantly hurts a strong one. We call this the \emph{saturation regularity}: once task
+weak backbone significantly hurts a converged one. We call this the \emph{saturation regularity}: once task
 labels alone have driven the network onto the target concept, further
 supervision can only deform an already-converged representation, without
 improving generalization. The finding cuts two ways: it explains the
 failures of concept-alignment supervision we report here, and---by locating
-the recoverable gain in the seed-specific residual supervision cannot
+the recoverable gain in the seed-specific residual that supervision cannot
 reach---it yields a new state of the art by ensembling rather than
 supervising (\Cref{fig:overview}).
 
@@ -94,8 +94,8 @@ parameter-efficient fine-tuning (PEFT) adapters~\citep{hu2022lora}, and topograp
 losses~\citep{padakanti2025meg}---none help: fifteen produce
 statistically significant decrements and zero produce gains, five
 families showing \emph{monotonic destruction}
-(Figure~\ref{fig:saturation-transition}). The effect flips sign
-with baseline strength (no measurable effect at BACC $\le 0.62$, a
+(Figure~\ref{fig:saturation-transition}). The effect depends on
+baseline strength (no measurable effect at BACC $\le 0.62$, a
 significant negative at BACC $\ge 0.66$). This is
 \emph{saturation}: distinct from overfitting, it is what happens once
 task labels alone have driven the network onto the target direction,
@@ -135,7 +135,7 @@ prediction, and encoding by converged EEG classifiers) and used to
 diagnose what the network has saturated on
 (\S\ref{sec:vaxis-llms}--\S\ref{sec:vaxis-brain}).
 
-\paragraph{What this paper does not claim.} Four non-claims scope the
+\paragraph{Scope.} Four boundaries scope the
 result. \textbf{(i)}~The V-axis is not privileged: a generic valence
 axis probes comparably (\S\ref{sec:vaxis-llms}), and inside the
 ensemble the language-derived KD prototypes are statistically equivalent

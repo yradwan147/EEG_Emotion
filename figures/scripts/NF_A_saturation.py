@@ -97,7 +97,7 @@ for i, strength in enumerate(["weak", "strong"]):
             axB.text(xp, yv - 0.55, "$\\ast$", ha="center", va="top", fontsize=8, color="white")
 axB.set_xticks(x); axB.set_xticklabels(groups)
 axB.set_ylabel(r"$\Delta$ balanced accuracy (%)")
-axB.set_title("(b) EEG: sign-flips, both concepts", fontsize=8.5, loc="left")
+axB.set_title("(b) EEG: same transition, both concepts", fontsize=8.5, loc="left")
 axB.yaxis.set_major_formatter(FormatStrFormatter("%+.1f"))
 axB.legend(frameon=False, fontsize=6.6, loc="lower left", handlelength=1.2)
 
