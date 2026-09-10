@@ -424,7 +424,7 @@ within-Qwen3 $r=+0.57$, $p=0.24$, $n=6$. Family-membership $\gg$ scale.}
 
 \paragraph{Time-locked dynamics.}
 Mid-late $\alpha$/$\beta$ peak at $t=18$--$21$\,s coincides with the
-LPP / sustained-attention window of Hajcak \& Foti
+LPP / sustained-attention window of Hajcak et~al.
 \citep{hajcak2010ofthelpp} and Codispoti et al.\
 \citep{codispoti2023arousal}; early $\gamma$ peak at $t=3$--$6$\,s
 coincides with M\"uller's affective-picture window
@@ -503,9 +503,9 @@ Penultimate (200-D) features from 15 stock CBraMod SEED-V-5s checkpoints
 (3 protocols $\times$ 5 seeds: vanilla baseline, augmentation, KD-midlayer)
 aggregated per-class on the test set. PC/best-PC scores
 correlated with the SEED-V V-axis class projection give
-$r(\mathrm{BACC}, \text{trial-best-PC}\,r) = +0.628$ ($p=0.012$, $n=15$;
+$r(\mathrm{BACC}, \text{trial-best-PC}\,r) = +0.632$ ($p=0.012$, $n=15$;
 this is the direction used for the causal ablation below) and
-$r(\mathrm{BACC}, \text{class-best-PC}\,r) = +0.520$ ($p=0.047$). The
+$r(\mathrm{BACC}, \text{class-best-PC}\,r) = +0.601$ ($p=0.018$). The
 SEED-V BACC dynamic range is much narrower than FACED, so the raw
 class-PC1 correlation is not significant; the best-PC estimators reach
 significance. These are 15 checkpoints of a single backbone (CBraMod),
@@ -545,7 +545,7 @@ baseline + 5 augmented + 5 KD-midlayer) we project penultimate features
 onto the orthogonal complement of the trial-level best-PC V-axis
 direction (no retraining; the class-level direction is degenerate at
 $k{=}5$, so we use the trial-level analogue, mirroring the
-$\text{trial-best-PC}\,r{=}+0.628$ estimator from Step 3). Every
+$\text{trial-best-PC}\,r{=}+0.632$ estimator from Step 3). Every
 checkpoint shows a negative $\Delta\mathrm{BACC} \in [-0.0291,
 -0.0093]$ (population mean $-0.0173 \pm 0.0061$); a matched
 random-direction control ($n=20$ uniform on $\mathbb{S}^{D-1}$) is
@@ -661,7 +661,7 @@ The all-band oracle ($\overline{|r|}=0.616$) exceeds the
 cohort-fixed top-8 ($+0.021$) by $+0.60$ in absolute $|r|$,
 indicating considerable per-subject signal that the cohort summary
 suppresses. The Simpson's-paradox dynamic that
-Sani et~al.\ \citep{sani2024crosssubject} flag for cross-subject
+Vahidi et~al.\ \citep{sani2024crosssubject} flag for cross-subject
 EEG-emotion modelling more broadly (Figure~\ref{fig:nine-stim-simpson}).
 
 \begin{figure}[ht]
@@ -1048,7 +1048,7 @@ standard deviation $0.62$ (range $[-0.95, +0.95]$); the wide null is a
 consequence of the low intrinsic dimensionality of the class-PC1
 subspace ($D_{\mathrm{eff}}\!=\!9$). The empirical V-axis correlation
 $+0.885$ sits at only the $93.5^\mathrm{th}$ percentile of this null
-(one-sided $p{=}0.066$, two-sided $p{=}0.099$)---it does not survive.
+(one-sided $p{=}0.066$, two-sided $p{=}0.10$)---it does not survive.
 Taken together with the within-architecture nulls above, we therefore
 do \emph{not} claim architecture-independent convergence: the only
 convergence claim we retain is the within-architecture class-PC1 basin
@@ -1344,7 +1344,7 @@ pseudo-replicated} (Section~\ref{sec:convergence}): the 36-checkpoint
 $r=+0.885$ is driven by $\sim$2--3 architecture clusters
 ($n_{\mathrm{eff}}\approx1.2$), is not significant within any single
 architecture, and sits at only the $93.5^\mathrm{th}$ percentile of a
-1000-direction null ($p_{\mathrm{one}}=0.066$, $p_{\mathrm{two}}=0.099$).
+1000-direction null ($p_{\mathrm{one}}=0.066$, $p_{\mathrm{two}}=0.10$).
 Within-class residual ($r=+0.74$, $p=0.014$) is the statistically
 robust signal we retain.
 \item \textbf{Per-subject V-axis adaptation does not transfer.} The
@@ -1374,9 +1374,9 @@ text; $r \in [0.18, 0.41]$ brain alignment across LLMs
 (Appendix~\ref{app:specificity-controls}).
 \item \textbf{LLM-content of KD is irrelevant at this scale.} Replacing
 the 9-D LLM-derived class prototypes with random orthonormal 9-D
-directions leaves BACC statistically unchanged ($\Delta{=}{-}0.004$,
-paired $p{=}0.37$; if anything the LLM prototypes are slightly below
-random). KD provides architectural regularisation; its semantic content
+directions leaves BACC statistically equivalent ($\Delta{=}{-}0.001$,
+paired $p{=}0.72$, $n{=}20$; TOST $\varepsilon{=}0.01$, $p{=}0.001$).
+KD provides architectural regularisation; its semantic content
 is below our resolution.
 \item \textbf{LLM-aligned initialization does not help; alignment and
 pretraining saturate too.} Beyond the auxiliary-loss screen, injecting the

@@ -1,14 +1,14 @@
 """LF6 — Saturation Cliff (§7 main).
 
 Δ-vs-recipe-strength plot: x-axis is the baseline BACC of the recipe the
-V-axis intervention is added to (CBraMod 0.572, EMOD-d3 ~0.624, full SOTA d6
+V-axis intervention is added to (CBraMod 0.572, EMOD d6 (vanilla) ~0.624, full SOTA d6
 0.658). y-axis is Δ from V-axis intervention. Visualizes the transition that
-crosses zero between EMOD-d3 and the full SOTA recipe.
+crosses zero between EMOD d6 (vanilla) and the full SOTA recipe.
 
 Top panel: scatter with all 25+ V-axis interventions, colored by
 significance tier; visible saturation cliff. Bottom panel zooms into the
 3-anchor "component ablation" used in the paper to nail the transition:
-CBraMod, EMOD d3, full SOTA recipe.
+CBraMod, EMOD d6 (vanilla), full SOTA recipe.
 """
 import os
 import sys
@@ -29,34 +29,34 @@ OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/landmark"
 ROWS = [
     # CBraMod (very weak base)
     ("CBraMod + Topo λ=0.05",       0.5717, +0.006, 0.30,   "ns_pos"),
-    # EMOD d3 baseline (~0.6235)
-    ("EMOD d3 + Topo λ=0.05",       0.6235, +0.002, 0.50,   "ns_pos"),
-    ("EMOD d3 + EMODSTYLE λ=0.5",   0.6235, +0.007, 0.22,   "ns_pos"),
-    ("EMOD d3 + Procrustes λ=0.05", 0.6235, +0.001, 0.89,   "ns_pos"),
-    ("EMOD d3 + PRIOR (smooth)",    0.6235, +0.002, 0.40,   "ns_pos"),
+    # EMOD d6 vanilla baseline (~0.6235)
+    ("EMOD d6 (vanilla) + Topo λ=0.05",       0.6235, +0.002, 0.50,   "ns_pos"),
+    ("EMOD d6 (vanilla) + EMODSTYLE λ=0.5",   0.6235, +0.007, 0.22,   "ns_pos"),
+    ("EMOD d6 (vanilla) + Procrustes λ=0.05", 0.6235, +0.001, 0.89,   "ns_pos"),
+    ("EMOD d6 (vanilla) + PRIOR (smooth)",    0.6235, +0.002, 0.40,   "ns_pos"),
     # NS negatives at d3
-    ("EMOD d3 + Topo λ=0.1",        0.6235, -0.013, 0.039,  "neg_sig"),
-    ("EMOD d3 + Frontal-mask λ=0.1",0.6235, -0.009, 0.21,   "neg_ns"),
-    ("EMOD d3 + FAA λ=0.1",         0.6235, -0.018, 0.063,  "neg_ns"),
-    ("EMOD d3 + PEFT λ=0.1",        0.6235, -0.009, 0.069,  "neg_ns"),
-    ("EMOD d3 + Curriculum cos",    0.6235, -0.009, 0.23,   "neg_ns"),
-    ("EMOD d3 + KD soft T=2 λ=1",   0.6235, -0.012, 0.05,   "neg_ns"),
-    ("EMOD d3 + Init weight",       0.6235, -0.017, 0.05,   "neg_ns"),
-    ("EMOD d3 + Distill",           0.6235, -0.017, 0.05,   "neg_ns"),
-    ("EMOD d3 + EEG-AUX MSE λ=0.1", 0.6235, -0.016, 0.05,   "neg_ns"),
+    ("EMOD d6 (vanilla) + Topo λ=0.1",        0.6235, -0.013, 0.039,  "neg_sig"),
+    ("EMOD d6 (vanilla) + Frontal-mask λ=0.1",0.6235, -0.009, 0.21,   "neg_ns"),
+    ("EMOD d6 (vanilla) + FAA λ=0.1",         0.6235, -0.018, 0.063,  "neg_ns"),
+    ("EMOD d6 (vanilla) + PEFT λ=0.1",        0.6235, -0.009, 0.069,  "neg_ns"),
+    ("EMOD d6 (vanilla) + Curriculum cos",    0.6235, -0.009, 0.23,   "neg_ns"),
+    ("EMOD d6 (vanilla) + KD soft T=2 λ=1",   0.6235, -0.012, 0.05,   "neg_ns"),
+    ("EMOD d6 (vanilla) + Init weight",       0.6235, -0.017, 0.05,   "neg_ns"),
+    ("EMOD d6 (vanilla) + Distill",           0.6235, -0.017, 0.05,   "neg_ns"),
+    ("EMOD d6 (vanilla) + EEG-AUX MSE λ=0.1", 0.6235, -0.016, 0.05,   "neg_ns"),
     # Stat-sig negatives at d3
-    ("EMOD d3 + Frontal-mask λ=0.5",0.6235, -0.052, 0.0015, "neg_sig"),
-    ("EMOD d3 + FAA λ=0.5",         0.6235, -0.044, 0.006,  "neg_sig"),
-    ("EMOD d3 + Anger-w λ=0.5",     0.6235, -0.054, 0.0003, "neg_sig"),
-    ("EMOD d3 + Occipital λ=0.1",   0.6235, -0.022, 0.007,  "neg_sig"),
-    ("EMOD d3 + Multi-V λ=0.5",     0.6235, -0.041, 0.005,  "neg_sig"),
-    ("EMOD d3 + EEG-AUX MSE λ=0.5", 0.6235, -0.043, 0.01,   "neg_sig"),
-    ("EMOD d3 + Uncert (Kendall)",  0.6235, -0.067, 0.001,  "neg_sig"),
-    ("EMOD d3 + RSA λ=1",           0.6235, -0.057, 0.001,  "neg_sig"),
-    ("EMOD d3 + RSA λ=5",           0.6235, -0.093, 0.001,  "monotonic"),
+    ("EMOD d6 (vanilla) + Frontal-mask λ=0.5",0.6235, -0.052, 0.0015, "neg_sig"),
+    ("EMOD d6 (vanilla) + FAA λ=0.5",         0.6235, -0.044, 0.006,  "neg_sig"),
+    ("EMOD d6 (vanilla) + Anger-w λ=0.5",     0.6235, -0.054, 0.0003, "neg_sig"),
+    ("EMOD d6 (vanilla) + Occipital λ=0.1",   0.6235, -0.022, 0.007,  "neg_sig"),
+    ("EMOD d6 (vanilla) + Multi-V λ=0.5",     0.6235, -0.041, 0.005,  "neg_sig"),
+    ("EMOD d6 (vanilla) + EEG-AUX MSE λ=0.5", 0.6235, -0.043, 0.01,   "neg_sig"),
+    ("EMOD d6 (vanilla) + Uncert (Kendall)",  0.6235, -0.067, 0.001,  "neg_sig"),
+    ("EMOD d6 (vanilla) + RSA λ=1",           0.6235, -0.057, 0.001,  "neg_sig"),
+    ("EMOD d6 (vanilla) + RSA λ=5",           0.6235, -0.093, 0.001,  "monotonic"),
     # Full SOTA recipe (saturation cliff)
-    ("d6 SOTA + Topo λ=0.05",       0.6581, -0.015, 0.001,  "neg_sig_full"),
-    ("d6 SOTA + EMODSTYLE λ=0.5",   0.6581, -0.024, 0.001,  "neg_sig_full"),
+    ("d6 SOTA + Topo λ=0.1",        0.6581, -0.029, 0.004,  "neg_sig_full"),
+    ("d6 SOTA + EMODSTYLE λ=0.5",   0.6581, -0.026, 0.004,  "neg_sig_full"),
 ]
 
 
@@ -112,7 +112,7 @@ def main():
                    linewidths=2.0, marker="D", zorder=5)
 
     # vertical guide lines at the three anchors — labels above the plot top
-    for xv, lab_t in [(0.572, "CBraMod"), (0.6235, "EMOD d3"), (0.6581, "d6 SOTA")]:
+    for xv, lab_t in [(0.572, "CBraMod"), (0.6235, "EMOD d6 (vanilla)"), (0.6581, "d6 SOTA")]:
         ax.axvline(xv, color=COLORS["gray"], ls=":", lw=0.8, alpha=0.7, zorder=1)
         ax.text(xv, 0.041, lab_t, fontsize=9.0, ha="center",
                 color=COLORS["gray"], fontweight="bold",
@@ -124,21 +124,21 @@ def main():
     annotate_points = {
         "Anger-w λ=0.5\n(−0.054***)":       (0.6235, -0.054),
         "RSA λ=5\n(−0.093***)":             (0.6235, -0.093),
-        "d6 SOTA + EMODSTYLE\n(−0.024***)": (0.6581, -0.024),
+        "d6 SOTA + EMODSTYLE\n(−0.026***)": (0.6581, -0.026),
         "EMODSTYLE λ=0.5\n(+0.007 ns)":     (0.6235, +0.007),
         "CBraMod+Topo\n(+0.006 ns)":        (0.5717, +0.006),
     }
     offsets = {
         "Anger-w λ=0.5\n(−0.054***)":       (0.595, -0.072),
         "RSA λ=5\n(−0.093***)":             (0.595, -0.097),
-        "d6 SOTA + EMODSTYLE\n(−0.024***)": (0.671, -0.018),
+        "d6 SOTA + EMODSTYLE\n(−0.026***)": (0.671, -0.018),
         "EMODSTYLE λ=0.5\n(+0.007 ns)":     (0.602, +0.018),
         "CBraMod+Topo\n(+0.006 ns)":        (0.572, +0.018),
     }
     halign = {
         "Anger-w λ=0.5\n(−0.054***)":       "right",
         "RSA λ=5\n(−0.093***)":             "right",
-        "d6 SOTA + EMODSTYLE\n(−0.024***)": "left",
+        "d6 SOTA + EMODSTYLE\n(−0.026***)": "left",
         "EMODSTYLE λ=0.5\n(+0.007 ns)":     "right",
         "CBraMod+Topo\n(+0.006 ns)":        "left",
     }
@@ -164,7 +164,7 @@ def main():
 
     ax.set_xlabel("base recipe FACED 9-class BACC  (capacity dimension)", fontsize=10.5)
     ax.set_ylabel("Δ BACC from adding V-axis supervision", fontsize=10.5)
-    ax.set_title("V-axis supervision crosses zero between EMOD d3 and the full SOTA recipe",
+    ax.set_title("V-axis supervision turns negative across the converged d=6 regime (vanilla to full SOTA)",
                  fontsize=11.5, fontweight="bold", loc="left", pad=10)
     panel_label(ax, "", x=-0.06, y=1.02)
     ax.set_xlim(0.555, 0.690)
