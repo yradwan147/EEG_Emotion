@@ -8,8 +8,8 @@ cohort~\citep{chen2023faced}: $123$ subjects watching $28$
 emotional video clips, $32$ EEG channels at $250$\,Hz. From the
 cohort EEG averaged over subjects and time, we fit a single
 \emph{ridge regression} (a linear model with $L_2$ regularisation)
-predicting the V-axis projection of each stimulus's textual
-description from the $160$ channel--band features (differential
+predicting the emotion-category V-axis value of each of the $28$
+stimuli from the $160$ channel--band features (differential
 entropy over $32$ channels $\times$ $5$ frequency bands). The ridge
 prediction matches the Qwen3-4B V-axis at $\mathbf{r{=}{+}0.80}$ and a
 CLIP-text emotion axis at $\mathbf{r{=}{+}0.87}$ ($n{=}28$ stimuli, both at
@@ -19,12 +19,12 @@ $r{=}{+}0.71$ (Figure~\ref{fig:eeg-llm-circle})---aligning
 across two distinct LLM substrates. Four controls support the brain--LM correlation: a fully nested
 permutation test (stimulus relabelling within the subject structure,
 $N{=}5000$) places the correlation beyond every permutation draw
-($p{\le}2{\times}10^{-4}$); a matched-norm
+($p<2{\times}10^{-4}$); a matched-norm
 random direction drops the same ridge to $r{=}{+}0.07$ ($p{=}0.73$);
 split-half subject reliability on per-stimulus valence is $r{=}{+}0.99$;
 the same EEG ridge predicts human-rated valence at $r{=}{+}0.86$,
-matching the V-axis prediction to within $0.01$ ($0.87$ vs $0.86$)---the brain signal is
-at the same strength as a panel of human raters would produce.
+matching the CLIP-text ridge to within $0.01$ ($0.87$ vs $0.86$): the EEG
+predicts behavioural valence about as well as it predicts the V-axis.
 Multi-comparison correction and other controls are in
 Appendix~\ref{app:brain-deep-dive}.
 
@@ -39,7 +39,7 @@ single-channel topography, not the multi-feature ridge that carries the
 headline.
 
 \paragraph{The brain aligns with valence, not the V-axis specifically.}
-Swapping the V-axis for a generic categorical valence axis (an integer
+Swapping the target axis for a generic categorical valence axis (an integer
 valence rank per emotion) or the behavioural valence ratings leaves the
 ridge essentially unchanged ($r{=}0.89$ and $r{=}0.86$ vs $0.87$; all
 $n{=}28$), while a matched-norm random direction stays at chance
@@ -63,12 +63,12 @@ $p{=}0.24$, $n{=}6$). As a label-level check, the FACED V-axis also
 orders SEED-V's~\citep{liu2022seedv} five emotion categories consistently
 with their valence ($r{=}{+}0.96$, $n{=}5$; this is an LLM-side ordering,
 not EEG decoding); the SEED-V \emph{EEG} is re-derived from scratch in
-Appendix~\ref{app:seedv-full} (cohort $r{=}0.59$).
+Appendix~\ref{app:seedv-full} (best cohort cell $r{=}0.59$).
 On EmoEEG-MC~\citep{xu2025emoeegmc} a within-subject valence decoder
 reaches $0.61$ accuracy ($p{=}3.4{\times}10^{-5}$) and its group axis
 tracks behavioural valence at $r{=}0.71$; an audio/visual confound
 control is inconclusive, so we frame the EEG--valence link as
-population-level, not confound-free (Appendix~\ref{app:brain-deep-dive}).
+population-level, not confound-free.
 Appendix~\ref{app:seedv-full} re-derives the V-axis on SEED-V and
 re-tests every claim.
 

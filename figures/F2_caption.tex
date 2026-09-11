@@ -1,11 +1,13 @@
-\textbf{Stimulus-level alignment between the LLM-derived valence
+\textbf{Category-level alignment between the LLM-derived valence
 direction and human EEG.}
 Each point is one of the $28$ FACED video stimuli; $x$ is the
-\emph{CLIP-text} V-axis projection of the textual stimulus description,
-$y$ is the single ridge-regression prediction of that projection from
+\emph{CLIP-text} V-axis value of each stimulus's emotion category (one
+value per class),
+$y$ is the single ridge-regression prediction of that value from
 all $160$ cohort channel--band features ($32$ channels $\times$ $5$
 frequency bands, averaged over $123$ subjects and each clip).
-Cohort Pearson $r{=}{+}0.87$ ($n{=}28$, $p<10^{-8}$); the nine-story
+Cohort Pearson $r{=}{+}0.87$ at emotion-category resolution
+($n{=}28$, nested-perm $p<2{\times}10^{-4}$; per-clip $r{=}0.71$); the nine-story
 Qwen3-4B V-axis reaches $r{=}0.80$ on the same ridge. The permutation
 null (top right) places the observed correlation outside the null
 support; a matched-norm random-direction control (bottom right) reads

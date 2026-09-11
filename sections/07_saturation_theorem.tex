@@ -4,7 +4,7 @@
 We test whether auxiliary supervision toward a known concept direction
 helps an EEG-emotion classifier. The setup uses an
 EMOD~\citep{chen2025emod} backbone (the previous FACED-9 SOTA) at
-two regimes we call \emph{weak} (network depth $d{=}3$, $0.62$ BACC)
+two regimes we call \emph{weak} (network depth $d{=}3$, $0.619$ BACC)
 and \emph{converged} ($d{=}6$, the SOTA recipe of \S\ref{sec:sota},
 $0.658$ BACC 5-seed mean; best single $0.6755$). The $25$-recipe screen
 ran on the standard $d{=}6$ baseline; the strongest variants were also
@@ -40,7 +40,7 @@ recipe (Holm-corrected across the four variants, $p{\le}0.011$). Error bars: $95
 \end{figure}
 
 \paragraph{Result.} None help. Fifteen produce statistically
-significant accuracy decrements ($p<0.05$, paired across five seeds);
+significant accuracy decrements (Holm-corrected $p<0.05$, paired across five seeds);
 zero produce gains. Five families show \emph{monotonic destruction}:
 the harder we push the auxiliary loss, the worse accuracy gets, with
 no positive setpoint. Even the anger-weighted target that
