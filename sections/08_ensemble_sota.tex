@@ -26,9 +26,9 @@ EMOD$+$aug$+$KD$+d{=}6$ (5-seed)   & $.658\!\pm\!.010$ \\
 \textbf{10-ckpt ensemble (SOTA)}   & $\mathbf{0.6948}$ \\
 \bottomrule
 \end{tabular}
-\subcaption*{(a) Headline. All baselines are single-model: our best
-single model reaches $0.6755$ ($+7.4\%$ over EMOD) and the
-$10$-checkpoint ensemble $0.6948$ ($+10.5\%$).}
+\subcaption*{(a) Headline. All baselines are single-model; our best
+single model is $+7.4\%$ over EMOD, the $10$-checkpoint
+ensemble $+10.5\%$.}
 \end{minipage}\hfill
 \begin{minipage}{0.55\linewidth}
 \centering
@@ -66,10 +66,8 @@ $+9.1\%$/$+12.2\%$) and walks up in six steps. Augmentation (four EEG augmentati
 $p{=}0.6$; Appendix~\ref{app:ensemble-extras}) contributes the
 largest single jump ($+0.0149$). Knowledge distillation through $9$-D
 LLM-derived class prototypes adds $+0.0096$; a \texttt{rand9} ablation
-(identical recipe with the $9$ LLM prototypes replaced by random
-orthonormal directions) is statistically equivalent to the LLM
-prototypes (TOST $\varepsilon{=}0.01$, $p{=}0.001$, $n{=}20$;
-$\Delta{=}{-}0.001$, paired $p{=}0.72$), so KD imposes a
+with random orthonormal directions is statistically equivalent
+(Table~\ref{tab:sota}), so KD imposes a
 $9$-direction frame on the features rather than transferring the LLM's
 emotion concept. Depth-doubling to $d{=}6$
 adds $+0.0142$; longer training ($e{=}150$) does not move single-seed
@@ -84,6 +82,6 @@ per-checkpoint encoding predicts leave-one-out contribution ($r{=}0.74$,
 $n{=}10$). The gain is variance reduction, not training-length
 diversity: the ten-checkpoint pool ($0.6948$) is not above the five
 $e{=}150$ checkpoints alone ($0.6919$; $+0.003$, $95\%$ CI
-$[-0.004,+0.010]$), and mixing lengths does not beat the $e{=}150$ set.
+$[-0.004,+0.010]$).
 Headroom-monotonicity, the $10$-checkpoint plateau, and the failure of
 cross-architecture mixing are in Appendix~\ref{app:ensemble-extras}.

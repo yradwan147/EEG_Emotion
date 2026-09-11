@@ -2,7 +2,7 @@
 \label{sec:saturation}
 
 We test whether auxiliary supervision toward a known concept direction
-helps an EEG-emotion classifier. The setup uses an
+helps an EEG-emotion classifier, using an
 EMOD~\citep{chen2025emod} backbone (the previous FACED-9 SOTA) at
 two regimes we call \emph{weak} (network depth $d{=}3$, $0.619$ BACC)
 and \emph{converged} ($d{=}6$, the SOTA recipe of \S\ref{sec:sota},
@@ -46,16 +46,15 @@ the harder we push the auxiliary loss, the worse accuracy gets, with
 no positive setpoint. Even the anger-weighted target that
 analytically maximises the V-axis ceiling on FACED is among the worst
 ($\Delta\mathrm{BACC} = -0.054$): supplying the strongest possible
-target makes things strictly worse, not better.
+target makes things strictly worse.
 
 \paragraph{The transition is sharp and unidirectional in baseline
 strength.} An intervention whose effect lies within seed noise on the
-weak $d{=}3$ backbone ($0.619$ BACC) becomes a statistically significant
-negative on the converged $d{=}6$ SOTA recipe ($0.658$ BACC); the
+weak $d{=}3$ backbone becomes a statistically significant
+negative on the converged $d{=}6$ SOTA recipe; the
 weak-vs-converged difference is a significant backbone$\times$loss
 interaction (Welch $p{=}0.001$). Across the screened $d{=}6$ backbones the
-harm grows with baseline strength, spanning the band $[0.62, 0.66]$ on
-FACED-9 (we make no claim about universal cut-offs).
+harm grows with baseline strength (we make no claim about universal cut-offs).
 
 \paragraph{The regularity generalises beyond valence and beyond EEG.}
 An \emph{arousal} target (the same recipe re-anchored on arousal poles)
@@ -93,8 +92,7 @@ empirical regularity over the recipes tested, not a proved theorem.}
 
 \paragraph{Saturation is not overfitting.} Overfitting is memorisation
 of the training set; saturation is how task and auxiliary supervision
-interact once both target the same feature-space direction, as the
-mechanism check below makes concrete.
+interact once both target the same feature-space direction.
 
 \paragraph{Mechanism check.} The auxiliary loss does push the network's
 class-mean features further along the target direction (alignment
@@ -109,7 +107,7 @@ that distinguish one trial of an emotion from another---which is
 seed-specific and load-bearing: its per-checkpoint encoding strength
 predicts leave-one-out ensemble contribution at $r{=}{+}0.74$
 (\S\ref{sec:sota}). Pushing the already-saturated class-mean basin
-along a fixed target does not, at the class-mean level, improve how the
+along a fixed target does not improve how the
 network uses this residual.
 The $25$ recipes reduce to one principle: \emph{a saturated
 representation is an unhelpful supervision target}, qualitatively
