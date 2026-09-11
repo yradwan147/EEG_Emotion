@@ -3,7 +3,7 @@
 Horizontal bar chart with cumulative Δ from CBraMod 0.572 → 0.6948 SOTA.
 Each bar labeled (replication, +aug, +KD, +d6, +e150, ensemble). Color by
 phase (replication / recipe / ensemble). Reference lines for prior SOTA
-(EmotionKD 0.628, EMOD AAAI 0.6287).
+(EMOD AAAI 0.6287).
 """
 import os
 import sys
@@ -20,7 +20,7 @@ OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/landmark"
 
 # (label, BACC, std_or_None, phase)
 ROWS = [
-    ("CBraMod   (ICLR 2025 prior SOTA)",       0.5720, 0.0060, "prior"),
+    ("CBraMod   (our reproduction)",           0.5720, 0.0060, "prior"),
     ("EMOD vanilla replication  (d3, race-fix)", 0.6194, 0.0040, "replication"),
     ("+ aug  (p=0.6)",                         0.6343, 0.0040, "recipe"),
     ("+ aug + KD  (rand9 9D)",                 0.6439, 0.0070, "recipe"),
@@ -95,9 +95,8 @@ def main():
     # vertical ref lines
     ax.axvline(0.5720, color=COLORS["gray"], ls=":", lw=0.9, alpha=0.7)
     ax.axvline(0.6948, color=COLORS["sota"], ls=":", lw=0.9, alpha=0.8)
-    ax.axvline(0.6280, color="#666", ls="--", lw=0.7, alpha=0.5)
     ax.axvline(0.6287, color="#666", ls="--", lw=0.7, alpha=0.5)
-    ax.text(0.6286, 1.5, "EmotionKD 0.6280\n  EMOD AAAI 0.6287",
+    ax.text(0.6286, 1.5, "EMOD AAAI 0.6287",
             color="#444", fontsize=7.5, va="center", ha="left")
 
     # final gain arrow

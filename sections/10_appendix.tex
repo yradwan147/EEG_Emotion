@@ -138,7 +138,7 @@ that is two orders of magnitude larger in supervised exposure.
 \toprule
 Benchmark & V-axis AUC & Supervised LR (5k) \\
 \midrule
-SST-2 binary \citep{socher2013recursive}      & 0.832 & 0.837 \\
+SST-2 binary \citep{socher2013recursive}      & 0.832 & 0.924 \\
 \midrule
 \multicolumn{3}{l}{\textit{SST-2 zero-shot reference baselines}} \\
 SBERT prototype cosine \citep{reimers2019sbert} & 0.793 & --- \\
@@ -146,9 +146,11 @@ RoBERTa-large-MNLI entailment \citep{liu2019roberta} & 0.912 & --- \\
 \bottomrule
 \end{tabular}
 \caption{Zero-shot V-axis sentiment results. The SST-2 V-axis AUC
-($0.832$) is the verified Qwen3-4B lead-model number, within $0.005$ of a 5k-sample supervised LR baseline
-($0.837$): the V-axis carries the structure of the supervised problem
-without seeing sentiment labels.
+($0.832$) is the verified Qwen3-4B lead-model number: the zero-label
+V-axis matches a same-feature supervised LR trained on ${\approx}50$--$100$
+labels, while a $5$k-label same-feature classifier reaches $0.924$
+(\Cref{tab:nshot-curve})---the V-axis carries the structure of the
+supervised problem without seeing sentiment labels.
 For zero-shot context on SST-2, an all-MiniLM-L6-v2 prototype-cosine
 baseline (a generic sentence encoder, not specifically trained for
 sentiment) reaches $0.793$, while RoBERTa-large-MNLI used as a zero-shot
@@ -341,10 +343,11 @@ The signal is encoded in semantic content.
 \paragraph{Random-direction baseline.}
 Random Gaussian directions in the LM's residual stream, $L_2$-matched
 to the V-axis, give SST-2 AUC $\approx 0.52$ and lexicon $|r| \approx
-0.07$--$0.09$. By contrast the V-axis bootstrap 95\% CIs are tight and
-well separated from chance: SST-2 AUC $[0.844, 0.890]$, EmoBank V
-$|r|\in[0.485, 0.512]$, Hu \& Liu $|r| \in [0.740, 0.776]$
-(1{,}000-sample bootstrap; statistical methods in
+0.07$--$0.09$. By contrast the V-axis (Qwen3-4B, final layer) bootstrap
+95\% CIs are tight and
+well separated from chance: SST-2 AUC $[0.804, 0.858]$, EmoBank V
+$|r|\in[0.503, 0.531]$, Hu \& Liu $|r| \in [0.709, 0.756]$
+(1{,}000-sample bootstrap over examples; statistical methods in
 Appendix~\ref{app:statistics}).
 
 \paragraph{Arousal asymmetry: where the recipe fails in text.}
@@ -370,7 +373,7 @@ limitation.
 Benchmark & V-axis (valence) & A-axis (arousal) \\
 \midrule
 SST-2 binary AUC                         & $0.832$ & --- \\
-EmoBank V $|r|$ / EmoBank A $|r|$        & $0.49$  & $0.01$--$0.06$ \\
+EmoBank V $|r|$ / EmoBank A $|r|$        & $0.52$  & $0.01$--$0.06$ \\
 Warriner V $|r|$ / Warriner A $|r|$      & $0.703$ & $\le 0.18$ \\
 NRC valence / arousal lexicon recovery   & $\ge 76\%$ & $\le 13\%$ \\
 OASIS image valence ($r$) / arousal ($r$)& $\mathbf{0.869}$ & $\mathbf{0.803}$ \\
@@ -463,12 +466,12 @@ each $(\text{channel}, \text{band})$ cell we compute Pearson with the
 SEED-V V-axis projection.
 
 \begin{itemize}
-\item \textbf{Best cohort cell}: PZ / $\theta$, $r=+0.5920$.
+\item \textbf{Best cohort cell}: PZ / $\theta$, $r=+0.592$.
 \item \textbf{Region-mean $|r|$}: occipital $0.300$, parietal $0.315$,
 central $0.302$, frontal $0.234$.
 \item \textbf{Posterior dominance}: occipital $-$ frontal $= +0.066$.
 \item \textbf{Random-direction null} (200 directions matched in $L_2$):
-empirical $|r|_{\max}=0.5920$ vs.\ null 95th percentile $=0.478$,
+empirical $|r|_{\max}=0.592$ vs.\ null 95th percentile $=0.478$,
 $p<0.005$.
 \end{itemize}
 
@@ -1102,8 +1105,8 @@ correlation that motivates the ensembling strategy.
 \caption{Recipe ablation cascade from the EMOD baseline at $0.6287$
 (previous FACED-9 SOTA~\citep{chen2025emod}) to our $10$-checkpoint
 ensemble at $0.6948$ ($+10.5\%$ relative). Each bar is one recipe
-component or ensembling step. Older baselines (CBraMod $0.572$,
-EmotionKD $0.628$) shown for reference.}
+component or ensembling step. The CBraMod backbone (our reproduction
+$0.572$; published $0.551$) is shown for reference.}
 \label{fig:cascade}
 \end{figure}
 

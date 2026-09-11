@@ -47,8 +47,9 @@ results in Appendix~\ref{app:per-llm-deep-dive}.}
 \label{tab:cross-modal}
 \end{table}
 
-The LLM-side direction is a strong sentiment classifier: $0.832$
-SST-2 AUC matches supervised LR on $5$k examples ($0.837$), beats
+The LLM-side direction is a strong sentiment classifier: its $0.832$
+SST-2 AUC (zero task labels) matches a same-feature supervised LR
+trained on ${\sim}50$ labels, beats
 SBERT prototype-cosine ($0.793$;~\citealp{reimers2019sbert}), and
 trails $355$M RoBERTa-MNLI zero-shot
 ($0.912$;~\citealp{liu2019roberta}) by $0.08$---all from nine
@@ -57,8 +58,8 @@ stories of supervision.
 \paragraph{The direction is recovered across model families.}
 Extracting the V-axis independently from four non-Qwen families
 recovers essentially the same valence ordering of the stimuli:
-Mistral-7B ($r{=}0.95$), Llama-3 ($r{=}0.95$), and BLOOM ($r{=}0.94$)
-all align with the behavioural valence reference, with Pythia the lone
+Mistral-7B ($r{=}0.95$), Llama-3-8B ($r{=}0.95$), and BLOOM-3B ($r{=}0.94$)
+all align with the behavioural valence reference, with Pythia-2.8B the lone
 outlier ($r{=}0.44$). Within the Qwen3 family the V-axis is essentially
 scale-invariant (off-diagonal $r{=}{+}0.995$ across $15$ size-pairs);
 across families the raw axes are looser ($r{=}{+}0.585$ over $48$

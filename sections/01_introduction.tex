@@ -58,9 +58,11 @@ chosen as the lead because it sits at the centre of the alignment
 manifold in our $14$-LLM sweep, with the highest per-stimulus
 alignment to a behavioural valence reference (the recipe itself is
 model-agnostic, see Appendix~\ref{app:per-llm-deep-dive}). The SST-2
-benchmark grounds the AUC $0.832$ headline:
-the V-axis projection alone is within $0.005$ of a $5$k-example
-supervised logistic regression~\citep{socher2013recursive}. And the
+benchmark grounds the AUC $0.832$ headline: with zero task labels the
+V-axis projection matches a supervised logistic regression on the same
+features trained on ${\approx}50$ labels ($0.821$ at $N{=}50$; a
+$5$k-label same-feature classifier reaches
+$0.924$)~\citep{socher2013recursive}. And the
 direction is not idiosyncratic to any one model: across the
 $14$ language models from $560$M to $32$B parameters, the V-axis is
 recovered across families, and within Qwen3 is essentially
@@ -91,7 +93,7 @@ distillation~\citep{hinton2015distilling}, representational
 similarity~\citep{kriegeskorte2008rsa},
 contrastive~\citep{khosla2020supcon,vandenoord2018cpc},
 parameter-efficient fine-tuning (PEFT) adapters~\citep{hu2022lora}, and topographic
-losses~\citep{padakanti2025meg}---none help: fifteen produce
+losses---none help: fifteen produce
 statistically significant decrements and zero produce gains, five
 families showing \emph{monotonic destruction}
 (Figure~\ref{fig:saturation-transition}). The effect depends on
