@@ -120,9 +120,9 @@ def main():
 
     ax_a.set_xlabel("CLIP V-axis projection of stimulus description  (z)",
                     fontsize=10)
-    ax_a.set_ylabel("Cohort EEG response at PO3/γ  (DE-ridge prediction, z)",
+    ax_a.set_ylabel("Cohort EEG response (160-feature DE ridge, z)",
                     fontsize=10)
-    ax_a.set_title("Stimulus-level alignment: LLM V-axis vs FACED EEG (n=28)",
+    ax_a.set_title("Category-level alignment: LLM V-axis vs FACED EEG (n=28)",
                    loc="left", fontsize=10.5, fontweight="bold")
     panel_label(ax_a, "a", x=-0.085, y=1.025)
     # emotion legend pushed BELOW the panel (below the dashed-circle caption) so
@@ -189,7 +189,7 @@ def main():
     ax_c.set_yticklabels(pretty, fontsize=7.5)
     ax_c.axvline(0, color="black", lw=0.6, zorder=1)
     ax_c.axvline(0.30, color=COLORS["gray"], ls=":", lw=0.7, alpha=0.7, zorder=1)
-    ax_c.set_xlabel("Per-LLM brain-anchor Pearson r at PO3/γ  (* p<0.05)", fontsize=9.5)
+    ax_c.set_xlabel("Per-LLM brain-anchor Pearson r  (* p<0.05)", fontsize=9.5)
     ax_c.set_title("14 LLMs predict the same EEG signal — Qwen3-14B leads",
                    loc="left", fontsize=11, fontweight="bold")
     panel_label(ax_c, "c", x=-0.085, y=1.05)
@@ -207,8 +207,8 @@ def main():
 
     # ---------------- super-title ----------------
     fig.suptitle(
-        "The LLM valence axis predicts a clean, lateralised EEG response "
-        "at PO3/γ across 28 stimuli and 14 LLMs",
+        "The LLM valence axis predicts the cohort EEG response "
+        "(160-feature DE ridge) across 28 stimuli and 14 LLMs",
         y=0.94, fontsize=12.5, fontweight="bold")
 
     save_dual(fig, f"{OUT}/lf2_eeg_llm_circle")

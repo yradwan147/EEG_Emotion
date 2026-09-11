@@ -1234,6 +1234,19 @@ in $L_2$ norm to the V-axis projection, recompute the cohort $|r|$ for
 each, and report the percentile of the empirical $|r|$ in the null
 distribution.
 
+\paragraph{Nested permutation test.} The headline brain--LM
+significance ($p<2{\times}10^{-4}$) is a fully nested permutation over
+the $N=5000$ relabellings that respect the experiment's structure: on
+each permutation we globally relabel the behavioural-valence target
+across the $28$ stimuli (the same relabelling applied to every
+subject), then re-run the entire pipeline---per-subject ridge,
+leave-one-stimulus-out prediction, cohort aggregation, and the final
+correlation---and compare the observed $r$ to this null. Because the
+target is permuted at the stimulus (emotion-category) level, the test
+accounts for the axis's category-resolution structure rather than
+treating the $28$ stimuli as independent; $0/5000$ permutations exceed
+the observed correlation ($p\le 1/5001$).
+
 \paragraph{Cross-architecture null.} For the 36-checkpoint cross-arch
 correlation, we sample $N=1000$ random directions matched in norm to
 $v_{\mathrm{CLIP}}$ and recompute the BACC--V-axis correlation. The

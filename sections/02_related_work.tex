@@ -48,10 +48,13 @@ statement for video paradigms rather than a refutation of FAA.
 
 \paragraph{Ensemble theory.}
 The two-tier mechanism we identify---a saturated class-mean basin
-plus a seed-specific within-class residual---is a representation-level
+plus a seed-specific within-class residual---is the between- vs
+within-class geometry of neural collapse~\citep{papyan2020prevalence},
+a representation-level
 form of bias--variance~\citep{geman1992neural,krogh1995neural} and
 linear-mode connectivity~\citep{frankle2020linearmode,wortsman2022model}.
-Our SOTA prescription operationalises this geometry: seed-ensembling
+Our SOTA prescription operationalises this geometry as a deep
+ensemble~\citep{fort2019deepensembles}: seed-ensembling
 averages out the seed-specific residual variance, while the residual is
 load-bearing (inference-time ablation); auxiliary supervision on the
 saturated basin yields no gain.
