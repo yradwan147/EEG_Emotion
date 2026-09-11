@@ -7,7 +7,7 @@
 \caption{\textbf{A converged classifier rejects the concept it already learned---in one view.}
 \emph{Top:} a language-model valence axis (\emph{V-axis}) orders the nine FACED
 emotions; the \emph{same} ordering appears in the cohort human EEG ($r{=}0.87$
-over $28$ clips) and, without ever being supervised on it, in a converged EEG
+at emotion-category resolution; per-clip $r{=}0.71$) and, without ever being supervised on it, in a converged EEG
 classifier's class means ($|r|\in[0.60, 0.77]$ across ten checkpoints). The axis
 shown is the CLIP-text variant (the tightest brain match); the nine-story Qwen3
 probe of \S\ref{sec:vaxis-llms} gives $r{=}0.80$. Thin lines mark the axis positions.
@@ -74,9 +74,10 @@ channel--band features (32 EEG channels $\times$ 5 frequency bands,
 differential-entropy) of the FACED cohort EEG predicts the V-axis position of
 each of the $28$ stimuli (video clips spanning the $9$ emotion classes); the regressor uses leave-one-stimulus-out
 cross-validation, no per-subject fitting, no auxiliary supervision.
-The Qwen3-4B V-axis itself reaches $r{=}0.80$ on this
-ridge; a CLIP-text variant of the V-axis built from the same $28$
-stimulus descriptions tightens this to $r{=}0.87$ (nested-permutation $p<2{\times}10^{-4}$).
+The Qwen3-4B V-axis reaches $r{=}0.80$ on this
+ridge and a CLIP-text emotion axis $r{=}0.87$, both at emotion-category
+resolution (nested-permutation $p<2{\times}10^{-4}$); a CLIP-text axis over
+the $28$ per-clip descriptions reaches $r{=}0.71$.
 The third claim --- that converged EEG classifiers encode the V-axis
 without ever being trained on it --- is quantified on the ten
 same-architecture SOTA-pool checkpoints trained on the $9$ emotion
@@ -97,8 +98,9 @@ losses---none help: fifteen produce
 statistically significant decrements and zero produce gains, five
 families showing \emph{monotonic destruction}
 (Figure~\ref{fig:saturation-transition}). The effect depends on
-baseline strength (no measurable effect at BACC $\le 0.62$, a
-significant negative at BACC $\ge 0.66$). This is
+backbone strength (no measurable effect on the weak $d{=}3$ backbone, a
+significant negative on the converged $d{=}6$ SOTA backbone; a significant
+backbone$\times$loss interaction, $p{=}0.001$). This is
 \emph{saturation}: distinct from overfitting, it is what happens once
 task labels alone have driven the network onto the target direction,
 so added supervision moves the class-mean component further along the

@@ -11,9 +11,11 @@ cohort EEG averaged over subjects and time, we fit a single
 predicting the V-axis projection of each stimulus's textual
 description from the $160$ channel--band features (differential
 entropy over $32$ channels $\times$ $5$ frequency bands). The ridge
-prediction matches the Qwen3-4B V-axis at $\mathbf{r{=}{+}0.80}$
-($n{=}28$ stimuli). Substituting the CLIP-text V-axis on the same $28$
-descriptions reaches $\mathbf{r{=}{+}0.87}$ (Figure~\ref{fig:eeg-llm-circle})---aligning
+prediction matches the Qwen3-4B V-axis at $\mathbf{r{=}{+}0.80}$ and a
+CLIP-text emotion axis at $\mathbf{r{=}{+}0.87}$ ($n{=}28$ stimuli, both at
+emotion-category resolution---the axis takes one value per class); a
+CLIP-text axis built from the $28$ per-clip descriptions reaches
+$r{=}{+}0.71$ (Figure~\ref{fig:eeg-llm-circle})---aligning
 across two distinct LLM substrates. Four controls support the brain--LM correlation: a fully nested
 permutation test (stimulus relabelling within the subject structure,
 $N{=}5000$) places the correlation beyond every permutation draw
@@ -57,9 +59,11 @@ probe of the saturated concept, not the concept itself.
 The same picture survives across the $14$ LLMs from $560$M to $32$B
 (Appendix~\ref{app:per-llm-deep-dive}; Qwen3 mean
 $r{=}{+}0.796 \pm 0.011$, no significant size trend, $r{=}0.57$,
-$p{=}0.24$, $n{=}6$) and on the held-out
-SEED-V dataset~\citep{liu2022seedv}, where the FACED V-axis
-ranks the five emotions at $r{=}{+}0.96$ without retraining.
+$p{=}0.24$, $n{=}6$). As a label-level check, the FACED V-axis also
+orders SEED-V's~\citep{liu2022seedv} five emotion categories consistently
+with their valence ($r{=}{+}0.96$, $n{=}5$; this is an LLM-side ordering,
+not EEG decoding); the SEED-V \emph{EEG} is re-derived from scratch in
+Appendix~\ref{app:seedv-full} (cohort $r{=}0.59$).
 On EmoEEG-MC~\citep{xu2025emoeegmc} a within-subject valence decoder
 reaches $0.61$ accuracy ($p{=}3.4{\times}10^{-5}$) and its group axis
 tracks behavioural valence at $r{=}0.71$; an audio/visual confound

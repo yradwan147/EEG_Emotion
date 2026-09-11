@@ -35,8 +35,7 @@ outperforms a random one at any epoch (dashed). \textbf{(b)}
 On FACED EEG the same transition appears for two concept axes: a valence
 or arousal auxiliary loss is within seed noise of zero on a weak
 ($d{=}3$) backbone but significantly negative on the converged SOTA
-recipe ($p{=}0.011$ topographic, Holm-corrected; emod-style variants
-$p{\le}0.008$). Error bars: $95\%$ CI (converged), $\pm$SEM (weak).}
+recipe (Holm-corrected across the four variants, $p{\le}0.011$). Error bars: $95\%$ CI (converged), $\pm$SEM (weak).}
 \label{fig:saturation-transition}
 \end{figure}
 
@@ -50,12 +49,13 @@ analytically maximises the V-axis ceiling on FACED is among the worst
 target makes things strictly worse, not better.
 
 \paragraph{The transition is sharp and unidirectional in baseline
-strength.} An intervention whose effect lies within seed noise on a
-weak baseline (BACC $\le 0.62$) becomes a statistically significant
-negative on the converged recipe ($0.658$ BACC); the weak-vs-converged
-difference is a significant backbone$\times$loss interaction (Welch
-$p{=}0.001$). The transition sits cleanly in the band
-$[0.62, 0.66]$ on FACED-9 (we make no claim about universal cut-offs).
+strength.} An intervention whose effect lies within seed noise on the
+weak $d{=}3$ backbone ($0.619$ BACC) becomes a statistically significant
+negative on the converged $d{=}6$ SOTA recipe ($0.658$ BACC); the
+weak-vs-converged difference is a significant backbone$\times$loss
+interaction (Welch $p{=}0.001$). Across the screened $d{=}6$ backbones the
+harm grows with baseline strength, spanning the band $[0.62, 0.66]$ on
+FACED-9 (we make no claim about universal cut-offs).
 
 \paragraph{The regularity generalises beyond valence and beyond EEG.}
 An \emph{arousal} target (the same recipe re-anchored on arousal poles)

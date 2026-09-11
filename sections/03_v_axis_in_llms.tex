@@ -33,16 +33,17 @@ held-out split.
 Modality & Axis source & Probe & Score & Reference \\
 \midrule
 Text   & Qwen3-4B (9 stories) & none (proj.) & $\mathbf{0.832}$ AUC & matches sup.\ LR on $5$k examples \\
-Brain  & Qwen3-4B (9 stories) & ridge LOOCV & $\mathbf{r{=}0.80}$ & $p<10^{-5}$, see \S\ref{sec:vaxis-brain} \\
+Brain  & Qwen3-4B (9 stories) & ridge LOOCV & $\mathbf{r{=}0.80}$ & category-level, nested-perm $p<2{\times}10^{-4}$, \S\ref{sec:vaxis-brain} \\
 Vision & CLIP-image ($9$ bins, $898$ imgs) & held-out split & $\mathbf{r{=}0.869}$ & beats sup.\ ridge (image-side) \\
 \bottomrule
 \end{tabular}
 \caption{Cross-modal external validity of the V-axis recipe (PCA on
 nine emotion-class centroids). The Qwen3-4B V-axis is the lead model
 for both Text and Brain rows. Vision uses CLIP-image because the
-language model has no image side; a CLIP-text variant of the V-axis
-on the same EEG ridge reaches $r{=}0.87$ ($p<10^{-8}$,
-\S\ref{sec:vaxis-brain}). Full sentiment, lexicon, and multilingual
+language model has no image side; a CLIP-text emotion axis
+on the same EEG ridge reaches $r{=}0.87$ at emotion-category resolution
+(nested-perm $p<2{\times}10^{-4}$; per-clip $r{=}0.71$),
+\S\ref{sec:vaxis-brain}. Full sentiment, lexicon, and multilingual
 results in Appendix~\ref{app:per-llm-deep-dive}.}
 \label{tab:cross-modal}
 \end{table}
@@ -51,8 +52,8 @@ The LLM-side direction is a strong sentiment classifier: its $0.832$
 SST-2 AUC (zero task labels) matches a same-feature supervised LR
 trained on ${\sim}50$ labels, beats
 SBERT prototype-cosine ($0.793$;~\citealp{reimers2019sbert}), and
-trails $355$M RoBERTa-MNLI zero-shot
-($0.912$;~\citealp{liu2019roberta}) by $0.08$---all from nine
+trails a $355$M RoBERTa-large-MNLI~\citep{liu2019roberta} run
+zero-shot ($0.912$ in our evaluation) by $0.08$---all from nine
 stories of supervision.
 
 \paragraph{The direction is recovered across model families.}
