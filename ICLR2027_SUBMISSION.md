@@ -29,3 +29,11 @@ Before submitting, confirm the following against the [ICLR 2027 author guideline
 - Complete the AI disclosure in both the manuscript and submission form, confirm supplementary/code anonymity, and acknowledge the Code of Ethics.
 
 Policy check: September 16, 2026. In Overleaf, use `main.tex` with pdfLaTeX and recompile from scratch after syncing GitHub.
+
+## Anonymity recheck (September 16, 2026)
+
+Full-PDF text and OCR checks found no identifying affiliation, personal email, cluster path or author declaration. PDF author metadata is empty; no embedded files or comment annotations are present. Normal published references are retained. All papers remain at nine main pages.
+
+Raw working repositories, source exports and Git history must not be treated as anonymized supplements: historical/internal material can identify authors. Submit the checked PDF; prepare and audit a separate package if supplying source/code. OpenReview eligibility, reviewer registration, final author lists, conflicts, related-submission overlap and duplicate-submission status still require author confirmation.
+
+Hidden real author blocks and unused named comment macros were removed from the LaTeX source; rebuilt PDF pages are pixel-identical to the previous version.

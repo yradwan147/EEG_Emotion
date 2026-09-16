@@ -34,84 +34,9 @@
 
 % === Cross-referencing ===
 \usepackage[capitalize,noabbrev]{cleveref}
-% === Coauthor / reviewer comment macros =============================
-% Toggle: \showcommentstrue shows comments, \showcommentsfalse hides.
-% Set to false for camera-ready / submission PDF (also neutralises \xuhui).
-\usepackage[normalem]{ulem}     % for \sout in tracked changes
-\newif\ifshowcomments
-\showcommentsfalse
-
-% Xuhui authorship marker — respects \ifshowcomments.
-% \showcommentstrue → blue (review mode); \showcommentsfalse → plain.
-\newcommand{\xuhui}[1]{\ifshowcomments{\color{blue}#1}\else#1\fi}
-
-% Kilich's color — vivid orange, HTML spec for maximum reliability
-\definecolor{kilichcolor}{HTML}{D2691E}
-
-% Inline comment:  \kilich{my note here}
-%   Multi-paragraph safe (uses \color switch + \bfseries instead of
-%   \textcolor + \textbf, both of which forbid \par in arguments).
-\newcommand{\kilich}[1]{%
-  \ifshowcomments%
-    \begingroup
-      \color{kilichcolor}\bfseries
-      [K: #1]%
-    \endgroup
-  \fi%
-}
-
-% Tracked-change replacement:  \kilichchg{old text}{new text}
-%   Note: \sout cannot span paragraphs, so OLD text must be inline only.
-%   For multi-paragraph replacements, use \kilich on the new text and
-%   delete (or comment out) the old text directly.
-\newcommand{\kilichchg}[2]{%
-  \ifshowcomments%
-    {\color{red}\sout{#1}}\,{\color{kilichcolor}\bfseries #2}%
-  \else%
-    #2%
-  \fi%
-}
-
-% Margin-note version:  \kilichmn{my margin comment}
-\newcommand{\kilichmn}[1]{%
-  \ifshowcomments%
-    \marginpar{%
-      \raggedright\footnotesize
-      \begingroup\color{kilichcolor}\bfseries[K]\,#1\endgroup%
-    }%
-  \fi%
-}
-% =====================================================================
-
 \title{The Saturation Regularity: When Concept-Aligned Supervision Stops Helping Converged EEG Classifiers}
 
-% \author{%
-%   Anonymous Author(s) \\
-%   Affiliation \\
-%   \texttt{email@example.com}
-% }
-
-\author{%
-  Yousef A. Radwan \\
-  King Abdullah University of Science and Technology (KAUST) \\
-  \texttt{yousef.radwan@kaust.edu.sa}
-  \And
-  Xuhui Liu \\
-  King Abdullah University of Science and Technology (KAUST) \\
-  \texttt{xuhui.liu@kaust.edu.sa}
-  \And
-  Kilichbek Haydarov \\
-  King Abdullah University of Science and Technology (KAUST) \\
-  \texttt{kilichbek.haydarov@kaust.edu.sa}
-  \And
-  Yuqian Fu \\
-  King Abdullah University of Science and Technology (KAUST) \\
-  \texttt{yuqian.fu@kaust.edu.sa}
-  \And
-  Mohamed Elhoseiny \\
-  King Abdullah University of Science and Technology (KAUST) \\
-  \texttt{mohamed.elhoseiny@kaust.edu.sa}
-}
+\author{Anonymous Authors}
 
 \begin{document}
 
