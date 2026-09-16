@@ -1,49 +1,23 @@
 # ICLR 2027 submission status
 
-The scientific conversion is limited to formatting. No scientific prose, claims, numerical
-results, figure assets, table entries, or bibliography records were removed,
-rewritten, or moved between the main paper and appendix.
+Updated September 16, 2026: **format and page-limit checks pass**. The author-approved AI use statement is included. The separate scientific/editorial review findings remain unaddressed at the author's direction; this status is not scientific validation.
 
-## Build and format
+## Verified PDF and build
 
-- Root: `main.tex`; compiler: pdfLaTeX with BibTeX, via `latexmk -pdf`.
-- Tested with TeX Live 2025 / pdfTeX 1.40.27.
-- Official unmodified ICLR 2027 style, bibliography style, `natbib.sty`, and
-  `fancyhdr.sty`, copied from `iclr-2027-style-files.zip`.
-- Anonymous submission mode; 10-point Times body text; US Letter pages;
-  official line numbers and author-year citations.
-- Normal bibliography font restored; appendix list spacing restored; one table
-  minipage widened slightly to eliminate an overfull box without changing data.
-- Main text, statements, references, and appendices separated with `\clearpage`,
-  which flushes pending floats without discarding them. Historical NeurIPS
-  checklist source remains unmodified and excluded from the PDF.
+- Main paper: **9 pages**, including all main-text figures and tables.
+- AI use statement: **page 10**, excluded from the main-text limit. Ethics and reproducibility statements also fit on page 10.
+- Total PDF: **36 pages**. References start on page 11.
+- Root/compiler: `main.tex`, pdfLaTeX with BibTeX. In Overleaf, sync GitHub and recompile from scratch.
+- Local build: `latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex`.
+- Official ICLR 2027 style/dependency files remain unmodified; anonymous review mode, US Letter, Times and author-year citations are preserved.
+- Fresh builds pass with no undefined citations/references, LaTeX errors or overfull boxes. Changed main-text pages and AI-statement pages were rendered and visually inspected. PDF author metadata is empty.
+- Figure assets, tables, displayed equations and bibliography data are unchanged. No figure or table was moved into the appendix and no layout compression was introduced.
 
-## Verified PDF
+## Authorized changes
 
-- Main scientific text: **9 pages**, within the 9-page initial submission limit.
-- Existing ethics and reproducibility statements: page 10.
-- References: pages 11–14.
-- Appendices: pages 15–36. Total: **36 pages**.
-- Successful latexmk build; no undefined citations/references or overfull boxes.
-  Remaining log notices are underfull boxes and automatic `h` to `ht` float
-  placement adjustments.
-- All 36 rendered pages visually reviewed, including the final main-text page.
-  The author block and affiliations are absent from the rendered paper, and PDF
-  author metadata is empty.
-- Bibliography and figure assets are unchanged. Section differences are limited
-  to list spacing, the width of a table minipage, and the author-confirmed code-release timing; all scientific content is preserved.
+No main-text trimming was needed. Scientific manuscript text is unchanged; only the approved AI disclosure was added.
 
-## Outstanding author input
-
-1. The mandatory **AI use statement** is pending the authors' disclosure. No
-   claim about AI use or author verification has been invented or inserted.
-   Supply the statement before final submission; it is excluded from the page
-   limit and must be at most one page.
-The authors confirmed that code will be released upon acceptance. The ethics
-and reproducibility statements have been updated to match the existing appendix
-release plan; this is the only author-requested wording correction.
-
-Official guidance: https://iclr.cc/Conferences/2027/AuthorGuidelines
+The paper-specific disclosure is in `ai_use_statement.tex`, included before the references. It records author-reported literature/idea assistance, implementation and interpretation, drafting, figures based on verified data, and human review at key stages. Story generation is disclosed only in Vaxis and EEG; CMKL and PrimeKG do not claim it. Use the same account for the OpenReview AI-use response.
 
 ## OpenReview author requirements
 
