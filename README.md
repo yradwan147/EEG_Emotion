@@ -1,58 +1,32 @@
-# NeurIPS 2026 — Universal Valence Axis paper
+# ICLR 2027 — EEG Emotion
 
-Working title: **Universal Valence Axis: From Language Models to Human EEG**
+**The Saturation Regularity: When Concept-Aligned Supervision Stops Helping Converged EEG Classifiers**
 
-This is the active, single-source-of-truth paper directory created on
-2026-04-27. All earlier paper drafts live in `_archive_pre_2026_04_27/`.
+`main.tex` is the LaTeX root. The default build uses the official ICLR 2027
+anonymous submission style, author-year citations, Times text, and US Letter pages.
+The author block stays in the source for later camera-ready use and is hidden in
+submission mode. Leave `\iclrfinalcopy` disabled for review.
+
+## Build
+
+Use pdfLaTeX and BibTeX through latexmk (tested with TeX Live 2025):
+
+```sh
+latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
+```
+
+For Overleaf, select `main.tex` as the main document and pdfLaTeX as the compiler.
+The tracked `main.pdf` is the compiled submission draft.
 
 ## Layout
 
-```
-paper_neurips26_final/
-├── _archive_pre_2026_04_27/   # All pre-2026-04-27 paper work, untouched
-├── neurips_2026.sty           # Style file (see STYLE_INFO.md)
-├── STYLE_INFO.md              # Provenance of the style file
-├── main.tex                   # Top-level shell, \input{sections/...}
-├── sections/                  # 00_abstract.tex ... 10_appendix.tex
-├── figures/                   # Figure files land here
-├── references.bib             # Empty; populate from audited list
-├── notes/
-│   ├── narrative.md           # Story spine
-│   ├── headline_numbers.md    # Verified numbers + source artefacts
-│   ├── reviewer_concerns.md   # Anticipated reviews + responses
-│   └── abstract_draft.md      # Working abstract drafts
-└── README.md                  # this file
-```
+- `sections/`: main text, existing ethics/reproducibility statements, and appendix.
+- `figures/`: original figure assets.
+- `references.bib`: original bibliography data.
+- `iclr2027_conference.sty`, `iclr2027_conference.bst`, `natbib.sty`, and
+  `fancyhdr.sty`: unmodified files from the official ICLR 2027 style archive.
+- `sections/checklist.tex`: historical NeurIPS checklist retained as source only;
+  it is not included in the ICLR PDF.
 
-## Build instructions
-
-LaTeX is provided via the Ibex `texlive/2022` module:
-
-```
-module load texlive/2022
-cd /ibex/project/c2323/yousef/paper_neurips26_final
-pdflatex main.tex
-bibtex main
-pdflatex main.tex
-pdflatex main.tex
-```
-
-The current `main.tex` is a placeholder shell. Section bodies are stubs;
-fill them in incrementally.
-
-## Source of truth
-
-- **Numbers** — `notes/headline_numbers.md` (every claim traceable to a JSON
-  artefact under `/ibex/project/c2323/yousef/reports/`).
-- **References** — populate `references.bib` only from
-  `_archive_pre_2026_04_27/reports_paper_md/PAPER_REFERENCES_AUDITED.md`.
-  Per the cycle-75 audit, drop these hallucinated entries entirely:
-  `li2025emod`, `aqa2024emotion`, `gemma4_2026`.
-
-## Conventions
-
-- One section per file under `sections/`, numbered `NN_name.tex`.
-- All figures go in `figures/` (auto-found via `\graphicspath{{figures/}}`).
-- No edits to worklog or memory from this directory.
-- Do NOT run paper edits during overnight experiment cycles
-  (per `feedback_no_paper_updates_overnight.md`).
+See [ICLR2027_SUBMISSION.md](ICLR2027_SUBMISSION.md) for measured page counts,
+validation, and outstanding author disclosures.
