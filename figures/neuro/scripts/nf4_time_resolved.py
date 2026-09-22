@@ -57,7 +57,7 @@ def main():
     ax_a = fig.add_subplot(gs[0, 0])
     shade_lpp(ax_a)
 
-    t = np.arange(30)
+    t = np.arange(1, 31)   # 1-indexed clip seconds (1..30), matching appendix text
     for bi, b in enumerate(bands):
         # raw + smoothed traces
         raw = np.abs(coh[bi])
@@ -68,13 +68,13 @@ def main():
                   zorder=4 + bi)
 
     # mark peaks with stars (use raw since the headline numbers are at integer t)
-    peak_info = []  # (band, t, r)
+    peak_info = []  # (band, second, r)   seconds are 1-indexed within the clip
     for bi, b in enumerate(bands):
         raw = np.abs(coh[bi])
         tp = int(np.argmax(raw))
         rp = float(coh[bi, tp])
-        peak_info.append((b, tp, rp))
-        ax_a.plot(tp, abs(rp), '*', color=BAND_COLORS[b],
+        peak_info.append((b, int(t[tp]), rp))
+        ax_a.plot(t[tp], abs(rp), '*', color=BAND_COLORS[b],
                   markersize=14, markeredgecolor='black', markeredgewidth=0.8,
                   zorder=10)
 
@@ -112,9 +112,9 @@ def main():
 
     ax_a.set_xlabel("time within clip  (seconds)", fontsize=9)
     ax_a.set_ylabel(r"cohort  $|r|$  (V-net DE  vs.  V-axis)", fontsize=9)
-    ax_a.set_xlim(0, 29)
+    ax_a.set_xlim(0, 30)
     ax_a.set_ylim(0, 0.78)
-    ax_a.set_xticks(np.arange(0, 30, 5))
+    ax_a.set_xticks(np.arange(0, 31, 5))
     ax_a.legend(loc='upper left', fontsize=8.5, frameon=True, ncol=5,
                 framealpha=0.95, handletextpad=0.4, columnspacing=0.6,
                 bbox_to_anchor=(0.0, 1.0))
@@ -141,14 +141,14 @@ def main():
     for bi, b in enumerate(bands):
         tp = int(np.argmax(np.abs(bs[bi])))
         rp = float(bs[bi, tp])
-        ax_b.plot(tp, abs(rp), '*', color=BAND_COLORS[b],
+        ax_b.plot(t[tp], abs(rp), '*', color=BAND_COLORS[b],
                   markersize=14, markeredgecolor='black', markeredgewidth=0.8,
                   zorder=10)
 
-    a_t = int(np.argmax(np.abs(bs[bands.index('alpha')])))
-    a_r = float(bs[bands.index('alpha'), a_t])
-    b_t2 = int(np.argmax(np.abs(bs[bands.index('beta')])))
-    b_r2 = float(bs[bands.index('beta'), b_t2])
+    a_idx = int(np.argmax(np.abs(bs[bands.index('alpha')])))
+    a_t = int(t[a_idx]); a_r = float(bs[bands.index('alpha'), a_idx])
+    b_idx2 = int(np.argmax(np.abs(bs[bands.index('beta')])))
+    b_t2 = int(t[b_idx2]); b_r2 = float(bs[bands.index('beta'), b_idx2])
     text_box = dict(boxstyle='round,pad=0.30', facecolor='white',
                     edgecolor='lightgray', linewidth=0.5, alpha=0.95)
     # Annotations placed at the right edge (after t≈22 the traces drop), so
@@ -172,9 +172,9 @@ def main():
 
     ax_b.set_xlabel("time within clip  (seconds)", fontsize=9)
     ax_b.set_ylabel(r"best-stim cohort  $|r|$  (9-stim subset)", fontsize=9)
-    ax_b.set_xlim(0, 29)
+    ax_b.set_xlim(0, 30)
     ax_b.set_ylim(0, 0.95)
-    ax_b.set_xticks(np.arange(0, 30, 5))
+    ax_b.set_xticks(np.arange(0, 31, 5))
     ax_b.legend(loc='upper left', fontsize=8.5, frameon=True, ncol=5,
                 framealpha=0.95, handletextpad=0.4, columnspacing=0.6)
     ax_b.grid(alpha=0.20, linewidth=0.4)

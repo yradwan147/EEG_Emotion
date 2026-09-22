@@ -144,13 +144,12 @@ def main():
              "All 25+ V-axis-as-supervision interventions, ranked by Δ",
              fontsize=12.5, fontweight="bold", ha="left")
     fig.text(0.05, 0.940,
-             "Forest plot of the saturation theorem: zero successful interventions at the converged baseline",
+             "Forest plot of the saturation regularity: zero successful interventions at the converged baseline",
              fontsize=10, ha="left", color=COLORS["gray"])
 
     fig.text(0.5, 0.025,
              "Bars = 95% CI from a paired t-test (1.96 × σ/√n).  "
-             "Asterisks: ***p<0.001, **p<0.01, *p<0.05.  "
-             "Source IDs reference cycle-75 worklog tasks (notes/all_findings_catalog.md).",
+             "Asterisks: ***p<0.001, **p<0.01, *p<0.05.",
              ha="center", fontsize=8.0, color=COLORS["gray"])
 
     save_dual(fig, f"{OUT}/lf9_all_interventions_forest")

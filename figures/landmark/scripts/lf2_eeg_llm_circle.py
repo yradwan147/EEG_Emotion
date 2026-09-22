@@ -103,7 +103,7 @@ def main():
                       np.percentile(boots, 97.5, axis=0),
                       color="black", alpha=0.10, zorder=1)
     # r-stat box
-    ax_a.text(0.03, 0.97, f"r = +{r_obs.statistic:.3f}\np < 10⁻⁹\nn = 28 stim",
+    ax_a.text(0.03, 0.97, f"r = +{r_obs.statistic:.3f}\np_param < 10⁻⁹\nn = 28 stim",
               transform=ax_a.transAxes, fontsize=14, fontweight="bold",
               color=COLORS["darkblue"], va="top",
               bbox=dict(boxstyle="round,pad=0.30", facecolor="white",
@@ -112,13 +112,14 @@ def main():
     # cannot overlap data points or the right-side emotion-class legend
     ax_a.text(0.50, -0.22,
               "dashed circle: 9 emotional-pole stimuli (Anger × 3, Amusement × 3, "
-              "Tenderness × 3) — these alone drive the cohort signal\n"
-              "(n=9 → r = 0.870;  n=19 mid-stim → r ≈ 0)",
+              "Tenderness × 3). The pole contrast drives the single PO3/γ channel\n"
+              "(n=9 → r = 0.87;  n=19 mid-stim → r ≈ 0); the 160-feature ridge plotted "
+              "here stays r = 0.88 on the 19 mid-valence stimuli.",
               transform=ax_a.transAxes, fontsize=7.6, color=COLORS["gray"],
               va="top", ha="center", linespacing=1.25,
               fontstyle="italic")
 
-    ax_a.set_xlabel("CLIP V-axis projection of stimulus description  (z)",
+    ax_a.set_xlabel("CLIP V-axis of emotion category  (category-level, z)",
                     fontsize=10)
     ax_a.set_ylabel("Cohort EEG response (160-feature DE ridge, z)",
                     fontsize=10)
@@ -189,7 +190,7 @@ def main():
     ax_c.set_yticklabels(pretty, fontsize=7.5)
     ax_c.axvline(0, color="black", lw=0.6, zorder=1)
     ax_c.axvline(0.30, color=COLORS["gray"], ls=":", lw=0.7, alpha=0.7, zorder=1)
-    ax_c.set_xlabel("Per-LLM brain-anchor Pearson r  (* p<0.05)", fontsize=9.5)
+    ax_c.set_xlabel("Per-LLM V-axis vs single PO3/γ channel, Pearson r  (* p<0.05)", fontsize=9.5)
     ax_c.set_title("14 LLMs predict the same EEG signal — Qwen3-14B leads",
                    loc="left", fontsize=11, fontweight="bold")
     panel_label(ax_c, "c", x=-0.085, y=1.05)

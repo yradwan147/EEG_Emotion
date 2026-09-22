@@ -87,7 +87,7 @@ def main():
     xs = np.linspace(0, max(headroom) * 1.05, 100)
     ys = np.polyval(coef, xs)
     ax_a.plot(xs, ys, ls="--", color=COLORS["gray"], lw=1.3, alpha=0.85,
-              label=fr"linear fit: $\Delta \approx {coef[0]:.2f}\,(1-\bar{{\mathrm{{Acc}}}}) + {coef[1]:+.3f}$",
+              label=fr"linear fit: $\Delta \approx {coef[0]:.2f}\,(1-\bar{{\mathrm{{Acc}}}}) {coef[1]:+.3f}$",
               zorder=2)
     ax_a.axhline(0, color="black", lw=0.7, alpha=0.5, zorder=1)
 
@@ -162,7 +162,8 @@ def main():
 
     fig.text(0.5, 0.018,
              "Source: §8 ensemble-generality table / sota_ensemble_theory.md. "
-             "All ensembles are 5-seed uniform softmax averages on identical recipe per dataset.",
+             "FACED shows the 10-checkpoint SOTA ensemble (0.6948; the matched 5-seed e=150 ensemble gives +0.034); "
+             "the other datasets show 5-seed single-length uniform softmax ensembles.",
              ha="center", fontsize=7.5, color=COLORS["gray"])
 
     save_dual(fig, f"{OUT}/lf14_ensemble_generality")

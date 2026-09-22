@@ -4,24 +4,16 @@
 Saturation reframes any auxiliary-loss result: a reported gain is
 uninterpretable without the receiving baseline's saturation state. The
 robust, cross-domain half is the \emph{absence of gain} at convergence
-(aligned $\approx$ random, $0/20$ non-EEG branches; the CIFAR-10 epoch
-sweep isolates convergence from capacity and there the benefit merely
-vanishes); statistically significant \emph{harm} is established on the
-converged FACED-9 backbone, where depth and recipe covary with
-convergence. The probe transfers are direction-existence results,
-not neuroscience mechanism claims, and the cohort signal is
-population-level, not within-subject
+(aligned $\approx$ random, $0/20$ non-EEG branches; on CIFAR-10 the
+benefit merely vanishes); significant \emph{harm} is established on the
+converged FACED-9 backbone. The probe transfers are direction-existence, not mechanism,
+claims, and the cohort signal is population-level
 (Appendix~\ref{app:topography-deep-dive}). Three limitations bound the
 broader reading. \textbf{(i)}~We do not claim architecture-independent
-convergence: the pooled encoding-vs-accuracy correlation is
-pseudo-replicated (it collapses within any architecture and fails a
-matched-norm null), so convergence is scoped to seeds of one
-architecture. \textbf{(ii)}~The cross-model LLM valence geometry is
-largely input-driven, not learned (an untrained model reproduces it), so
-the V-axis is a probe, not a universal learned representation.
-\textbf{(iii)}~Transfer is content-specific (valence carries across
-text, vision, and EEG; arousal only in vision) and the
-weak-to-converged transition is cleanest on
-CIFAR-10~\citep{krizhevsky2009cifar}. Whether the
-residual-vs-basin decomposition generalises to other saturated concepts
-is the open question.
+convergence: the pooled encoding--accuracy correlation is
+pseudo-replicated, scoping convergence to seeds of one architecture. \textbf{(ii)}~The cross-model LLM
+valence geometry is largely input-driven (an untrained model reproduces
+it): a probe, not a learned representation.
+\textbf{(iii)}~Transfer is content-specific (valence across text, vision,
+and EEG; arousal only in vision); whether the decomposition generalises
+to other concepts is open.

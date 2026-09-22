@@ -27,6 +27,7 @@ ROWS = [
     ("+ d6 depth-doubling",                    0.6581, 0.0066, "recipe"),
     ("+ e150 single-ckpt  (val-selected SOTA)",0.6755, None,   "single_sota"),
     ("5-ckpt ensemble  (e100)",                0.6798, None,   "ensemble"),
+    ("5-ckpt ensemble  (e150)",                0.6919, None,   "ensemble"),
     ("10-ckpt ensemble  (e100 + e150) — SOTA", 0.6948, None,   "ensemble_sota"),
 ]
 
@@ -122,10 +123,24 @@ def main():
     ax.legend(handles=legend_elems, loc="upper left", frameon=False,
               fontsize=9.5, bbox_to_anchor=(1.02, 0.95))
 
+    # Clarify how the ensembling gain should be read: the 5-ckpt(e100) ensemble
+    # does NOT build on the e150 single-ckpt model; its true single-model base is
+    # the d6 step (0.6581). Measured from there the ensembling gain is +0.0217,
+    # not the tiny +0.0043 that the consecutive-step arrow implies.
+    ax.text(0.6255, n - 1.75,
+            "Ensembling gain from its own base:\n"
+            "d6 0.6581 → 5-ckpt e100 0.6798\n"
+            "= +0.0217  (not +0.0043).\n"
+            "5×e150 = 0.6919;  10-ckpt SOTA\n"
+            "0.6948 not sig. above 5×e150.",
+            fontsize=7.5, va="center", ha="left", color="black", linespacing=1.3,
+            bbox=dict(boxstyle="round,pad=0.35", facecolor="#f4f4f4",
+                      edgecolor="#bbbbbb", linewidth=0.6), zorder=6)
+
     ax.set_xlim(0.560, 0.715)
     ax.set_ylim(-1.3, n - 0.4)
 
-    ax.set_title("FACED SOTA cascade:  CBraMod → 0.6948 ensemble in 7 steps",
+    ax.set_title("FACED SOTA cascade:  CBraMod → 0.6948 ensemble in 8 steps",
                  fontsize=12, fontweight="bold", loc="left", pad=12)
 
     save_dual(fig, f"{OUT}/lf7_recipe_cascade")

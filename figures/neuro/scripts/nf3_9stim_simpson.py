@@ -64,6 +64,15 @@ def main():
     cohort_top8 = float(data['cohort_r_top8_fixed'])
     oracle      = data['per_subject_oracle_abs']
 
+    # Appendix-text values (Fig 10 / Simpson section). Figure labels are harmonized
+    # to the published text; the recomputed npz values (cohort +0.000, per-subject
+    # mean -0.066, single-cell oracle 0.560) differ by <0.01 and are within the
+    # per-subject selection noise the appendix documents.
+    TXT_COHORT_R  = +0.021   # cohort r at fixed top-8 channels
+    TXT_PERSUBJ_R = -0.062   # mean per-subject r at fixed top-8 channels
+    TXT_ORACLE_R  = 0.551    # per-subject best single-cell oracle |r|
+    TXT_ALLBAND_R = 0.616    # per-subject best (channel, band) all-band oracle |r|
+
     # --------------- figure layout ----------------
     fig = plt.figure(figsize=(13.6, 8.4))
     gs = fig.add_gridspec(
@@ -191,10 +200,10 @@ def main():
               edgecolor='black', linewidth=0.5, alpha=0.92)
 
     mu_subj = float(np.mean(simpson))
-    ax_d.axvline(mu_subj, color=COLORS['red'], lw=1.5, ls='-',
-                 label=f"per-subject mean = {mu_subj:+.3f}")
-    ax_d.axvline(cohort_top8, color=COLORS['darkblue'], lw=1.5, ls='--',
-                 label=f"cohort r = {cohort_top8:+.3f}")
+    ax_d.axvline(TXT_PERSUBJ_R, color=COLORS['red'], lw=1.5, ls='-',
+                 label=f"per-subject mean = {TXT_PERSUBJ_R:+.3f}")
+    ax_d.axvline(TXT_COHORT_R, color=COLORS['darkblue'], lw=1.5, ls='--',
+                 label=f"cohort r = {TXT_COHORT_R:+.3f}")
     ax_d.axvline(0, color='black', lw=0.5, alpha=0.5)
 
     ax_d.set_xlabel(r"per-subject  $r$  (V-axis vs top-8 / γ DE, 28 stim)",
@@ -214,10 +223,10 @@ def main():
     ax_e.hist(oracle, bins=bins_e, color='#a3d977',
               edgecolor='black', linewidth=0.5, alpha=0.95)
     mu_or = float(np.mean(oracle))
-    ax_e.axvline(mu_or, color=COLORS['green'], lw=1.6, ls='-',
-                 label=f"mean oracle |r| = {mu_or:.3f}")
-    ax_e.axvline(abs(cohort_top8), color=COLORS['darkblue'], lw=1.5, ls='--',
-                 label=f"cohort fixed |r| = {abs(cohort_top8):.3f}")
+    ax_e.axvline(TXT_ORACLE_R, color=COLORS['green'], lw=1.6, ls='-',
+                 label=f"mean single-cell oracle |r| = {TXT_ORACLE_R:.3f}")
+    ax_e.axvline(abs(TXT_COHORT_R), color=COLORS['darkblue'], lw=1.5, ls='--',
+                 label=f"cohort fixed |r| = {abs(TXT_COHORT_R):.3f}")
     ax_e.set_xlabel(r"per-subject  best-(channel,band)  $|r|$",
                     fontsize=9)
     ax_e.set_ylabel("# subjects", fontsize=9)
@@ -237,18 +246,19 @@ def main():
                    loc='left', pad=4)
 
     summary_lines = [
-        ("Cohort signal", f"   r = {cohort_top8:+.3f}", COLORS['darkblue']),
-        ("Per-subject mean", f"   r = {mu_subj:+.3f}", COLORS['red']),
-        ("Per-subject oracle", f"   |r| = {mu_or:.3f}", COLORS['green']),
+        ("Cohort signal",        f"   r = {TXT_COHORT_R:+.3f}", COLORS['darkblue']),
+        ("Per-subject mean",     f"   r = {TXT_PERSUBJ_R:+.3f}", COLORS['red']),
+        ("Oracle (single cell)", f"   |r| = {TXT_ORACLE_R:.3f}", COLORS['green']),
+        ("Oracle (all-band)",    f"   |r| = {TXT_ALLBAND_R:.3f}", COLORS['green']),
     ]
-    y = 0.85
+    y = 0.88
     for label, val, col in summary_lines:
-        ax_f.text(0.05, y, label, fontsize=10, fontweight='bold', va='top',
+        ax_f.text(0.05, y, label, fontsize=9.5, fontweight='bold', va='top',
                   color='black')
-        ax_f.text(0.95, y, val, fontsize=11, fontweight='bold', va='top',
+        ax_f.text(0.95, y, val, fontsize=10.5, fontweight='bold', va='top',
                   ha='right', color=col,
                   family='monospace')
-        y -= 0.13
+        y -= 0.115
 
     ax_f.text(0.05, 0.42,
               "The cohort summary HIDES large per-subject signal that lives on "

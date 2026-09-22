@@ -26,21 +26,24 @@ and does not survive a matched-norm null; see
 Appendix~\ref{app:convergence-deep-dive}.)
 
 \paragraph{The residual is what averaging recovers.}
-Within-class residual encoding predicts ensemble contribution: across
-the $10$ checkpoints used to build our SOTA ensemble
-(\S\ref{sec:sota}), per-checkpoint residual strength predicts
-leave-one-out contribution at $\mathbf{r{=}{+}0.74}$ ($p{=}0.014$,
-$n{=}10$)---an empirical trend, not a law given the small $n$.
-Bootstrap CIs and per-deletion ranges are in
-Appendix~\ref{app:convergence-deep-dive}.
+Within-class residual encoding is \emph{consistent with} ensemble
+contribution: across the $10$ SOTA-pool checkpoints (\S\ref{sec:sota}),
+per-checkpoint residual strength correlates with leave-one-out
+contribution at $\mathbf{r{=}{+}0.74}$ ($p{=}0.014$, $n{=}10$; five
+seeds $\times$ two lengths, so a trend not an independent-sample
+law---per-length and bootstrap detail in
+Appendix~\ref{app:convergence-deep-dive}). The causal ablation below is
+the load-bearing evidence.
 
 \paragraph{Direct test: ablate the residual at inference time.}
-A directional ablation~\citep{arditi2024refusal}---projecting the
-CLIP-derived V-axis residual out of the classifier's penultimate
-features at inference time, without retraining---drops accuracy on
-every one of the $10$ SOTA-pool checkpoints (mean $\Delta\mathrm{BACC}
-= -0.0157$, mean $z{\approx}7.7$ above a matched random-direction
-null). The residual carries the load. This decomposition---saturated
+A directional ablation~\citep{arditi2024refusal}---the projection
+$(I - vv^\top)$ with $v$ the unit CLIP-derived within-class V-axis
+residual---drops accuracy on all $10$ SOTA-pool checkpoints (mean
+$\Delta\mathrm{BACC}{=}{-}0.0157$, $z{\approx}7.7$ vs a matched random
+null); the residual is genuinely load-bearing---an orthogonalised
+within-class-only ablation still lowers accuracy ($z{\approx}3.5$,
+Appendix~\ref{app:convergence-deep-dive}). This
+decomposition---saturated
 basin, load-bearing residual---is the operative geometry that
 \S\ref{sec:saturation} predicted from the failure of V-axis
 supervision and that \S\ref{sec:sota} turns into a positive

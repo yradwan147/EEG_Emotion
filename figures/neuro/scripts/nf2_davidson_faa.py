@@ -195,11 +195,12 @@ def main():
     ax_b.set_title("(b)  Davidson FAA  vs.  posterior |r| reference",
                    fontsize=10, fontweight='bold', loc='left', pad=4)
 
-    # annotate the gap visually
+    # annotate the gap visually (qualitative only; a raw ΔDE in nats and a Pearson
+    # |r| are incommensurate, so no numeric cross-metric ratio is drawn)
     ax_b.annotate('', xy=(2.4, OCCIPITAL_R), xytext=(2.4, 0.012),
                   arrowprops=dict(arrowstyle='<->', lw=1.0, color=COLORS['gray']))
-    ax_b.text(2.55, (OCCIPITAL_R + 0.012) / 2, "≈19×",
-              fontsize=9, fontweight='bold', color=COLORS['gray'],
+    ax_b.text(2.55, (OCCIPITAL_R + 0.012) / 2, "far\nweaker",
+              fontsize=8, fontweight='bold', color=COLORS['gray'],
               ha='left', va='center')
 
     # ------------------ (c) Dramatic comparison panel ------------------
@@ -219,11 +220,11 @@ def main():
     ax_c.set_axisbelow(True)
     ax_c.set_title("(c)  Magnitude gap",
                    fontsize=10, fontweight='bold', loc='left', pad=4)
-    # annotation
-    ratio = OCCIPITAL_R / FRONTAL_ALPHA_MEAN
-    ax_c.text(0.5, OCCIPITAL_R * 0.55,
-              f"posterior  =  {ratio:.0f}×  frontal-α",
-              ha='center', va='center', fontsize=10, fontweight='bold',
+    # qualitative annotation (no numeric cross-metric ratio: a raw ΔDE in nats and
+    # a dimensionless Pearson |r| are incommensurate)
+    ax_c.text(0.5, OCCIPITAL_R * 0.58,
+              "frontal-α asymmetry\nis present but far weaker\nthan the posterior\nV-axis encoding",
+              ha='center', va='center', fontsize=8.5, fontweight='bold',
               color=COLORS['darkblue'],
               bbox=dict(boxstyle='round,pad=0.4',
                         facecolor='#e8f0fa', edgecolor=COLORS['darkblue'],
@@ -231,8 +232,8 @@ def main():
 
     # Suptitle
     fig.suptitle(
-        r"Davidson frontal-alpha asymmetry replicates qualitatively, "
-        r"but at $\sim$10$\times$ smaller magnitude than posterior V-axis encoding",
+        "Davidson frontal-alpha asymmetry replicates qualitatively, "
+        "but is far weaker than the posterior V-axis encoding",
         fontsize=11.5, fontweight='bold', y=0.99)
 
     save_dual(fig, f"{OUT_DIR}/NF2_davidson_faa")

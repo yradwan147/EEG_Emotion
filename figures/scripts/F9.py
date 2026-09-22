@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _style import apply_style, COLORS, save_dual
 
 OUT = "/ibex/project/c2323/yousef/paper_neurips26_final/figures"
+OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures"
 
 
 def main():
@@ -75,7 +76,7 @@ def main():
     ax.set_yticks(y)
     ax.set_yticklabels(labels, fontsize=8.5)
     ax.set_xlabel("Δ FACED 9-class BACC vs vanilla baseline", fontsize=11)
-    ax.set_title("All 25+ V-axis-as-supervision interventions, ranked by Δ\n(none survives at the converged baseline; saturation theorem)",
+    ax.set_title("All 25+ V-axis-as-supervision interventions, ranked by Δ\n(none survives at the converged baseline; saturation regularity)",
                  loc="left", fontsize=11)
 
     # value annotation
@@ -114,11 +115,11 @@ def main():
 
     plt.subplots_adjust(left=0.18, right=0.97, top=0.92, bottom=0.14)
     fig.text(0.5, 0.005,
-             "Asterisks: ***p<0.001, **p<0.01, *p<0.05 (paired t-test vs the same-recipe vanilla baseline). "
-             "Sources: cycle-75 worklog tasks listed in `notes/all_findings_catalog.md`.",
+             "Asterisks: ***p<0.001, **p<0.01, *p<0.05 (paired t-test vs the same-recipe vanilla baseline).",
              ha="center", fontsize=7.5, color=COLORS["gray"])
 
     save_dual(fig, f"{OUT}/F9_all_interventions")
+    save_dual(fig, f"{OUT_PAPER}/F9_all_interventions")
     print("F9 saved.")
 
 

@@ -11,5 +11,8 @@ Cohort Pearson $r{=}{+}0.87$ at emotion-category resolution
 Qwen3-4B V-axis reaches $r{=}0.80$ on the same ridge. The permutation
 null (top right) places the observed correlation beyond the null
 support (a matched-norm random direction reads $r{=}0.07$); the
-bottom-right panel shows the same cohort EEG$\leftrightarrow$V-axis
-correlation across all $14$ LLMs. The axis is extracted with no EEG supervision.
+bottom-right panel ranks the $14$ LLMs by a \emph{single-channel} metric
+(per-LLM V-axis vs the PO3/$\gamma$ channel), which is weaker than and
+distinct from the $160$-feature ridge that carries the headline
+(cf.\ Appendix~\ref{app:per-llm-deep-dive} and the ridge forest plot).
+The axis is extracted with no EEG supervision.

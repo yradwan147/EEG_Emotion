@@ -162,7 +162,7 @@ def main():
     fig.text(0.5, 0.018,
              "Red box: most-confused off-diagonal cell per row.  "
              "Diagonal cells show row-normalised true-positive rate (parenthesis = raw count).  "
-             "Per-class accuracies sum to overall BACC.",
+             "Per-class accuracies average (macro-mean) to overall BACC.",
              ha="center", fontsize=8.5, color=COLORS["gray"])
 
     save_dual(fig, f"{OUT}/lf10_confusion_matrices")

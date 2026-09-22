@@ -22,9 +22,10 @@ $N{=}5000$) places the correlation beyond every permutation draw
 ($p<2{\times}10^{-4}$); a matched-norm
 random direction drops the same ridge to $r{=}{+}0.07$ ($p{=}0.73$);
 split-half subject reliability on per-stimulus valence is $r{=}{+}0.99$;
-the same EEG ridge predicts human-rated valence at $r{=}{+}0.86$,
+and the same EEG ridge predicts human-rated valence at $r{=}{+}0.86$,
 matching the CLIP-text ridge to within $0.01$ ($0.87$ vs $0.86$).
-Multi-comparison correction and other controls are in
+Leave-one-\emph{emotion}-out group cross-validation (no within-category
+leakage), multi-comparison correction, and other controls are in
 Appendix~\ref{app:brain-deep-dive}.
 
 \paragraph{The ridge is not carried by a few high-affect stimuli.}
@@ -48,8 +49,8 @@ probe of the saturated concept, not the concept itself.
 \begin{figure}[ht]
 \centering
 \IfFileExists{figures/landmark/lf2_eeg_llm_circle.pdf}
-  {\includegraphics[width=0.82\linewidth]{landmark/lf2_eeg_llm_circle.pdf}}
-  {\includegraphics[width=0.82\linewidth]{F2_eeg_llm_circle.pdf}}
+  {\includegraphics[width=0.76\linewidth]{landmark/lf2_eeg_llm_circle.pdf}}
+  {\includegraphics[width=0.76\linewidth]{F2_eeg_llm_circle.pdf}}
 \caption[EEG-LLM cohort circle]{\input{figures/F2_caption}}
 \label{fig:eeg-llm-circle}
 \end{figure}
@@ -58,7 +59,7 @@ The same picture survives across the $14$ LLMs from $560$M to $32$B
 (Appendix~\ref{app:per-llm-deep-dive}; Qwen3 mean
 $r{=}{+}0.796 \pm 0.011$, no significant size trend, $r{=}0.57$,
 $p{=}0.24$, $n{=}6$). As a label-level check, the FACED V-axis also
-orders SEED-V's~\citep{liu2022seedv} five emotion categories consistently
+orders the five SEED-V~\citep{liu2022seedv} emotion categories consistently
 with their valence ($r{=}{+}0.96$, $n{=}5$; this is an LLM-side ordering,
 not EEG decoding); the SEED-V \emph{EEG} is re-derived from scratch in
 Appendix~\ref{app:seedv-full} (best cohort cell $r{=}0.59$).

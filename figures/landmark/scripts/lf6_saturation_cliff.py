@@ -28,7 +28,7 @@ OUT_PAPER = "/ibex/project/c2323/yousef/EEG_Emotion/figures/landmark"
 # JSONs at merge_*_results.json).
 ROWS = [
     # CBraMod (very weak base)
-    ("CBraMod + Topo λ=0.05",       0.5717, +0.006, 0.30,   "ns_pos"),
+    ("CBraMod + Topo λ=0.05",       0.5717, -0.005, 0.30,   "neg_ns"),
     # EMOD d6 vanilla baseline (~0.6235)
     ("EMOD d6 (vanilla) + Topo λ=0.05",       0.6235, +0.002, 0.50,   "ns_pos"),
     ("EMOD d6 (vanilla) + EMODSTYLE λ=0.5",   0.6235, +0.007, 0.22,   "ns_pos"),
@@ -100,7 +100,7 @@ def main():
     # Fit a robust trend through (base_x, mean(delta_at_base)) — anchor visualization
     anchor_x = np.array([0.572, 0.6235, 0.6581])
     anchor_y = np.array([
-        +0.006,                         # CBraMod (single seed)
+        -0.005,                         # CBraMod (single seed; Table 10: 0.572->0.567)
         np.mean([d for (_, b, d, _, _) in ROWS if abs(b - 0.6235) < 0.001]),
         np.mean([d for (_, b, d, _, _) in ROWS if abs(b - 0.6581) < 0.001]),
     ])
@@ -112,7 +112,7 @@ def main():
                    linewidths=2.0, marker="D", zorder=5)
 
     # vertical guide lines at the three anchors — labels above the plot top
-    for xv, lab_t in [(0.572, "CBraMod"), (0.6235, "EMOD d6 (vanilla)"), (0.6581, "d6 SOTA")]:
+    for xv, lab_t in [(0.572, "CBraMod"), (0.6235, "EMOD d3 (vanilla)"), (0.6581, "d6 SOTA")]:
         ax.axvline(xv, color=COLORS["gray"], ls=":", lw=0.8, alpha=0.7, zorder=1)
         ax.text(xv, 0.041, lab_t, fontsize=9.0, ha="center",
                 color=COLORS["gray"], fontweight="bold",
@@ -126,21 +126,21 @@ def main():
         "RSA λ=5\n(−0.093***)":             (0.6235, -0.093),
         "d6 SOTA + EMODSTYLE\n(−0.026***)": (0.6581, -0.026),
         "EMODSTYLE λ=0.5\n(+0.007 ns)":     (0.6235, +0.007),
-        "CBraMod+Topo\n(+0.006 ns)":        (0.5717, +0.006),
+        "CBraMod+Topo\n(−0.005 ns)":        (0.5717, -0.005),
     }
     offsets = {
         "Anger-w λ=0.5\n(−0.054***)":       (0.595, -0.072),
         "RSA λ=5\n(−0.093***)":             (0.595, -0.097),
         "d6 SOTA + EMODSTYLE\n(−0.026***)": (0.671, -0.018),
         "EMODSTYLE λ=0.5\n(+0.007 ns)":     (0.602, +0.018),
-        "CBraMod+Topo\n(+0.006 ns)":        (0.572, +0.018),
+        "CBraMod+Topo\n(−0.005 ns)":        (0.572, +0.018),
     }
     halign = {
         "Anger-w λ=0.5\n(−0.054***)":       "right",
         "RSA λ=5\n(−0.093***)":             "right",
         "d6 SOTA + EMODSTYLE\n(−0.026***)": "left",
         "EMODSTYLE λ=0.5\n(+0.007 ns)":     "right",
-        "CBraMod+Topo\n(+0.006 ns)":        "left",
+        "CBraMod+Topo\n(−0.005 ns)":        "left",
     }
     for lab, (x, y) in annotate_points.items():
         tx, ty = offsets[lab]

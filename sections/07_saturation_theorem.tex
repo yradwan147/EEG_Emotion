@@ -39,8 +39,9 @@ recipe (Holm-corrected across the four variants, $p{\le}0.011$). Error bars: $95
 \label{fig:saturation-transition}
 \end{figure}
 
-\paragraph{Result.} None help. Fifteen produce statistically
-significant accuracy decrements (Holm-corrected $p<0.05$, paired across five seeds);
+\paragraph{Result.} None help. Ten produce statistically
+significant accuracy decrements under a global Holm--Bonferroni correction
+across all $25$ hypotheses ($16$ at uncorrected $p<0.05$, paired across five seeds);
 zero produce gains. Five families show \emph{monotonic destruction}:
 the harder we push the auxiliary loss, the worse accuracy gets, with
 no positive setpoint. Even the anger-weighted target that
@@ -57,7 +58,8 @@ interaction (Welch $p{=}0.001$). Across the screened $d{=}6$ backbones the
 harm grows with baseline strength (we make no claim about universal cut-offs).
 
 \paragraph{The regularity generalises beyond valence and beyond EEG.}
-An \emph{arousal} target (the same recipe re-anchored on arousal poles)
+An \emph{arousal} target (the validated CLIP--OASIS image arousal axis,
+\emph{not} the failing text axis of Table~\ref{tab:arousal-asymmetry})
 hurts the converged backbone just as much (topographic
 $\Delta\mathrm{BACC}={-}0.031$, $p{=}0.011$; emod-style ${-}0.035$,
 $p{=}0.007$; Holm-corrected) while remaining within seed noise on the
@@ -83,7 +85,7 @@ all leave the converged encoder unimproved
 $\mathrm{BACC}(\theta)$ lies in the band $[0.62, 0.66]$ or higher, adding
 any V-axis auxiliary loss $\mathcal{L}_v$ at $\lambda > 0$ produces
 $\mathbb{E}[\Delta\mathrm{BACC}] \leq 0$ across all families tested
-($15/25$ significant at Holm-corrected $p<0.05$, $0/25$ positive). The threshold
+($10/25$ significant at global Holm-corrected $p<0.05$, $0/25$ positive). The threshold
 coincides with the regime where the V-axis encoding strength---the
 absolute correlation $|r|$ between the class-mean features and the
 V-axis---saturates across seeds (\S\ref{sec:convergence}). This is an

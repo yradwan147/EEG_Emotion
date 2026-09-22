@@ -216,6 +216,12 @@ def main():
         "V-axis-aligned channels form a tight posterior-occipital network with F7 as frontal hub",
         fontsize=12, fontweight='bold', y=0.98)
 
+    # footnote: clarify channel count (8 V-axis + 22 other = 30; the 2 mastoid
+    # reference electrodes are excluded from the 32-channel montage)
+    fig.text(0.5, 0.015,
+             "A1/A2 mastoid reference electrodes excluded (30 of 32 channels shown).",
+             ha='center', fontsize=7.5, color=COLORS['gray'], fontstyle='italic')
+
     save_dual(fig, f"{OUT_DIR}/NF5_connectivity")
     save_dual(fig, f"{OUT_PAPER}/NF5_connectivity")
     plt.close(fig)

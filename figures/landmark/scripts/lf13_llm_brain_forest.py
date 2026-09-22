@@ -143,7 +143,7 @@ def main():
     render(fig.add_subplot(gs[0, 0]), rows_eeg,
            "r_eeg", "eeg_lo", "eeg_hi",
            "(a) Brain prediction: r vs cohort EEG-DE-Ridge",
-           r"r vs cohort EEG (PO3/$\gamma$, $n=28$ stim)",
+           r"r vs cohort EEG DE-ridge ($160$-feature, $n=28$ stim)",
            xlim=(-0.10, 1.20))
     render(fig.add_subplot(gs[0, 1]), rows_beh,
            "r_beh", "beh_lo", "beh_hi",

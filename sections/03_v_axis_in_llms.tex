@@ -57,11 +57,14 @@ zero-shot ($0.912$ in our evaluation) by $0.08$---all from nine
 stories of supervision.
 
 \paragraph{The direction is recovered across model families.}
-Extracting the V-axis independently from four non-Qwen families
-recovers essentially the same valence ordering of the stimuli:
-Mistral-7B ($r{=}0.95$), Llama-3-8B ($r{=}0.95$), and BLOOM-3B ($r{=}0.94$)
-all align with the behavioural valence reference, with Pythia-2.8B the lone
-outlier ($r{=}0.44$). Within the Qwen3 family the V-axis is essentially
+Extracting the V-axis independently from larger instruct checkpoints of
+four non-Qwen families recovers essentially the same valence ordering of
+the stimuli: Mistral-7B ($r{=}0.95$), Llama-3-8B ($r{=}0.95$), and
+BLOOM-3b ($r{=}0.94$) all align with the behavioural valence reference,
+with Pythia-2.8b the lone outlier ($r{=}0.44$); the broader $14$-model
+sweep spans smaller checkpoints where alignment degrades with scale
+(Appendix~\ref{app:per-llm-deep-dive}).
+Within the Qwen3 family the V-axis is essentially
 scale-invariant (off-diagonal $r{=}{+}0.995$ across $15$ size-pairs);
 across families the raw axes are looser ($r{=}{+}0.585$ over $48$
 pairs). We therefore describe the valence direction as
