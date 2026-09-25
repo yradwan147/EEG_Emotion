@@ -1,150 +1,182 @@
+% \section{Introduction}
+% \label{sec:intro}
+
+% \begin{figure}[t]
+% \centering
+% \includegraphics[width=0.95\linewidth]{landmark/fig1_hero_v6.pdf}
+% \caption{\textbf{A converged classifier rejects the concept it already learned---in one view.}
+% \emph{Top:} a language-model valence axis (\emph{V-axis}) orders the nine FACED
+% emotions; the \emph{same} ordering appears in the cohort human EEG ($r{=}0.87$
+% at emotion-category resolution; per-clip $r{=}0.71$) and, without ever being supervised on it, in a converged EEG
+% classifier's class means ($|r|\in[0.60, 0.77]$ across ten checkpoints). The axis
+% shown is the CLIP-text variant (the tightest brain match); the nine-story Qwen3
+% probe of \S\ref{sec:vaxis-llms} gives $r{=}0.80$. Thin lines mark the axis positions.
+% \emph{Bottom:} the converged classifier has already absorbed the concept, so
+% adding the V-axis as an auxiliary loss \emph{lowers} FACED-9 balanced accuracy
+% ($0.658{\to}0.629$, $\Delta{=}{-}0.029$, raw $p{=}0.004$; of $25$ variants, $0$ help
+% and $10$ hurt at global Holm $p{<}0.05$), whereas averaging its ten checkpoints---which share the axis but
+% differ in their seed-specific residual---sets a new state of the art ($0.6948$;
+% best single model $0.6755$).}
+% \label{fig:overview}
+% \end{figure}
+
+% Auxiliary losses that pull a network's features toward a known concept
+% direction are a standard way to inject prior knowledge. We report a
+% regime in which they systematically backfire. Take an EEG emotion
+% classifier that has already converged, and add a loss aligning its
+% features with a valence direction: across twenty-five such recipes on
+% FACED~\citep{chen2023faced}, none improve balanced accuracy (BACC) and
+% ten significantly reduce it (global Holm; sixteen uncorrected). The same loss that is within noise of zero on a
+% weak backbone significantly hurts a converged one. We call this the \emph{saturation regularity}: once task
+% labels alone have driven the network onto the target concept, further
+% supervision can only deform an already-converged representation, without
+% improving generalization. The finding cuts two ways: it explains the concept-alignment failures we report, and---by locating the recoverable gain in the seed-specific residual supervision cannot reach---it yields a new state of the art by ensembling rather than supervising (\Cref{fig:overview}).
+
+% To make ``the concept the network has saturated on'' concrete, we extract it. Pass nine emotion-evocative stories (each
+% expanded to paraphrases) through a language model, mean-pool the
+% final-layer hidden states class by class, and take the first principal component; the resulting
+% \emph{valence axis} (V-axis) predicts movie-review sentiment at AUC
+% $0.832$ zero-shot, tracks the cohort-averaged EEG response of $123$
+% subjects at the emotion-category level ($r{=}0.80$), and---in its
+% CLIP-text form---is encoded, without supervision, by all ten
+% same-architecture EEG checkpoints we tested.
+% Recent work shows that neural networks encode human-interpretable
+% concept directions in their internal
+% features~\citep{kim2018tcav,arditi2024refusal}. We use the V-axis as a
+% \emph{probe} of what brain-decoding networks encode, not as a training
+% signal---which, as the saturation regularity shows, a converged network
+% cannot benefit from.
+
+% \textbf{A nine-story axis.} The nine stories are one per
+% FACED~\citep{chen2023faced} class; the language model is Qwen3-4B,
+% chosen as the lead because it sits at the centre of the alignment
+% manifold in our $14$-LLM sweep, with the highest per-stimulus
+% alignment to a behavioural valence reference (the recipe itself is
+% model-agnostic, see Appendix~\ref{app:per-llm-deep-dive}). The SST-2
+% benchmark grounds the AUC $0.832$ headline: with zero task labels the
+% V-axis projection matches a supervised logistic regression on the same
+% features trained on ${\approx}50$ labels ($0.821$ at $N{=}50$; a
+% $5$k-label same-feature classifier reaches
+% $0.924$)~\citep{socher2013recursive}. And the
+% direction is not idiosyncratic to any one model: across the
+% $14$ language models from $560$M to $32$B parameters, the V-axis is
+% recovered across families, and within Qwen3 is essentially
+% scale-invariant (off-diagonal $r{=}{+}0.995$ over $15$ size-pairs).
+
+% \textbf{A valence ordering, consistent with the axis, in cohort EEG.}
+% A ridge regression on $160$
+% channel--band features (32 EEG channels $\times$ 5 frequency bands,
+% differential-entropy) of the FACED cohort EEG predicts the V-axis position of
+% each of the $28$ stimuli (video clips spanning the $9$ emotion classes); the regressor uses leave-one-stimulus-out
+% cross-validation, no per-subject fitting, no auxiliary supervision.
+% The Qwen3-4B V-axis reaches $r{=}0.80$ on this
+% ridge and a CLIP-text emotion axis $r{=}0.87$, both at emotion-category
+% resolution (nested-permutation $p<2{\times}10^{-4}$); a CLIP-text axis over
+% the $28$ per-clip descriptions reaches $r{=}0.71$.
+% The third claim --- that converged EEG classifiers encode the V-axis
+% without ever being trained on it --- is quantified on the ten
+% same-architecture SOTA-pool checkpoints trained on the $9$ emotion
+% labels alone: each encodes the CLIP-text V-axis in its class-mean
+% subspace ($|r|\in[0.60,0.77]$; the nine-story Qwen3 axis more weakly and
+% per-checkpoint non-significantly, \S\ref{sec:convergence}).
+
+% \textbf{Yet supervision fails.} The natural way to use such an
+% alignment is an auxiliary loss pulling the EEG network's penultimate
+% features toward the V-axis. Across $25$ such recipes---knowledge
+% distillation~\citep{hinton2015distilling}, representational
+% similarity~\citep{kriegeskorte2008rsa},
+% contrastive~\citep{khosla2020supcon,vandenoord2018cpc},
+% parameter-efficient fine-tuning (PEFT) adapters~\citep{hu2022lora}, and topographic
+% losses---none help: ten produce significant decrements (global Holm; sixteen uncorrected), five families showing \emph{monotonic destruction}
+% (Figure~\ref{fig:saturation-transition}). The effect depends on
+% backbone strength (no measurable effect on the weak $d{=}3$ backbone, a
+% significant negative on the converged $d{=}6$ SOTA backbone; a significant
+% backbone$\times$loss interaction, $p{=}0.001$; on FACED depth and recipe
+% covary with convergence, isolated by the CIFAR-10 epoch sweep). This is
+% \emph{saturation}: distinct from overfitting, it is what happens once
+% task labels alone---without concept or valence guidance---have driven the network onto the target direction,
+% so added supervision moves the class-mean component further along the
+% axis ($\Delta|r|$ up to ${+}0.36$) while test accuracy falls and
+% training accuracy stays at ceiling.
+
+% \textbf{Where the gain lives.} The same diagnosis locates the
+% recoverable gain in the within-class residual that supervision cannot
+% reach: the class-mean subspace (the ``basin'') is shared across seeds,
+% while the residual is seed-specific and load-bearing. Ensembling across seeds averages
+% out residual noise without disturbing the basin---per-checkpoint
+% residual encoding predicts leave-one-out contribution at $r{=}{+}0.74$,
+% and a $10$-checkpoint ensemble reaches FACED-9 SOTA at
+% $\mathbf{0.6948}$ (val-selected single $\mathbf{0.6755}$), a $+10.5\%$
+% improvement over EMOD~\citep{chen2025emod}. Replacing the
+% language-derived KD prototypes with random orthonormal vectors leaves
+% BACC statistically equivalent (TOST $p{=}0.001$, $n{=}20$; $\Delta{=}{-}0.001$): the gain is the \emph{shape} of the loss, not the
+% \emph{content} of the prototypes, so the V-axis is a probe of what the
+% network saturated on, not the supervised signal.
+
+% \paragraph{Contributions.} \textbf{(1)} The \emph{saturation
+% regularity}: concept-aligned auxiliary supervision cannot improve a
+% \emph{converged} classifier and tends to hurt it---established across
+% $25$ recipes on FACED-9, for both valence and arousal, and reproduced
+% on a CIFAR-10 classifier, with a benefit present only while the backbone
+% is still weak (\S\ref{sec:saturation}); it is consistent on a second EEG
+% dataset, SEED-V, where auxiliary supervision likewise yields no gain
+% (\citealp{liu2022seedv}; Appendix~\ref{app:seedv-full}).
+% \textbf{(2)} A bias--variance seed ensemble that turns this mechanism
+% into a positive prescription and a new FACED-9 state of the art
+% (\S\ref{sec:convergence},~\S\ref{sec:sota}).
+% \textbf{(3)} A nine-story \emph{V-axis probe}: a one-dimensional valence
+% direction extracted from nine language-model emotion stories, validated
+% as a genuine semantic axis (text sentiment zero-shot, cohort-EEG
+% prediction, and encoding by converged EEG classifiers) and used to
+% diagnose what the network has saturated on
+% (\S\ref{sec:vaxis-llms}--\S\ref{sec:vaxis-brain}).
+
+% \paragraph{Scope.} Four boundaries scope the
+% result. \textbf{(i)}~The V-axis is not privileged: a generic valence
+% axis probes comparably (\S\ref{sec:vaxis-llms}), and inside the
+% ensemble the language-derived KD prototypes are statistically equivalent
+% to random orthonormal vectors (TOST $\varepsilon{=}0.01$, $p{=}0.001$,
+% $n{=}20$; $\Delta{=}{-}0.001$ BACC, paired $p{=}0.72$).
+% \textbf{(ii)}~We do not claim single-trial or within-subject decoding:
+% the brain correlation is on the EEG response averaged across $123$
+% subjects, and the within-subject cohort-transfer correlation is near
+% zero ($r{=}0.03$; single-subject decoding is a separate result, \S\ref{sec:vaxis-brain}).
+% \textbf{(iii)}~Alignment is not universally harmful---on a weak backbone
+% the same loss is within seed noise ($+0.007$ BACC, $p{=}0.41$) and on a
+% still-converging CIFAR-10 classifier it helps; saturation is specific to
+% the \emph{converged} regime. \textbf{(iv)}~We do not present saturation
+% as a proven theorem for all architectures and datasets: we establish it
+% empirically on FACED-9 and find it consistent on SEED-V. Limitations are
+% collected in \S\ref{sec:discussion}.
+
+
 \section{Introduction}
 \label{sec:intro}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.95\linewidth]{landmark/fig1_hero_v6.pdf}
-\caption{\textbf{A converged classifier rejects the concept it already learned---in one view.}
-\emph{Top:} a language-model valence axis (\emph{V-axis}) orders the nine FACED
-emotions; the \emph{same} ordering appears in the cohort human EEG ($r{=}0.87$
-at emotion-category resolution; per-clip $r{=}0.71$) and, without ever being supervised on it, in a converged EEG
-classifier's class means ($|r|\in[0.60, 0.77]$ across ten checkpoints). The axis
-shown is the CLIP-text variant (the tightest brain match); the nine-story Qwen3
-probe of \S\ref{sec:vaxis-llms} gives $r{=}0.80$. Thin lines mark the axis positions.
-\emph{Bottom:} the converged classifier has already absorbed the concept, so
-adding the V-axis as an auxiliary loss \emph{lowers} FACED-9 balanced accuracy
-($0.658{\to}0.629$, $\Delta{=}{-}0.029$, raw $p{=}0.004$; of $25$ variants, $0$ help
-and $10$ hurt at global Holm $p{<}0.05$), whereas averaging its ten checkpoints---which share the axis but
-differ in their seed-specific residual---sets a new state of the art ($0.6948$;
-best single model $0.6755$).}
+\includegraphics[width=0.95\linewidth]{landmark/fig1_final.pdf}
+\caption[Concept alignment and predictive benefit]{\textbf{Concept alignment and predictive benefit can diverge.} \textbf{(a)} Standardized emotion-class positions in CLIP text, cohort EEG ridge readouts, and class-mean features from one classifier checkpoint. \textbf{(b)} Adding V-axis supervision lowers FACED balanced accuracy under a strong recipe. \textbf{(c)} SatEnsemble combines improved training with checkpoint probability averaging.}
 \label{fig:overview}
 \end{figure}
 
-Auxiliary losses that pull a network's features toward a known concept
-direction are a standard way to inject prior knowledge. We report a
-regime in which they systematically backfire. Take an EEG emotion
-classifier that has already converged, and add a loss aligning its
-features with a valence direction: across twenty-five such recipes on
-FACED~\citep{chen2023faced}, none improve balanced accuracy (BACC) and
-ten significantly reduce it (global Holm; sixteen uncorrected). The same loss that is within noise of zero on a
-weak backbone significantly hurts a converged one. We call this the \emph{saturation regularity}: once task
-labels alone have driven the network onto the target concept, further
-supervision can only deform an already-converged representation, without
-improving generalization. The finding cuts two ways: it explains the concept-alignment failures we report, and---by locating the recoverable gain in the seed-specific residual supervision cannot reach---it yields a new state of the art by ensembling rather than supervising (\Cref{fig:overview}).
+Concept-aligned supervision seeks to improve learning by shaping representations around task-relevant knowledge~\citep{koh2020concept}. For EEG learning, it offers a way to connect neural signals to interpretable attributes of the task. Valence and arousal, for example, have been used to guide EEG emotion representations~\citep{chen2025emod}. Yet the value of such supervision depends on what the receiving model already represents. A concept can be meaningful and readily decodable while offering little additional value as a training target. This makes the choice of auxiliary supervision a practical design problem. An objective can change a representation as intended without improving the prediction it is meant to support. We therefore ask: \emph{when does stronger concept alignment cease to improve prediction, and what information should learning exploit next?}
 
-To make ``the concept the network has saturated on'' concrete, we extract it. Pass nine emotion-evocative stories (each
-expanded to paraphrases) through a language model, mean-pool the
-final-layer hidden states class by class, and take the first principal component; the resulting
-\emph{valence axis} (V-axis) predicts movie-review sentiment at AUC
-$0.832$ zero-shot, tracks the cohort-averaged EEG response of $123$
-subjects at the emotion-category level ($r{=}0.80$), and---in its
-CLIP-text form---is encoded, without supervision, by all ten
-same-architecture EEG checkpoints we tested.
-Recent work shows that neural networks encode human-interpretable
-concept directions in their internal
-features~\citep{kim2018tcav,arditi2024refusal}. We use the V-axis as a
-\emph{probe} of what brain-decoding networks encode, not as a training
-signal---which, as the saturation regularity shows, a converged network
-cannot benefit from.
+For EEG emotion recognition, we study valence---the positive--negative dimension of emotion---on the nine-class FACED benchmark~\citep{chen2023faced}. We construct language-derived directions, or \emph{V-axis probes}, from representations of emotion descriptions. The story-based probe predicts sentiment on SST-2~\citep{socher2013recursive} without task-specific training (\Cref{tab:cross-modal}). Both story-based and CLIP-text~\citep{radford2021clip} variants correspond to cohort-averaged EEG responses (\S\ref{sec:vaxis-brain}). A 14-model sweep recovers valence structure across several model families (Appendix~\ref{app:per-llm-deep-dive}). Rephrasing yields similar projections, supporting robustness to wording changes (Appendix~\ref{app:vaxis-protocol}). Paraphrase averaging improves sentiment transfer over a single description in the lead model (\Cref{tab:nshot-curve}). Within trained EEG classifiers, valence is already encoded in class-mean features (\S\ref{sec:convergence}). \Cref{fig:overview}a compares standardized emotion-class positions in CLIP text, cohort EEG ridge readouts, and one classifier checkpoint. These results establish a task-relevant, already represented concept for testing whether further supervision improves prediction.
 
-\textbf{A nine-story axis.} The nine stories are one per
-FACED~\citep{chen2023faced} class; the language model is Qwen3-4B,
-chosen as the lead because it sits at the centre of the alignment
-manifold in our $14$-LLM sweep, with the highest per-stimulus
-alignment to a behavioural valence reference (the recipe itself is
-model-agnostic, see Appendix~\ref{app:per-llm-deep-dive}). The SST-2
-benchmark grounds the AUC $0.832$ headline: with zero task labels the
-V-axis projection matches a supervised logistic regression on the same
-features trained on ${\approx}50$ labels ($0.821$ at $N{=}50$; a
-$5$k-label same-feature classifier reaches
-$0.924$)~\citep{socher2013recursive}. And the
-direction is not idiosyncratic to any one model: across the
-$14$ language models from $560$M to $32$B parameters, the V-axis is
-recovered across families, and within Qwen3 is essentially
-scale-invariant (off-diagonal $r{=}{+}0.995$ over $15$ size-pairs).
+We then test whether explicitly reinforcing an already represented concept improves prediction. We evaluate 25 auxiliary-supervision recipes on a standard EMOD~\citep{chen2025emod} receiving baseline, spanning distillation, representation matching, contrastive objectives, and topographic constraints. None yields a statistically significant improvement. Ten significantly reduce accuracy after global Holm correction (\Cref{tab:full-vaxis}). Follow-up interventions on a stronger recipe increase concept alignment (\S\ref{sec:saturation}), yet reduce predictive accuracy (\Cref{fig:overview}b). These experiments establish the \emph{Saturation Regularity} in EEG learning: additional concept supervision can strengthen alignment without detectable predictive gains, and can even reduce accuracy.
 
-\textbf{A valence ordering, consistent with the axis, in cohort EEG.}
-A ridge regression on $160$
-channel--band features (32 EEG channels $\times$ 5 frequency bands,
-differential-entropy) of the FACED cohort EEG predicts the V-axis position of
-each of the $28$ stimuli (video clips spanning the $9$ emotion classes); the regressor uses leave-one-stimulus-out
-cross-validation, no per-subject fitting, no auxiliary supervision.
-The Qwen3-4B V-axis reaches $r{=}0.80$ on this
-ridge and a CLIP-text emotion axis $r{=}0.87$, both at emotion-category
-resolution (nested-permutation $p<2{\times}10^{-4}$); a CLIP-text axis over
-the $28$ per-clip descriptions reaches $r{=}0.71$.
-The third claim --- that converged EEG classifiers encode the V-axis
-without ever being trained on it --- is quantified on the ten
-same-architecture SOTA-pool checkpoints trained on the $9$ emotion
-labels alone: each encodes the CLIP-text V-axis in its class-mean
-subspace ($|r|\in[0.60,0.77]$; the nine-story Qwen3 axis more weakly and
-per-checkpoint non-significantly, \S\ref{sec:convergence}).
+We next examine how this pattern depends on training conditions and whether auxiliary gains require meaningful targets. Valence and arousal objectives with no detectable effect under a weaker FACED recipe reduce accuracy under the stronger recipe (\Cref{fig:saturation-transition}b). Complementary experiments on CIFAR-10~\citep{krizhevsky2009cifar} compare training stages within one architecture. Early auxiliary gains are no longer statistically detectable at convergence, and aligned targets never significantly outperform random targets at any tested stage (\Cref{fig:saturation-transition}a). An intervention on SEED-V~\citep{liu2022seedv} provides a second EEG comparison, with only a small change under the tested recipe (Appendix~\ref{app:seedv-full}). These experiments characterize the dependence on training conditions, while the random-target controls separate auxiliary-objective gains from evidence for the value of target semantics.
 
-\textbf{Yet supervision fails.} The natural way to use such an
-alignment is an auxiliary loss pulling the EEG network's penultimate
-features toward the V-axis. Across $25$ such recipes---knowledge
-distillation~\citep{hinton2015distilling}, representational
-similarity~\citep{kriegeskorte2008rsa},
-contrastive~\citep{khosla2020supcon,vandenoord2018cpc},
-parameter-efficient fine-tuning (PEFT) adapters~\citep{hu2022lora}, and topographic
-losses---none help: ten produce significant decrements (global Holm; sixteen uncorrected), five families showing \emph{monotonic destruction}
-(Figure~\ref{fig:saturation-transition}). The effect depends on
-backbone strength (no measurable effect on the weak $d{=}3$ backbone, a
-significant negative on the converged $d{=}6$ SOTA backbone; a significant
-backbone$\times$loss interaction, $p{=}0.001$; on FACED depth and recipe
-covary with convergence, isolated by the CIFAR-10 epoch sweep). This is
-\emph{saturation}: distinct from overfitting, it is what happens once
-task labels alone---without concept or valence guidance---have driven the network onto the target direction,
-so added supervision moves the class-mean component further along the
-axis ($\Delta|r|$ up to ${+}0.36$) while test accuracy falls and
-training accuracy stays at ceiling.
+The saturation results leave open what predictive information remains beyond class-mean concept alignment. Across the analyzed checkpoints, class-mean valence encoding has similar strength, motivating a closer examination of within-class variation. We introduce \emph{ResDiag}, a residual diagnostic framework for analyzing predictive information beyond class-mean alignment. ResDiag separates shared class structure from within-class variation. To test the predictive role of concept-related residuals, we use directional ablation~\citep{arditi2024refusal} while preserving the class-mean subspace. Accuracy decreases in eight of ten checkpoints (\S\ref{sec:convergence}). To examine the link to model complementarity, we measure leave-one-out ensemble contribution as the performance change upon removing each checkpoint. Residual encoding correlates with this contribution ($r=0.74$), with uncertainty assessed by seed-clustered bootstrap (Appendix~\ref{app:convergence-deep-dive}). Together, these analyses identify useful information beyond class means and motivate combining complementary predictions.
 
-\textbf{Where the gain lives.} The same diagnosis locates the
-recoverable gain in the within-class residual that supervision cannot
-reach: the class-mean subspace (the ``basin'') is shared across seeds,
-while the residual is seed-specific and load-bearing. Ensembling across seeds averages
-out residual noise without disturbing the basin---per-checkpoint
-residual encoding predicts leave-one-out contribution at $r{=}{+}0.74$,
-and a $10$-checkpoint ensemble reaches FACED-9 SOTA at
-$\mathbf{0.6948}$ (val-selected single $\mathbf{0.6755}$), a $+10.5\%$
-improvement over EMOD~\citep{chen2025emod}. Replacing the
-language-derived KD prototypes with random orthonormal vectors leaves
-BACC statistically equivalent (TOST $p{=}0.001$, $n{=}20$; $\Delta{=}{-}0.001$): the gain is the \emph{shape} of the loss, not the
-\emph{content} of the prototypes, so the V-axis is a probe of what the
-network saturated on, not the supervised signal.
+Motivated by the supervision controls and residual analyses, we develop \emph{SatEnsemble}, a saturation-informed ensemble learning framework. Augmentation, prototype regularization, and increased depth strengthen individual models. Uniform averaging of checkpoint softmax probabilities combines their complementary outputs (\Cref{fig:overview}c; \S\ref{sec:sota}).
 
-\paragraph{Contributions.} \textbf{(1)} The \emph{saturation
-regularity}: concept-aligned auxiliary supervision cannot improve a
-\emph{converged} classifier and tends to hurt it---established across
-$25$ recipes on FACED-9, for both valence and arousal, and reproduced
-on a CIFAR-10 classifier, with a benefit present only while the backbone
-is still weak (\S\ref{sec:saturation}); it is consistent on a second EEG
-dataset, SEED-V, where auxiliary supervision likewise yields no gain
-(\citealp{liu2022seedv}; Appendix~\ref{app:seedv-full}).
-\textbf{(2)} A bias--variance seed ensemble that turns this mechanism
-into a positive prescription and a new FACED-9 state of the art
-(\S\ref{sec:convergence},~\S\ref{sec:sota}).
-\textbf{(3)} A nine-story \emph{V-axis probe}: a one-dimensional valence
-direction extracted from nine language-model emotion stories, validated
-as a genuine semantic axis (text sentiment zero-shot, cohort-EEG
-prediction, and encoding by converged EEG classifiers) and used to
-diagnose what the network has saturated on
-(\S\ref{sec:vaxis-llms}--\S\ref{sec:vaxis-brain}).
+SatEnsemble achieves state-of-the-art EEG emotion recognition on FACED. The ten-checkpoint ensemble reaches 69.48\% balanced accuracy, outperforming both published EMOD~\citep{chen2025emod} and our five-seed EMOD ensemble baseline. The improved training recipe also yields 67.55\% with a validation-selected single model (\Cref{tab:sota}). Recipe ablations support gains from both improved training and prediction averaging (\S\ref{sec:sota}). Replacing language-derived prototypes with random orthonormal targets preserves performance within the tested equivalence margin (\Cref{tab:sota}). This control shows that prototype regularization can benefit prediction without relying on target semantics. These results establish a practical strategy for improving EEG prediction when further alignment of an already represented concept no longer helps.
 
-\paragraph{Scope.} Four boundaries scope the
-result. \textbf{(i)}~The V-axis is not privileged: a generic valence
-axis probes comparably (\S\ref{sec:vaxis-llms}), and inside the
-ensemble the language-derived KD prototypes are statistically equivalent
-to random orthonormal vectors (TOST $\varepsilon{=}0.01$, $p{=}0.001$,
-$n{=}20$; $\Delta{=}{-}0.001$ BACC, paired $p{=}0.72$).
-\textbf{(ii)}~We do not claim single-trial or within-subject decoding:
-the brain correlation is on the EEG response averaged across $123$
-subjects, and the within-subject cohort-transfer correlation is near
-zero ($r{=}0.03$; single-subject decoding is a separate result, \S\ref{sec:vaxis-brain}).
-\textbf{(iii)}~Alignment is not universally harmful---on a weak backbone
-the same loss is within seed noise ($+0.007$ BACC, $p{=}0.41$) and on a
-still-converging CIFAR-10 classifier it helps; saturation is specific to
-the \emph{converged} regime. \textbf{(iv)}~We do not present saturation
-as a proven theorem for all architectures and datasets: we establish it
-empirically on FACED-9 and find it consistent on SEED-V. Limitations are
-collected in \S\ref{sec:discussion}.
+To conclude, our contributions are:
+\begin{itemize}
+\item We identify the \emph{Saturation Regularity} in EEG learning: stronger concept alignment does not necessarily translate into better prediction. Systematic experiments characterize its dependence on training conditions and distinguish the effects of auxiliary supervision from those of target semantics.
+\item We introduce \emph{ResDiag}, a residual diagnostic framework for analyzing predictive information beyond class-mean alignment. Ablations show that within-class residuals support prediction, while ensemble analyses link encoding strength to ensemble contribution.
+\item We develop \emph{SatEnsemble}, a saturation-informed ensemble learning framework combining improved training with prediction averaging. It achieves state-of-the-art performance on FACED, with ablations supporting the value of both components.
+\end{itemize}
