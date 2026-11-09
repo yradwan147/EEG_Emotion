@@ -46,7 +46,7 @@ zero produce gains. Five families show \emph{monotonic destruction}:
 the harder we push the auxiliary loss, the worse accuracy gets, with
 no positive setpoint. Even the anger-weighted target that
 analytically maximises the V-axis ceiling on FACED is among the worst
-($\Delta\mathrm{BACC} = -0.054$): supplying the strongest possible
+($\Delta\mathrm{BACC} = \rev{-0.053}$): supplying the strongest possible
 target makes things strictly worse.
 
 \paragraph{The transition is sharp and unidirectional in baseline
@@ -54,10 +54,10 @@ strength.} An intervention whose effect lies within seed noise on the
 weak $d{=}3$ backbone becomes a statistically significant
 negative on the converged $d{=}6$ SOTA recipe; the
 weak-vs-converged difference is a significant backbone$\times$loss
-interaction (Welch $p{=}0.001$). Across the screened $d{=}6$ backbones the
+interaction (Welch $p{=}\rev{0.007}$\rev{, with a seed-matched weak baseline}). Across the screened $d{=}6$ backbones the
 harm grows with baseline strength (we make no claim about universal cut-offs).
 
-\paragraph{The regularity generalises beyond valence and beyond EEG.}
+\paragraph{The regularity generalises beyond valence\rev{; a training-stage analogue appears outside EEG}.}
 An \emph{arousal} target (the validated CLIP--OASIS image arousal axis,
 \emph{not} the failing text axis of Table~\ref{tab:arousal-asymmetry})
 hurts the converged backbone just as much (topographic
@@ -68,7 +68,7 @@ weak $d{=}3$ baseline---two concept axes, one saturation
 transition also reproduces outside EEG: on CIFAR-10~\citep{krizhevsky2009cifar} an auxiliary head
 significantly \emph{improves} an undertrained backbone (Holm
 $p\in[0.006,0.016]$) and the benefit vanishes at convergence
-($p{>}0.37$; Figure~\ref{fig:saturation-transition}a).
+($p{>}0.37$; Figure~\ref{fig:saturation-transition}a\rev{; setup in Appendix~\ref{app:cifar-details}}).
 Across $20$ further non-EEG branches (text, vision, audio) an aligned
 target never significantly beats a random one ($0/20$): what a
 converged network rejects, and a weak one accepts, is the loss's
@@ -77,7 +77,7 @@ converged network rejects, and a weak one accepts, is the loss's
 \emph{form} of injection too: the same direction as frozen-feature
 alignment, as LLM-aligned initialization, or as a cross-subject anchor
 all leave the converged encoder unimproved
-(Appendix~\ref{app:saturation-beyond}).
+(Appendix~\ref{app:saturation-beyond}). \rev{On non-emotion EEG (PhysioNet motor imagery), class-name targets neither help nor hurt relative to random ones (Appendix~\ref{app:physionet}).}
 
 \begin{quote}
 \textbf{Saturation (empirical regularity; FACED-9, EMOD backbone).}
@@ -91,6 +91,18 @@ absolute correlation $|r|$ between the class-mean features and the
 V-axis---saturates across seeds (\S\ref{sec:convergence}). This is an
 empirical regularity over the recipes tested, not a proved theorem.}
 \end{quote}
+
+\begin{revblock}
+\paragraph{Operational criterion.} For a model $M$, target $t$ and a
+same-shape content-free control $\tilde t$ (matched seeds), let
+$G_{\mathrm{sem}}{=}\mathrm{Acc}(M{+}\mathrm{aux}[t]){-}\mathrm{Acc}(M{+}\mathrm{aux}[\tilde t])$
+and $G_{\mathrm{aux}}{=}\mathrm{Acc}(M{+}\mathrm{aux}[t]){-}\mathrm{Acc}(M)$. $M$ is
+\emph{saturated w.r.t.\ $t$} when $G_{\mathrm{sem}}$ is equivalent to zero or negative
+(TOST, pre-set margin), and harmfully so when $G_{\mathrm{aux}}$ is also significantly
+negative. $G_{\mathrm{sem}}$ is never significantly positive on CIFAR-10, FACED
+prototypes pass TOST ($p{=}0.001$, $n{=}20$; \S\ref{sec:sota}), and $G_{\mathrm{aux}}{<}0$
+for FACED valence/arousal on the converged recipe (no random arm run there).
+\end{revblock}
 
 \paragraph{Saturation is not overfitting.} Overfitting is memorisation
 of the training set; saturation is how task and auxiliary supervision
@@ -106,9 +118,8 @@ the network has already converged onto from task labels alone, rather
 than supplying new discriminative signal. What actually carries
 generalization is the \emph{within-class residual}---the directions
 that distinguish one trial of an emotion from another---which is
-seed-specific and load-bearing: its per-checkpoint encoding strength
-predicts leave-one-out ensemble contribution at $r{=}{+}0.74$
-(\S\ref{sec:sota}). Pushing the already-saturated class-mean basin
+seed-specific and load-bearing: \rev{removing it by inference-time ablation
+consistently costs accuracy (\S\ref{sec:convergence})}. Pushing the already-saturated class-mean basin
 along a fixed target does not improve how the
 network uses this residual.
 The $25$ recipes reduce to one principle: \emph{a saturated

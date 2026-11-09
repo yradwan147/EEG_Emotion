@@ -21,8 +21,10 @@ Method & BACC \\
 CBraMod \citep{wang2025cbramod}    & $0.551$  \\
 EMOD \citep{chen2025emod}          & $0.6287$ \\
 EMOD ensemble ($5$-seed)           & $0.655$  \\
+\rev{EMOD ensemble ($10$-seed)}       & \rev{$0.662$}  \\
 \midrule
-EMOD$+$aug$+$KD$+d{=}6$ (5-seed)   & $.658\!\pm\!.010$ \\
+\rev{Ours, single model (5-seed mean)} & $.658\!\pm\!.010$ \\
+\rev{Ours, $10$-seed $e{=}150$ ensemble} & \rev{$0.694$} \\
 \textbf{Best single (val-sel)}     & $\mathbf{0.6755}$ \\
 \textbf{10-ckpt ensemble (SOTA)}   & $\mathbf{0.6948}$ \\
 \bottomrule
@@ -55,7 +57,7 @@ above the $5{\times}e150$ ensemble ($+.003$, n.s.).}
 \caption{New FACED 9-class SOTA. The \texttt{rand9} ablation replaces
 LLM-derived KD prototypes with random orthonormal 9-D directions and
 leaves BACC statistically equivalent (TOST $\varepsilon{=}0.01$,
-$p{=}0.001$, $n{=}20$; $\Delta{=}{-}0.001$, paired $p{=}0.72$) --- KD
+$p{=}0.001$, $n{=}20$; $\Delta{=}{-}0.001$, paired $p{=}0.72$\rev{; run in a recipe variant with an additional weak valence-axis term, $\lambda{=}0.05$, in both arms}) --- KD
 provides architectural regularisation without semantic content. Visual
 cascade in Appendix~\ref{app:ensemble-extras}.}
 \label{tab:sota}
@@ -79,15 +81,15 @@ vs $5{\times}e100{=}0.6798$; $+0.012$, bootstrap $95\%$ CI $[0.001,0.023]$).
 \paragraph{Why the ensemble works.}
 Ensembling reduces seed-specific variance without moving the shared
 class means (bias--variance); the residual it averages is load-bearing
-(ablation $z{\approx}7.7$, \S\ref{sec:convergence}) and its
-per-checkpoint encoding predicts leave-one-out contribution ($r{=}0.74$,
-$n{=}10$). The gain is variance reduction, not training-length
+(\rev{ablation lowers accuracy on $20/20$ independent checkpoints}, \S\ref{sec:convergence}). The gain is variance reduction, not training-length
 diversity: the ten-checkpoint pool ($0.6948$) is not above the five
 $e{=}150$ checkpoints alone ($0.6919$; $+0.003$, $95\%$ CI
 $[-0.004,+0.010]$). The improvement is the recipe, not the ensembling
 trick: the EMOD baseline itself gains a matching ${\approx}3$ pt from
 $5$-seed ensembling ($0.624{\to}0.655$) yet stays $+0.039$ ($+6.0\%$)
 below our ensemble, and single-model---before any ensembling---the recipe
-already leads $+7.4\%$.
+already leads $+7.4\%$. \rev{At matched size, ten SatEnsemble checkpoints beat ten EMOD checkpoints by
+$+0.032$ ($95\%$ CI $[0.018, 0.046]$; all $2{,}000$ random $10$-subsets of our $20$
+checkpoints do), and accuracy plateaus near $k{=}10$--$15$ (Appendix~\ref{app:pool-curves}).}
 Headroom-monotonicity, the $10$-checkpoint plateau, and the failure of
 cross-architecture mixing are in Appendix~\ref{app:ensemble-extras}.

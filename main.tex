@@ -32,9 +32,13 @@
 
 \graphicspath{{figures/}}
 
+% === Rebuttal revision (Nov 2026): revised text is shown in blue. ===
+\newcommand{\rev}[1]{{\color{blue}#1}}
+\newenvironment{revblock}{\color{blue}}{}
+
 % === Cross-referencing ===
 \usepackage[capitalize,noabbrev]{cleveref}
-\title{The Saturation Regularity: Rethinking Concept-Aligned Supervision in EEG Learning}
+\title{The Saturation Regularity: Rethinking Concept-Aligned Supervision in EEG Emotion Recognition}
 % The Saturation Regularity: When Concept-Aligned Supervision Stops Helping Converged EEG Classifiers}
 
 \author{Anonymous Authors}
@@ -42,6 +46,7 @@
 \begin{document}
 
 \maketitle
+\suppressfloats[t] % keep Figure 1 off the title page (revision: redesigned figure is shorter)
 
 \input{sections/00_abstract}
 \input{sections/01_introduction}
